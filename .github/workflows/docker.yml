@@ -1,8 +1,10 @@
-name: ci
+name: Create docker image
 
 on:
   push:
-    branches: master
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   multi:
