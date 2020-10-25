@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CovidMassTesting</name>
+    </assembly>
+    <members>
+        <member name="M:CovidMassTesting.Controllers.AdminController.CheckSlots(System.String,System.Int32,System.Int32)">
+            <summary>
+            Shows available days per place
+            </summary>
+            <param name="testingDay"></param>
+            <param name="from">Hour from when testing place is open</param>
+            <param name="until">Hour until when testing place is open. 20 means that 20:05 is closed</param>
+            <returns>Number of new slots</returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String)">
+            <summary>
+            Shows available days per place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Helpers.Aes">
+            <summary>
+            https://gist.github.com/magicsih/be06c2f60288b54d9f52856feb96ce8c
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.Dispose">
+            <summary>
+            For IDisposable
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.Dispose(System.Boolean)">
+            <summary>
+            Protected implementation of Dispose pattern.
+            </summary>
+            <param name="disposing"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
+            <summary>
+            Checks if all slots for the day, and testing place has been created
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
