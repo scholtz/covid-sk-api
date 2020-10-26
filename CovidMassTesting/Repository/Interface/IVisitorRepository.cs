@@ -9,5 +9,7 @@ namespace CovidMassTesting.Repository.Interface
     public interface IVisitorRepository
     {
         public Task<Visitor> Add(Visitor visitor);
+        public Task<Result> GetTest(int code, string pass);
+        public Task<bool> UpdateTestingState(int code, string state);
     }
 }

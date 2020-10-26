@@ -18,5 +18,6 @@ namespace CovidMassTesting.Model
         public string Phone { get; set; }
         public long ChosenSlot { get; set; }
         public string ChosenPlaceId { get; set; }
+        public string Result { get; set; } = "test-not-taken";
     }
 }

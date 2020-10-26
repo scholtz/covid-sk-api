@@ -22,16 +22,14 @@ namespace CovidMassTesting.Repository.MockRepository
         {
 
         }
-        public override async Task<Visitor> Add(Visitor visitor)
+        public override async Task<Visitor> Set(Visitor visitor)
         {
-            if (visitor is null)
-            {
-                throw new ArgumentNullException(nameof(visitor));
-            }
-            visitor.Id = await CreateNewVisitorId();
-
             data[visitor.Id] = visitor;
             return visitor;
+        }
+        public override async Task<Visitor> Get(int code)
+        {
+            return data[code];
         }
         public override async Task<IEnumerable<string>> ListAllKeys()
         {
