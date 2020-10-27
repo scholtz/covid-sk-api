@@ -1,4 +1,6 @@
-﻿using CovidMassTesting.Model;
+﻿using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Model;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
@@ -11,20 +13,17 @@ namespace CovidMassTesting.Repository.MockRepository
 {
     public class UserRepository : Repository.RedisRepository.UserRepository
     {
-        private ConcurrentDictionary<string, User> data = new ConcurrentDictionary<string, User>();
+        private readonly ConcurrentDictionary<string, User> data = new ConcurrentDictionary<string, User>();
 
         public UserRepository(
+            IConfiguration configuration,
             ILoggerFactory loggerFactory,
-            IRedisCacheClient redisCacheClient
-            ) : base(loggerFactory.CreateLogger<Repository.RedisRepository.UserRepository>(), redisCacheClient)
+            IRedisCacheClient redisCacheClient,
+            IEmailSender emailSender
+            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.UserRepository>(), redisCacheClient, emailSender)
         {
-            Add(new User()
-            {
-                Email = "ludovit@scholtz.sk",
-                Name = "Ludovit Scholtz"
-            }).Wait();
         }
-        public override async Task<bool> Add(User user)
+        public override async Task<bool> Set(User user)
         {
             if (user is null)
             {
@@ -33,6 +32,11 @@ namespace CovidMassTesting.Repository.MockRepository
 
             data[user.Email] = user;
             return true;
+        }
+        public override async Task<User> Get(string email)
+        {
+            if (!data.ContainsKey(email)) return null;
+            return data[email];
         }
         public override async Task<IEnumerable<User>> ListAll()
         {

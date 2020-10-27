@@ -13,6 +13,15 @@
             <param name="until">Hour until when testing place is open. 20 means that 20:05 is closed</param>
             <returns>Number of new slots</returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.InviteUser(System.String,System.String,System.String[])">
+            <summary>
+            Administrator is allowed to invite other users and set their groups
+            </summary>
+            <param name="email"></param>
+            <param name="name"></param>
+            <param name="roles"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -86,6 +95,40 @@
             Shows available days per place
             </summary>
             <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.UserController">
+            <summary>
+            Controller that manages user requests
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="logger"></param>
+            <param name="userRepository"></param>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.List">
+            <summary>
+            List all public information of all users
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.Preauthenticate(System.String)">
+            <summary>
+            Preauthenticate. Cohash is important part of hash. This method returns cohash
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.Authenticate(System.String,System.String,System.String)">
+            <summary>
+            Returns JWT token
+            </summary>
+            <param name="email"></param>
+            <param name="hash"></param>
+            <param name="data"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Helpers.Aes">
@@ -189,10 +232,42 @@
             From email
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Visitor">
+            <summary>
+            Data stored in this object are encrypted
+            
+            Stores personal data, contact data as well as medical condition
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
             <summary>
             Checks if all slots for the day, and testing place has been created
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GenerateRandomPassword(Microsoft.AspNetCore.Identity.PasswordOptions)">
+            <summary>
+            Generates a Random Password
+            respecting the given strength requirements.
+            </summary>
+            <param name="opts">A valid PasswordOptions object
+            containing the password strength requirements.</param>
+            <returns>A random password</returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Preauthenticate(System.String)">
+            <summary>
+            Returns cohash
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Authenticate(System.String,System.String,System.String)">
+            <summary>
+            Returns JWT token
+            </summary>
+            <param name="email"></param>
+            <param name="hash"></param>
+            <param name="data"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Startup">
@@ -211,12 +286,13 @@
             This method gets called by the runtime. Use this method to add services to the container.
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             </summary>
             <param name="app"></param>
-            <param name="env"></param>        
+            <param name="env"></param>
+            <param name="userRepository"></param>        
         </member>
     </members>
 </doc>

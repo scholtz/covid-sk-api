@@ -10,6 +10,8 @@ namespace CovidMassTesting.Repository.Interface
     {
         public Task<bool> Add(User place);
         public Task<IEnumerable<User>> ListAll();
-
+        public Task CreateAdminUsersFromConfiguration();
+        public Task<string> Preauthenticate(string email);
+        public Task<string> Authenticate(string email, string hash, string data);
     }
 }

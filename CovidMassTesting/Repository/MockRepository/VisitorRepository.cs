@@ -36,6 +36,8 @@ namespace CovidMassTesting.Repository.MockRepository
         }
         public override async Task<Visitor> Get(int code)
         {
+            if (!data.ContainsKey(code)) return null;
+
             return data[code];
         }
         public override async Task<IEnumerable<string>> ListAllKeys()

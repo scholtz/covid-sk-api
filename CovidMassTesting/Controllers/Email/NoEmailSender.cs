@@ -17,6 +17,7 @@ namespace CovidMassTesting.Controllers.Email
         /// <returns></returns>
         public async Task<bool> SendEmail(string toEmail, string toName, IEmail data)
         {
+            System.Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(data));
             await Task.Delay(1);
             return true;
         }

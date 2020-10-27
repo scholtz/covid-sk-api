@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class AdminController : ControllerBase
@@ -18,15 +20,18 @@ namespace CovidMassTesting.Controllers
         private readonly ILogger<AdminController> logger;
         private readonly ISlotRepository slotRepository;
         private readonly IPlaceRepository placeRepository;
+        private readonly IUserRepository userRepository;
         public AdminController(
             ILogger<AdminController> logger,
             ISlotRepository slotRepository,
-            IPlaceRepository placeRepository
+            IPlaceRepository placeRepository,
+            IUserRepository userRepository
             )
         {
             this.logger = logger;
             this.slotRepository = slotRepository;
             this.placeRepository = placeRepository;
+            this.userRepository = userRepository;
         }
         /// <summary>
         /// Shows available days per place
@@ -55,28 +60,26 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message + (exc.InnerException != null ? $";\n{exc.InnerException.Message}" : "") + "\n" + exc.StackTrace, Title = exc.Message, Type = exc.GetType().ToString() });
             }
         }
-        [HttpGet("ListHourSlotsByPlaceAndDaySlotId")]
+        /// <summary>
+        /// Administrator is allowed to invite other users and set their groups
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        [HttpGet("InviteUser")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, UserPublic>>> ListHourSlotsByPlaceAndDaySlotId([FromQuery] string placeId, [FromQuery] long daySlotId)
+        public async Task<ActionResult<bool>> InviteUser([FromForm] string email, [FromForm] string name, [FromForm] string[] roles)
         {
             try
             {
-                return Ok((await slotRepository.ListHourSlotsByPlaceAndDaySlotId(placeId, daySlotId)).ToDictionary(p => p.Time.Ticks, p => p));
-            }
-            catch (Exception exc)
-            {
-                return BadRequest(new ProblemDetails() { Detail = exc.Message + (exc.InnerException != null ? $";\n{exc.InnerException.Message}" : "") + "\n" + exc.StackTrace, Title = exc.Message, Type = exc.GetType().ToString() });
-            }
-        }
-        [HttpGet("ListMinuteSlotsByPlaceAndHourSlotId")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, UserPublic>>> ListMinuteSlotsByPlaceAndHourSlotId([FromQuery] string placeId, [FromQuery] long hourSlotId)
-        {
-            try
-            {
-                return Ok((await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(placeId, hourSlotId)).ToDictionary(p => p.Time.Ticks, p => p));
+                return Ok(await userRepository.Add(new Model.User()
+                {
+                    Email = email,
+                    Name = name,
+                    Roles = roles
+                }));
             }
             catch (Exception exc)
             {

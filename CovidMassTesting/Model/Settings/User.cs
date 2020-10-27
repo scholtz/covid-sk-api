@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CovidMassTesting.Model
+namespace CovidMassTesting.Model.Settings
 {
-    public class UserPublic
+    public class User
     {
-        public string Email { get; set; }
         public string Name { get; set; }
-        public string[] Roles { get; set; }
+        public string Email { get; set; }
     }
 }

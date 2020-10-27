@@ -9,6 +9,7 @@ namespace CovidMassTesting.Model
     {
         public string Email { get; set; }
         public string Name { get; set; }
+        public string[] Roles { get; set; }
         public string PswHash { get; set; }
         public string CoHash { get; set; }
 
@@ -17,7 +18,8 @@ namespace CovidMassTesting.Model
             return new UserPublic()
             {
                 Email = Email,
-                Name = Name
+                Name = Name,
+                Roles = Roles
             };
         }
     }

@@ -52,6 +52,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"Visitor loaded from database: {code.GetHashCode()}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>(REDIS_KEY_VISITORS_OBJECTS, code.ToString());
+            if (string.IsNullOrEmpty(encoded)) return null;
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);

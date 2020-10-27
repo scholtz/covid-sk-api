@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -14,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Newtonsoft;
@@ -67,6 +71,33 @@ namespace CovidMassTesting
                 c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"doc/documentation.xml"));
             });
 
+
+            services.AddAuthorization(options =>
+            {
+                options.DefaultPolicy = new AuthorizationPolicyBuilder(
+                    JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build();
+            });
+
+            var key = Encoding.ASCII.GetBytes(Configuration["JWTTokenSecret"]);
+
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+              .AddJwtBearer(x =>
+              {
+                  x.RequireHttpsMetadata = false;
+                  x.SaveToken = true;
+                  x.TokenValidationParameters = new TokenValidationParameters
+                  {
+                      ValidateIssuerSigningKey = true,
+                      IssuerSigningKey = new SymmetricSecurityKey(key),
+                      ValidateIssuer = false,
+                      ValidateAudience = false
+                  };
+              });
+
             // Add CORS policy
             var corsConfig = Configuration.GetSection("Cors").AsEnumerable().Select(k => k.Value).Where(k => !string.IsNullOrEmpty(k)).ToArray();
 
@@ -87,6 +118,7 @@ namespace CovidMassTesting
             try
             {
                 Configuration.GetSection("Redis")?.Bind(redisConfiguration);
+
             }
             catch (Exception exc)
             {
@@ -129,9 +161,25 @@ namespace CovidMassTesting
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         /// <param name="app"></param>
-        /// <param name="env"></param>        
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        /// <param name="env"></param>
+        /// <param name="userRepository"></param>        
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, IUserRepository userRepository)
         {
+            if (app is null)
+            {
+                throw new ArgumentNullException(nameof(app));
+            }
+
+            if (env is null)
+            {
+                throw new ArgumentNullException(nameof(env));
+            }
+
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -155,6 +203,8 @@ namespace CovidMassTesting
             {
                 endpoints.MapControllers();
             });
+
+            userRepository.CreateAdminUsersFromConfiguration().Wait();
 
             GC.Collect();
             try
