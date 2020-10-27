@@ -1,4 +1,5 @@
-﻿using CovidMassTesting.Model;
+﻿using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
@@ -12,18 +13,24 @@ namespace CovidMassTesting.Repository.MockRepository
 {
     public class VisitorRepository : Repository.RedisRepository.VisitorRepository
     {
-        private ConcurrentDictionary<int, Visitor> data = new ConcurrentDictionary<int, Visitor>();
+        private readonly ConcurrentDictionary<int, Visitor> data = new ConcurrentDictionary<int, Visitor>();
 
         public VisitorRepository(
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
-            IRedisCacheClient redisCacheClient
-            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.VisitorRepository>(), redisCacheClient)
+            IRedisCacheClient redisCacheClient,
+            IEmailSender emailSender
+            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.VisitorRepository>(), redisCacheClient, emailSender)
         {
 
         }
         public override async Task<Visitor> Set(Visitor visitor)
         {
+            if (visitor is null)
+            {
+                throw new ArgumentNullException(nameof(visitor));
+            }
+
             data[visitor.Id] = visitor;
             return visitor;
         }

@@ -52,7 +52,7 @@ namespace CovidMassTesting.Controllers
             }
             catch (Exception exc)
             {
-                return BadRequest(new ProblemDetails() { Detail = exc.Message});
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
 

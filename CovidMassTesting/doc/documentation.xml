@@ -13,6 +13,74 @@
             <param name="until">Hour until when testing place is open. 20 means that 20:05 is closed</param>
             <returns>Number of new slots</returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
+            <summary>
+            Interface for email client
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.IEmailSender.SendEmail(System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+            <summary>
+            Send email
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.Email.NoEmailSender">
+            <summary>
+            If no email sender is defined
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.NoEmailSender.SendEmail(System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+            <summary>
+            Act as email was sent
+            </summary>
+            <param name="toEmail"></param>
+            <param name="toName"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.Email.SendGridController">
+            <summary>
+            Sendgrid email sender
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.Email.SendGridController},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.SendEmail(System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+            <summary>
+            Semd email
+            </summary>
+            <param name="toEmail"></param>
+            <param name="toName"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.Email.SendgridTemplate">
+            <summary>
+            Sendgrid Email templating : https://sendgrid.com/docs/API_Reference/Web_API_v3/Transactional_Templates/templates.html
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Controllers.Email.SendgridTemplate.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Controllers.Email.SendgridTemplate.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.Email.SendgridTemplates">
+            <summary>
+            List of templates
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Controllers.Email.SendgridTemplates.Templates">
+            <summary>
+            templates
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String)">
             <summary>
             Shows available days per place
@@ -35,6 +103,91 @@
             Protected implementation of Dispose pattern.
             </summary>
             <param name="disposing"></param>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.IEmail">
+            <summary>
+            Email abstraction class
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.TemplateId">
+            <summary>
+            Identifier of the template
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.InvitationEmail">
+            <summary>
+            User with permissions to invite other people can invite them and 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.InvitationEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.RolesUpdatedEmail">
+            <summary>
+            User with permissions to invite other people can invite them and 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.RolesUpdatedEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail">
+            <summary>
+            Sends information to visitor that his test has been processed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail.Name">
+            <summary>
+            Visitor name
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.VisitorTestingResultEmail">
+            <summary>
+            Sends information to visitor that his test has been processed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorTestingResultEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorTestingResultEmail.Name">
+            <summary>
+            Visitor name
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Settings.SendGridConfiguration">
+            <summary>
+            configuration for mailing through sendgrid
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.MailerApiKey">
+            <summary>
+            API key
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.MailerFromName">
+            <summary>
+            From name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.MailerFromEmail">
+            <summary>
+            From email
+            </summary>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
             <summary>

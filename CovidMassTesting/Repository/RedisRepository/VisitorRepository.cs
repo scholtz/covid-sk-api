@@ -1,4 +1,5 @@
-﻿using CovidMassTesting.Helpers;
+﻿using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
@@ -18,16 +19,18 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly ILogger<VisitorRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
-
+        private readonly IEmailSender emailSender;
         public VisitorRepository(
             IConfiguration configuration,
             ILogger<VisitorRepository> logger,
-            IRedisCacheClient redisCacheClient
+            IRedisCacheClient redisCacheClient,
+            IEmailSender emailSender
             )
         {
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
             this.configuration = configuration;
+            this.emailSender = emailSender;
         }
         public async Task<Visitor> Add(Visitor visitor)
         {
@@ -36,6 +39,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(visitor));
             }
             visitor.Id = await CreateNewVisitorId();
+            var code = visitor.Id.ToString();
+            await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorRegistrationEmail()
+            {
+                Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                Name = $"{visitor.FirstName} {visitor.LastName}",
+                ///@TODO BAR CODE
+            });
             return await Set(visitor);
         }
         public virtual async Task<Visitor> Get(int code)
@@ -61,9 +71,34 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<bool> UpdateTestingState(int code, string state)
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
-            var item = await Get(code);
-            item.Result = state;
-            await Set(item);
+            var visitor = await Get(code);
+            visitor.Result = state;
+            await Set(visitor);
+
+            switch (state)
+            {
+                case "test-not-processed":
+                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingInProcessEmail()
+                    {
+                        Name = $"{visitor.FirstName} {visitor.LastName}",
+
+                    });
+                    break;
+                case "positive":
+                case "negative":
+                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingResultEmail()
+                    {
+                        Name = $"{visitor.FirstName} {visitor.LastName}",
+
+                    });
+                    break;
+                case "not-submitted":
+                case "submitting":
+                case "error":
+                case "test-not-taken":
+                default:
+                    break;
+            }
             return true;
         }
         public async Task<Result> GetTest(int code, string pass)

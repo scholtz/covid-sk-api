@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
-using CovidMassTesting.Repository.MockRepository;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -42,8 +42,6 @@ namespace CovidMassTesting
         {
             services.AddControllers().AddNewtonsoftJson();
 
-            var redisConfiguration = Configuration.GetSection("Redis").Get<RedisConfiguration>();
-            services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
 
             services.AddSwaggerGen(c =>
             {
@@ -85,12 +83,45 @@ namespace CovidMassTesting
                 });
             });
 
+            var redisConfiguration = new RedisConfiguration();
+            try
+            {
+                Configuration.GetSection("Redis")?.Bind(redisConfiguration);
+            }
+            catch (Exception exc)
+            {
+                Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
+            }
+            if (string.IsNullOrEmpty(redisConfiguration?.Hosts?.FirstOrDefault()?.Host))
+            {
+                services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
 
-            services.AddSingleton<IPlaceRepository, PlaceRepository>();
-            services.AddSingleton<ISlotRepository, SlotRepository>();
-            services.AddSingleton<IUserRepository, UserRepository>();
-            services.AddSingleton<IVisitorRepository, VisitorRepository>();
 
+                services.AddSingleton<IPlaceRepository, Repository.MockRepository.PlaceRepository>();
+                services.AddSingleton<ISlotRepository, Repository.MockRepository.SlotRepository>();
+                services.AddSingleton<IUserRepository, Repository.MockRepository.UserRepository>();
+                services.AddSingleton<IVisitorRepository, Repository.MockRepository.VisitorRepository>();
+            }
+            else
+            {
+                services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
+
+                services.AddSingleton<IPlaceRepository, Repository.RedisRepository.PlaceRepository>();
+                services.AddSingleton<ISlotRepository, Repository.RedisRepository.SlotRepository>();
+                services.AddSingleton<IUserRepository, Repository.RedisRepository.UserRepository>();
+                services.AddSingleton<IVisitorRepository, Repository.RedisRepository.VisitorRepository>();
+            }
+
+
+            var sendGridConfiguration = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
+            if (string.IsNullOrEmpty(sendGridConfiguration?.MailerApiKey))
+            {
+                services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
+            }
+            else
+            {
+                services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
+            }
 
         }
 

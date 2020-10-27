@@ -22,6 +22,7 @@
     </PackageReference>
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+    <PackageReference Include="SendGrid" Version="9.21.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.1.58" />
     <PackageReference Include="StackExchange.Redis.Extensions.AspNetCore" Version="6.3.5" />
     <PackageReference Include="StackExchange.Redis.Extensions.Core" Version="6.3.5" />
