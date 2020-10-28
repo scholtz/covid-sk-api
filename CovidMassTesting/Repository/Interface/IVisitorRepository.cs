@@ -12,5 +12,6 @@ namespace CovidMassTesting.Repository.Interface
         public Task<Result> GetTest(int code, string pass);
         public Task<bool> UpdateTestingState(int code, string state);
         public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear);
+        public Task<Visitor> GetVisitor(int codeInt);
     }
 }

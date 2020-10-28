@@ -27,6 +27,38 @@ namespace CovidMassTesting.Controllers
             this.visitorRepository = visitorRepository;
         }
         /// <summary>
+        /// Testing personell can load data by the code, so that they can verify that the code is the specific user
+        /// </summary>
+        /// <param name="visitorCode"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("GetVisitor")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Visitor>> GetVisitor([FromForm] string visitorCode)
+        {
+            try
+            {
+
+                if (string.IsNullOrEmpty(visitorCode))
+                {
+                    throw new ArgumentException($"'{nameof(visitorCode)}' cannot be null or empty", nameof(visitorCode));
+                }
+
+                var codeClear = visitorCode.Replace("-", "").Replace(" ", "").Trim();
+                var testCodeClear = visitorCode.Replace("-", "").Replace(" ", "").Trim();
+                if (int.TryParse(codeClear, out var codeInt))
+                {
+                    return Ok(await visitorRepository.GetVisitor(codeInt));
+                }
+                throw new Exception("Invalid visitor code");
+            }
+            catch (Exception exc)
+            {
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// This method is for triage person who scans the visitor bar code, scans the testing set bar code and performs test.
         /// </summary>
         /// <param name="visitorCode"></param>
@@ -53,7 +85,7 @@ namespace CovidMassTesting.Controllers
 
 
                 var codeClear = visitorCode.Replace("-", "").Replace(" ", "").Trim();
-                var testCodeClear = visitorCode.Replace("-", "").Replace(" ", "").Trim();
+                var testCodeClear = testCode.Replace("-", "").Replace(" ", "").Trim();
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.ConnectVisitorToTest(codeInt, testCodeClear));

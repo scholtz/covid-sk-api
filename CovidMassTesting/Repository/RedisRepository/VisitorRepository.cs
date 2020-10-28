@@ -77,6 +77,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
         }
+
         public virtual async Task<Visitor> Set(Visitor visitor)
         {
             if (visitor is null)
@@ -206,5 +207,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
         }
 
+        public Task<Visitor> GetVisitor(int codeInt)
+        {
+            return Get(codeInt);
+        }
     }
 }
