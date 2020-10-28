@@ -97,11 +97,16 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
-
+        /// <summary>
+        /// Public method to show test results to user
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
         [HttpPost("Get")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Result>> List([FromForm] string code, [FromForm] string pass)
+        public async Task<ActionResult<Result>> Get([FromForm] string code, [FromForm] string pass)
         {
 
             try
@@ -128,5 +133,35 @@ namespace CovidMassTesting.Controllers
             }
         }
 
+        /// <summary>
+        /// This method is for triage person who scans the visitor bar code, scans the testing set bar code and performs test.
+        /// </summary>
+        /// <param name="testCode"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("SetResult")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Result>> SetResult([FromForm] string testCode, [FromForm] string result)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(testCode))
+                {
+                    throw new ArgumentException($"'{nameof(testCode)}' cannot be null or empty", nameof(testCode));
+                }
+
+                if (string.IsNullOrEmpty(result))
+                {
+                    throw new ArgumentException($"'{nameof(result)}' cannot be null or empty", nameof(result));
+                }
+                return Ok(await visitorRepository.SetTestResult(testCode, result));
+            }
+            catch (Exception exc)
+            {
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }

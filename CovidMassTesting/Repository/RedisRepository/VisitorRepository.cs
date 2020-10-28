@@ -145,6 +145,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             switch (state)
             {
+                case "test-to-be-repeated":
+                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingToBeRepeatedEmail()
+                    {
+                        Name = $"{visitor.FirstName} {visitor.LastName}",
+                    });
+                    break;
                 case "test-not-processed":
                     await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingInProcessEmail()
                     {
@@ -210,6 +216,18 @@ namespace CovidMassTesting.Repository.RedisRepository
         public Task<Visitor> GetVisitor(int codeInt)
         {
             return Get(codeInt);
+        }
+
+        public async Task<Result> SetTestResult(string testCode, string result)
+        {
+            var visitorCode = await GETVisitorCodeFromTesting(testCode);
+            if (!visitorCode.HasValue) throw new Exception("Unable to find visitor code from test code. Are you sure test code is correct?");
+
+            await UpdateTestingState(visitorCode.Value, result);
+            return new Result()
+            {
+                State = result
+            };
         }
     }
 }

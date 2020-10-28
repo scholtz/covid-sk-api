@@ -31,7 +31,11 @@ namespace CovidMassTesting.Controllers
             this.slotRepository = slotRepository;
             this.placeRepository = placeRepository;
         }
-
+        /// <summary>
+        /// Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
         [HttpPost("Register")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
