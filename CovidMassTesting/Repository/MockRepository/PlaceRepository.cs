@@ -19,7 +19,7 @@ namespace CovidMassTesting.Repository.MockRepository
             IRedisCacheClient redisCacheClient
             ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.PlaceRepository>(), redisCacheClient)
         {
-            Add(new Place()
+            Set(new Place()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "Škola AA",
@@ -32,7 +32,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 Registrations = 0
             }).Wait();
 
-            Add(new Place()
+            Set(new Place()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "Odberné miesto 2",
@@ -43,7 +43,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 IsWalkIn = true,
                 Registrations = 0
             }).Wait();
-            Add(new Place()
+            Set(new Place()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = "Odberné miesto 3",
@@ -55,17 +55,32 @@ namespace CovidMassTesting.Repository.MockRepository
                 Registrations = 0
             }).Wait();
         }
-        public override async Task<bool> Add(Place place)
+        public override async Task<Place> Set(Place place)
         {
+            if (place is null)
+            {
+                throw new ArgumentNullException(nameof(place));
+            }
+
             data[place.Id] = place;
-            return true;
+            return place;
         }
         public override async Task<Place> GetPlace(string placeId)
         {
+            if (string.IsNullOrEmpty(placeId))
+            {
+                throw new ArgumentException($"'{nameof(placeId)}' cannot be null or empty", nameof(placeId));
+            }
+
             return data[placeId];
         }
         public override async Task IncrementPlaceRegistrations(string placeId)
         {
+            if (string.IsNullOrEmpty(placeId))
+            {
+                throw new ArgumentException($"'{nameof(placeId)}' cannot be null or empty", nameof(placeId));
+            }
+
             data[placeId].Registrations++;
         }
         public override async Task<IEnumerable<Place>> ListAll()

@@ -43,31 +43,31 @@ namespace CovidMassTesting.Controllers
         }
 
         [Authorize]
-        [HttpPost("Create")]
+        [HttpPost("InsertOrUpdate")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Place>> Create(
-            [FromForm] string address,
-            [FromForm] string lat,
-            [FromForm] string lng,
-            [FromForm] bool isDriveIn,
-            [FromForm] bool isWalkIn
+        public async Task<ActionResult<Place>> InsertOrUpdate(
+            [FromBody] Place place
             )
         {
             try
             {
-                var ret = new Place()
+                if (string.IsNullOrEmpty(place.Id) || await placeRepository.GetPlace(place.Id) == null)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    IsDriveIn = isDriveIn,
-                    IsWalkIn = isWalkIn,
-                    Address = address,
-                    Lat = decimal.Parse(lat.Replace(",", "."), CultureInfo.InvariantCulture),
-                    Lng = decimal.Parse(lng.Replace(",", "."), CultureInfo.InvariantCulture),
-                };
-                await placeRepository.Add(ret);
-                logger.LogInformation($"Place {ret.Name} has been created");
-                return Ok(ret);
+                    // new place
+                    place.Id = Guid.NewGuid().ToString();
+                    await placeRepository.Set(place);
+                    logger.LogInformation($"Place {place.Name} has been created");
+                }
+                else
+                {
+                    // update existing
+
+                    await placeRepository.Set(place);
+                    logger.LogInformation($"Place {place.Name} has been updated");
+                }
+
+                return Ok(place);
             }
             catch (Exception exc)
             {

@@ -27,7 +27,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.redisCacheClient = redisCacheClient;
             this.configuration = configuration;
         }
-        public virtual async Task<bool> Add(Place place)
+        public virtual async Task<Place> Set(Place place)
         {
             if (place is null)
             {
@@ -40,12 +40,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     throw new Exception("Error creating place");
                 }
-                return true;
+                return place;
             }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-                return false;
+                throw;
             }
         }
 
