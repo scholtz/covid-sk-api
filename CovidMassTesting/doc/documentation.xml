@@ -90,6 +90,20 @@
             templates
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.InsertOrUpdate(CovidMassTesting.Model.Place)">
+            <summary>
+            Admin can insert new testing location
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.Delete(CovidMassTesting.Model.Place)">
+            <summary>
+            Admin can delete testing location
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.GetVisitor(System.String)">
             <summary>
             Testing personell can load data by the code, so that they can verify that the code is the specific user
@@ -103,6 +117,22 @@
             </summary>
             <param name="visitorCode"></param>
             <param name="testCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.Get(System.String,System.String)">
+            <summary>
+            Public method to show test results to user
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.SetResult(System.String,System.String)">
+            <summary>
+            This method is for triage person who scans the visitor bar code, scans the testing set bar code and performs test.
+            </summary>
+            <param name="testCode"></param>
+            <param name="result"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String)">
@@ -146,6 +176,13 @@
             <param name="data"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.Register(CovidMassTesting.Model.Visitor)">
+            <summary>
+            Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Helpers.Aes">
             <summary>
             https://gist.github.com/magicsih/be06c2f60288b54d9f52856feb96ce8c
@@ -180,6 +217,21 @@
         <member name="P:CovidMassTesting.Model.Email.InvitationEmail.TemplateId">
             <summary>
             Template identifier
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.PersonalDataRemovedEmail">
+            <summary>
+            Email sent when test was not positive not negative, and needs to be repeated
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.PersonalDataRemovedEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.PersonalDataRemovedEmail.Name">
+            <summary>
+            Visitor name
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Email.RolesUpdatedEmail">
@@ -223,6 +275,21 @@
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingResultEmail.Name">
+            <summary>
+            Visitor name
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail">
+            <summary>
+            Email sent when test was not positive not negative, and needs to be repeated
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.Name">
             <summary>
             Visitor name
             </summary>
@@ -301,7 +368,7 @@
             This method gets called by the runtime. Use this method to add services to the container.
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CovidMassTesting.Repository.Interface.IUserRepository,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Startup})">
             <summary>
             This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             </summary>
