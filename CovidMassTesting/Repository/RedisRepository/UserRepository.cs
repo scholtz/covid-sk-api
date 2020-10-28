@@ -156,12 +156,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         public virtual async Task<IEnumerable<User>> ListAll()
         {
             var ret = new List<User>();
-            var list = await redisCacheClient.Db0.HashValuesAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
+            var list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
             foreach (var item in list)
             {
                 try
                 {
-                    ret.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<User>(item));
+                    ret.Add(await Get(item));
                 }
                 catch (Exception exc)
                 {
