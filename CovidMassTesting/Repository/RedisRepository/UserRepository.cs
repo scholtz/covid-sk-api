@@ -153,9 +153,23 @@ namespace CovidMassTesting.Repository.RedisRepository
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<User>(decoded);
         }
-        public virtual Task<IEnumerable<User>> ListAll()
+        public virtual async Task<IEnumerable<User>> ListAll()
         {
-            return redisCacheClient.Db0.HashValuesAsync<User>($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
+            var ret = new List<User>();
+            var list = await redisCacheClient.Db0.HashValuesAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
+            foreach (var item in list)
+            {
+                try
+                {
+                    ret.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<User>(item));
+                }
+                catch (Exception exc)
+                {
+                    logger.LogInformation("Unable to deserialize user");
+                    ///@TODO .. remove faulted object
+                }
+            }
+            return ret;
         }
 
         public async Task CreateAdminUsersFromConfiguration()
