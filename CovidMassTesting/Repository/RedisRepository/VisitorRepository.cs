@@ -89,7 +89,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"Setting object {visitor.Id.GetHashCode()}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var encoded = aes.EncryptToBase64String(objectToEncode);
-            if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitor.Id.ToString(CultureInfo.InvariantCulture), encoded, mustBeNew))
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitor.Id.ToString(CultureInfo.InvariantCulture), encoded, mustBeNew);
+            if (mustBeNew && !ret)
             {
                 throw new Exception("Error creating record in the database");
             }

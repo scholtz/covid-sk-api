@@ -56,7 +56,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 Password = pass,
                 Roles = user.Roles,
             });
-            return await Set(user);
+            return await Set(user, true);
         }
         private (string pass, string hash, string cohash) GeneratePassword()
         {
@@ -127,7 +127,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             return new string(chars.ToArray());
         }
 
-        public virtual async Task<bool> Set(User user)
+        public virtual async Task<bool> Set(User user, bool mustBeNew)
         {
             if (user is null)
             {
@@ -138,7 +138,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"Setting user {user.Email}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var encoded = aes.EncryptToBase64String(objectToEncode);
-            if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", user.Email, encoded, true))
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", user.Email, encoded, mustBeNew);
+            if (mustBeNew && !ret)
             {
                 throw new Exception("Error creating record in the database");
             }

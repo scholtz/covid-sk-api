@@ -23,11 +23,18 @@ namespace CovidMassTesting.Repository.MockRepository
             ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.UserRepository>(), redisCacheClient, emailSender)
         {
         }
-        public override async Task<bool> Set(User user)
+        public override async Task<bool> Set(User user, bool mustBeNew)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
+            }
+            if (mustBeNew)
+            {
+                if (data.ContainsKey(user.Email))
+                {
+                    throw new Exception("User already exists");
+                }
             }
 
             data[user.Email] = user;
