@@ -66,7 +66,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="name"></param>
         /// <param name="roles"></param>
         /// <returns></returns>
-        [HttpGet("InviteUser")]
+        [HttpPost("InviteUser")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<bool>> InviteUser([FromForm] string email, [FromForm] string name, [FromForm] string[] roles)

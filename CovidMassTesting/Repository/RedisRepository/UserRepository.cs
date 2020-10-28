@@ -165,7 +165,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
                 catch (Exception exc)
                 {
-                    logger.LogInformation("Unable to deserialize user");
+                    logger.LogInformation("Unable to deserialize user: " + item);
                     ///@TODO .. remove faulted object
                 }
             }
