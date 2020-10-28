@@ -56,7 +56,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (string.IsNullOrEmpty(place.Id) || await placeRepository.GetPlace(place.Id) == null)
+                Place oldPlace;
+                if (string.IsNullOrEmpty(place.Id) || (oldPlace = await placeRepository.GetPlace(place.Id)) == null)
                 {
                     // new place
                     place.Id = Guid.NewGuid().ToString();
@@ -66,7 +67,9 @@ namespace CovidMassTesting.Controllers
                 else
                 {
                     // update existing
-
+                    place.Healthy = oldPlace.Healthy;
+                    place.Sick = oldPlace.Sick;
+                    place.Registrations = oldPlace.Registrations;
                     await placeRepository.Set(place);
                     logger.LogInformation($"Place {place.Name} has been updated");
                 }
