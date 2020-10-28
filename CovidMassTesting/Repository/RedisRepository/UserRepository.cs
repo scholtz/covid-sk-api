@@ -24,7 +24,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IRedisCacheClient redisCacheClient;
         private readonly IEmailSender emailSender;
         private readonly IConfiguration configuration;
-        private readonly string REDIS_KEY_USERS_OBJECTS = "PLACE";
+        private readonly string REDIS_KEY_USERS_OBJECTS = "USERS";
 
         private readonly int RehashN = 99;
 
