@@ -163,7 +163,7 @@ namespace CovidMassTesting
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="userRepository"></param>        
-        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env, IUserRepository userRepository)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IUserRepository userRepository)
         {
             if (app is null)
             {
@@ -205,7 +205,7 @@ namespace CovidMassTesting
             });
 
             userRepository.CreateAdminUsersFromConfiguration().Wait();
-
+            Console.WriteLine($"App started {Configuration["db-prefix"]}");
             GC.Collect();
             try
             {
