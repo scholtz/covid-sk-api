@@ -66,7 +66,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 Name = $"{visitor.FirstName} {visitor.LastName}",
                 ///@TODO BAR CODE
             });
-            return await Set(visitor);
+            return await Set(visitor, true);
         }
         public virtual async Task<Visitor> Get(int code)
         {
@@ -78,7 +78,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
         }
 
-        public virtual async Task<Visitor> Set(Visitor visitor)
+        public virtual async Task<Visitor> Set(Visitor visitor, bool mustBeNew)
         {
             if (visitor is null)
             {
@@ -89,7 +89,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"Setting object {visitor.Id.GetHashCode()}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var encoded = aes.EncryptToBase64String(objectToEncode);
-            if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitor.Id.ToString(CultureInfo.InvariantCulture), encoded, true))
+            if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitor.Id.ToString(CultureInfo.InvariantCulture), encoded, mustBeNew))
             {
                 throw new Exception("Error creating record in the database");
             }
@@ -141,7 +141,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 visitor.TestingSet = testingSet;
             }
-            await Set(visitor);
+            await Set(visitor, false);
 
             switch (state)
             {

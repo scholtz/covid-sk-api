@@ -26,13 +26,13 @@ namespace CovidMassTesting.Repository.MockRepository
         {
 
         }
-        public override async Task<Visitor> Set(Visitor visitor)
+        public override async Task<Visitor> Set(Visitor visitor, bool mustBeNew)
         {
             if (visitor is null)
             {
                 throw new ArgumentNullException(nameof(visitor));
             }
-
+            if (mustBeNew && data.ContainsKey(visitor.Id)) throw new Exception("Item already exists");
             data[visitor.Id] = visitor;
             return visitor;
         }
