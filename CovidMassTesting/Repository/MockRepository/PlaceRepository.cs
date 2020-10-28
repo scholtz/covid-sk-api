@@ -87,5 +87,13 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             return data.Values;
         }
+        public virtual async Task Delete(Place place)
+        {
+            if (place is null)
+            {
+                throw new ArgumentNullException(nameof(place));
+            }
+            data.TryRemove(place.Id, out var _);
+        }
     }
 }

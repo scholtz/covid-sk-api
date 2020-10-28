@@ -41,7 +41,11 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
-
+        /// <summary>
+        /// Admin can insert new testing location
+        /// </summary>
+        /// <param name="place"></param>
+        /// <returns></returns>
         [Authorize]
         [HttpPost("InsertOrUpdate")]
         [ProducesResponseType(200)]
@@ -65,6 +69,41 @@ namespace CovidMassTesting.Controllers
 
                     await placeRepository.Set(place);
                     logger.LogInformation($"Place {place.Name} has been updated");
+                }
+
+                return Ok(place);
+            }
+            catch (Exception exc)
+            {
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Admin can delete testing location
+        /// </summary>
+        /// <param name="place"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("Delete")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Place>> Delete(
+            [FromBody] Place place
+            )
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(place.Id) || await placeRepository.GetPlace(place.Id) == null)
+                {
+                    // new place
+                    throw new Exception("Place not found");
+                }
+                else
+                {
+                    // update existing
+
+                    await placeRepository.Delete(place);
+                    logger.LogInformation($"Place {place.Name} has been deleted");
                 }
 
                 return Ok(place);
