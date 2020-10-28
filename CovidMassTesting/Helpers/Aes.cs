@@ -16,7 +16,7 @@ namespace CovidMassTesting.Helpers
         private readonly System.Text.UnicodeEncoding unicodeEncoding = new UnicodeEncoding();
         private bool disposed;
 
-        private const int CHUNK_SIZE = 128;
+        private const int CHUNK_SIZE = 256;
 
         private void InitializeRijndael()
         {

@@ -138,7 +138,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"Setting user {user.Email}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var encoded = aes.EncryptToBase64String(objectToEncode);
-            if (!await redisCacheClient.Db0.HashSetAsync(REDIS_KEY_USERS_OBJECTS, user.Email, encoded, true))
+            if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", user.Email, encoded, true))
             {
                 throw new Exception("Error creating record in the database");
             }
@@ -147,7 +147,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         public virtual async Task<User> Get(string email)
         {
             logger.LogInformation($"User loaded from database: {email}");
-            var encoded = await redisCacheClient.Db0.HashGetAsync<string>(REDIS_KEY_USERS_OBJECTS, email);
+            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", email);
             if (string.IsNullOrEmpty(encoded)) return null;
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
@@ -155,7 +155,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         }
         public virtual Task<IEnumerable<User>> ListAll()
         {
-            return redisCacheClient.Db0.HashValuesAsync<User>(REDIS_KEY_USERS_OBJECTS);
+            return redisCacheClient.Db0.HashValuesAsync<User>($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
         }
 
         public async Task CreateAdminUsersFromConfiguration()

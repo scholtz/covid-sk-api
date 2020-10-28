@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Model;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
@@ -11,14 +12,15 @@ namespace CovidMassTesting.Repository.MockRepository
 {
     public class SlotRepository : Repository.RedisRepository.SlotRepository
     {
-        private ConcurrentDictionary<string, Slot1Day> dataD = new ConcurrentDictionary<string, Slot1Day>();
-        private ConcurrentDictionary<string, Slot1Hour> dataH = new ConcurrentDictionary<string, Slot1Hour>();
-        private ConcurrentDictionary<string, Slot5Min> dataM = new ConcurrentDictionary<string, Slot5Min>();
+        private readonly ConcurrentDictionary<string, Slot1Day> dataD = new ConcurrentDictionary<string, Slot1Day>();
+        private readonly ConcurrentDictionary<string, Slot1Hour> dataH = new ConcurrentDictionary<string, Slot1Hour>();
+        private readonly ConcurrentDictionary<string, Slot5Min> dataM = new ConcurrentDictionary<string, Slot5Min>();
 
         public SlotRepository(
+            IConfiguration configuration,
             ILoggerFactory loggerFactory,
             IRedisCacheClient redisCacheClient
-            ) : base(loggerFactory.CreateLogger<Repository.RedisRepository.SlotRepository>(), redisCacheClient)
+            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.SlotRepository>(), redisCacheClient)
         {
         }
         public override async Task<bool> Add(Slot1Day slot)

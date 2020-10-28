@@ -52,12 +52,11 @@ namespace CovidMassTesting.Controllers
                 {
                     ret += await slotRepository.CheckSlots(DateTimeOffset.Parse(testingDay, CultureInfo.InvariantCulture).Ticks, item.Id, from, until);
                 }
-
                 return Ok(ret);
             }
             catch (Exception exc)
             {
-                return BadRequest(new ProblemDetails() { Detail = exc.Message + (exc.InnerException != null ? $";\n{exc.InnerException.Message}" : "") + "\n" + exc.StackTrace, Title = exc.Message, Type = exc.GetType().ToString() });
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
         /// <summary>
@@ -83,7 +82,7 @@ namespace CovidMassTesting.Controllers
             }
             catch (Exception exc)
             {
-                return BadRequest(new ProblemDetails() { Detail = exc.Message + (exc.InnerException != null ? $";\n{exc.InnerException.Message}" : "") + "\n" + exc.StackTrace, Title = exc.Message, Type = exc.GetType().ToString() });
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
 

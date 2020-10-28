@@ -1,5 +1,6 @@
 ﻿using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
@@ -13,26 +14,32 @@ namespace CovidMassTesting.Repository.RedisRepository
     {
         private readonly ILogger<PlaceRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
+        private readonly IConfiguration configuration;
         private readonly string REDIS_KEY_PLACES_OBJECTS = "PLACE";
-        private readonly string REDIS_KEY_PLACES_LIST = "PLACESLIST";
 
         public PlaceRepository(
+            IConfiguration configuration,
             ILogger<PlaceRepository> logger,
             IRedisCacheClient redisCacheClient
             )
         {
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
+            this.configuration = configuration;
         }
         public virtual async Task<bool> Add(Place place)
         {
+            if (place is null)
+            {
+                throw new ArgumentNullException(nameof(place));
+            }
+
             try
             {
-                if (!await redisCacheClient.Db0.HashSetAsync(REDIS_KEY_PLACES_OBJECTS, place.Id.ToString(), place, true))
+                if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", place.Id.ToString(), place, true))
                 {
                     throw new Exception("Error creating place");
                 }
-                await redisCacheClient.Db0.SetAddAsync($"{REDIS_KEY_PLACES_LIST}_{place.Id}", $"{place.Id}");
                 return true;
             }
             catch (Exception exc)
@@ -46,15 +53,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             var update = await GetPlace(placeId);
             update.Registrations++;
-            await redisCacheClient.Db0.HashSetAsync(REDIS_KEY_PLACES_OBJECTS, placeId, update);
+            await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", placeId, update);
         }
         public virtual Task<Place> GetPlace(string placeId)
         {
-            return redisCacheClient.Db0.HashGetAsync<Place>(REDIS_KEY_PLACES_OBJECTS, placeId);
+            return redisCacheClient.Db0.HashGetAsync<Place>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", placeId);
         }
         public virtual Task<IEnumerable<Place>> ListAll()
         {
-            return redisCacheClient.Db0.HashValuesAsync<Place>(REDIS_KEY_PLACES_OBJECTS);
+            return redisCacheClient.Db0.HashValuesAsync<Place>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}");
         }
     }
 }

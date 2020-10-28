@@ -25,5 +25,6 @@ namespace CovidMassTesting.Model
         public long ChosenSlot { get; set; }
         public string ChosenPlaceId { get; set; }
         public string Result { get; set; } = "test-not-taken";
+        public string TestingSet { get; set; }
     }
 }

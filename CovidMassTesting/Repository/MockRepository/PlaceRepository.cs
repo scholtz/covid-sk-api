@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Model;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
@@ -11,11 +12,12 @@ namespace CovidMassTesting.Repository.MockRepository
 {
     public class PlaceRepository : Repository.RedisRepository.PlaceRepository
     {
-        private ConcurrentDictionary<string, Place> data = new ConcurrentDictionary<string, Place>();
+        private readonly ConcurrentDictionary<string, Place> data = new ConcurrentDictionary<string, Place>();
         public PlaceRepository(
+            IConfiguration configuration,
             ILoggerFactory loggerFactory,
             IRedisCacheClient redisCacheClient
-            ) : base(loggerFactory.CreateLogger<Repository.RedisRepository.PlaceRepository>(), redisCacheClient)
+            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.PlaceRepository>(), redisCacheClient)
         {
             Add(new Place()
             {

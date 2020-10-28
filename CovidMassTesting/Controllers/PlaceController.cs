@@ -38,7 +38,7 @@ namespace CovidMassTesting.Controllers
             }
             catch (Exception exc)
             {
-                return BadRequest(new ProblemDetails() { Detail = exc.Message + (exc.InnerException != null ? $";\n{exc.InnerException.Message}" : "") + "\n" + exc.StackTrace, Title = exc.Message, Type = exc.GetType().ToString() });
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
 
@@ -71,7 +71,7 @@ namespace CovidMassTesting.Controllers
             }
             catch (Exception exc)
             {
-                return BadRequest(new ProblemDetails() { Detail = exc.Message + (exc.InnerException != null ? $";\n{exc.InnerException.Message}" : "") + "\n" + exc.StackTrace, Title = exc.Message, Type = exc.GetType().ToString() });
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
     }

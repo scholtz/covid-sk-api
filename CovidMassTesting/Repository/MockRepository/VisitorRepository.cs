@@ -14,6 +14,8 @@ namespace CovidMassTesting.Repository.MockRepository
     public class VisitorRepository : Repository.RedisRepository.VisitorRepository
     {
         private readonly ConcurrentDictionary<int, Visitor> data = new ConcurrentDictionary<int, Visitor>();
+        private readonly ConcurrentDictionary<string, int> testing2code = new ConcurrentDictionary<string, int>();
+        private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
 
         public VisitorRepository(
             IConfiguration configuration,
@@ -43,6 +45,24 @@ namespace CovidMassTesting.Repository.MockRepository
         public override async Task<IEnumerable<string>> ListAllKeys()
         {
             return data.Keys.Select(k => k.ToString());
+        }
+        public override async Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
+        {
+            if (!pname2code.ContainsKey(personalNumber)) return null;
+            return pname2code[personalNumber];
+        }
+        public override async Task<int?> GETVisitorCodeFromTesting(string testCodeClear)
+        {
+            if (!testing2code.ContainsKey(testCodeClear)) return null;
+            return testing2code[testCodeClear];
+        }
+        public override async Task MapPersonalNumberToVisitorCode(string personalNumber, int visitorCode)
+        {
+            pname2code[personalNumber] = visitorCode;
+        }
+        public override async Task MapTestingSetToVisitorCode(int codeInt, string testCodeClear)
+        {
+            testing2code[testCodeClear] = codeInt;
         }
     }
 }

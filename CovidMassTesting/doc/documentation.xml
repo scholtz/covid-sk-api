@@ -90,6 +90,14 @@
             templates
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ConnectVisitorToTest(System.String,System.String)">
+            <summary>
+            This method is for triage person who scans the visitor bar code, scans the testing set bar code and performs test.
+            </summary>
+            <param name="visitorCode"></param>
+            <param name="testCode"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String)">
             <summary>
             Shows available days per place
