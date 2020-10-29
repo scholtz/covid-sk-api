@@ -75,6 +75,11 @@ namespace CovidMassTesting.Controllers
                 var slotH = await slotRepository.GetHourSlot(visitor.ChosenPlaceId, slotM.HourSlotId);
                 var slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
 
+                if (slotM.Registrations >= place.LimitPer5MinSlot)
+                {
+                    throw new Exception("Tento časový slot má kapacitu zaplnenú.");
+                }
+
                 var ret = await visitorRepository.Add(visitor);
 
                 await slotRepository.IncrementRegistration5MinSlot(slotM);
