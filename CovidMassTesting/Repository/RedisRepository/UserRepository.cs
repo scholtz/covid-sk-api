@@ -262,15 +262,15 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 Subject = subject = new ClaimsIdentity(new Claim[]
                 {
-                        new Claim(ClaimTypes.NameIdentifier, email),
-                        new Claim("Name",usr.Name)
+                    new Claim(Token.EmailClaim, email),
+                    new Claim(Token.NameClaim, usr.Name)
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             foreach (var role in usr.Roles)
             {
-                subject.AddClaim(new Claim("Role", role));
+                subject.AddClaim(new Claim(Token.RoleClaim, role));
             }
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);

@@ -10,7 +10,8 @@ namespace CovidMassTesting.Model
     public static class Token
     {
         public const string RoleClaim = "Role";
-        public const string EmailClaim = "Email";
+        public const string NameClaim = "Name";
+        public const string EmailClaim = ClaimTypes.NameIdentifier;
 
 
         public static string GetEmail(this ClaimsPrincipal user)
@@ -21,6 +22,15 @@ namespace CovidMassTesting.Model
             }
 
             return user.Claims.FirstOrDefault(c => c.Type == EmailClaim)?.Value ?? "";
+        }
+        public static string GetName(this ClaimsPrincipal user)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            return user.Claims.FirstOrDefault(c => c.Type == NameClaim)?.Value ?? "";
         }
         public static bool IsAdmin(this ClaimsPrincipal user)
         {
