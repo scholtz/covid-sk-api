@@ -46,6 +46,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(visitor));
             }
             visitor.Id = await CreateNewVisitorId();
+            visitor.LastUpdate = DateTimeOffset.Now;
             var code = visitor.Id.ToString();
             switch (visitor.PersonType)
             {
@@ -148,6 +149,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             visitor.Result = state;
+            visitor.LastUpdate = DateTimeOffset.Now;
             if (state == "test-not-processed")
             {
                 visitor.TestingSet = testingSet;

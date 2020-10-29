@@ -26,5 +26,6 @@ namespace CovidMassTesting.Model
         public string ChosenPlaceId { get; set; }
         public string Result { get; set; } = "test-not-taken";
         public string TestingSet { get; set; }
+        public DateTimeOffset LastUpdate { get; set; }
     }
 }
