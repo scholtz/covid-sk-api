@@ -39,6 +39,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsRegistrationManager() && !User.IsMedicTester()) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
 
                 if (string.IsNullOrEmpty(visitorCode))
                 {
@@ -73,6 +74,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsRegistrationManager() && !User.IsMedicTester()) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
 
                 if (string.IsNullOrEmpty(rc))
                 {
@@ -102,6 +104,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsRegistrationManager() && !User.IsMedicTester()) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user to test");
+
 
                 if (string.IsNullOrEmpty(visitorCode))
                 {
@@ -181,6 +185,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsMedicLab()) throw new Exception("Only user with Medic Lab role is allowed to set results of tests");
+
                 if (string.IsNullOrEmpty(testCode))
                 {
                     throw new ArgumentException($"'{nameof(testCode)}' cannot be null or empty", nameof(testCode));

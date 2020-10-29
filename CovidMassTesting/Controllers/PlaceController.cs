@@ -59,6 +59,8 @@ namespace CovidMassTesting.Controllers
 
             try
             {
+                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to manage testing places");
+
                 if (place is null)
                 {
                     throw new ArgumentNullException(nameof(place));
@@ -127,6 +129,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to manage testing places");
+
                 if (string.IsNullOrEmpty(place.Id) || await placeRepository.GetPlace(place.Id) == null)
                 {
                     // new place

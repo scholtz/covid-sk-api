@@ -183,6 +183,14 @@
             <param name="data"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.ChangePassword(System.String)">
+            <summary>
+            Set new password
+            </summary>
+            <param name="email"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Register(CovidMassTesting.Model.Visitor)">
             <summary>
             Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
@@ -362,6 +370,27 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Repository.RedisRepository.UserRepository">
+            <summary>
+            User repository manages users and stores user data securly in the database
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="redisCacheClient"></param>
+            <param name="emailSender"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Add(CovidMassTesting.Model.User)">
+            <summary>
+            Inserts new user
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GenerateRandomPassword(Microsoft.AspNetCore.Identity.PasswordOptions)">
             <summary>
             Generates a Random Password
@@ -370,6 +399,27 @@
             <param name="opts">A valid PasswordOptions object
             containing the password strength requirements.</param>
             <returns>A random password</returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Set(CovidMassTesting.Model.User,System.Boolean)">
+            <summary>
+            Set user. Encodes and stores to db.
+            </summary>
+            <param name="user"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Get(System.String)">
+            <summary>
+            Decode encrypted user data
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ListAll">
+            <summary>
+            Lists all users 
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Preauthenticate(System.String)">
             <summary>
@@ -385,6 +435,14 @@
             <param name="email"></param>
             <param name="hash"></param>
             <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ChangePassword(System.String,System.String)">
+            <summary>
+            Change password
+            </summary>
+            <param name="email"></param>
+            <param name="hash"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Startup">

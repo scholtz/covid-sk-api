@@ -18,6 +18,9 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.RedisRepository
 {
+    /// <summary>
+    /// User repository manages users and stores user data securly in the database
+    /// </summary>
     public class UserRepository : IUserRepository
     {
         private readonly ILogger<UserRepository> logger;
@@ -27,7 +30,13 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_USERS_OBJECTS = "USERS";
 
         private readonly int RehashN = 99;
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="logger"></param>
+        /// <param name="redisCacheClient"></param>
+        /// <param name="emailSender"></param>
         public UserRepository(
             IConfiguration configuration,
             ILogger<UserRepository> logger,
@@ -40,6 +49,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.emailSender = emailSender;
             this.configuration = configuration;
         }
+        /// <summary>
+        /// Inserts new user
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<bool> Add(User user)
         {
             if (user is null)
@@ -126,7 +140,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return new string(chars.ToArray());
         }
-
+        /// <summary>
+        /// Set user. Encodes and stores to db.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
         public virtual async Task<bool> Set(User user, bool mustBeNew)
         {
             if (user is null)
@@ -145,6 +164,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return true;
         }
+        /// <summary>
+        /// Decode encrypted user data
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
         public virtual async Task<User> Get(string email)
         {
             logger.LogInformation($"User loaded from database: {email}");
@@ -154,6 +178,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<User>(decoded);
         }
+        /// <summary>
+        /// Lists all users 
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task<IEnumerable<User>> ListAll()
         {
             var ret = new List<User>();
@@ -246,6 +274,19 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
+        }
+        /// <summary>
+        /// Change password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public async Task<bool> ChangePassword(string email, string hash)
+        {
+            var user = await Get(email);
+            if (user == null) throw new Exception("User not found by email");
+            user.PswHash = hash;
+            return await Set(user, false);
         }
     }
 }

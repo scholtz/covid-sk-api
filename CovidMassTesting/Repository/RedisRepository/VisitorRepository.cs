@@ -268,5 +268,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                 State = result
             };
         }
+
     }
 }

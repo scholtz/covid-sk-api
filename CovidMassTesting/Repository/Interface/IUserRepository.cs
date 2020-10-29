@@ -13,5 +13,6 @@ namespace CovidMassTesting.Repository.Interface
         public Task CreateAdminUsersFromConfiguration();
         public Task<string> Preauthenticate(string email);
         public Task<string> Authenticate(string email, string hash, string data);
+        public Task<bool> ChangePassword(string email, string hash);
     }
 }

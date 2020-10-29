@@ -47,6 +47,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to manage time");
+
                 var ret = 0;
                 foreach (var item in await placeRepository.ListAll())
                 {
@@ -75,6 +77,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to invite other users");
+
                 return Ok(await userRepository.Add(new Model.User()
                 {
                     Email = email,

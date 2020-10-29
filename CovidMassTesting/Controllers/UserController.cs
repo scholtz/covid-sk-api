@@ -47,6 +47,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (!User.IsAdmin()) throw new Exception("Only user with Admin role can list users");
+
                 return Ok((await userRepository.ListAll()).ToDictionary(p => p.Email, p => p.ToPublic()));
             }
             catch (Exception exc)
@@ -103,6 +105,31 @@ namespace CovidMassTesting.Controllers
             try
             {
                 return Ok(await userRepository.Authenticate(email, hash, data));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Set new password
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("ChangePassword")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<string>> ChangePassword(
+            [FromForm] string hash
+            )
+        {
+            try
+            {
+                return Ok(await userRepository.ChangePassword(User.GetEmail(), hash));
             }
             catch (Exception exc)
             {
