@@ -89,6 +89,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(visitor));
             }
 
+            visitor.LastUpdate = DateTimeOffset.Now;
+
             var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(visitor);
             logger.LogInformation($"Setting object {visitor.Id.GetHashCode()}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);

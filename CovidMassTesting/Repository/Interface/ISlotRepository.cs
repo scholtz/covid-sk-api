@@ -11,6 +11,9 @@ namespace CovidMassTesting.Repository.Interface
         public Task<bool> Add(Slot1Day slot);
         public Task<bool> Add(Slot1Hour slot);
         public Task<bool> Add(Slot5Min slot);
+        public Task DecrementRegistrationDaySlot(Slot1Day slotD);
+        public Task DecrementRegistrationHourSlot(Slot1Hour slotH);
+        public Task DecrementRegistration5MinSlot(Slot5Min slotM);
         public Task IncrementRegistrationDaySlot(Slot1Day slotD);
         public Task IncrementRegistrationHourSlot(Slot1Hour slotH);
         public Task IncrementRegistration5MinSlot(Slot5Min slotM);

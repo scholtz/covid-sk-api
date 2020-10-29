@@ -74,15 +74,6 @@ namespace CovidMassTesting.Repository.MockRepository
 
             return data[placeId];
         }
-        public override async Task IncrementPlaceRegistrations(string placeId)
-        {
-            if (string.IsNullOrEmpty(placeId))
-            {
-                throw new ArgumentException($"'{nameof(placeId)}' cannot be null or empty", nameof(placeId));
-            }
-
-            data[placeId].Registrations++;
-        }
         public override async Task<IEnumerable<Place>> ListAll()
         {
             return data.Values;

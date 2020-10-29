@@ -84,15 +84,70 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Tento hodinový časový slot má kapacitu zaplnenú.");
                 }
+                Visitor previous = null;
+                switch (visitor.PersonType)
+                {
+                    case "idcard":
+                    case "child":
+                        if (!string.IsNullOrEmpty(visitor.RC))
+                        {
+                            previous = await visitorRepository.GetVisitorByPersonalNumber(visitor.RC);
+                        }
+                        break;
+                    case "foreign":
+                        if (!string.IsNullOrEmpty(visitor.Passport))
+                        {
+                            previous = await visitorRepository.GetVisitorByPersonalNumber(visitor.Passport);
+                        }
+                        break;
+                }
+                if (previous == null)
+                {
+                    // new registration
 
-                var ret = await visitorRepository.Add(visitor);
+                    var ret = await visitorRepository.Add(visitor);
 
-                await slotRepository.IncrementRegistration5MinSlot(slotM);
-                await slotRepository.IncrementRegistrationHourSlot(slotH);
-                await slotRepository.IncrementRegistrationDaySlot(slotD);
-                await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+                    await slotRepository.IncrementRegistration5MinSlot(slotM);
+                    await slotRepository.IncrementRegistrationHourSlot(slotH);
+                    await slotRepository.IncrementRegistrationDaySlot(slotD);
+                    await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
 
-                return Ok(ret);
+                    return Ok(ret);
+                }
+                else
+                {
+                    // update registration
+                    visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
+                    var ret = await visitorRepository.Set(visitor, false);
+                    if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
+                    {
+                        await placeRepository.DecrementPlaceRegistrations(previous.ChosenPlaceId);
+                        await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+                    }
+                    if (previous.ChosenSlot != visitor.ChosenSlot)
+                    {
+                        try
+                        {
+
+                            var slotMPrev = await slotRepository.Get5MinSlot(previous.ChosenPlaceId, previous.ChosenSlot);
+                            var slotHPrev = await slotRepository.GetHourSlot(previous.ChosenPlaceId, slotMPrev.HourSlotId);
+                            var slotDPrev = await slotRepository.GetDaySlot(previous.ChosenPlaceId, slotHPrev.DaySlotId);
+
+                            await slotRepository.DecrementRegistration5MinSlot(slotM);
+                            await slotRepository.DecrementRegistrationHourSlot(slotH);
+                            await slotRepository.DecrementRegistrationDaySlot(slotD);
+                        }
+                        catch (Exception exc)
+                        {
+                            logger.LogError(exc, exc.Message);
+                        }
+                        await slotRepository.IncrementRegistration5MinSlot(slotM);
+                        await slotRepository.IncrementRegistrationHourSlot(slotH);
+                        await slotRepository.IncrementRegistrationDaySlot(slotD);
+                    }
+
+                    return Ok(ret);
+                }
             }
             catch (Exception exc)
             {

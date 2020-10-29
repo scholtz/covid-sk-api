@@ -8,6 +8,7 @@ namespace CovidMassTesting.Repository.Interface
 {
     public interface IPlaceRepository
     {
+        public Task DecrementPlaceRegistrations(string placeId);
         public Task IncrementPlaceRegistrations(string placeId);
         public Task IncrementPlaceHealthy(string placeId);
         public Task IncrementPlaceSick(string placeId);

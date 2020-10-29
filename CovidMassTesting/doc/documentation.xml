@@ -111,6 +111,13 @@
             <param name="visitorCode"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.GetVisitorByRC(System.String)">
+            <summary>
+            Testing personell can load data by the personal number, so that they can verify that person legitimity
+            </summary>
+            <param name="rc">Personal number</param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.ConnectVisitorToTest(System.String,System.String)">
             <summary>
             This method is for triage person who scans the visitor bar code, scans the testing set bar code and performs test.
@@ -310,6 +317,16 @@
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.Name">
             <summary>
             Visitor name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.LimitPer5MinSlot">
+            <summary>
+            Registration in minute slot is rejected if more then this amount of people are registered
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.LimitPer1HourSlot">
+            <summary>
+            Registration in hour slot is rejected if more then this amount of people are registered
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Settings.SendGridConfiguration">

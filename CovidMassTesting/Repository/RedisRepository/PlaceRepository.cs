@@ -47,7 +47,13 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
         }
 
-        public virtual async Task IncrementPlaceRegistrations(string placeId)
+        public async Task DecrementPlaceRegistrations(string placeId)
+        {
+            var update = await GetPlace(placeId);
+            update.Registrations--;
+            await Set(update);
+        }
+        public async Task IncrementPlaceRegistrations(string placeId)
         {
             var update = await GetPlace(placeId);
             update.Registrations++;

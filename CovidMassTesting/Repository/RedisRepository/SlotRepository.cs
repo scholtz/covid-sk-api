@@ -139,7 +139,40 @@ namespace CovidMassTesting.Repository.RedisRepository
             update.Registrations++;
             await Set(slotM, false);
         }
+        public async Task DecrementRegistrationDaySlot(Slot1Day slotD)
+        {
+            if (slotD is null)
+            {
+                throw new ArgumentNullException(nameof(slotD));
+            }
 
+            var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
+            update.Registrations--;
+            await Set(slotD, false);
+        }
+        public async Task DecrementRegistrationHourSlot(Slot1Hour slotH)
+        {
+            if (slotH is null)
+            {
+                throw new ArgumentNullException(nameof(slotH));
+            }
+
+            var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
+            update.Registrations--;
+            await Set(slotH, false);
+        }
+
+        public async Task DecrementRegistration5MinSlot(Slot5Min slotM)
+        {
+            if (slotM is null)
+            {
+                throw new ArgumentNullException(nameof(slotM));
+            }
+
+            var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
+            update.Registrations--;
+            await Set(slotM, false);
+        }
 
         public Task<bool> Add(Slot1Day slot)
         {
