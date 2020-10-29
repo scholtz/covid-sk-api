@@ -140,6 +140,13 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await Get(code);
+
+            if (visitor.Result == state)
+            {
+                // repeated requests should not send emails
+                return true;
+            }
+
             visitor.Result = state;
             if (state == "test-not-processed")
             {
@@ -149,8 +156,6 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-
-
                 // update slots stats
                 switch (state)
                 {
