@@ -54,10 +54,36 @@ namespace CovidMassTesting.Controllers
             [FromBody] Place place
             )
         {
+
             try
             {
-                Place oldPlace;
-                if (string.IsNullOrEmpty(place.Id) || (oldPlace = await placeRepository.GetPlace(place.Id)) == null)
+                if (place is null)
+                {
+                    throw new ArgumentNullException(nameof(place));
+                }
+
+                Place oldPlace = null;
+                var update = true;
+                if (string.IsNullOrEmpty(place.Id))
+                {
+                    update = false;
+                }
+                else
+                {
+                    oldPlace = await placeRepository.GetPlace(place.Id);
+                    if (oldPlace == null)
+                    {
+                        logger.LogInformation("Old place not found");
+                        update = false;
+                    }
+                    else
+                    {
+                        logger.LogInformation("Changing place: " + Newtonsoft.Json.JsonConvert.SerializeObject(oldPlace));
+                    }
+                }
+
+
+                if (!update)
                 {
                     // new place
                     place.Id = Guid.NewGuid().ToString();
@@ -70,7 +96,7 @@ namespace CovidMassTesting.Controllers
                     place.Healthy = oldPlace.Healthy;
                     place.Sick = oldPlace.Sick;
                     place.Registrations = oldPlace.Registrations;
-                    await placeRepository.Set(place);
+                    place = await placeRepository.Set(place);
                     logger.LogInformation($"Place {place.Name} has been updated");
                 }
 
