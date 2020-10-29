@@ -179,8 +179,26 @@
         <member name="M:CovidMassTesting.Controllers.VisitorController.Register(CovidMassTesting.Model.Visitor)">
             <summary>
             Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
+            
+            Request size is limitted.
             </summary>
             <param name="visitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.FormatPhone(System.String)">
+            <summary>
+            Format phone to slovak standard
+            
+            0800 123 456 convers to +421800123456
+            </summary>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.IsPhoneNumber(System.String)">
+            <summary>
+            Validates the phone number +421800123456
+            </summary>
+            <param name="number"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Helpers.Aes">
