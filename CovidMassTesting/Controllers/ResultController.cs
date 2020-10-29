@@ -59,6 +59,32 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// Testing personell can load data by the personal number, so that they can verify that person legitimity
+        /// </summary>
+        /// <param name="rc">Personal number</param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("GetVisitorByRC")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Visitor>> GetVisitorByRC([FromForm] string rc)
+        {
+            try
+            {
+
+                if (string.IsNullOrEmpty(rc))
+                {
+                    throw new ArgumentException($"'{nameof(rc)}' cannot be null or empty", nameof(rc));
+                }
+                return Ok(await visitorRepository.GetVisitorByPersonalNumber(rc));
+            }
+            catch (Exception exc)
+            {
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+        /// <summary>
         /// This method is for triage person who scans the visitor bar code, scans the testing set bar code and performs test.
         /// </summary>
         /// <param name="visitorCode"></param>

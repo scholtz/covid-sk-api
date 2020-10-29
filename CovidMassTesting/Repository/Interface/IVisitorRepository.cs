@@ -14,5 +14,6 @@ namespace CovidMassTesting.Repository.Interface
         public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear);
         public Task<Visitor> GetVisitor(int codeInt);
         public Task<Result> SetTestResult(string testCode, string result);
+        public Task<Visitor> GetVisitorByPersonalNumber(string rc);
     }
 }

@@ -218,6 +218,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return Get(codeInt);
         }
+        public async Task<Visitor> GetVisitorByPersonalNumber(string personalNumber)
+        {
+            var code = await GETVisitorCodeFromPersonalNumber(personalNumber);
+            if (!code.HasValue) throw new Exception("Nezname rodne cislo");
+            return await Get(code.Value);
+        }
 
         public async Task<Result> SetTestResult(string testCode, string result)
         {
