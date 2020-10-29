@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -254,6 +255,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception("Invalid user or password");
             }
 
+            return CreateToken(usr);
+        }
+        private string CreateToken(User usr)
+        {
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration["JWTTokenSecret"]);
@@ -262,7 +267,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 Subject = subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(Token.EmailClaim, email),
+                    new Claim(Token.EmailClaim, usr.Email),
                     new Claim(Token.NameClaim, usr.Name)
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
@@ -277,18 +282,24 @@ namespace CovidMassTesting.Repository.RedisRepository
         }
         /// <summary>
         /// Change password
+        /// 
+        /// If successful, returns new JWT token
         /// </summary>
         /// <param name="email">Email</param>
         /// <param name="oldHash">Old password</param>
         /// <param name="newHash">New password</param>
         /// <returns></returns>
-        public async Task<bool> ChangePassword(string email, string oldHash, string newHash)
+        public async Task<string> ChangePassword(string email, string oldHash, string newHash)
         {
             var user = await Get(email);
             if (user == null) throw new Exception("User not found by email");
             if (user.PswHash != oldHash) throw new Exception("Invalid old password");
             user.PswHash = newHash;
-            return await Set(user, false);
+            if (await Set(user, false))
+            {
+                return CreateToken(user);
+            }
+            return "";
         }
     }
 }
