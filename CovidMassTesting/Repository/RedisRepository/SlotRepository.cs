@@ -105,31 +105,61 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
 
-        public virtual async Task IncrementRegistrationDaySlot(Slot1Day slotD)
+        public async Task IncrementRegistrationDaySlot(Slot1Day slotD)
         {
+            if (slotD is null)
+            {
+                throw new ArgumentNullException(nameof(slotD));
+            }
+
             var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
             update.Registrations++;
-            await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slotD.PlaceId}_{slotD.Time.Ticks}", update);
+            await Set(slotD, false);
         }
-        public virtual async Task IncrementRegistrationHourSlot(Slot1Hour slotH)
+        public async Task IncrementRegistrationHourSlot(Slot1Hour slotH)
         {
+            if (slotH is null)
+            {
+                throw new ArgumentNullException(nameof(slotH));
+            }
+
             var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
             update.Registrations++;
-            await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slotH.PlaceId}_{slotH.Time.Ticks}", update);
+            await Set(slotH, false);
         }
 
-        public virtual async Task IncrementRegistration5MinSlot(Slot5Min slotM)
+        public async Task IncrementRegistration5MinSlot(Slot5Min slotM)
         {
+            if (slotM is null)
+            {
+                throw new ArgumentNullException(nameof(slotM));
+            }
+
             var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
             update.Registrations++;
-            await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slotM.PlaceId}_{slotM.Time.Ticks}", update);
+            await Set(slotM, false);
         }
 
-        public virtual async Task<bool> Add(Slot1Day slot)
+
+        public Task<bool> Add(Slot1Day slot)
+        {
+            return Set(slot, true);
+        }
+        public Task<bool> Add(Slot1Hour slot)
+        {
+            return Set(slot, true);
+        }
+        public Task<bool> Add(Slot5Min slot)
+        {
+            return Set(slot, true);
+        }
+
+        public virtual async Task<bool> Set(Slot1Day slot, bool newOnly)
         {
             try
             {
-                if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, true))
+                var ret = !await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
+                if (newOnly && !ret)
                 {
                     throw new Exception("Error creating place");
                 }
@@ -142,11 +172,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return false;
             }
         }
-        public virtual async Task<bool> Add(Slot1Hour slot)
+        public virtual async Task<bool> Set(Slot1Hour slot, bool newOnly)
         {
             try
             {
-                if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, true))
+                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
+                if (newOnly && !ret)
                 {
                     throw new Exception("Error creating place");
                 }
@@ -159,11 +190,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return false;
             }
         }
-        public virtual async Task<bool> Add(Slot5Min slot)
+        public virtual async Task<bool> Set(Slot5Min slot, bool newOnly)
         {
             try
             {
-                if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, true))
+                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
+                if (newOnly && !ret)
                 {
                     throw new Exception("Error creating place");
                 }
@@ -176,6 +208,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return false;
             }
         }
+
 
         public virtual Task<Slot1Day> GetDaySlot(string placeId, long daySlotId)
         {

@@ -20,6 +20,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IConfiguration configuration;
         private readonly ILogger<VisitorRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
+        private readonly IPlaceRepository placeRepository;
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
         private readonly string REDIS_KEY_TEST2VISITOR = "TEST2VISITOR";
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
@@ -28,13 +29,15 @@ namespace CovidMassTesting.Repository.RedisRepository
             IConfiguration configuration,
             ILogger<VisitorRepository> logger,
             IRedisCacheClient redisCacheClient,
-            IEmailSender emailSender
+            IEmailSender emailSender,
+            IPlaceRepository placeRepository
             )
         {
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
             this.configuration = configuration;
             this.emailSender = emailSender;
+            this.placeRepository = placeRepository;
         }
         public async Task<Visitor> Add(Visitor visitor)
         {
@@ -144,6 +147,26 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             await Set(visitor, false);
 
+            try
+            {
+
+
+                // update slots stats
+                switch (state)
+                {
+                    case "positive":
+                        await placeRepository.IncrementPlaceSick(visitor.ChosenPlaceId);
+                        break;
+                    case "negative":
+                        await placeRepository.IncrementPlaceHealthy(visitor.ChosenPlaceId);
+                        break;
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+            }
+            // send email
             switch (state)
             {
                 case "test-to-be-repeated":

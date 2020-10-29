@@ -51,7 +51,19 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             var update = await GetPlace(placeId);
             update.Registrations++;
-            await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", placeId, update);
+            await Set(update);
+        }
+        public virtual async Task IncrementPlaceHealthy(string placeId)
+        {
+            var update = await GetPlace(placeId);
+            update.Healthy++;
+            await Set(update);
+        }
+        public virtual async Task IncrementPlaceSick(string placeId)
+        {
+            var update = await GetPlace(placeId);
+            update.Sick++;
+            await Set(update);
         }
         public virtual Task<Place> GetPlace(string placeId)
         {

@@ -23,34 +23,55 @@ namespace CovidMassTesting.Repository.MockRepository
             ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.SlotRepository>(), redisCacheClient)
         {
         }
-        public override async Task<bool> Add(Slot1Day slot)
+        public override async Task<bool> Set(Slot1Day slot, bool newOnly)
         {
             if (slot is null)
             {
                 throw new ArgumentNullException(nameof(slot));
             }
-
-            dataD[$"{slot.PlaceId}_{slot.Time.Ticks}"] = slot;
+            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            if (newOnly)
+            {
+                if (dataD.ContainsKey(key))
+                {
+                    throw new Exception("Item already exists");
+                }
+            }
+            dataD[key] = slot;
             return true;
         }
-        public override async Task<bool> Add(Slot1Hour slot)
+        public override async Task<bool> Set(Slot1Hour slot, bool newOnly)
         {
             if (slot is null)
             {
                 throw new ArgumentNullException(nameof(slot));
             }
-
-            dataH[$"{slot.PlaceId}_{slot.Time.Ticks}"] = slot;
+            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            if (newOnly)
+            {
+                if (dataH.ContainsKey(key))
+                {
+                    throw new Exception("Item already exists");
+                }
+            }
+            dataH[key] = slot;
             return true;
         }
-        public override async Task<bool> Add(Slot5Min slot)
+        public override async Task<bool> Set(Slot5Min slot, bool newOnly)
         {
             if (slot is null)
             {
                 throw new ArgumentNullException(nameof(slot));
             }
-
-            dataM[$"{slot.PlaceId}_{slot.Time.Ticks}"] = slot;
+            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            if (newOnly)
+            {
+                if (dataM.ContainsKey(key))
+                {
+                    throw new Exception("Item already exists");
+                }
+            }
+            dataM[key] = slot;
             return true;
         }
         public override async Task<Slot5Min> Get5MinSlot(string placeId, long minuteSlotId)
@@ -65,18 +86,7 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             return dataH[$"{placeId}_{hourSlotId}"];
         }
-        public override async Task IncrementRegistration5MinSlot(Slot5Min slotM)
-        {
-            dataM[$"{slotM.PlaceId}_{slotM.Time.Ticks}"].Registrations++;
-        }
-        public override async Task IncrementRegistrationDaySlot(Slot1Day slotD)
-        {
-            dataD[$"{slotD.PlaceId}_{slotD.Time.Ticks}"].Registrations++;
-        }
-        public override async Task IncrementRegistrationHourSlot(Slot1Hour slotH)
-        {
-            dataH[$"{slotH.PlaceId}_{slotH.Time.Ticks}"].Registrations++;
-        }
+
         public override async Task<IEnumerable<Slot1Day>> ListDaySlotsByPlace(string placeId)
         {
             return dataD.Values.Where(s => s.PlaceId == placeId);

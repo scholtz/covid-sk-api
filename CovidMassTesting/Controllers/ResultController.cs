@@ -190,6 +190,8 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentException($"'{nameof(result)}' cannot be null or empty", nameof(result));
                 }
+
+
                 return Ok(await visitorRepository.SetTestResult(testCode, result));
             }
             catch (Exception exc)

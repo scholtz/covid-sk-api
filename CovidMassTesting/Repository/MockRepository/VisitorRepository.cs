@@ -1,5 +1,6 @@
 ﻿using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Model;
+using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
@@ -21,8 +22,15 @@ namespace CovidMassTesting.Repository.MockRepository
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
             IRedisCacheClient redisCacheClient,
-            IEmailSender emailSender
-            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.VisitorRepository>(), redisCacheClient, emailSender)
+            IEmailSender emailSender,
+            IPlaceRepository placeRepository
+            ) : base(
+                configuration,
+                loggerFactory.CreateLogger<Repository.RedisRepository.VisitorRepository>(),
+                redisCacheClient,
+                emailSender,
+                placeRepository
+                )
         {
 
         }
