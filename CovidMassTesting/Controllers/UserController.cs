@@ -51,6 +51,8 @@ namespace CovidMassTesting.Controllers
             }
             catch (Exception exc)
             {
+                logger.LogError(exc, exc.Message);
+
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -78,6 +80,8 @@ namespace CovidMassTesting.Controllers
             }
             catch (Exception exc)
             {
+                logger.LogError(exc, exc.Message);
+
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -102,6 +106,8 @@ namespace CovidMassTesting.Controllers
             }
             catch (Exception exc)
             {
+                logger.LogError(exc, exc.Message);
+
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
