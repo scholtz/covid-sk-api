@@ -9,7 +9,14 @@ namespace CovidMassTesting.Model
     {
         public string Id { get; set; }
         public string Name { get; set; }
+        /// <summary>
+        /// Registration in minute slot is rejected if more then this amount of people are registered
+        /// </summary>
         public int LimitPer5MinSlot { get; set; } = 5;
+        /// <summary>
+        /// Registration in hour slot is rejected if more then this amount of people are registered
+        /// </summary>
+        public int LimitPer1HourSlot { get; set; } = 40;
         public string Description { get; set; }
         public string Address { get; set; }
         public decimal Lat { get; set; }
@@ -19,5 +26,6 @@ namespace CovidMassTesting.Model
         public int Registrations { get; set; }
         public int Healthy { get; set; }
         public int Sick { get; set; }
+
     }
 }
