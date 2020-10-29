@@ -278,14 +278,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// Change password
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="hash"></param>
+        /// <param name="email">Email</param>
+        /// <param name="oldHash">Old password</param>
+        /// <param name="newHash">New password</param>
         /// <returns></returns>
-        public async Task<bool> ChangePassword(string email, string hash)
+        public async Task<bool> ChangePassword(string email, string oldHash, string newHash)
         {
             var user = await Get(email);
             if (user == null) throw new Exception("User not found by email");
-            user.PswHash = hash;
+            if (user.PswHash != oldHash) throw new Exception("Invalid old password");
+            user.PswHash = newHash;
             return await Set(user, false);
         }
     }

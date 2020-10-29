@@ -116,20 +116,21 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Set new password
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="hash"></param>
+        /// <param name="oldHash"></param>
+        /// <param name="newHash"></param>
         /// <returns></returns>
         [Authorize]
         [HttpPost("ChangePassword")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<string>> ChangePassword(
-            [FromForm] string hash
+            [FromForm] string oldHash,
+            [FromForm] string newHash
             )
         {
             try
             {
-                return Ok(await userRepository.ChangePassword(User.GetEmail(), hash));
+                return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash));
             }
             catch (Exception exc)
             {

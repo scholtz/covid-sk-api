@@ -183,12 +183,12 @@
             <param name="data"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.UserController.ChangePassword(System.String)">
+        <member name="M:CovidMassTesting.Controllers.UserController.ChangePassword(System.String,System.String)">
             <summary>
             Set new password
             </summary>
-            <param name="email"></param>
-            <param name="hash"></param>
+            <param name="oldHash"></param>
+            <param name="newHash"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Register(CovidMassTesting.Model.Visitor)">
@@ -437,12 +437,13 @@
             <param name="data"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ChangePassword(System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ChangePassword(System.String,System.String,System.String)">
             <summary>
             Change password
             </summary>
-            <param name="email"></param>
-            <param name="hash"></param>
+            <param name="email">Email</param>
+            <param name="oldHash">Old password</param>
+            <param name="newHash">New password</param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Startup">
