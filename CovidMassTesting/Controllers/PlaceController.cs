@@ -82,6 +82,7 @@ namespace CovidMassTesting.Controllers
                     }
                 }
 
+                logger.LogInformation($"InsertUpdate : {place.Id} {update}");
 
                 if (!update)
                 {

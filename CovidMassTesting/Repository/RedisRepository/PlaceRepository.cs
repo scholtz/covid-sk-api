@@ -36,7 +36,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", place.Id.ToString(), place, true))
+                if (!await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", place.Id.ToString(), place))
                 {
                     throw new Exception("Error creating place");
                 }
