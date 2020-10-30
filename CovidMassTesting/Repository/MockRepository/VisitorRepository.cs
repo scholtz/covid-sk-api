@@ -72,5 +72,19 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             testing2code[testCodeClear] = codeInt;
         }
+        public override async Task UnMapPersonalNumber(string personalNumber)
+        {
+            if (pname2code.ContainsKey(personalNumber)) pname2code.TryRemove(personalNumber, out var _);
+        }
+        public override async Task UnMapTestingSet(string testCodeClear)
+        {
+            if (testing2code.ContainsKey(testCodeClear)) testing2code.TryRemove(testCodeClear, out var _);
+        }
+        public override async Task<bool> Remove(int id)
+        {
+            if (!data.ContainsKey(id)) return false;
+            data.TryRemove(id, out var _);
+            return true;
+        }
     }
 }

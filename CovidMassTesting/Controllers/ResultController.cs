@@ -170,7 +170,45 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Public method to remove user test from database and all his private information
+        /// 
+        /// It is possible to remove this test only when test is marked as negative
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        [HttpPost("RemoveTest")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Result>> RemoveTest([FromForm] string code, [FromForm] string pass)
+        {
 
+            try
+            {
+                if (string.IsNullOrEmpty(code))
+                {
+                    throw new ArgumentException($"'{nameof(code)}' cannot be null or empty", nameof(code));
+                }
+
+                if (string.IsNullOrEmpty(pass))
+                {
+                    throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
+                }
+                var codeClear = code.Replace("-", "").Replace(" ", "").Trim();
+                if (int.TryParse(codeClear, out var codeInt))
+                {
+                    return Ok(await visitorRepository.RemoveTest(codeInt, pass));
+                }
+                throw new Exception("Invalid code");
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// This method is for triage person who scans the visitor bar code, scans the testing set bar code and performs test.
         /// </summary>

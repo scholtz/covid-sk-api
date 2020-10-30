@@ -72,6 +72,13 @@ namespace CovidMassTesting.Repository.RedisRepository
             });
             return await Set(visitor, true);
         }
+        public virtual async Task<bool> Remove(int id)
+        {
+            await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", id.ToString(CultureInfo.InvariantCulture));
+            return true;
+        }
+
+
         public virtual async Task<Visitor> Get(int code)
         {
             logger.LogInformation($"Visitor loaded from database: {code.GetHashCode()}");
@@ -106,6 +113,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", testCodeClear, codeInt);
         }
+        public virtual async Task UnMapTestingSet(string testCodeClear)
+        {
+            await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", testCodeClear);
+        }
         public virtual Task<int?> GETVisitorCodeFromTesting(string testCodeClear)
         {
             return redisCacheClient.Db0.HashGetAsync<int?>(
@@ -120,6 +131,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 Encoding.ASCII.GetBytes($"{personalNumber}{configuration["key"]}").GetSHA256Hash(),
                 visitorCode
             );
+        }
+        public virtual async Task UnMapPersonalNumber(string personalNumber)
+        {
+            await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}", Encoding.ASCII.GetBytes($"{personalNumber}{configuration["key"]}").GetSHA256Hash());
         }
         public virtual Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
         {
@@ -228,6 +243,58 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception("Invalid code");
             }
             return new Result { State = visitor.Result };
+        }
+        public async Task<bool> RemoveTest(int code, string pass)
+        {
+            if (string.IsNullOrEmpty(pass))
+            {
+                throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
+            }
+            if (pass.Length < 4)
+            {
+                throw new Exception("Invalid code");
+            }
+            var visitor = await Get(code);
+            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim()))
+            {
+                throw new Exception("Invalid code");
+            }
+            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim()))
+            {
+                throw new Exception("Invalid code");
+            }
+            if (visitor.Result != "negative") throw new Exception("Osobné údaje môžu byť vymazané iba pre testy s negatívnym výsledkom");
+
+            await Remove(visitor.Id);
+            if (!string.IsNullOrEmpty(visitor.TestingSet))
+            {
+                await UnMapTestingSet(visitor.TestingSet);
+            }
+
+            switch (visitor.PersonType)
+            {
+                case "idcard":
+                case "child":
+                    if (!string.IsNullOrEmpty(visitor.RC))
+                    {
+                        await UnMapPersonalNumber(visitor.RC);
+                    }
+                    break;
+                case "foreign":
+                    if (!string.IsNullOrEmpty(visitor.Passport))
+                    {
+                        await UnMapPersonalNumber(visitor.Passport);
+                    }
+                    break;
+            }
+
+            await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}",
+                new Model.Email.PersonalDataRemovedEmail()
+                {
+                    Name = $"{visitor.FirstName} {visitor.LastName}",
+                });
+
+            return true;
         }
         protected async Task<int> CreateNewVisitorId()
         {
