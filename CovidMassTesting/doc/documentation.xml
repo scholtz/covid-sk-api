@@ -22,6 +22,15 @@
             <param name="roles"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.RemoveUser(System.String)">
+            <summary>
+            Administrator is allowed to invite other users and set their groups
+            </summary>
+            <param name="email"></param>
+            <param name="name"></param>
+            <param name="roles"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -364,6 +373,48 @@
             Stores personal data, contact data as well as medical condition
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Repository.MockRepository.UserRepository">
+            <summary>
+            In memory user repository
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender)">
+            <summary>
+            constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="loggerFactory"></param>
+            <param name="redisCacheClient"></param>
+            <param name="emailSender"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Set(CovidMassTesting.Model.User,System.Boolean)">
+            <summary>
+            set user
+            </summary>
+            <param name="user"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Get(System.String)">
+            <summary>
+            Gets user
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.ListAll">
+            <summary>
+            Returns all users
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Remove(System.String)">
+            <summary>
+            Removes user
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
             <summary>
             Checks if all slots for the day, and testing place has been created
@@ -408,6 +459,13 @@
             <param name="mustBeNew"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Remove(System.String)">
+            <summary>
+            Removes user.
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Get(System.String)">
             <summary>
             Decode encrypted user data
@@ -440,6 +498,8 @@
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ChangePassword(System.String,System.String,System.String)">
             <summary>
             Change password
+            
+            If successful, returns new JWT token
             </summary>
             <param name="email">Email</param>
             <param name="oldHash">Old password</param>

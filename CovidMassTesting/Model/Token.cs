@@ -41,6 +41,16 @@ namespace CovidMassTesting.Model
 
             return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "Admin");
         }
+        public static bool IsPasswordProtected(this ClaimsPrincipal user)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "PasswordProtected");
+        }
+
         public static bool IsRegistrationManager(this ClaimsPrincipal user)
         {
             if (user is null)

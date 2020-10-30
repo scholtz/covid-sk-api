@@ -8,6 +8,7 @@ using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
@@ -21,7 +22,9 @@ namespace CovidMassTesting.Controllers
         private readonly ISlotRepository slotRepository;
         private readonly IPlaceRepository placeRepository;
         private readonly IUserRepository userRepository;
+        private readonly IConfiguration configuration;
         public AdminController(
+            IConfiguration configuration,
             ILogger<AdminController> logger,
             ISlotRepository slotRepository,
             IPlaceRepository placeRepository,
@@ -32,6 +35,7 @@ namespace CovidMassTesting.Controllers
             this.slotRepository = slotRepository;
             this.placeRepository = placeRepository;
             this.userRepository = userRepository;
+            this.configuration = configuration;
         }
         /// <summary>
         /// Shows available days per place
@@ -85,6 +89,35 @@ namespace CovidMassTesting.Controllers
                     Name = name,
                     Roles = roles
                 }));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Administrator is allowed to invite other users and set their groups
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="roles"></param>
+        /// <returns></returns>
+        [HttpPost("RemoveUser")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> RemoveUser([FromForm] string email)
+        {
+            try
+            {
+                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to remove users");
+                if (User.GetEmail() == email) throw new Exception("You cannot remove yourself");
+
+                var mustKeepUsers = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
+                if (mustKeepUsers.Any(u => u.Email == email)) throw new Exception("This user is protected by the configuration");
+
+                return Ok(await userRepository.Remove(email));
             }
             catch (Exception exc)
             {

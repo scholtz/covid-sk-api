@@ -166,6 +166,22 @@ namespace CovidMassTesting.Repository.RedisRepository
             return true;
         }
         /// <summary>
+        /// Removes user.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> Remove(string email)
+        {
+            if (email is null)
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            logger.LogInformation($"Removing user {email}");
+            await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", email);
+            return true;
+        }
+        /// <summary>
         /// Decode encrypted user data
         /// </summary>
         /// <param name="email"></param>

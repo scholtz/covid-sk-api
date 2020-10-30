@@ -130,6 +130,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (User.IsPasswordProtected()) { throw new Exception("This special user cannot change the password."); }
+
                 return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash));
             }
             catch (Exception exc)
