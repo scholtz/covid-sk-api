@@ -12,6 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
 {
+    /// <summary>
+    /// This controller manages test results
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class ResultController : ControllerBase
@@ -19,6 +22,12 @@ namespace CovidMassTesting.Controllers
         private readonly ILogger<ResultController> logger;
         private readonly IVisitorRepository visitorRepository;
         private readonly IUserRepository userRepository;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="visitorRepository"></param>
+        /// <param name="userRepository"></param>
         public ResultController(
             ILogger<ResultController> logger,
             IVisitorRepository visitorRepository,
