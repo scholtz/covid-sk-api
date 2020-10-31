@@ -71,5 +71,16 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="rc"></param>
         /// <returns></returns>
         public Task<Visitor> GetVisitorByPersonalNumber(string rc);
+        /// <summary>
+        /// Document manager can fetch one visitor from executed tests
+        /// </summary>
+        /// <returns></returns>
+        public Task<Visitor> GetNextTest();
+        /// <summary>
+        /// Removes test from test queue
+        /// </summary>
+        /// <param name="testId"></param>
+        /// <returns></returns>
+        public Task<bool> RemoveFromDocQueue(string testId);
     }
 }

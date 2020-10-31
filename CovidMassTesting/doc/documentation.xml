@@ -195,6 +195,18 @@
             <param name="result"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.GetNextTest">
+            <summary>
+            This method is for person who writes certificates on paper
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.RemoveFromDocQueue(System.String)">
+            <summary>
+            This method removes test from queue
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String)">
             <summary>
             Shows available days per place
@@ -434,6 +446,46 @@
         <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.MailerFromEmail">
             <summary>
             From email
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.TestResult">
+            <summary>
+            Test results strings
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.NotTaken">
+            <summary>
+            Waiting for visitor to take the test
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.TestIsBeingProcessing">
+            <summary>
+            Test has been taken by visitor and waiting for test results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.TestMustBeRepeated">
+            <summary>
+            Test result is failed test, and must be repeated
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.PositiveWaitingForCertificate">
+            <summary>
+            Test result is positive. Waiting for visitor to take the certificate
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.PositiveCertificateTaken">
+            <summary>
+            Test result is positive. Certificate has been given to visitor.
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.NegativeWaitingForCertificate">
+            <summary>
+            Test result is negative. Waiting for visitor to take the certificate
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.NegativeCertificateTaken">
+            <summary>
+            Test result is negative. Certificate has been given to visitor.
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Token">
@@ -826,6 +878,19 @@
             Get visitor by personal number
             </summary>
             <param name="rc"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetNextTest">
+            <summary>
+            Document manager can fetch one visitor from executed tests
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveFromDocQueue(System.String)">
+            <summary>
+            Removes test from test queue
+            </summary>
+            <param name="testId"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.UserRepository">

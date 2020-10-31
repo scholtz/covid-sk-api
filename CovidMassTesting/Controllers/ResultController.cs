@@ -256,5 +256,55 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// This method is for person who writes certificates on paper
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("GetNextTest")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Visitor>> GetNextTest()
+        {
+            try
+            {
+                if (!User.IsDocumentManager(userRepository)) throw new Exception("Only user with Document Manager role is allowed to fetch visitor data");
+
+                return Ok(await visitorRepository.GetNextTest());
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// This method removes test from queue
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("RemoveFromDocQueue")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> RemoveFromDocQueue([FromForm] string testId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(testId))
+                {
+                    throw new ArgumentException($"'{nameof(testId)}' cannot be null or empty", nameof(testId));
+                }
+
+                if (!User.IsDocumentManager(userRepository)) throw new Exception("Only user with Document Manager role is allowed to fetch visitor data");
+
+                return Ok(await visitorRepository.RemoveFromDocQueue(testId));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }

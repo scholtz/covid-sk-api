@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
+using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,6 +25,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
         private readonly string REDIS_KEY_TEST2VISITOR = "TEST2VISITOR";
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
+        private readonly string REDIS_KEY_DOCUMENT_QUEUE = "DOCUMENT_QUEUE";
         private readonly IEmailSender emailSender;
         public VisitorRepository(
             IConfiguration configuration,
@@ -178,11 +180,25 @@ namespace CovidMassTesting.Repository.RedisRepository
                 // update slots stats
                 switch (state)
                 {
-                    case "positive":
+                    case TestResult.PositiveWaitingForCertificate:
                         await placeRepository.IncrementPlaceSick(visitor.ChosenPlaceId);
                         break;
-                    case "negative":
+                    case TestResult.NegativeWaitingForCertificate:
                         await placeRepository.IncrementPlaceHealthy(visitor.ChosenPlaceId);
+                        break;
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+            }
+            try
+            {
+                // update slots stats
+                switch (state)
+                {
+                    case TestResult.PositiveWaitingForCertificate:
+                        await AddToDocQueue(visitor.TestingSet);
                         break;
                 }
             }
@@ -193,31 +209,27 @@ namespace CovidMassTesting.Repository.RedisRepository
             // send email
             switch (state)
             {
-                case "test-to-be-repeated":
+                case TestResult.TestMustBeRepeated:
                     await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingToBeRepeatedEmail()
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
                     });
                     break;
-                case "test-not-processed":
+                case TestResult.TestIsBeingProcessing:
                     await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingInProcessEmail()
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
 
                     });
                     break;
-                case "positive":
-                case "negative":
+                case TestResult.PositiveWaitingForCertificate:
+                case TestResult.NegativeWaitingForCertificate:
                     await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingResultEmail()
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
 
                     });
                     break;
-                case "not-submitted":
-                case "submitting":
-                case "error":
-                case "test-not-taken":
                 default:
                     break;
             }
@@ -336,5 +348,30 @@ namespace CovidMassTesting.Repository.RedisRepository
             };
         }
 
+        public virtual Task<bool> AddToDocQueue(string testId)
+        {
+            return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId, DateTimeOffset.UtcNow.Ticks);
+        }
+        public virtual Task<bool> RemoveFromDocQueue(string testId)
+        {
+            return redisCacheClient.Db0.SortedSetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId);
+        }
+        public virtual async Task<string> GetFirstItemFromQueue()
+        {
+            return (await redisCacheClient.Db0.SortedSetRangeByScoreAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", take: 1, skip: 0)).FirstOrDefault();
+        }
+        public async Task<Visitor> GetNextTest()
+        {
+            var firstTest = await GetFirstItemFromQueue();
+            if (firstTest == null) throw new Exception("No test in queue");
+            var visitor = await GETVisitorCodeFromTesting(firstTest);
+            if (!visitor.HasValue)
+            {
+                logger.LogInformation($"Unable to match test {firstTest} to visitor");
+                await RemoveFromDocQueue(firstTest);
+                return await GetNextTest();
+            }
+            return await Get(visitor.Value);
+        }
     }
 }
