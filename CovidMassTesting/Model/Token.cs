@@ -23,7 +23,7 @@ namespace CovidMassTesting.Model
             /// <summary>
             /// Roles claim identifier
             /// </summary>
-            public const string Role = "Roles";
+            public const string Role = "Role";
             /// <summary>
             /// Name claim identifier
             /// </summary>
@@ -113,12 +113,12 @@ namespace CovidMassTesting.Model
         /// <returns></returns>
         private static string[] ProcessRoles(ClaimsPrincipal user)
         {
-            var value = user.Claims.FirstOrDefault(c => c.Type == Claims.Role);
+            var value = user.Claims.Where(c => c.Type == Claims.Role).Select(c=>c.Value).ToArray();
             if (value == null)
             {
                 return Array.Empty<string>();
             }
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<string[]>(value.Value);
+            return value;
         }
         /// <summary>
         /// Check if user has password protected .. Created for demo users
@@ -218,22 +218,40 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(configuration));
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(configuration["JWTTokenSecret"]);
-            ClaimsIdentity subject;
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(Token.Claims.Email, usr.Email),
-                    new Claim(Token.Claims.Name, usr.Name),
-                    new Claim(Token.Claims.Role, Newtonsoft.Json.JsonConvert.SerializeObject(usr.Roles))
-                }),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+
+            var payload = new JwtPayload {
+                  {
+                    Token.Claims.Email,
+                     usr.Email
+                  },{
+                    Token.Claims.Name,
+                     usr.Name
+                  },
+                  {
+                    Token.Claims.Role,
+                     usr.Roles
+                  },
+                  {
+                    "nbf",
+                     DateTimeOffset.UtcNow.AddSeconds(-1).ToUnixTimeSeconds()
+                  },
+                  {
+                    "iat",
+                     DateTimeOffset.UtcNow.AddSeconds(-1).ToUnixTimeSeconds()
+                  },
+                  {
+                    "exp",
+                     DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds()
+                  },
             };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
+
+            var credentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature);
+
+            var header = new JwtHeader(credentials);
+            var secToken = new JwtSecurityToken(header, payload);
+            var handler = new JwtSecurityTokenHandler();
+            return handler.WriteToken(secToken);
         }
     }
 }
