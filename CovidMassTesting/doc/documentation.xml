@@ -99,6 +99,27 @@
             templates
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Controllers.PlaceController">
+            <summary>
+            Manages places
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="logger"></param>
+            <param name="placeRepository"></param>
+            <param name="userRepository"></param>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.List">
+            <summary>
+            List places
+            
+            Contains live statistics of users, registered, infected and healthy visitors
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.PlaceController.InsertOrUpdate(CovidMassTesting.Model.Place)">
             <summary>
             Admin can insert new testing location
@@ -112,6 +133,19 @@
             </summary>
             <param name="place"></param>
             <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.ResultController">
+            <summary>
+            This controller manages test results
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="logger"></param>
+            <param name="visitorRepository"></param>
+            <param name="userRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.GetVisitor(System.String)">
             <summary>
@@ -210,6 +244,20 @@
             <param name="newHash"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.VisitorController">
+            <summary>
+            This controller manages public registrations
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.VisitorController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+            <summary>
+            constructor
+            </summary>
+            <param name="logger"></param>
+            <param name="slotRepository"></param>
+            <param name="visitorRepository"></param>
+            <param name="placeRepository"></param>
+        </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Register(CovidMassTesting.Model.Visitor)">
             <summary>
             Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
@@ -250,6 +298,18 @@
             Protected implementation of Dispose pattern.
             </summary>
             <param name="disposing"></param>
+        </member>
+        <member name="T:CovidMassTesting.Helpers.Hash">
+            <summary>
+            Hash helper
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Hash.GetSHA256Hash(System.Byte[])">
+            <summary>
+            Allows to make hash of any string
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.Email.IEmail">
             <summary>
@@ -450,53 +510,52 @@
             <param name="user"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsAdmin(System.Security.Claims.ClaimsPrincipal)">
+        <member name="M:CovidMassTesting.Model.Token.IsAdmin(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Checks if user is admin
             </summary>
             <param name="user"></param>
+            <param name="userRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.ProcessRoles(System.Security.Claims.ClaimsPrincipal)">
-            <summary>
-            Roles from claim
-            </summary>
-            <param name="user"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CovidMassTesting.Model.Token.IsPasswordProtected(System.Security.Claims.ClaimsPrincipal)">
+        <member name="M:CovidMassTesting.Model.Token.IsPasswordProtected(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Check if user has password protected .. Created for demo users
             </summary>
             <param name="user"></param>
+            <param name="userRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsRegistrationManager(System.Security.Claims.ClaimsPrincipal)">
+        <member name="M:CovidMassTesting.Model.Token.IsRegistrationManager(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Checks if user has role Registration Manager
             </summary>
             <param name="user"></param>
+            <param name="userRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsMedicTester(System.Security.Claims.ClaimsPrincipal)">
+        <member name="M:CovidMassTesting.Model.Token.IsMedicTester(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Checks if user has role Medic Tester
             </summary>
             <param name="user"></param>
+            <param name="userRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsMedicLab(System.Security.Claims.ClaimsPrincipal)">
+        <member name="M:CovidMassTesting.Model.Token.IsMedicLab(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Checks if user has role Medic Lab
             </summary>
             <param name="user"></param>
+            <param name="userRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsDocumentManager(System.Security.Claims.ClaimsPrincipal)">
+        <member name="M:CovidMassTesting.Model.Token.IsDocumentManager(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Check if user has role Document Manager
             </summary>
             <param name="user"></param>
+            <param name="userRepository"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Model.Token.CreateToken(CovidMassTesting.Model.User,Microsoft.Extensions.Configuration.IConfiguration)">
@@ -507,12 +566,267 @@
             <param name="configuration">APP Configuran</param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Model.User">
+            <summary>
+            User model
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.User.Email">
+            <summary>
+            User email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.User.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.User.Roles">
+            <summary>
+            List of roles
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.User.PswHash">
+            <summary>
+            Password
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.User.CoHash">
+            <summary>
+            Cohash
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.User.ToPublic">
+            <summary>
+            Converts to public export (password is not sent out)
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.UserPublic">
+            <summary>
+            User public object
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.UserPublic.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.UserPublic.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.UserPublic.Roles">
+            <summary>
+            List of roles
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Visitor">
             <summary>
             Data stored in this object are encrypted
             
             Stores personal data, contact data as well as medical condition
             </summary>
+        </member>
+        <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
+            <summary>
+            Place repository interface for dependency injection
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.DecrementPlaceRegistrations(System.String)">
+            <summary>
+            Decrement registrations at place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.IncrementPlaceRegistrations(System.String)">
+            <summary>
+            Increment registrations at place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.IncrementPlaceHealthy(System.String)">
+            <summary>
+            increment healthy visitors
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.IncrementPlaceSick(System.String)">
+            <summary>
+            increment sick visitors
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.GetPlace(System.String)">
+            <summary>
+            Returns place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.ListAll">
+            <summary>
+            List all places
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.Set(CovidMassTesting.Model.Place)">
+            <summary>
+            Set new place object
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.Delete(CovidMassTesting.Model.Place)">
+            <summary>
+            Admin can remove place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.Interface.IUserRepository">
+            <summary>
+            User repository interface for dependency injection
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Add(CovidMassTesting.Model.User)">
+            <summary>
+            Create user
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListAll">
+            <summary>
+            List all users
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.CreateAdminUsersFromConfiguration">
+            <summary>
+            Create admins from configuration
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Preauthenticate(System.String)">
+            <summary>
+            Returns cohash
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Authenticate(System.String,System.String,System.String)">
+            <summary>
+            Authenticates user
+            Returns jwt if successful
+            </summary>
+            <param name="email"></param>
+            <param name="hash"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ChangePassword(System.String,System.String,System.String)">
+            <summary>
+            Change user password
+            </summary>
+            <param name="email"></param>
+            <param name="oldHash"></param>
+            <param name="newHash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Remove(System.String)">
+            <summary>
+            Deletes user
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.InAnyGroup(System.String,System.String[])">
+            <summary>
+            Checks if user is in any of selected groups
+            </summary>
+            <param name="email"></param>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.Interface.IVisitorRepository">
+            <summary>
+            Visitor repository interface for dependency injection
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Add(CovidMassTesting.Model.Visitor)">
+            <summary>
+            Creates new visitor
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Set(CovidMassTesting.Model.Visitor,System.Boolean)">
+            <summary>
+            Sets the visitor to the database
+            </summary>
+            <param name="visitor"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetTest(System.Int32,System.String)">
+            <summary>
+            Get test result for public
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveTest(System.Int32,System.String)">
+            <summary>
+            Removes test on wish of user when visitor was tested negative
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.UpdateTestingState(System.Int32,System.String)">
+            <summary>
+            Update test state of visitor
+            </summary>
+            <param name="code"></param>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ConnectVisitorToTest(System.Int32,System.String)">
+            <summary>
+            Bind visitor to specific test
+            </summary>
+            <param name="codeInt"></param>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitor(System.Int32)">
+            <summary>
+            Load visitor
+            </summary>
+            <param name="codeInt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetTestResult(System.String,System.String)">
+            <summary>
+            Set test result
+            </summary>
+            <param name="testCode"></param>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitorByPersonalNumber(System.String)">
+            <summary>
+            Get visitor by personal number
+            </summary>
+            <param name="rc"></param>
+            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.UserRepository">
             <summary>
@@ -645,6 +959,14 @@
             <param name="email">Email</param>
             <param name="oldHash">Old password</param>
             <param name="newHash">New password</param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.InAnyGroup(System.String,System.String[])">
+            <summary>
+            Checks if user with specified email has any of reqested groups
+            </summary>
+            <param name="email">User email</param>
+            <param name="roles">Search any of this roles</param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Startup">
