@@ -271,31 +271,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception("Invalid user or password");
             }
 
-            return CreateToken(usr);
+            return Token.CreateToken(usr, configuration);
         }
-        private string CreateToken(User usr)
-        {
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(configuration["JWTTokenSecret"]);
-            ClaimsIdentity subject;
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(Token.EmailClaim, usr.Email),
-                    new Claim(Token.NameClaim, usr.Name)
-                }),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            foreach (var role in usr.Roles)
-            {
-                subject.AddClaim(new Claim(Token.RoleClaim, role));
-            }
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return tokenHandler.WriteToken(token);
-        }
         /// <summary>
         /// Change password
         /// 
@@ -313,7 +291,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             user.PswHash = newHash;
             if (await Set(user, false))
             {
-                return CreateToken(user);
+                return Token.CreateToken(user, configuration);
             }
             return "";
         }

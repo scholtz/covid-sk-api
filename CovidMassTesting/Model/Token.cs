@@ -1,8 +1,11 @@
-﻿using System;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model
@@ -102,6 +105,38 @@ namespace CovidMassTesting.Model
         {
             var handler = new JwtSecurityTokenHandler();
             return handler.ReadToken(token) as JwtSecurityToken;
+        }
+        public static string CreateToken(User usr, IConfiguration configuration)
+        {
+            if (usr is null)
+            {
+                throw new ArgumentNullException(nameof(usr));
+            }
+
+            if (configuration is null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(configuration["JWTTokenSecret"]);
+            ClaimsIdentity subject;
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(Token.Claims.Email, usr.Email),
+                    new Claim(Token.Claims.Name, usr.Name)
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            foreach (var role in usr.Roles)
+            {
+                subject.AddClaim(new Claim(Token.Claims.Role, role));
+            }
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token);
         }
     }
 }
