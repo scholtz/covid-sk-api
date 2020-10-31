@@ -9,10 +9,21 @@ namespace CovidMassTesting.Model
 {
     public static class Token
     {
-        public const string RoleClaim = "Role";
-        public const string NameClaim = "Name";
-        public const string EmailClaim = ClaimTypes.NameIdentifier;
-
+        public class Claims
+        {
+            public const string Role = "Role";
+            public const string Name = "Name";
+            public const string Email = ClaimTypes.NameIdentifier;
+        }
+        public class Groups
+        {
+            public const string Admin = "Admin";
+            public const string PasswordProtected = "PasswordProtected";
+            public const string RegistrationManager = "RegistrationManager";
+            public const string MedicTester = "MedicTester";
+            public const string DocumentManager = "DocumentManager";
+            public const string MedicLab = "MedicLab";
+        }
 
         public static string GetEmail(this ClaimsPrincipal user)
         {
@@ -21,7 +32,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.FirstOrDefault(c => c.Type == EmailClaim)?.Value ?? "";
+            return user.Claims.FirstOrDefault(c => c.Type == Claims.Email)?.Value ?? "";
         }
         public static string GetName(this ClaimsPrincipal user)
         {
@@ -30,7 +41,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.FirstOrDefault(c => c.Type == NameClaim)?.Value ?? "";
+            return user.Claims.FirstOrDefault(c => c.Type == Claims.Name)?.Value ?? "";
         }
         public static bool IsAdmin(this ClaimsPrincipal user)
         {
@@ -39,7 +50,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "Admin");
+            return user.Claims.Any(c => c.Type == Claims.Role && c.Value == Groups.Admin);
         }
         public static bool IsPasswordProtected(this ClaimsPrincipal user)
         {
@@ -48,7 +59,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "PasswordProtected");
+            return user.Claims.Any(c => c.Type == Claims.Role && c.Value == Groups.PasswordProtected);
         }
 
         public static bool IsRegistrationManager(this ClaimsPrincipal user)
@@ -58,7 +69,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "Admin" || c.Value == "RegistrationManager");
+            return user.Claims.Any(c => c.Type == Claims.Role && (c.Value == Groups.Admin || c.Value == Groups.RegistrationManager));
         }
         public static bool IsMedicTester(this ClaimsPrincipal user)
         {
@@ -67,7 +78,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "Admin" || c.Value == "MedicTester");
+            return user.Claims.Any(c => c.Type == Claims.Role && (c.Value == Groups.Admin || c.Value == Groups.MedicTester));
         }
         public static bool IsMedicLab(this ClaimsPrincipal user)
         {
@@ -76,7 +87,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "Admin" || c.Value == "MedicLab");
+            return user.Claims.Any(c => c.Type == Claims.Role && (c.Value == Groups.Admin || c.Value == Groups.MedicLab));
         }
         public static bool IsDocumentManager(this ClaimsPrincipal user)
         {
@@ -85,7 +96,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.Any(c => c.Type == RoleClaim && c.Value == "Admin" || c.Value == "DocumentManager");
+            return user.Claims.Any(c => c.Type == Claims.Role && (c.Value == Groups.Admin || c.Value == Groups.DocumentManager));
         }
         private static JwtSecurityToken Parse(string token)
         {
