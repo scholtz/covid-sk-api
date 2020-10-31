@@ -503,8 +503,8 @@
             <summary>
             Method creates jwt token
             </summary>
-            <param name="usr"></param>
-            <param name="configuration"></param>
+            <param name="usr">User object</param>
+            <param name="configuration">APP Configuran</param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.Visitor">

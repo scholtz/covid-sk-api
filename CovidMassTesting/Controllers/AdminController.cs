@@ -87,7 +87,7 @@ namespace CovidMassTesting.Controllers
                 {
                     Email = email,
                     Name = name,
-                    Roles = roles
+                    Roles = roles.ToList()
                 }));
             }
             catch (Exception exc)

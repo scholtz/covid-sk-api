@@ -69,7 +69,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 Name = user.Name,
                 Password = pass,
-                Roles = user.Roles,
+                Roles = user.Roles.ToArray(),
             });
             return await Set(user, true);
         }
@@ -235,7 +235,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         await Add(new User()
                         {
                             Email = usr.Email,
-                            Roles = new string[] { "Admin" },
+                            Roles = new List<string>() { "Admin", "Test" },
                             Name = usr.Name
                         });
                     }

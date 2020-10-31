@@ -113,7 +113,7 @@ namespace CovidMassTesting.Model
         /// <returns></returns>
         private static string[] ProcessRoles(ClaimsPrincipal user)
         {
-            var value = user.Claims.Where(c => c.Type == Claims.Role).Select(c=>c.Value).ToArray();
+            var value = user.Claims.Where(c => c.Type == Claims.Role).Select(c => c.Value).ToArray();
             if (value == null)
             {
                 return Array.Empty<string>();
@@ -203,8 +203,8 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Method creates jwt token
         /// </summary>
-        /// <param name="usr"></param>
-        /// <param name="configuration"></param>
+        /// <param name="usr">User object</param>
+        /// <param name="configuration">APP Configuran</param>
         /// <returns></returns>
         public static string CreateToken(User usr, IConfiguration configuration)
         {
