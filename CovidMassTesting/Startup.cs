@@ -191,7 +191,7 @@ namespace CovidMassTesting
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("v1/swagger.json", "Enumerations Service API V1");
+                c.SwaggerEndpoint("v1/swagger.json", "API V1");
             });
             app.UserRedisInformation();
             app.UseRouting();

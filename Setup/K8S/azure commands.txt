@@ -1,0 +1,18 @@
+az account set --subscription 6e16ffd0-6083-49b4-a382-ab175d23d9af
+az aks get-credentials --resource-group COVID --name covid-sk
+
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm repo add jetstack https://charts.jetstack.io
+helm repo update
+
+kubectl create namespace ingress-basic
+kubectl label namespace ingress-basic certmanager.k8s.io/disable-validation=true
+
+helm template nginx-ingress ingress-nginx/ingress-nginx --namespace ingress-basic  --set controller.replicaCount=3 --set controller.nodeSelector."beta\.kubernetes\.io/os"=linux --set defaultBackend.nodeSelector."beta\.kubernetes\.io/os"=linux > ingress.yaml
+kubectl apply -f ingress.yaml -n ingress-basic
+
+helm template cert-manager  --namespace ingress-basic   --set installCRDs=true  --set nodeSelector."beta\.kubernetes\.io/os"=linux  jetstack/cert-manager > cert-manager.yaml
+
+kubectl apply -f cert-manager.yaml -n ingress-basic
+kubectl apply -f issuer.yaml -n ingress-basic
+kubectl apply -f deployment.yaml
