@@ -12,21 +12,38 @@ using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
 {
+    /// <summary>
+    /// Manages places
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class PlaceController : ControllerBase
     {
         private readonly ILogger<PlaceController> logger;
         private readonly IPlaceRepository placeRepository;
+        private readonly IUserRepository userRepository;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="placeRepository"></param>
+        /// <param name="userRepository"></param>
         public PlaceController(
             ILogger<PlaceController> logger,
-            IPlaceRepository placeRepository
+            IPlaceRepository placeRepository,
+            IUserRepository userRepository
             )
         {
             this.logger = logger;
             this.placeRepository = placeRepository;
+            this.userRepository = userRepository;
         }
-
+        /// <summary>
+        /// List places
+        /// 
+        /// Contains live statistics of users, registered, infected and healthy visitors
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("List")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -59,7 +76,7 @@ namespace CovidMassTesting.Controllers
 
             try
             {
-                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to manage testing places");
+                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to manage testing places");
 
                 if (place is null)
                 {
@@ -129,7 +146,12 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to manage testing places");
+                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to manage testing places");
+
+                if (place is null)
+                {
+                    throw new ArgumentNullException(nameof(place));
+                }
 
                 if (string.IsNullOrEmpty(place.Id) || await placeRepository.GetPlace(place.Id) == null)
                 {

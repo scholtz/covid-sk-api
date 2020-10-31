@@ -265,6 +265,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<string> Authenticate(string email, string hash, string data)
         {
             var usr = await Get(email);
+            if (usr == null)
+            {
+                throw new Exception("Invalid user or password");
+            }
             var ourHash = Encoding.ASCII.GetBytes($"{usr.PswHash}{data}").GetSHA256Hash();
             if (ourHash != hash)
             {
@@ -294,6 +298,34 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return Token.CreateToken(user, configuration);
             }
             return "";
+        }
+        /// <summary>
+        /// Checks if user with specified email has any of reqested groups
+        /// </summary>
+        /// <param name="email">User email</param>
+        /// <param name="roles">Search any of this roles</param>
+        /// <returns></returns>
+        public async Task<bool> InAnyGroup(string email, string[] roles)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException($"'{nameof(email)}' cannot be null or empty", nameof(email));
+            }
+
+            if (roles is null)
+            {
+                throw new ArgumentNullException(nameof(roles));
+            }
+
+            if (roles.Length == 0) return true;
+
+
+            var usr = await Get(email);
+            foreach (var role in roles)
+            {
+                if (usr.Roles.Contains(role)) return true;
+            }
+            return false;
         }
     }
 }

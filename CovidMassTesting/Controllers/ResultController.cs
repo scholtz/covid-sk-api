@@ -18,13 +18,16 @@ namespace CovidMassTesting.Controllers
     {
         private readonly ILogger<ResultController> logger;
         private readonly IVisitorRepository visitorRepository;
+        private readonly IUserRepository userRepository;
         public ResultController(
             ILogger<ResultController> logger,
-            IVisitorRepository visitorRepository
+            IVisitorRepository visitorRepository,
+            IUserRepository userRepository
             )
         {
             this.logger = logger;
             this.visitorRepository = visitorRepository;
+            this.userRepository = userRepository;
         }
         /// <summary>
         /// Testing personell can load data by the code, so that they can verify that the code is the specific user
@@ -39,7 +42,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager() && !User.IsMedicTester()) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
+                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
 
                 if (string.IsNullOrEmpty(visitorCode))
                 {
@@ -74,7 +77,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager() && !User.IsMedicTester()) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
+                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
 
                 if (string.IsNullOrEmpty(rc))
                 {
@@ -104,7 +107,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager() && !User.IsMedicTester()) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user to test");
+                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user to test");
 
 
                 if (string.IsNullOrEmpty(visitorCode))
@@ -223,7 +226,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsMedicLab()) throw new Exception("Only user with Medic Lab role is allowed to set results of tests");
+                if (!User.IsMedicLab(userRepository)) throw new Exception("Only user with Medic Lab role is allowed to set results of tests");
 
                 if (string.IsNullOrEmpty(testCode))
                 {

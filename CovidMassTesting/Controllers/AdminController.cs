@@ -51,7 +51,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to manage time");
+                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to manage time");
 
                 var ret = 0;
                 foreach (var item in await placeRepository.ListAll())
@@ -81,7 +81,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to invite other users");
+                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to invite other users");
 
                 return Ok(await userRepository.Add(new Model.User()
                 {
@@ -111,7 +111,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin()) throw new Exception("Only admin is allowed to remove users");
+                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to remove users");
                 if (User.GetEmail() == email) throw new Exception("You cannot remove yourself");
 
                 var mustKeepUsers = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();

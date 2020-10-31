@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using CovidMassTesting.Repository.Interface;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -95,110 +96,127 @@ namespace CovidMassTesting.Model
         /// Checks if user is admin
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="userRepository"></param>
         /// <returns></returns>
-        public static bool IsAdmin(this ClaimsPrincipal user)
+        public static bool IsAdmin(this ClaimsPrincipal user, IUserRepository userRepository)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var roles = ProcessRoles(user);
-            return roles.Any(c => c == Groups.Admin);
-        }
-        /// <summary>
-        /// Roles from claim
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        private static string[] ProcessRoles(ClaimsPrincipal user)
-        {
-            var value = user.Claims.Where(c => c.Type == Claims.Role).Select(c => c.Value).ToArray();
-            if (value == null)
+            if (userRepository is null)
             {
-                return Array.Empty<string>();
+                throw new ArgumentNullException(nameof(userRepository));
             }
-            return value;
+
+            var email = user.GetEmail();
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin }).Result;
         }
         /// <summary>
         /// Check if user has password protected .. Created for demo users
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="userRepository"></param>
         /// <returns></returns>
-        public static bool IsPasswordProtected(this ClaimsPrincipal user)
+        public static bool IsPasswordProtected(this ClaimsPrincipal user, IUserRepository userRepository)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var roles = ProcessRoles(user);
-            return roles.Any(c => c == Groups.PasswordProtected);
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+
+            var email = user.GetEmail();
+            return userRepository.InAnyGroup(email, new string[] { Groups.PasswordProtected }).Result;
         }
         /// <summary>
         /// Checks if user has role Registration Manager
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="userRepository"></param>
         /// <returns></returns>
-        public static bool IsRegistrationManager(this ClaimsPrincipal user)
+        public static bool IsRegistrationManager(this ClaimsPrincipal user, IUserRepository userRepository)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var roles = ProcessRoles(user);
-            return roles.Any(c => c == Groups.Admin || c == Groups.RegistrationManager);
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+
+            var email = user.GetEmail();
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.RegistrationManager }).Result;
         }
         /// <summary>
         /// Checks if user has role Medic Tester
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="userRepository"></param>
         /// <returns></returns>
-        public static bool IsMedicTester(this ClaimsPrincipal user)
+        public static bool IsMedicTester(this ClaimsPrincipal user, IUserRepository userRepository)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var roles = ProcessRoles(user);
-            return roles.Any(c => c == Groups.Admin || c == Groups.MedicTester);
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+
+            var email = user.GetEmail();
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicTester }).Result;
         }
         /// <summary>
         /// Checks if user has role Medic Lab
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="userRepository"></param>
         /// <returns></returns>
-        public static bool IsMedicLab(this ClaimsPrincipal user)
+        public static bool IsMedicLab(this ClaimsPrincipal user, IUserRepository userRepository)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var roles = ProcessRoles(user);
-            return roles.Any(c => c == Groups.Admin || c == Groups.MedicLab);
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+
+            var email = user.GetEmail();
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicLab }).Result;
         }
         /// <summary>
         /// Check if user has role Document Manager
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="userRepository"></param>
         /// <returns></returns>
-        public static bool IsDocumentManager(this ClaimsPrincipal user)
+        public static bool IsDocumentManager(this ClaimsPrincipal user, IUserRepository userRepository)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var roles = ProcessRoles(user);
-            return roles.Any(c => c == Groups.Admin || c == Groups.DocumentManager);
-        }
-        private static JwtSecurityToken Parse(string token)
-        {
-            var handler = new JwtSecurityTokenHandler();
-            return handler.ReadToken(token) as JwtSecurityToken;
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+
+            var email = user.GetEmail();
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.DocumentManager }).Result;
         }
         /// <summary>
         /// Method creates jwt token

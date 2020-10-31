@@ -47,7 +47,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin()) throw new Exception("Only user with Admin role can list users");
+                if (!User.IsAdmin(userRepository)) throw new Exception("Only user with Admin role can list users");
 
                 return Ok((await userRepository.ListAll()).ToDictionary(p => p.Email, p => p.ToPublic()));
             }
@@ -130,7 +130,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (User.IsPasswordProtected()) { throw new Exception("This special user cannot change the password."); }
+                if (User.IsPasswordProtected(userRepository)) { throw new Exception("This special user cannot change the password."); }
 
                 return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash));
             }

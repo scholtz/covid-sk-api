@@ -15,5 +15,6 @@ namespace CovidMassTesting.Repository.Interface
         public Task<string> Authenticate(string email, string hash, string data);
         public Task<string> ChangePassword(string email, string oldHash, string newHash);
         public Task<bool> Remove(string email);
+        public Task<bool> InAnyGroup(string email, string[] role);
     }
 }
