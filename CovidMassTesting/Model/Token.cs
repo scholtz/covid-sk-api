@@ -126,15 +126,12 @@ namespace CovidMassTesting.Model
                 Subject = subject = new ClaimsIdentity(new Claim[]
                 {
                     new Claim(Token.Claims.Email, usr.Email),
-                    new Claim(Token.Claims.Name, usr.Name)
+                    new Claim(Token.Claims.Name, usr.Name),
+                    new Claim(Token.Claims.Role, Newtonsoft.Json.JsonConvert.SerializeObject(usr.Roles))
                 }),
                 Expires = DateTime.UtcNow.AddDays(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
-            foreach (var role in usr.Roles)
-            {
-                subject.AddClaim(new Claim(Token.Claims.Role, role));
-            }
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
