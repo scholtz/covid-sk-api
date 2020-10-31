@@ -32,7 +32,7 @@ namespace CovidMassTesting.Model
             /// <summary>
             /// Email claim identifier
             /// </summary>
-            public const string Email = ClaimTypes.NameIdentifier;
+            public const string Email = "nameid";
         }
         /// <summary>
         /// List of roles
