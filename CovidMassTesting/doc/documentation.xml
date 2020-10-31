@@ -376,6 +376,137 @@
             From email
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Token">
+            <summary>
+            Token management
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Token.Claims">
+            <summary>
+            Claim names
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Claims.Role">
+            <summary>
+            Roles claim identifier
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Claims.Name">
+            <summary>
+            Name claim identifier
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Claims.Email">
+            <summary>
+            Email claim identifier
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Token.Groups">
+            <summary>
+            List of roles
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Groups.Admin">
+            <summary>
+            Admin can create users, places, set dates, and all methods with other roles
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Groups.PasswordProtected">
+            <summary>
+            User with this role can not change password
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Groups.RegistrationManager">
+            <summary>
+            User in this role can fetch users by the registration code
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Groups.MedicTester">
+            <summary>
+            User with this role can assign test bar code to the registed user
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Groups.DocumentManager">
+            <summary>
+            User with this role can export data of all infected users and pass them to covid center
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Token.Groups.MedicLab">
+            <summary>
+            User with this role can set testing results
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.GetEmail(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Get email from claim
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.GetName(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Get name from claim
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsAdmin(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Checks if user is admin
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.ProcessRoles(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Roles from claim
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsPasswordProtected(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Check if user has password protected .. Created for demo users
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsRegistrationManager(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Checks if user has role Registration Manager
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsMedicTester(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Checks if user has role Medic Tester
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsMedicLab(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Checks if user has role Medic Lab
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsDocumentManager(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Check if user has role Document Manager
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.CreateToken(CovidMassTesting.Model.User,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Method creates jwt token
+            </summary>
+            <param name="usr"></param>
+            <param name="configuration"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Model.Visitor">
             <summary>
             Data stored in this object are encrypted
