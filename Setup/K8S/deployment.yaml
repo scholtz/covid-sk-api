@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: covid
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mass-covid-testing-api-deployment
+  namespace: covid
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mass-covid-testing-api
+  template:
+    metadata:
+      labels:
+        app: mass-covid-testing-api
+    spec:
+      containers:
+        - name: mass-covid-testing-api-pod
+          image: scholtz2/mass-covid-testing-api:latest
+          imagePullPolicy: Always
+          ports:
+          -
+            containerPort: 80
+            protocol: "TCP"
+          -
+            containerPort: 443
+            protocol: "TCP"  
+          readinessProbe:
+              exec:
+                command:
+                - cat
+                - /app/ready.txt
+              initialDelaySeconds: 120
+              periodSeconds: 20
+              
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mass-covid-testing-api-service
+  namespace: aaa
+spec:
+  type: LoadBalancer
+  selector:
+    app: mass-covid-testing-api
+  ports:
+    - protocol: TCP
+      port: 80
+      name: http
+    - protocol: TCP
+      port: 443
+      name: https
