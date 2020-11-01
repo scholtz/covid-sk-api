@@ -75,7 +75,7 @@ namespace CovidMassTesting.Controllers
                 visitor.Phone = FormatPhone(visitor.Phone);
                 if (!IsPhoneNumber(visitor.Phone))
                 {
-                    visitor.Phone = visitor.Phone;
+                    visitor.Phone = "";
                 }
 
                 var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);

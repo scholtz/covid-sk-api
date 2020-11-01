@@ -232,12 +232,35 @@ namespace CovidMassTesting.Repository.RedisRepository
                     var user = await Get(usr.Email);
                     if (user == null)
                     {
-                        await Add(new User()
+                        if (string.IsNullOrEmpty(usr.Password))
                         {
-                            Email = usr.Email,
-                            Roles = new List<string>() { "Admin", "Test" },
-                            Name = usr.Name
-                        });
+                            await Add(new User()
+                            {
+                                Email = usr.Email,
+                                Roles = usr.Roles == null ? new List<string>() { "Admin" } : usr.Roles.ToList(),
+                                Name = usr.Name
+                            });
+                        }
+                        else
+                        {
+                            var pass = usr.Password;
+                            var cohash = GenerateRandomPassword(new PasswordOptions() { RequiredLength = 4 });
+
+                            for (int i = 0; i < RehashN; i++)
+                            {
+                                pass = Encoding.ASCII.GetBytes($"{pass}{cohash}").GetSHA256Hash();
+                            }
+
+                            var newUser = new User()
+                            {
+                                Email = usr.Email,
+                                Roles = usr.Roles == null ? new List<string>() { "Admin" } : usr.Roles.ToList(),
+                                Name = usr.Name,
+                                CoHash = cohash,
+                                PswHash = pass
+                            };
+                            await Set(newUser, false);
+                        }
                     }
                 }
                 catch (Exception exc)

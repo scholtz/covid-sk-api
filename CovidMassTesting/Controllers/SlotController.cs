@@ -33,7 +33,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListDaySlotsByPlace")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, UserPublic>>> ListDaySlotsByPlace([FromQuery] string placeId)
+        public async Task<ActionResult<Dictionary<string, Slot1Day>>> ListDaySlotsByPlace([FromQuery] string placeId)
         {
             try
             {
@@ -49,7 +49,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListHourSlotsByPlaceAndDaySlotId")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, UserPublic>>> ListHourSlotsByPlaceAndDaySlotId([FromQuery] string placeId, [FromQuery] long daySlotId)
+        public async Task<ActionResult<Dictionary<string, Slot1Hour>>> ListHourSlotsByPlaceAndDaySlotId([FromQuery] string placeId, [FromQuery] long daySlotId)
         {
             try
             {
@@ -65,7 +65,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListMinuteSlotsByPlaceAndHourSlotId")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, UserPublic>>> ListMinuteSlotsByPlaceAndHourSlotId([FromQuery] string placeId, [FromQuery] long hourSlotId)
+        public async Task<ActionResult<Dictionary<string, Slot5Min>>> ListMinuteSlotsByPlaceAndHourSlotId([FromQuery] string placeId, [FromQuery] long hourSlotId)
         {
             try
             {

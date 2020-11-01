@@ -3,12 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30611.23
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CovidMassTesting", "CovidMassTesting\CovidMassTesting.csproj", "{44B8FD6B-56A2-41B8-A6ED-F45C5A7B8147}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CovidMassTesting", "CovidMassTesting\CovidMassTesting.csproj", "{44B8FD6B-56A2-41B8-A6ED-F45C5A7B8147}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{77540D10-E956-4617-90C7-94069C2E32D2}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnitTestCovidApi", "NUnitTestCovidApi\NUnitTestCovidApi.csproj", "{DC54C929-AFF0-4A97-91A8-620C85622A62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,6 +22,10 @@ Global
 		{44B8FD6B-56A2-41B8-A6ED-F45C5A7B8147}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{44B8FD6B-56A2-41B8-A6ED-F45C5A7B8147}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{44B8FD6B-56A2-41B8-A6ED-F45C5A7B8147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC54C929-AFF0-4A97-91A8-620C85622A62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC54C929-AFF0-4A97-91A8-620C85622A62}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC54C929-AFF0-4A97-91A8-620C85622A62}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC54C929-AFF0-4A97-91A8-620C85622A62}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

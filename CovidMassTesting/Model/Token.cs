@@ -76,7 +76,7 @@ namespace CovidMassTesting.Model
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return user.Claims.FirstOrDefault(c => c.Type == Claims.Email)?.Value ?? "";
+            return user.Claims.FirstOrDefault(c => c.Type == Claims.Email || c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
         }
         /// <summary>
         /// Get name from claim

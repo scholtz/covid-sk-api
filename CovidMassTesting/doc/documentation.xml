@@ -448,6 +448,33 @@
             From email
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Settings.User">
+            <summary>
+            Configuration user
+            
+            Users in the configurataion cannot be deleted
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.User.Name">
+            <summary>
+            User name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.User.Email">
+            <summary>
+            Password will be sent to this email in first run
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.User.Password">
+            <summary>
+            Do not setup password. This is for tesing purposes only.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.User.Roles">
+            <summary>
+            If not defined, Admin role is set
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.TestResult">
             <summary>
             Test results strings
