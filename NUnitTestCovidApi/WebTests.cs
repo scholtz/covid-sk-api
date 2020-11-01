@@ -130,6 +130,16 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
+        private HttpResponseMessage PublicGetTestResult(HttpClient client, string code, string pass)
+        {
+            return client.PostAsync("Result/Get",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("code",code),
+                        new KeyValuePair<string, string>("pass",pass),
+                    })
+                ).Result;
+        }
+
 
 
         private bool RegisterTestVisitors(HttpClient client, string placeId, long slotId)
@@ -455,11 +465,23 @@ namespace NUnitTestCovidApi
                 var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
                 Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
 
+                // TEST mark as wrong code
                 request = SetResult(client, test1, TestResult.PositiveCertificateTaken);
                 Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
 
+                // TEST mark as sick
+                request = SetResult(client, test2, TestResult.NegativeWaitingForCertificate);
+                Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
+                result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+                Assert.AreEqual(TestResult.NegativeWaitingForCertificate, result.State);
+                client.DefaultRequestHeaders.Clear();
 
-                request = SetResult(client, test1, TestResult.NegativeWaitingForCertificate);
+                request = PublicGetTestResult(client, Registered[0].Id.ToString(), Registered[0].RC.Substring(6, 4));
+                Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
+                result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+                Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
+
+                request = PublicGetTestResult(client, Registered[1].Id.ToString(), Registered[1].RC.Substring(6, 4));
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
                 result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
                 Assert.AreEqual(TestResult.NegativeWaitingForCertificate, result.State);
