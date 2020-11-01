@@ -60,7 +60,7 @@ namespace CovidMassTesting.Repository.MockRepository
         }
         public override async Task<string> GetFirstItemFromQueue()
         {
-            logger.LogInformation($"Visitor.GetFirstItemFromQueue {testId}");
+            logger.LogInformation($"Visitor.GetFirstItemFromQueue");
             return docqueue.FirstOrDefault();
         }
         public override async Task<Visitor> Get(int code)
