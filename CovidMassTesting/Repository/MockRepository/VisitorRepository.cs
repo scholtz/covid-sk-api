@@ -17,6 +17,7 @@ namespace CovidMassTesting.Repository.MockRepository
         private readonly ConcurrentDictionary<int, Visitor> data = new ConcurrentDictionary<int, Visitor>();
         private readonly ConcurrentDictionary<string, int> testing2code = new ConcurrentDictionary<string, int>();
         private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
+        private readonly SortedSet<string> docqueue = new SortedSet<string>();
 
         public VisitorRepository(
             IConfiguration configuration,
@@ -42,7 +43,22 @@ namespace CovidMassTesting.Repository.MockRepository
             }
             if (mustBeNew && data.ContainsKey(visitor.Id)) throw new Exception("Item already exists");
             data[visitor.Id] = visitor;
+
             return visitor;
+        }
+        public override async Task<bool> RemoveFromDocQueue(string testId)
+        {
+            docqueue.Remove(testId);
+            return true;
+        }
+        public override async Task<bool> AddToDocQueue(string testId)
+        {
+            docqueue.Add(testId);
+            return true;
+        }
+        public override async Task<string> GetFirstItemFromQueue()
+        {
+            return docqueue.FirstOrDefault();
         }
         public override async Task<Visitor> Get(int code)
         {

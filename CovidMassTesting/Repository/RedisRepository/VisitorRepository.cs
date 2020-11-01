@@ -49,6 +49,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             visitor.Id = await CreateNewVisitorId();
             visitor.LastUpdate = DateTimeOffset.Now;
+            visitor.Result = TestResult.NotTaken;
+            visitor.TestingSet = "";
+
             var code = visitor.Id.ToString();
             switch (visitor.PersonType)
             {
@@ -108,6 +111,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (mustBeNew && !ret)
             {
                 throw new Exception("Error creating record in the database");
+            }
+            if (!string.IsNullOrEmpty(visitor.TestingSet))
+            {
+                await MapTestingSetToVisitorCode(visitor.Id, visitor.TestingSet);
             }
             return visitor;
         }

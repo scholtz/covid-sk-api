@@ -95,21 +95,28 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Tento hodinový časový slot má kapacitu zaplnenú.");
                 }
                 Visitor previous = null;
-                switch (visitor.PersonType)
+                try
                 {
-                    case "idcard":
-                    case "child":
-                        if (!string.IsNullOrEmpty(visitor.RC))
-                        {
-                            previous = await visitorRepository.GetVisitorByPersonalNumber(visitor.RC);
-                        }
-                        break;
-                    case "foreign":
-                        if (!string.IsNullOrEmpty(visitor.Passport))
-                        {
-                            previous = await visitorRepository.GetVisitorByPersonalNumber(visitor.Passport);
-                        }
-                        break;
+                    switch (visitor.PersonType)
+                    {
+                        case "idcard":
+                        case "child":
+                            if (!string.IsNullOrEmpty(visitor.RC))
+                            {
+                                previous = await visitorRepository.GetVisitorByPersonalNumber(visitor.RC);
+                            }
+                            break;
+                        case "foreign":
+                            if (!string.IsNullOrEmpty(visitor.Passport))
+                            {
+                                previous = await visitorRepository.GetVisitorByPersonalNumber(visitor.Passport);
+                            }
+                            break;
+                    }
+                }
+                catch
+                {
+
                 }
                 if (previous == null)
                 {
