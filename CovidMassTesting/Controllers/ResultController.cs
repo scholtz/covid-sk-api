@@ -58,8 +58,8 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException($"'{nameof(visitorCode)}' cannot be null or empty", nameof(visitorCode));
                 }
 
-                var codeClear = visitorCode.Replace("-", "").Replace(" ", "").Trim();
-                var testCodeClear = visitorCode.Replace("-", "").Replace(" ", "").Trim();
+                var codeClear = FormatBarCode(visitorCode);
+                var testCodeClear = FormatBarCode(visitorCode);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.GetVisitor(codeInt));
@@ -130,8 +130,8 @@ namespace CovidMassTesting.Controllers
                 }
 
 
-                var codeClear = visitorCode.Replace("-", "").Replace(" ", "").Trim();
-                var testCodeClear = testCode.Replace("-", "").Replace(" ", "").Trim();
+                var codeClear = FormatBarCode(visitorCode);
+                var testCodeClear = FormatBarCode(testCode);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.ConnectVisitorToTest(codeInt, testCodeClear));
@@ -168,7 +168,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
                 }
-                var codeClear = code.Replace("-", "").Replace(" ", "").Trim();
+                var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.GetTest(codeInt, pass));
@@ -207,7 +207,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
                 }
-                var codeClear = code.Replace("-", "").Replace(" ", "").Trim();
+                var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.RemoveTest(codeInt, pass));
@@ -247,8 +247,14 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException($"'{nameof(result)}' cannot be null or empty", nameof(result));
                 }
 
-
-                return Ok(await visitorRepository.SetTestResult(testCode, result));
+                switch (result)
+                {
+                    case TestResult.NegativeWaitingForCertificate:
+                    case TestResult.PositiveWaitingForCertificate:
+                    case TestResult.TestMustBeRepeated:
+                        return Ok(await visitorRepository.SetTestResult(FormatBarCode(testCode), result));
+                }
+                throw new Exception("Invalid state");
             }
             catch (Exception exc)
             {
@@ -298,13 +304,21 @@ namespace CovidMassTesting.Controllers
 
                 if (!User.IsDocumentManager(userRepository)) throw new Exception("Only user with Document Manager role is allowed to fetch visitor data");
 
-                return Ok(await visitorRepository.RemoveFromDocQueue(testId));
+                return Ok(await visitorRepository.RemoveFromDocQueue(FormatBarCode(testId)));
             }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
+        }
+
+        private static string FormatBarCode(string code)
+        {
+            return code
+                .Replace("-", "")
+                .Replace(" ", "")
+                .Trim();
         }
     }
 }
