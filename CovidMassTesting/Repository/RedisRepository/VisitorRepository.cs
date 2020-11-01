@@ -167,7 +167,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await Get(code);
-            if (visitor == null) throw new Exception($"Visitory with code {code} not found");
+            if (visitor == null) throw new Exception($"Visitor with code {code} not found");
             if (visitor.Result == state)
             {
                 // repeated requests should not send emails
