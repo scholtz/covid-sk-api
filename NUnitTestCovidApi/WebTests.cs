@@ -19,7 +19,7 @@ namespace NUnitTestCovidApi
     public class Tests
     {
         private IConfiguration configuration;
-        private List<Visitor> Registered = new List<Visitor>();
+
         [SetUp]
         public void Setup()
         {
@@ -142,8 +142,9 @@ namespace NUnitTestCovidApi
 
 
 
-        private bool RegisterTestVisitors(HttpClient client, string placeId, long slotId)
+        private List<Visitor> RegisterTestVisitors(HttpClient client, string placeId, long slotId)
         {
+            var Registered = new List<Visitor>();
             Visitor visitor1 = new Visitor()
             {
                 Address = "addr",
@@ -159,7 +160,7 @@ namespace NUnitTestCovidApi
 
             };
             var result = Register(client, visitor1);
-            if (result.StatusCode != HttpStatusCode.OK) return false;
+            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
             Registered.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(result.Content.ReadAsStringAsync().Result));
             Visitor visitor2 = new Visitor()
             {
@@ -175,10 +176,10 @@ namespace NUnitTestCovidApi
                 RC = "0101010019",
             };
             result = Register(client, visitor2);
-            if (result.StatusCode != HttpStatusCode.OK) return false;
+            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
             Registered.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(result.Content.ReadAsStringAsync().Result));
 
-            return true;
+            return Registered;
         }
 
         [Test]
@@ -363,8 +364,9 @@ namespace NUnitTestCovidApi
                 Assert.IsTrue(minutes.Count > 0);
 
                 var minute = minutes.Values.First();
-                Assert.IsTrue(RegisterTestVisitors(client, place.Id, minute.SlotId));
 
+                var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+                Assert.IsTrue(registered.Count >= 2);
                 var registrationManager = users.First(u => u.Name == "RegistrationManager");
                 request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -372,7 +374,7 @@ namespace NUnitTestCovidApi
                 Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {registrationManagerToken}");
 
-                var user1 = Registered.First();
+                var user1 = registered.First();
 
                 request = GetVisitor(client, user1.Id.ToString());
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -442,8 +444,8 @@ namespace NUnitTestCovidApi
                 Assert.IsTrue(minutes.Count > 0);
 
                 var minute = minutes.Values.First();
-                Assert.IsTrue(RegisterTestVisitors(client, place.Id, minute.SlotId));
-
+                var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+                Assert.IsTrue(registered.Count >= 2);
                 var registrationManager = users.First(u => u.Name == "RegistrationManager");
                 request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -452,11 +454,11 @@ namespace NUnitTestCovidApi
                 client.DefaultRequestHeaders.Add("Authorization", $"Bearer {registrationManagerToken}");
 
                 string test1 = "111-111-111";
-                request = ConnectVisitorToTest(client, Registered[0].Id.ToString(), test1);
+                request = ConnectVisitorToTest(client, registered[0].Id.ToString(), test1);
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
                 string test2 = "222-222-222";
-                request = ConnectVisitorToTest(client, Registered[1].Id.ToString(), test2);
+                request = ConnectVisitorToTest(client, registered[1].Id.ToString(), test2);
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
                 // TEST mark as sick
@@ -476,12 +478,12 @@ namespace NUnitTestCovidApi
                 Assert.AreEqual(TestResult.NegativeWaitingForCertificate, result.State);
                 client.DefaultRequestHeaders.Clear();
 
-                request = PublicGetTestResult(client, Registered[0].Id.ToString(), Registered[0].RC.Substring(6, 4));
+                request = PublicGetTestResult(client, registered[0].Id.ToString(), registered[0].RC.Substring(6, 4));
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
                 result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
                 Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
 
-                request = PublicGetTestResult(client, Registered[1].Id.ToString(), Registered[1].RC.Substring(6, 4));
+                request = PublicGetTestResult(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
                 result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
                 Assert.AreEqual(TestResult.NegativeWaitingForCertificate, result.State);
