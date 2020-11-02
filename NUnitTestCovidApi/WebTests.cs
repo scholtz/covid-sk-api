@@ -95,6 +95,14 @@ namespace NUnitTestCovidApi
                                 new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                 ).Result;
         }
+        private HttpResponseMessage RegisterByManager(HttpClient client, Visitor visitor)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(visitor);
+            return client.PostAsync("Visitor/RegisterByManager",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+
         private HttpResponseMessage ConnectVisitorToTest(HttpClient client, string visitorCode, string testCode)
         {
             return client.PostAsync("Result/ConnectVisitorToTest",
@@ -148,6 +156,14 @@ namespace NUnitTestCovidApi
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
                         new KeyValuePair<string, string>("code",code),
                         new KeyValuePair<string, string>("pass",pass),
+                    })
+                ).Result;
+        }
+        private HttpResponseMessage SetLocation(HttpClient client, string placeId)
+        {
+            return client.PostAsync("User/SetLocation",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("placeId",placeId),
                     })
                 ).Result;
         }
@@ -334,7 +350,7 @@ namespace NUnitTestCovidApi
 
 
         [Test]
-        public void MatchVisitorWithTest()
+        public void RoleRegistrationManagerTest()
         {
             using (var web = new MockWebApp())
             {
@@ -388,6 +404,10 @@ namespace NUnitTestCovidApi
 
                 var user1 = registered.First();
 
+                request = SetLocation(client, place.Id);
+                Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
                 request = GetVisitor(client, user1.Id.ToString());
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
                 var responseVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
@@ -409,6 +429,31 @@ namespace NUnitTestCovidApi
                 Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
 
+                Visitor visitor = new Visitor()
+                {
+                    Address = "addr",
+                    Email = "email@scholtz.sk",
+                    FirstName = "F",
+                    LastName = "L",
+                    Insurance = "25",
+                    PersonType = "idcard",
+                    Phone = "+421907000000",
+                    RC = "0101010008",
+                };
+                request = RegisterByManager(client, visitor);
+
+                Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+                var responsedVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+                Assert.IsTrue(responsedVisitor.Id > 100000000);
+                Assert.AreEqual(visitor.Address, responsedVisitor.Address);
+                Assert.AreEqual(place.Id, responsedVisitor.ChosenPlaceId);
+                Assert.IsTrue(responsedVisitor.ChosenSlot > 0);
+                Assert.AreEqual(visitor.Email, responsedVisitor.Email);
+                Assert.AreEqual(visitor.FirstName, responsedVisitor.FirstName);
+                Assert.AreEqual(visitor.Insurance, responsedVisitor.Insurance);
+                Assert.AreEqual(visitor.RC, responsedVisitor.RC);
+                Assert.AreEqual(visitor.Phone, responsedVisitor.Phone);
+                Assert.AreEqual(TestResult.NotTaken, responsedVisitor.Result);
             }
         }
 

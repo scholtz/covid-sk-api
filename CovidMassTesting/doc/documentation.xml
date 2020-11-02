@@ -232,6 +232,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.SetLocation(System.String)">
+            <summary>
+            Place at which person is assigned. All person's registrations will be placed to this location
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.UserController.Preauthenticate(System.String)">
             <summary>
             Preauthenticate. Cohash is important part of hash. This method returns cohash
@@ -279,20 +286,11 @@
             <param name="visitor"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.VisitorController.FormatPhone(System.String)">
+        <member name="M:CovidMassTesting.Controllers.VisitorController.RegisterByManager(CovidMassTesting.Model.Visitor)">
             <summary>
-            Format phone to slovak standard
-            
-            0800 123 456 convers to +421800123456
+            Registration manager can register visitor
             </summary>
-            <param name="number"></param>
-            <returns></returns>
-        </member>
-        <member name="M:CovidMassTesting.Controllers.VisitorController.IsPhoneNumber(System.String)">
-            <summary>
-            Validates the phone number +421800123456
-            </summary>
-            <param name="number"></param>
+            <param name="visitor"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Helpers.Aes">
@@ -675,6 +673,11 @@
             Cohash
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.User.Place">
+            <summary>
+            Place at which person is assigned. All person's registrations will be placed to this location
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Model.User.ToPublic">
             <summary>
             Converts to public export (password is not sent out)
@@ -699,6 +702,11 @@
         <member name="P:CovidMassTesting.Model.UserPublic.Roles">
             <summary>
             List of roles
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.UserPublic.Place">
+            <summary>
+            Place at which person is assigned. All person's registrations will be placed to this location
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Visitor">
@@ -833,6 +841,21 @@
             <param name="role"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.SetLocation(System.String,System.String)">
+            <summary>
+            Registration Manager can select place. All his registrations will be placed at this location
+            </summary>
+            <param name="v"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.GetPublicUser(System.String)">
+            <summary>
+            Get public user data.. eg location
+            </summary>
+            <param name="managerEmail"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IVisitorRepository">
             <summary>
             Visitor repository interface for dependency injection
@@ -890,6 +913,14 @@
             Load visitor
             </summary>
             <param name="codeInt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String)">
+            <summary>
+            Public registration
+            </summary>
+            <param name="visitor"></param>
+            <param name="managerEmail"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetTestResult(System.String,System.String)">
@@ -968,6 +999,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetCurrentSlot(System.String)">
+            <summary>
+            Get current slot
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.UserRepository">
             <summary>
             User repository manages users and stores user data securly in the database
@@ -1026,6 +1064,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.SetLocation(System.String,System.String)">
+            <summary>
+            Registration manager can set his place at which he performs tests
+            </summary>
+            <param name="email"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Preauthenticate(System.String)">
             <summary>
             Returns cohash
@@ -1059,6 +1105,37 @@
             </summary>
             <param name="email">User email</param>
             <param name="roles">Search any of this roles</param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GetPublicUser(System.String)">
+            <summary>
+            Returns public information about specific user
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String)">
+            <summary>
+            Public registration
+            </summary>
+            <param name="visitor"></param>
+            <param name="managerEmail"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FormatPhone(System.String)">
+            <summary>
+            Format phone to slovak standard
+            
+            0800 123 456 convers to +421800123456
+            </summary>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.IsPhoneNumber(System.String)">
+            <summary>
+            Validates the phone number +421800123456
+            </summary>
+            <param name="number"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Startup">

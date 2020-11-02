@@ -24,5 +24,6 @@ namespace CovidMassTesting.Repository.Interface
         public Task<Slot5Min> Get5MinSlot(string placeId, long minuteSlotId);
         public Task<IEnumerable<Slot5Min>> ListMinuteSlotsByPlaceAndHourSlotId(string placeId, long hourSlotId);
         public Task<int> CheckSlots(long testingDay, string placeId, int testingFromHour = 9, int testingUntilHour = 20);
+        public Task<Slot5Min> GetCurrentSlot(string place);
     }
 }

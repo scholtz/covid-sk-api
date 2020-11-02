@@ -59,6 +59,14 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<Visitor> GetVisitor(int codeInt);
         /// <summary>
+        /// Public registration
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="managerEmail"></param>
+        /// <returns></returns>
+        public Task<Visitor> Register(Visitor visitor, string managerEmail);
+
+        /// <summary>
         /// Set test result
         /// </summary>
         /// <param name="testCode"></param>

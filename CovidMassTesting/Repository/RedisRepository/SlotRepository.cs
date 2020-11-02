@@ -282,5 +282,19 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return ret;
         }
+        /// <summary>
+        /// Get current slot
+        /// </summary>
+        /// <param name="place"></param>
+        /// <returns></returns>
+        public async Task<Slot5Min> GetCurrentSlot(string place)
+        {
+            var days = await ListDaySlotsByPlace(place);
+            var currentDay = days.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var hours = await ListHourSlotsByPlaceAndDaySlotId(place, currentDay.SlotId);
+            var currentHour = hours.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var minutes = await ListMinuteSlotsByPlaceAndHourSlotId(place, currentHour.SlotId);
+            return minutes.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+        }
     }
 }

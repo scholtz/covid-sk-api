@@ -24,13 +24,17 @@ namespace CovidMassTesting.Repository.MockRepository
             ILoggerFactory loggerFactory,
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
-            IPlaceRepository placeRepository
+            IPlaceRepository placeRepository,
+            ISlotRepository slotRepository,
+            IUserRepository userRepository
             ) : base(
                 configuration,
                 loggerFactory.CreateLogger<Repository.RedisRepository.VisitorRepository>(),
                 redisCacheClient,
                 emailSender,
-                placeRepository
+                placeRepository,
+                slotRepository,
+                userRepository
                 )
         {
             logger = loggerFactory.CreateLogger<VisitorRepository>();

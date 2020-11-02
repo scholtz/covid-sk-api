@@ -31,6 +31,11 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string CoHash { get; set; }
         /// <summary>
+        /// Place at which person is assigned. All person's registrations will be placed to this location
+        /// </summary>
+        public string Place { get; set; }
+
+        /// <summary>
         /// Converts to public export (password is not sent out)
         /// </summary>
         /// <returns></returns>
@@ -40,7 +45,8 @@ namespace CovidMassTesting.Model
             {
                 Email = Email,
                 Name = Name,
-                Roles = Roles
+                Roles = Roles,
+                Place = Place
             };
         }
     }

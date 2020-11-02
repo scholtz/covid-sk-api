@@ -58,7 +58,35 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Place at which person is assigned. All person's registrations will be placed to this location
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("SetLocation")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Dictionary<string, UserPublic>>> SetLocation([FromForm] string placeId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(placeId))
+                {
+                    throw new ArgumentException($"'{nameof(placeId)}' cannot be null or empty", nameof(placeId));
+                }
 
+                if (!User.IsRegistrationManager(userRepository)) throw new Exception("Only RegistrationManager can select his place.");
+
+                return Ok(await userRepository.SetLocation(User.GetEmail(), placeId));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// Preauthenticate. Cohash is important part of hash. This method returns cohash
         /// </summary>

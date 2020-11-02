@@ -63,5 +63,18 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="role"></param>
         /// <returns></returns>
         public Task<bool> InAnyGroup(string email, string[] role);
+        /// <summary>
+        /// Registration Manager can select place. All his registrations will be placed at this location
+        /// </summary>
+        /// <param name="v"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public Task<bool> SetLocation(string v, string placeId);
+        /// <summary>
+        /// Get public user data.. eg location
+        /// </summary>
+        /// <param name="managerEmail"></param>
+        /// <returns></returns>
+        public Task<UserPublic> GetPublicUser(string managerEmail);
     }
 }

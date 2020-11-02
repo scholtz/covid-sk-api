@@ -22,5 +22,9 @@ namespace CovidMassTesting.Model
         /// List of roles
         /// </summary>
         public List<string> Roles { get; set; }
+        /// <summary>
+        /// Place at which person is assigned. All person's registrations will be placed to this location
+        /// </summary>
+        public string Place { get; set; }
     }
 }

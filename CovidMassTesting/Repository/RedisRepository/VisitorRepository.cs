@@ -13,6 +13,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.RedisRepository
@@ -23,6 +24,8 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly ILogger<VisitorRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
         private readonly IPlaceRepository placeRepository;
+        private readonly ISlotRepository slotRepository;
+        private readonly IUserRepository userRepository;
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
         private readonly string REDIS_KEY_TEST2VISITOR = "TEST2VISITOR";
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
@@ -33,7 +36,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             ILogger<VisitorRepository> logger,
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
-            IPlaceRepository placeRepository
+            IPlaceRepository placeRepository,
+            ISlotRepository slotRepository,
+            IUserRepository userRepository
             )
         {
             this.logger = logger;
@@ -41,6 +46,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.configuration = configuration;
             this.emailSender = emailSender;
             this.placeRepository = placeRepository;
+            this.slotRepository = slotRepository;
+            this.userRepository = userRepository;
         }
         public async Task<Visitor> Add(Visitor visitor)
         {
@@ -399,6 +406,160 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return await GetNextTest();
             }
             return await Get(visitor.Value);
+        }
+
+        /// <summary>
+        /// Public registration
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="managerEmail"></param>
+        /// <returns></returns>
+        public async Task<Visitor> Register(Visitor visitor, string managerEmail)
+        {
+            if (visitor is null)
+            {
+                throw new ArgumentNullException(nameof(visitor));
+            }
+
+            if (!string.IsNullOrEmpty(managerEmail))
+            {
+                // register to manager place and nearest slot
+
+                UserPublic manager = await userRepository.GetPublicUser(managerEmail);
+
+                visitor.ChosenPlaceId = manager.Place;
+                var currentSlot = await slotRepository.GetCurrentSlot(manager.Place);
+                visitor.ChosenSlot = currentSlot.SlotId;
+            }
+
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(visitor.Email);
+                visitor.Email = addr.Address;
+            }
+            catch
+            {
+                visitor.Email = "";
+            }
+
+            visitor.Phone = FormatPhone(visitor.Phone);
+            if (!IsPhoneNumber(visitor.Phone))
+            {
+                visitor.Phone = "";
+            }
+
+            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            if (place == null) { throw new Exception("We are not able to find chosen testing place"); }
+            var slotM = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
+            if (slotM == null) { throw new Exception("We are not able to find chosen slot"); }
+            var slotH = await slotRepository.GetHourSlot(visitor.ChosenPlaceId, slotM.HourSlotId);
+            if (slotH == null) { throw new Exception("We are not able to find chosen hour slot"); }
+            var slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
+
+            if (slotM.Registrations >= place.LimitPer5MinSlot)
+            {
+                throw new Exception("Tento 5-minútový časový slot má kapacitu zaplnenú.");
+            }
+            if (slotH.Registrations >= place.LimitPer1HourSlot)
+            {
+                throw new Exception("Tento hodinový časový slot má kapacitu zaplnenú.");
+            }
+            Visitor previous = null;
+            try
+            {
+                switch (visitor.PersonType)
+                {
+                    case "idcard":
+                    case "child":
+                        if (!string.IsNullOrEmpty(visitor.RC))
+                        {
+                            previous = await GetVisitorByPersonalNumber(visitor.RC);
+                        }
+                        break;
+                    case "foreign":
+                        if (!string.IsNullOrEmpty(visitor.Passport))
+                        {
+                            previous = await GetVisitorByPersonalNumber(visitor.Passport);
+                        }
+                        break;
+                }
+            }
+            catch
+            {
+
+            }
+            if (previous == null)
+            {
+                // new registration
+
+                var ret = await Add(visitor);
+
+                await slotRepository.IncrementRegistration5MinSlot(slotM);
+                await slotRepository.IncrementRegistrationHourSlot(slotH);
+                await slotRepository.IncrementRegistrationDaySlot(slotD);
+                await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+
+                return ret;
+            }
+            else
+            {
+                // update registration
+                visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
+                var ret = await Set(visitor, false);
+                if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
+                {
+                    await placeRepository.DecrementPlaceRegistrations(previous.ChosenPlaceId);
+                    await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+                }
+                if (previous.ChosenSlot != visitor.ChosenSlot)
+                {
+                    try
+                    {
+
+                        var slotMPrev = await slotRepository.Get5MinSlot(previous.ChosenPlaceId, previous.ChosenSlot);
+                        var slotHPrev = await slotRepository.GetHourSlot(previous.ChosenPlaceId, slotMPrev.HourSlotId);
+                        var slotDPrev = await slotRepository.GetDaySlot(previous.ChosenPlaceId, slotHPrev.DaySlotId);
+
+                        await slotRepository.DecrementRegistration5MinSlot(slotM);
+                        await slotRepository.DecrementRegistrationHourSlot(slotH);
+                        await slotRepository.DecrementRegistrationDaySlot(slotD);
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, exc.Message);
+                    }
+                    await slotRepository.IncrementRegistration5MinSlot(slotM);
+                    await slotRepository.IncrementRegistrationHourSlot(slotH);
+                    await slotRepository.IncrementRegistrationDaySlot(slotD);
+                }
+
+                return ret;
+            }
+        }
+        /// <summary>
+        /// Format phone to slovak standard
+        /// 
+        /// 0800 123 456 convers to +421800123456
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        public static string FormatPhone(string number)
+        {
+            if (number == null) number = "";
+            number = number.Replace(" ", "");
+            number = number.Replace("\t", "");
+            if (number.StartsWith("00")) number = "+" + number.Substring(2);
+            if (number.StartsWith("0")) number = "+421" + number.Substring(1);
+            return number;
+        }
+        /// <summary>
+        /// Validates the phone number +421800123456
+        /// </summary>
+        /// <param name="number"></param>
+        /// <returns></returns>
+        public static bool IsPhoneNumber(string number)
+        {
+            return Regex.Match(number, @"^(\+[0-9]{12})$").Success;
         }
     }
 }

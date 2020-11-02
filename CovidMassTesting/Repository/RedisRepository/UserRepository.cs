@@ -216,6 +216,18 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return ret;
         }
+        /// <summary>
+        /// Registration manager can set his place at which he performs tests
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public async Task<bool> SetLocation(string email, string placeId)
+        {
+            var user = await Get(email);
+            user.Place = placeId;
+            return await Set(user, false);
+        }
 
         public async Task CreateAdminUsersFromConfiguration()
         {
@@ -349,6 +361,15 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (usr.Roles.Contains(role)) return true;
             }
             return false;
+        }
+        /// <summary>
+        /// Returns public information about specific user
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public async Task<UserPublic> GetPublicUser(string email)
+        {
+            return (await Get(email)).ToPublic();
         }
     }
 }
