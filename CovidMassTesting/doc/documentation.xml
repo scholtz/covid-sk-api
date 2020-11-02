@@ -913,9 +913,9 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveFromDocQueue(System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(System.String)">
             <summary>
-            Removes test from test queue
+            Removes test from test queue and mark test as taken
             </summary>
             <param name="testId"></param>
             <returns></returns>

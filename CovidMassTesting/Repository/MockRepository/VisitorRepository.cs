@@ -46,6 +46,12 @@ namespace CovidMassTesting.Repository.MockRepository
             logger.LogInformation($"Visitor.Set {visitor.Id}");
             return visitor;
         }
+        public async Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId)
+        {
+            docqueue.Remove(testId);
+            logger.LogInformation($"Visitor.RemoveFromDocQueue {testId}");
+            return true;
+        }
         public override async Task<bool> RemoveFromDocQueue(string testId)
         {
             docqueue.Remove(testId);

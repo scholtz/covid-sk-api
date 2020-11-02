@@ -303,8 +303,9 @@ namespace CovidMassTesting.Controllers
                 }
 
                 if (!User.IsDocumentManager(userRepository)) throw new Exception("Only user with Document Manager role is allowed to fetch visitor data");
-
-                return Ok(await visitorRepository.RemoveFromDocQueue(FormatBarCode(testId)));
+                var code = FormatBarCode(testId);
+                var ret = await visitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(code);
+                return Ok(ret);
             }
             catch (Exception exc)
             {

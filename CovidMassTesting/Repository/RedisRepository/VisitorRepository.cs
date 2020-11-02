@@ -9,6 +9,7 @@ using StackExchange.Redis.Extensions.Core.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -205,6 +206,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 switch (state)
                 {
                     case TestResult.PositiveWaitingForCertificate:
+                    case TestResult.NegativeWaitingForCertificate:
                         await AddToDocQueue(visitor.TestingSet);
                         break;
                 }
@@ -363,6 +365,24 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return redisCacheClient.Db0.SortedSetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId);
         }
+        public async Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId)
+        {
+            var first = await GetFirstItemFromQueue();
+            if (first != testId) throw new Exception("You can remove only first item from the queue");
+            var visitorCode = await GETVisitorCodeFromTesting(testId);
+            if (!visitorCode.HasValue) throw new Exception($"Visitor with code {visitorCode} not found");
+            var visitor = await Get(visitorCode.Value);
+            switch (visitor.Result)
+            {
+                case TestResult.NegativeWaitingForCertificate:
+                    await SetTestResult(testId, TestResult.NegativeCertificateTaken);
+                    break;
+                case TestResult.PositiveWaitingForCertificate:
+                    await SetTestResult(testId, TestResult.PositiveCertificateTaken);
+                    break;
+            }
+            return await RemoveFromDocQueue(testId);
+        }
         public virtual async Task<string> GetFirstItemFromQueue()
         {
             return (await redisCacheClient.Db0.SortedSetRangeByScoreAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", take: 1, skip: 0)).FirstOrDefault();
@@ -370,7 +390,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Visitor> GetNextTest()
         {
             var firstTest = await GetFirstItemFromQueue();
-            if (firstTest == null) throw new Exception("No test in queue");
+            if (firstTest == null) return null;
             var visitor = await GETVisitorCodeFromTesting(firstTest);
             if (!visitor.HasValue)
             {

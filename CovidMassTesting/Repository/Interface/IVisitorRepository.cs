@@ -77,10 +77,10 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<Visitor> GetNextTest();
         /// <summary>
-        /// Removes test from test queue
+        /// Removes test from test queue and mark test as taken
         /// </summary>
         /// <param name="testId"></param>
         /// <returns></returns>
-        public Task<bool> RemoveFromDocQueue(string testId);
+        public Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId);
     }
 }
