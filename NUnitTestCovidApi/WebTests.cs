@@ -398,6 +398,10 @@ namespace NUnitTestCovidApi
 
             var user1 = registered.First();
 
+            // Set invalid place
+            request = SetLocation(client, "undefined");
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            // Set place
             request = SetLocation(client, place.Id);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 

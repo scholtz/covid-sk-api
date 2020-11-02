@@ -956,7 +956,7 @@
             In memory user repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             constructor
             </summary>
@@ -964,6 +964,7 @@
             <param name="loggerFactory"></param>
             <param name="redisCacheClient"></param>
             <param name="emailSender"></param>
+            <param name="placeRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Set(CovidMassTesting.Model.User,System.Boolean)">
             <summary>
@@ -1011,7 +1012,7 @@
             User repository manages users and stores user data securly in the database
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             Constructor
             </summary>

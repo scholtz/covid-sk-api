@@ -28,6 +28,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IRedisCacheClient redisCacheClient;
         private readonly IEmailSender emailSender;
         private readonly IConfiguration configuration;
+        private readonly IPlaceRepository placeRepository;
         private readonly string REDIS_KEY_USERS_OBJECTS = "USERS";
 
         private readonly int RehashN = 99;
@@ -42,13 +43,15 @@ namespace CovidMassTesting.Repository.RedisRepository
             IConfiguration configuration,
             ILogger<UserRepository> logger,
             IRedisCacheClient redisCacheClient,
-            IEmailSender emailSender
+            IEmailSender emailSender,
+            IPlaceRepository placeRepository
             )
         {
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
             this.emailSender = emailSender;
             this.configuration = configuration;
+            this.placeRepository = placeRepository;
         }
         /// <summary>
         /// Inserts new user
@@ -224,6 +227,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<bool> SetLocation(string email, string placeId)
         {
+            if (string.IsNullOrEmpty(placeId)) throw new Exception("Invalid place provided");
+            var place = await placeRepository.GetPlace(placeId);
+            if (place == null) throw new Exception("Invalid place provided");
             var user = await Get(email);
             user.Place = placeId;
             return await Set(user, false);
