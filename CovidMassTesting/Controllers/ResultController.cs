@@ -193,7 +193,7 @@ namespace CovidMassTesting.Controllers
         [HttpPost("RemoveTest")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Result>> RemoveTest([FromForm] string code, [FromForm] string pass)
+        public async Task<ActionResult<bool>> RemoveTest([FromForm] string code, [FromForm] string pass)
         {
 
             try

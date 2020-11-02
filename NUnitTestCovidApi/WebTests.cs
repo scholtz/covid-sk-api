@@ -159,6 +159,16 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
+        private HttpResponseMessage PublicRemoveTest(HttpClient client, string code, string pass)
+        {
+            return client.PostAsync("Result/RemoveTest",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("code",code),
+                        new KeyValuePair<string, string>("pass",pass),
+                    })
+                ).Result;
+        }
+
         private HttpResponseMessage SetLocation(HttpClient client, string placeId)
         {
             return client.PostAsync("User/SetLocation",
@@ -664,6 +674,17 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeCertificateTaken, result.State);
+
+            // remove my private information from system
+            request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            bool resultBool = Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(resultBool);
+
+            // unable to delete removed test
+            request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
         }
 
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>

@@ -291,7 +291,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new Exception("Invalid code");
             }
-            if (visitor.Result != "negative") throw new Exception("Osobné údaje môžu byť vymazané iba pre testy s negatívnym výsledkom");
+            if (visitor.Result != TestResult.NegativeCertificateTaken) throw new Exception("Osobné údaje môžu byť vymazané iba pre testy s negatívnym výsledkom po prevzatí certifikátu");
 
             await Remove(visitor.Id);
             if (!string.IsNullOrEmpty(visitor.TestingSet))
