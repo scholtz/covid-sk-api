@@ -20,7 +20,6 @@ namespace CovidMassTesting.Controllers.Email
         private readonly string fromEmail;
         private readonly Dictionary<string, string> Name2Id;
         private readonly ILogger<SendGridController> logger;
-        private readonly IConfiguration configuration;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -42,7 +41,6 @@ namespace CovidMassTesting.Controllers.Email
             try
             {
                 this.logger = logger;
-                this.configuration = configuration;
                 var config = new Model.Settings.SendGridConfiguration();
                 configuration.GetSection("SendGrid").Bind(config);
                 if (string.IsNullOrEmpty(config.MailerApiKey)) throw new Exception("Invalid SendGrid configuration");

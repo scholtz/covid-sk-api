@@ -22,8 +22,6 @@ namespace CovidMassTesting.Controllers
     {
         private readonly ILogger<VisitorController> logger;
         private readonly IVisitorRepository visitorRepository;
-        private readonly ISlotRepository slotRepository;
-        private readonly IPlaceRepository placeRepository;
         /// <summary>
         /// constructor
         /// </summary>
@@ -33,15 +31,11 @@ namespace CovidMassTesting.Controllers
         /// <param name="placeRepository"></param>
         public VisitorController(
             ILogger<VisitorController> logger,
-            ISlotRepository slotRepository,
-            IVisitorRepository visitorRepository,
-            IPlaceRepository placeRepository
+            IVisitorRepository visitorRepository
             )
         {
             this.logger = logger;
             this.visitorRepository = visitorRepository;
-            this.slotRepository = slotRepository;
-            this.placeRepository = placeRepository;
         }
         /// <summary>
         /// Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code

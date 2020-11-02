@@ -428,7 +428,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                 UserPublic manager = await userRepository.GetPublicUser(managerEmail);
 
                 visitor.ChosenPlaceId = manager.Place;
+                if (string.IsNullOrEmpty(visitor.ChosenPlaceId)) throw new Exception("Vyberte si najskôr miesto kde sa nachádzate.");
                 var currentSlot = await slotRepository.GetCurrentSlot(manager.Place);
+                if (currentSlot == null) throw new Exception("Unable to select testing slot.");
                 visitor.ChosenSlot = currentSlot.SlotId;
             }
 
