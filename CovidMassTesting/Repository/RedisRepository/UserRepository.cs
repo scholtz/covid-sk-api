@@ -80,7 +80,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             var orig = GenerateRandomPassword();
             var pass = orig.Clone().ToString();
-            var cohash = GenerateRandomPassword(new PasswordOptions() { RequiredLength = 4 });
+            var cohash = GenerateRandomPassword();
 
             for (int i = 0; i < RehashN; i++)
             {
@@ -262,7 +262,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         else
                         {
                             var pass = usr.Password;
-                            var cohash = GenerateRandomPassword(new PasswordOptions() { RequiredLength = 4 });
+                            var cohash = GenerateRandomPassword();
 
                             for (int i = 0; i < RehashN; i++)
                             {
@@ -302,7 +302,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return new AuthData()
                 {
                     CoData = GenerateRandomPassword(),
-                    CoHash = GenerateRandomPassword(new PasswordOptions() { RequiredLength = 4 })
+                    CoHash = GenerateRandomPassword()
                 };
             }
             user = await GenerateCoData(user);
@@ -369,6 +369,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (user == null) throw new Exception("User not found by email");
             if (user.PswHash != oldHash) throw new Exception("Invalid old password");
             user.PswHash = newHash;
+            user.CoHash = user.CoData;
             if (await Set(user, false))
             {
                 return Token.CreateToken(user, configuration);

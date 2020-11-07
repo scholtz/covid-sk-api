@@ -55,6 +55,15 @@ namespace NUnitTestCovidApi
                     })
                     ).Result;
         }
+        private HttpResponseMessage ChangePassword(HttpClient client, string oldHash, string newHash)
+        {
+            return client.PostAsync("User/ChangePassword",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("oldHash",oldHash),
+                        new KeyValuePair<string, string>("newHash",newHash)
+                    })
+                    ).Result;
+        }
         private HttpResponseMessage Preauthenticate(HttpClient client, string email)
         {
             return client.PostAsync("User/Preauthenticate",
@@ -263,6 +272,71 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
             request = CheckSlots(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+        }
+
+
+
+        [Test]
+        public void ChangePasswordTest()
+        {
+            using var web = new MockWebApp();
+            var client = web.CreateClient();
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();//.GetValue<List<CovidMassTesting.Model.Settings.User>>("AdminUsers");
+
+            var user = users.First(u => u.Name == "Admin");
+            /// Preauthenticate
+            var request = Preauthenticate(client, user.Email);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var authData = JsonConvert.DeserializeObject<AuthData>(request.Content.ReadAsStringAsync().Result);
+
+            /// Authenticate
+            var pass = user.Password;
+            for (int i = 0; i < 99; i++)
+            {
+                pass = Encoding.ASCII.GetBytes($"{pass}{authData.CoHash}").GetSHA256Hash();
+            }
+            pass = Encoding.ASCII.GetBytes($"{pass}{authData.CoData}").GetSHA256Hash();
+
+            request = Authenticate(client, user.Email, pass);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            request = Preauthenticate(client, user.Email);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            authData = JsonConvert.DeserializeObject<AuthData>(request.Content.ReadAsStringAsync().Result);
+            /// Authenticate
+            pass = user.Password;
+            for (int i = 0; i < 99; i++)
+            {
+                pass = Encoding.ASCII.GetBytes($"{pass}{authData.CoHash}").GetSHA256Hash();
+            }
+
+            var newPassword = "New Password";
+            var newPasswordHash = newPassword;
+            for (int i = 0; i < 99; i++)
+            {
+                newPasswordHash = Encoding.ASCII.GetBytes($"{newPasswordHash}{authData.CoData}").GetSHA256Hash();
+            }
+            request = ChangePassword(client, pass, newPasswordHash);
+
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            // test to authenticate with new login
+            request = Preauthenticate(client, user.Email);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            authData = JsonConvert.DeserializeObject<AuthData>(request.Content.ReadAsStringAsync().Result);
+
+            /// Authenticate
+            pass = newPassword;
+            for (int i = 0; i < 99; i++)
+            {
+                pass = Encoding.ASCII.GetBytes($"{pass}{authData.CoHash}").GetSHA256Hash();
+            }
+            pass = Encoding.ASCII.GetBytes($"{pass}{authData.CoData}").GetSHA256Hash();
+
+            request = Authenticate(client, user.Email, pass);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
         }
 
