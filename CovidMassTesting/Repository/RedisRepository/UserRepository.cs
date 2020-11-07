@@ -292,9 +292,38 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public async Task<string> Preauthenticate(string email)
+        public async Task<AuthData> Preauthenticate(string email)
         {
-            return (await Get(email))?.CoHash;
+            var user = await Get(email);
+            if (user == null)
+            {
+                // invalid email .. we do not dispose usage of email on first sight so return valid answer
+
+                return new AuthData()
+                {
+                    CoData = GenerateRandomPassword(),
+                    CoHash = GenerateRandomPassword(new PasswordOptions() { RequiredLength = 4 })
+                };
+            }
+            user = await GenerateCoData(user);
+            return new AuthData()
+            {
+                CoData = user.CoData,
+                CoHash = user.CoHash
+            };
+        }
+
+        private async Task<User> GenerateCoData(User user)
+        {
+            user.CoData = GenerateRandomPassword();
+            await Set(user, false);
+            return user;
+        }
+        private async Task<User> SetInvalidLogin(User user)
+        {
+            user.InvalidLogin = DateTimeOffset.UtcNow;
+            await Set(user, false);
+            return user;
         }
         /// <summary>
         /// Returns JWT token
@@ -303,16 +332,22 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="hash"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public async Task<string> Authenticate(string email, string hash, string data)
+        public async Task<string> Authenticate(string email, string hash)
         {
             var usr = await Get(email);
             if (usr == null)
             {
                 throw new Exception("Invalid user or password");
             }
-            var ourHash = Encoding.ASCII.GetBytes($"{usr.PswHash}{data}").GetSHA256Hash();
+            if (usr.InvalidLogin.HasValue && usr.InvalidLogin.Value.AddSeconds(1) > DateTimeOffset.UtcNow)
+            {
+                await SetInvalidLogin(usr);
+                throw new Exception("Invalid user or password");
+            }
+            var ourHash = Encoding.ASCII.GetBytes($"{usr.PswHash}{usr.CoData}").GetSHA256Hash();
             if (ourHash != hash)
             {
+                await SetInvalidLogin(usr);
                 throw new Exception("Invalid user or password");
             }
 

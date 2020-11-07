@@ -246,13 +246,23 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.UserController.Authenticate(System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Controllers.UserController.Authenticate(System.String,System.String)">
             <summary>
             Returns JWT token
+            
+            First preauthenticate request must be executed. It returns
+            {CoData : "..", CoHash : ".."}
+            
+            Hash is:
+            
+            Password = Real Password
+            99 repeat of 
+             Password = SHA256(Password + CoHash)
+             
+            Hash = SHA256(Password + CoData)
             </summary>
-            <param name="email"></param>
-            <param name="hash"></param>
-            <param name="data"></param>
+            <param name="email">User email address</param>
+            <param name="hash">Hash of CoData, CoHash and password</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.UserController.ChangePassword(System.String,System.String)">
@@ -320,6 +330,21 @@
             </summary>
             <param name="data"></param>
             <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.AuthData">
+            <summary>
+            Preauthenticate data to be hashed with password
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.AuthData.CoHash">
+            <summary>
+            Cohash is stable and is set when the password is originally set
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.AuthData.CoData">
+            <summary>
+            CoData is unique per sign in request. Server generated
+            </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Email.IEmail">
             <summary>
@@ -673,6 +698,16 @@
             Cohash
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.User.CoData">
+            <summary>
+            CoData
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.User.InvalidLogin">
+            <summary>
+            Last invalid password attempt
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.User.Place">
             <summary>
             Place at which person is assigned. All person's registrations will be placed to this location
@@ -807,7 +842,7 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Authenticate(System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Authenticate(System.String,System.String)">
             <summary>
             Authenticates user
             Returns jwt if successful
@@ -1080,7 +1115,7 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Authenticate(System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Authenticate(System.String,System.String)">
             <summary>
             Returns JWT token
             </summary>

@@ -31,6 +31,14 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string CoHash { get; set; }
         /// <summary>
+        /// CoData
+        /// </summary>
+        public string CoData { get; set; }
+        /// <summary>
+        /// Last invalid password attempt
+        /// </summary>
+        public DateTimeOffset? InvalidLogin { get; set; }
+        /// <summary>
         /// Place at which person is assigned. All person's registrations will be placed to this location
         /// </summary>
         public string Place { get; set; }

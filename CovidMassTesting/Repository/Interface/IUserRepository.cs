@@ -32,7 +32,7 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public Task<string> Preauthenticate(string email);
+        public Task<AuthData> Preauthenticate(string email);
         /// <summary>
         /// Authenticates user
         /// Returns jwt if successful
@@ -41,7 +41,7 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="hash"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public Task<string> Authenticate(string email, string hash, string data);
+        public Task<string> Authenticate(string email, string hash);
         /// <summary>
         /// Change user password
         /// </summary>

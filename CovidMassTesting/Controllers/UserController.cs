@@ -95,7 +95,7 @@ namespace CovidMassTesting.Controllers
         [HttpPost("Preauthenticate")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<string>> Preauthenticate(
+        public async Task<ActionResult<AuthData>> Preauthenticate(
             [FromForm] string email
             )
         {
@@ -117,22 +117,32 @@ namespace CovidMassTesting.Controllers
         }
         /// <summary>
         /// Returns JWT token
+        /// 
+        /// First preauthenticate request must be executed. It returns
+        /// {CoData : "..", CoHash : ".."}
+        /// 
+        /// Hash is:
+        /// 
+        /// Password = Real Password
+        /// 99 repeat of 
+        ///  Password = SHA256(Password + CoHash)
+        ///  
+        /// Hash = SHA256(Password + CoData)
         /// </summary>
-        /// <param name="email"></param>
-        /// <param name="hash"></param>
-        /// <param name="data"></param>
+        /// <param name="email">User email address</param>
+        /// <param name="hash">Hash of CoData, CoHash and password</param>
         /// <returns></returns>
         [HttpPost("Authenticate")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<string>> Authenticate(
             [FromForm] string email,
-            [FromForm] string hash,
-            [FromForm] string data)
+            [FromForm] string hash
+            )
         {
             try
             {
-                return Ok(await userRepository.Authenticate(email, hash, data));
+                return Ok(await userRepository.Authenticate(email, hash));
             }
             catch (Exception exc)
             {

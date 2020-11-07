@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NUnitTestCovidApi
 {
@@ -31,9 +33,10 @@ namespace NUnitTestCovidApi
         private HttpResponseMessage AuthenticateUser(HttpClient client, string email, string password)
         {
             var request = Preauthenticate(client, email);
-            var cohash = request.Content.ReadAsStringAsync().Result;
+            var data = JsonConvert.DeserializeObject<AuthData>(request.Content.ReadAsStringAsync().Result);
+            var cohash = data.CoHash;
+            var rand = data.CoData;
             /// Authenticate
-            var rand = "123";
             var pass = password;
             for (int i = 0; i < 99; i++)
             {
@@ -41,15 +44,14 @@ namespace NUnitTestCovidApi
             }
             pass = Encoding.ASCII.GetBytes($"{pass}{rand}").GetSHA256Hash();
 
-            return Authenticate(client, email, pass, rand);
+            return Authenticate(client, email, pass);
         }
-        private HttpResponseMessage Authenticate(HttpClient client, string email, string pass, string rand)
+        private HttpResponseMessage Authenticate(HttpClient client, string email, string pass)
         {
             return client.PostAsync("User/Authenticate",
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
                         new KeyValuePair<string, string>("email",email),
-                        new KeyValuePair<string, string>("hash",pass),
-                        new KeyValuePair<string, string>("data",rand)
+                        new KeyValuePair<string, string>("hash",pass)
                     })
                     ).Result;
         }
@@ -231,10 +233,11 @@ namespace NUnitTestCovidApi
             /// Preauthenticate
             var request = Preauthenticate(client, user.Email);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            var cohash = request.Content.ReadAsStringAsync().Result;
+            var authData = JsonConvert.DeserializeObject<AuthData>(request.Content.ReadAsStringAsync().Result);
+            var cohash = authData.CoHash;
+            var rand = authData.CoData;
 
             /// Authenticate
-            var rand = "123";
             var pass = user.Password;
             for (int i = 0; i < 99; i++)
             {
@@ -242,15 +245,19 @@ namespace NUnitTestCovidApi
             }
             pass = Encoding.ASCII.GetBytes($"{pass}{rand}").GetSHA256Hash();
 
-            request = Authenticate(client, user.Email, pass + "1", rand);
-            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
-            request = Authenticate(client, user.Email, pass, rand + "1");
-            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
-            request = Authenticate(client, user.Email + "1", pass, rand);
-            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+            request = Authenticate(client, user.Email + "1", pass);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            Task.Delay(1000).Wait();
+            request = Authenticate(client, user.Email, pass + "1");
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            // Test brute force
+            request = Authenticate(client, user.Email, pass);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
-            request = Authenticate(client, user.Email, pass, rand);
+            Task.Delay(1000).Wait();
+            request = Authenticate(client, user.Email, pass);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
             var token = request.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(token));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
