@@ -393,7 +393,7 @@ namespace NUnitTestCovidApi
                 LastName = "Scholtz",
                 Insurance = "25",
                 PersonType = "idcard",
-                Phone = "+420 776082012",
+                Phone = "+421 000 000 000",
                 RC = "0101010008",
 
             };
