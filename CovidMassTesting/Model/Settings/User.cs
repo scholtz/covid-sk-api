@@ -21,6 +21,10 @@ namespace CovidMassTesting.Model.Settings
         /// </summary>
         public string Email { get; set; }
         /// <summary>
+        /// Admin Phone
+        /// </summary>
+        public string Phone { get; set; }
+        /// <summary>
         /// Do not setup password. This is for tesing purposes only.
         /// </summary>
         public string Password { get; set; }

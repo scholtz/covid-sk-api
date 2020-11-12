@@ -345,8 +345,7 @@ namespace NUnitTestCovidApi
         {
             using var web = new MockWebApp();
             var client = web.CreateClient();
-            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();//.GetValue<List<CovidMassTesting.Model.Settings.User>>("AdminUsers");
-
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
             var admin = users.First(u => u.Name == "Admin");
 
             var request = AuthenticateUser(client, admin.Email, admin.Password);
@@ -390,11 +389,11 @@ namespace NUnitTestCovidApi
                 Email = "email@scholtz.sk",
                 ChosenPlaceId = place.Id,
                 ChosenSlot = minute.SlotId,
-                FirstName = "F",
-                LastName = "L",
+                FirstName = "Ľudovít",
+                LastName = "Scholtz",
                 Insurance = "25",
                 PersonType = "idcard",
-                Phone = "+421",
+                Phone = "+420 776082012",
                 RC = "0101010008",
 
             };
@@ -409,7 +408,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(visitor.FirstName, responsedVisitor.FirstName);
             Assert.AreEqual(visitor.Insurance, responsedVisitor.Insurance);
             Assert.AreEqual(visitor.RC, responsedVisitor.RC);
-            Assert.AreEqual("", responsedVisitor.Phone);
+            Assert.AreEqual("+421000000000", responsedVisitor.Phone);
             Assert.AreEqual(TestResult.NotTaken, responsedVisitor.Result);
 
             request = ListDaySlotsByPlace(client, place.Id);

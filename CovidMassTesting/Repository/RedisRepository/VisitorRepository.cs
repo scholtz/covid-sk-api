@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
@@ -18,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.RedisRepository
 {
+    /// <summary>
+    /// Visitor repository holds data about visitors
+    /// </summary>
     public class VisitorRepository : IVisitorRepository
     {
         private readonly IConfiguration configuration;
@@ -31,11 +35,24 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
         private readonly string REDIS_KEY_DOCUMENT_QUEUE = "DOCUMENT_QUEUE";
         private readonly IEmailSender emailSender;
+        private readonly ISMSSender smsSender;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="logger"></param>
+        /// <param name="redisCacheClient"></param>
+        /// <param name="emailSender"></param>
+        /// <param name="smsSender"></param>
+        /// <param name="placeRepository"></param>
+        /// <param name="slotRepository"></param>
+        /// <param name="userRepository"></param>
         public VisitorRepository(
             IConfiguration configuration,
             ILogger<VisitorRepository> logger,
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
+            ISMSSender smsSender,
             IPlaceRepository placeRepository,
             ISlotRepository slotRepository,
             IUserRepository userRepository
@@ -45,6 +62,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.redisCacheClient = redisCacheClient;
             this.configuration = configuration;
             this.emailSender = emailSender;
+            this.smsSender = smsSender;
             this.placeRepository = placeRepository;
             this.slotRepository = slotRepository;
             this.userRepository = userRepository;
@@ -77,21 +95,48 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                     break;
             }
+
+            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
+
             await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorRegistrationEmail()
             {
                 Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                 Name = $"{visitor.FirstName} {visitor.LastName}",
+                Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
+                Place = place.Name,
+                PlaceDescription = place.Description
                 ///@TODO BAR CODE
             });
+
+            if (!string.IsNullOrEmpty(visitor.Phone))
+            {
+                await smsSender.SendSMS(visitor.Phone, new Model.SMS.RegistrationSMS()
+                {
+                    Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                    Name = $"{visitor.FirstName} {visitor.LastName}",
+                    Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
+                    Place = place.Name
+                });
+            }
             return await Set(visitor, true);
         }
+        /// <summary>
+        /// Remove visitor from redis
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public virtual async Task<bool> Remove(int id)
         {
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", id.ToString(CultureInfo.InvariantCulture));
             return true;
         }
 
-
+        /// <summary>
+        /// Decode visitor data from database
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public virtual async Task<Visitor> Get(int code)
         {
             logger.LogInformation($"Visitor loaded from database: {code.GetHashCode()}");
@@ -101,7 +146,12 @@ namespace CovidMassTesting.Repository.RedisRepository
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
         }
-
+        /// <summary>
+        /// Encode visitor data and store to database
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
         public virtual async Task<Visitor> Set(Visitor visitor, bool mustBeNew)
         {
             if (visitor is null)
@@ -230,13 +280,29 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
                     });
+
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.TestToRepeatSMS()
+                        {
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                        });
+                    }
+
                     break;
                 case TestResult.TestIsBeingProcessing:
                     await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingInProcessEmail()
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
-
                     });
+
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.TestIsInProcessingSMS()
+                        {
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                        });
+                    }
                     break;
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
@@ -245,6 +311,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                         Name = $"{visitor.FirstName} {visitor.LastName}",
 
                     });
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.TestIsFinishedSMS()
+                        {
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                        });
+                    }
                     break;
                 default:
                     break;
@@ -322,6 +395,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                     Name = $"{visitor.FirstName} {visitor.LastName}",
                 });
 
+            if (!string.IsNullOrEmpty(visitor.Phone))
+            {
+                await smsSender.SendSMS(visitor.Phone, new Model.SMS.PersonalDataRemovedSMS()
+                {
+                    Name = $"{visitor.FirstName} {visitor.LastName}",
+                });
+            }
             return true;
         }
         protected async Task<int> CreateNewVisitorId()
@@ -507,12 +587,39 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 // update registration
                 visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
+                var slot = slotM;
+
                 var ret = await Set(visitor, false);
                 if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {
                     await placeRepository.DecrementPlaceRegistrations(previous.ChosenPlaceId);
                     await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
                 }
+                var code = visitor.Id.ToString();
+                var codeFormatted = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}";
+
+                await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}",
+                    new Model.Email.VisitorChangeRegistrationEmail()
+                    {
+                        Code = codeFormatted,
+                        Name = $"{visitor.FirstName} {visitor.LastName}",
+                        Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
+                        Place = place.Name,
+                        PlaceDescription = place.Description
+                        ///@TODO BAR CODE
+                    });
+
+                if (!string.IsNullOrEmpty(visitor.Phone))
+                {
+                    await smsSender.SendSMS(visitor.Phone, new Model.SMS.RegistrationChangedSMS()
+                    {
+                        Code = codeFormatted,
+                        Name = $"{visitor.FirstName} {visitor.LastName}",
+                        Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
+                        Place = place.Name
+                    });
+                }
+
                 if (previous.ChosenSlot != visitor.ChosenSlot)
                 {
                     try

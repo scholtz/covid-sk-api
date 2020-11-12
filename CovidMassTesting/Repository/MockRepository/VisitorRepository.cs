@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,7 @@ namespace CovidMassTesting.Repository.MockRepository
             ILoggerFactory loggerFactory,
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
+            ISMSSender smsSender,
             IPlaceRepository placeRepository,
             ISlotRepository slotRepository,
             IUserRepository userRepository
@@ -32,6 +34,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 loggerFactory.CreateLogger<Repository.RedisRepository.VisitorRepository>(),
                 redisCacheClient,
                 emailSender,
+                smsSender,
                 placeRepository,
                 slotRepository,
                 userRepository

@@ -13,6 +13,9 @@ using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
 {
+    /// <summary>
+    /// Administration methods
+    /// </summary>
     [Authorize]
     [ApiController]
     [Route("[controller]")]
@@ -23,6 +26,14 @@ namespace CovidMassTesting.Controllers
         private readonly IPlaceRepository placeRepository;
         private readonly IUserRepository userRepository;
         private readonly IConfiguration configuration;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="logger"></param>
+        /// <param name="slotRepository"></param>
+        /// <param name="placeRepository"></param>
+        /// <param name="userRepository"></param>
         public AdminController(
             IConfiguration configuration,
             ILogger<AdminController> logger,

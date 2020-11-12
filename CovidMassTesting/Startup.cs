@@ -118,7 +118,6 @@ namespace CovidMassTesting
             try
             {
                 Configuration.GetSection("Redis")?.Bind(redisConfiguration);
-
             }
             catch (Exception exc)
             {
@@ -142,6 +141,28 @@ namespace CovidMassTesting
                 services.AddSingleton<ISlotRepository, Repository.RedisRepository.SlotRepository>();
                 services.AddSingleton<IUserRepository, Repository.RedisRepository.UserRepository>();
                 services.AddSingleton<IVisitorRepository, Repository.RedisRepository.VisitorRepository>();
+            }
+
+
+
+
+            var goSMSConfiguration = new Model.Settings.GoSMSConfiguration();
+            try
+            {
+                Configuration.GetSection("GoSMS")?.Bind(goSMSConfiguration);
+            }
+            catch (Exception exc)
+            {
+                Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
+            }
+            if (!string.IsNullOrEmpty(goSMSConfiguration.ClientId))
+            {
+                services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
+                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();
+            }
+            else
+            {
+                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.MockSMSSender>();
             }
 
 

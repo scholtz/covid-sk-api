@@ -1,6 +1,8 @@
 ﻿using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
+using CovidMassTesting.Model.SMS;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -27,6 +29,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly ILogger<UserRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
         private readonly IEmailSender emailSender;
+        private readonly ISMSSender smsSender;
         private readonly IConfiguration configuration;
         private readonly IPlaceRepository placeRepository;
         private readonly string REDIS_KEY_USERS_OBJECTS = "USERS";
@@ -44,12 +47,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             ILogger<UserRepository> logger,
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
+            ISMSSender smsSender,
             IPlaceRepository placeRepository
             )
         {
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
             this.emailSender = emailSender;
+            this.smsSender = smsSender;
             this.configuration = configuration;
             this.placeRepository = placeRepository;
         }
@@ -74,6 +79,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 Password = pass,
                 Roles = user.Roles.ToArray(),
             });
+            if (!string.IsNullOrEmpty(user.Phone))
+            {
+                await smsSender.SendSMS(user.Phone, new NewUserSMS() { User = user.Name });
+            }
             return await Set(user, true);
         }
         private (string pass, string hash, string cohash) GeneratePassword()
@@ -255,6 +264,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             await Add(new User()
                             {
                                 Email = usr.Email,
+                                Phone = usr.Phone,
                                 Roles = usr.Roles == null ? new List<string>() { "Admin" } : usr.Roles.ToList(),
                                 Name = usr.Name
                             });

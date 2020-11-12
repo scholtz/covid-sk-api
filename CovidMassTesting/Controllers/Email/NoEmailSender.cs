@@ -9,7 +9,7 @@ namespace CovidMassTesting.Controllers.Email
     public class NoEmailSender : IEmailSender
     {
         /// <summary>
-        /// Act as email was sent
+        /// Act as email was sent. Log event to console
         /// </summary>
         /// <param name="toEmail"></param>
         /// <param name="toName"></param>
@@ -17,7 +17,7 @@ namespace CovidMassTesting.Controllers.Email
         /// <returns></returns>
         public async Task<bool> SendEmail(string toEmail, string toName, IEmail data)
         {
-            System.Console.WriteLine(Newtonsoft.Json.JsonConvert.SerializeObject(data));
+            System.Console.WriteLine($"Email: {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
             await Task.Delay(1);
             return true;
         }

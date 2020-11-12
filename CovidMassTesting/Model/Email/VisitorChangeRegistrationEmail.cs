@@ -5,15 +5,12 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model.Email
 {
-    /// <summary>
-    /// Visitor registration email
-    /// </summary>
-    public class VisitorRegistrationEmail : IEmail
+    public class VisitorChangeRegistrationEmail : IEmail
     {
         /// <summary>
         /// Template identifier
         /// </summary>
-        public override string TemplateId => "VisitorRegistration";
+        public override string TemplateId => "VisitorChangeRegistration";
         /// <summary>
         /// Registration code
         /// </summary>

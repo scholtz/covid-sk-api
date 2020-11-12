@@ -15,6 +15,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Email { get; set; }
         /// <summary>
+        /// User phone
+        /// </summary>
+        public string Phone { get; set; }
+        /// <summary>
         /// Name
         /// </summary>
         public string Name { get; set; }

@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
@@ -7,7 +8,6 @@ using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.MockRepository
@@ -25,14 +25,23 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="loggerFactory"></param>
         /// <param name="redisCacheClient"></param>
         /// <param name="emailSender"></param>
+        /// <param name="smsSender"></param>
         /// <param name="placeRepository"></param>
         public UserRepository(
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
+            ISMSSender smsSender,
             IPlaceRepository placeRepository
-            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.UserRepository>(), redisCacheClient, emailSender, placeRepository)
+        ) : base(
+                configuration,
+                loggerFactory.CreateLogger<Repository.RedisRepository.UserRepository>(),
+                redisCacheClient,
+                emailSender,
+                smsSender,
+                placeRepository
+                )
         {
         }
         /// <summary>
@@ -65,7 +74,11 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task<User> Get(string email)
         {
-            if (!data.ContainsKey(email)) return null;
+            if (!data.ContainsKey(email))
+            {
+                return null;
+            }
+
             return data[email];
         }
         /// <summary>

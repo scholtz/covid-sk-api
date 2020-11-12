@@ -4,6 +4,21 @@
         <name>CovidMassTesting</name>
     </assembly>
     <members>
+        <member name="T:CovidMassTesting.Controllers.AdminController">
+            <summary>
+            Administration methods
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="slotRepository"></param>
+            <param name="placeRepository"></param>
+            <param name="userRepository"></param>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.CheckSlots(System.String,System.Int32,System.Int32)">
             <summary>
             Shows available days per place
@@ -48,7 +63,7 @@
         </member>
         <member name="M:CovidMassTesting.Controllers.Email.NoEmailSender.SendEmail(System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
             <summary>
-            Act as email was sent
+            Act as email was sent. Log event to console
             </summary>
             <param name="toEmail"></param>
             <param name="toName"></param>
@@ -212,6 +227,49 @@
             Shows available days per place
             </summary>
             <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.SMS.GoSMSSender">
+            <summary>
+            https://doc.gosms.cz/#dokumentace-gosms-api
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.GoSMSSender.#ctor(Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.GoSMSConfiguration},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.SMS.GoSMSSender})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="settings"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.GoSMSSender.SendSMS(System.String,CovidMassTesting.Model.SMS.ISMS)">
+            <summary>
+            Act as sms was sent. Log event to console
+            </summary>
+            <param name="toPhone"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.SMS.ISMSSender">
+            <summary>
+            Interface for email client
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.ISMSSender.SendSMS(System.String,CovidMassTesting.Model.SMS.ISMS)">
+            <summary>
+            Send email
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.SMS.MockSMSSender">
+            <summary>
+            If no email sender is defined
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.MockSMSSender.SendSMS(System.String,CovidMassTesting.Model.SMS.ISMS)">
+            <summary>
+            Act as sms was sent. Log event to console
+            </summary>
+            <param name="toPhone"></param>
+            <param name="data"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.UserController">
@@ -391,9 +449,79 @@
             Template identifier
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.Code">
+            <summary>
+            Registration code
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.BarCode">
+            <summary>
+            BarCode image
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.Place">
+            <summary>
+            Place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.PlaceDescription">
+            <summary>
+            Place description
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.VisitorRegistrationEmail">
+            <summary>
+            Visitor registration email
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.TemplateId">
             <summary>
             Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.Code">
+            <summary>
+            Registration code
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.BarCode">
+            <summary>
+            BarCode image
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.Place">
+            <summary>
+            Place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.PlaceDescription">
+            <summary>
+            Place description
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail">
@@ -451,6 +579,26 @@
             Registration in hour slot is rejected if more then this amount of people are registered
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Settings.GoSMSConfiguration">
+            <summary>
+            GoSMS configuration https://doc.gosms.cz/
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.ClientId">
+            <summary>
+            Client identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.ClientSecret">
+            <summary>
+            Client Secret
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.Channel">
+            <summary>
+            Channel
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.SendGridConfiguration">
             <summary>
             configuration for mailing through sendgrid
@@ -488,6 +636,11 @@
             Password will be sent to this email in first run
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Settings.User.Phone">
+            <summary>
+            Admin Phone
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Settings.User.Password">
             <summary>
             Do not setup password. This is for tesing purposes only.
@@ -497,6 +650,197 @@
             <summary>
             If not defined, Admin role is set
             </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.GoSMSAuthMessage">
+            <summary>
+            https://doc.gosms.cz/#ziskani-access-tokenu
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.GoSMSAuthMessage.access_token">
+            <summary>
+            Token
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.GoSMSAuthMessage.expires_in">
+            <summary>
+            Expire in seconds: 3600
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.GoSMSAuthMessage.token_type">
+            <summary>
+            token type: bearer
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.GoSMSAuthMessage.scope">
+            <summary>
+            scope: user
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.GoSMSSendMessage">
+            <summary>
+            https://doc.gosms.cz/#jak-poslat-zpravu
+            
+            curl -X POST "https://app.gosms.cz/api/v1/messages/" \
+             -H "Content-Type: application/json" \
+             -H "Authorization: Bearer {token}" \
+             -d '{"message":"Hello","recipients":"111222333","channel":1}'
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.ISMS">
+            <summary>
+            SMS abstraction class
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.ISMS.GetText">
+            <summary>
+            Returns text of sms message
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.NewUserSMS">
+            <summary>
+            New system user SMS
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.NewUserSMS.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.NewUserSMS.GetText">
+            <summary>
+            Generates message
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.PersonalDataRemovedSMS">
+            <summary>
+            Notification after we remove personal data from system
+            
+            Healthy people are allowed to remove their data from system.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.PersonalDataRemovedSMS.Name">
+            <summary>
+            Person name
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.PersonalDataRemovedSMS.GetText">
+            <summary>
+            Generate sms message text
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.RegistrationChangedSMS">
+            <summary>
+            When registration has been changed, send sms message
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationChangedSMS.Name">
+            <summary>
+            Person name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationChangedSMS.Code">
+            <summary>
+            Code
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationChangedSMS.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationChangedSMS.Place">
+            <summary>
+            Place
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.RegistrationChangedSMS.GetText">
+            <summary>
+            Generate sms message text
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.RegistrationSMS">
+            <summary>
+            Registration SMS
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationSMS.Name">
+            <summary>
+            Person name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationSMS.Code">
+            <summary>
+            Code
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationSMS.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.RegistrationSMS.Place">
+            <summary>
+            Place
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.RegistrationSMS.GetText">
+            <summary>
+            Generate sms message text
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.TestIsFinishedSMS">
+            <summary>
+            Test has been finished, person should take the certificate.
+            
+            We do not dispose medical information over SMS or Email. Person can check it online.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.TestIsFinishedSMS.Name">
+            <summary>
+            Person name
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.TestIsFinishedSMS.GetText">
+            <summary>
+            Generate sms message text
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.TestIsInProcessingSMS">
+            <summary>
+            We notify person by sms after we match testing set with visitor
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.TestIsInProcessingSMS.Name">
+            <summary>
+            Person name
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.TestIsInProcessingSMS.GetText">
+            <summary>
+            Generate sms message text
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.SMS.TestToRepeatSMS">
+            <summary>
+            Test must be repeated
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.TestToRepeatSMS.Name">
+            <summary>
+            Person name
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.TestToRepeatSMS.GetText">
+            <summary>
+            Generate sms message text
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.TestResult">
             <summary>
@@ -676,6 +1020,11 @@
         <member name="P:CovidMassTesting.Model.User.Email">
             <summary>
             User email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.User.Phone">
+            <summary>
+            User phone
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.User.Name">
@@ -991,7 +1340,7 @@
             In memory user repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             constructor
             </summary>
@@ -999,6 +1348,7 @@
             <param name="loggerFactory"></param>
             <param name="redisCacheClient"></param>
             <param name="emailSender"></param>
+            <param name="smsSender"></param>
             <param name="placeRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Set(CovidMassTesting.Model.User,System.Boolean)">
@@ -1047,7 +1397,7 @@
             User repository manages users and stores user data securly in the database
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             Constructor
             </summary>
@@ -1148,6 +1498,46 @@
             Returns public information about specific user
             </summary>
             <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.RedisRepository.VisitorRepository">
+            <summary>
+            Visitor repository holds data about visitors
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.VisitorRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="redisCacheClient"></param>
+            <param name="emailSender"></param>
+            <param name="smsSender"></param>
+            <param name="placeRepository"></param>
+            <param name="slotRepository"></param>
+            <param name="userRepository"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Remove(System.Int32)">
+            <summary>
+            Remove visitor from redis
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Get(System.Int32)">
+            <summary>
+            Decode visitor data from database
+            </summary>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Set(CovidMassTesting.Model.Visitor,System.Boolean)">
+            <summary>
+            Encode visitor data and store to database
+            </summary>
+            <param name="visitor"></param>
+            <param name="mustBeNew"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String)">
