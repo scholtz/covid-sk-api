@@ -44,8 +44,14 @@ namespace CovidMassTesting
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson();
 
+            services.AddControllers(options =>
+            {
+                options.RespectBrowserAcceptHeader = true; // false by default
+            })
+                .AddNewtonsoftJson()
+                .AddXmlSerializerFormatters()
+                .AddXmlDataContractSerializerFormatters();
 
             services.AddSwaggerGen(c =>
             {
