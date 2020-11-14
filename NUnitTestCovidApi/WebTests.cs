@@ -361,9 +361,9 @@ namespace NUnitTestCovidApi
 
             request = ListPlaces(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            var places = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
-            Assert.IsTrue(places.Count > 0);
-            var place = places.First().Value;
+            var places = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result).Values.ToArray();
+            Assert.IsTrue(places.Length > 1);
+            var place = places[0];
             request = ListDaySlotsByPlace(client, place.Id);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
@@ -378,10 +378,10 @@ namespace NUnitTestCovidApi
             var hour = hours.First().Value;
             request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
-            Assert.IsTrue(minutes.Count > 0);
+            var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result).Values.ToArray();
+            Assert.IsTrue(minutes.Length > 0);
 
-            var minute = minutes.Values.First();
+            var minute = minutes[0];
 
             Visitor visitor = new Visitor()
             {
@@ -393,7 +393,7 @@ namespace NUnitTestCovidApi
                 LastName = "Scholtz",
                 Insurance = "25",
                 PersonType = "idcard",
-                Phone = "+421 000 000 000",
+                Phone = "+421",
                 RC = "0101010008",
 
             };
@@ -408,7 +408,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(visitor.FirstName, responsedVisitor.FirstName);
             Assert.AreEqual(visitor.Insurance, responsedVisitor.Insurance);
             Assert.AreEqual(visitor.RC, responsedVisitor.RC);
-            Assert.AreEqual("+421000000000", responsedVisitor.Phone);
+            Assert.AreEqual("", responsedVisitor.Phone);
             Assert.AreEqual(TestResult.NotTaken, responsedVisitor.Result);
 
             request = ListDaySlotsByPlace(client, place.Id);
@@ -427,10 +427,71 @@ namespace NUnitTestCovidApi
 
             request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
-            Assert.IsTrue(minutes.Count > 0);
-            minute = minutes[minute.SlotId.ToString()];
-            Assert.AreEqual(1, hour.Registrations);
+            var minutesDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(minutesDict.Count > 0);
+            minute = minutesDict[minute.SlotId.ToString()];
+            Assert.AreEqual(1, minute.Registrations);
+
+            // Test new registration of the same user - validate statistics
+            visitor.Phone = "+421 000 000 000";
+            var place2 = places[1];
+            visitor.ChosenPlaceId = place2.Id;
+            request = Register(client, visitor);
+
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            responsedVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(responsedVisitor.Id > 100000000);
+            Assert.AreEqual(visitor.Address, responsedVisitor.Address);
+            Assert.AreEqual(visitor.ChosenPlaceId, responsedVisitor.ChosenPlaceId);
+            Assert.AreEqual(visitor.ChosenSlot, responsedVisitor.ChosenSlot);
+            Assert.AreEqual(visitor.Email, responsedVisitor.Email);
+            Assert.AreEqual(visitor.FirstName, responsedVisitor.FirstName);
+            Assert.AreEqual(visitor.Insurance, responsedVisitor.Insurance);
+            Assert.AreEqual(visitor.RC, responsedVisitor.RC);
+            Assert.AreEqual("+421000000000", responsedVisitor.Phone);
+            Assert.AreEqual(TestResult.NotTaken, responsedVisitor.Result);
+
+            request = ListPlaces(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var placesDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(placesDict.Count > 1);
+
+            Assert.AreEqual(1, placesDict[place2.Id].Registrations);
+            Assert.AreEqual(0, placesDict[place.Id].Registrations);
+
+
+            request = ListDaySlotsByPlace(client, place2.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(days.Count > 0);
+            day = days[day.SlotId.ToString()];
+            Assert.AreEqual(place2.Id, day.PlaceId);
+            Assert.AreEqual(1, day.Registrations);
+
+            request = ListDaySlotsByPlace(client, place.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(days.Count > 0);
+            day = days[day.SlotId.ToString()];
+            Assert.AreEqual(place.Id, day.PlaceId);
+            Assert.AreEqual(0, day.Registrations);
+
+            request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            hours = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(hours.Count > 0);
+            hour = hours[hour.SlotId.ToString()];
+            Assert.AreEqual(0, hour.Registrations);
+
+            request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            minutesDict = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(minutesDict.Count > 0);
+            minute = minutesDict[minute.SlotId.ToString()];
+            Assert.AreEqual(0, minute.Registrations);
+
+
+
         }
 
 

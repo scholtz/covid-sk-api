@@ -620,7 +620,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     });
                 }
 
-                if (previous.ChosenSlot != visitor.ChosenSlot)
+                if (previous.ChosenSlot != visitor.ChosenSlot || previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {
                     try
                     {
@@ -629,9 +629,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                         var slotHPrev = await slotRepository.GetHourSlot(previous.ChosenPlaceId, slotMPrev.HourSlotId);
                         var slotDPrev = await slotRepository.GetDaySlot(previous.ChosenPlaceId, slotHPrev.DaySlotId);
 
-                        await slotRepository.DecrementRegistration5MinSlot(slotM);
-                        await slotRepository.DecrementRegistrationHourSlot(slotH);
-                        await slotRepository.DecrementRegistrationDaySlot(slotD);
+                        await slotRepository.DecrementRegistration5MinSlot(slotMPrev);
+                        await slotRepository.DecrementRegistrationHourSlot(slotHPrev);
+                        await slotRepository.DecrementRegistrationDaySlot(slotDPrev);
                     }
                     catch (Exception exc)
                     {
