@@ -573,6 +573,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (previous == null)
             {
                 // new registration
+                logger.LogInformation($"New registration");
 
                 var ret = await Add(visitor);
 
@@ -581,10 +582,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                 await slotRepository.IncrementRegistrationDaySlot(slotD);
                 await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
 
+                logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+
                 return ret;
             }
             else
             {
+                logger.LogInformation($"Update registration");
                 // update registration
                 visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
                 var slot = slotM;
@@ -632,6 +636,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                         await slotRepository.DecrementRegistration5MinSlot(slotMPrev);
                         await slotRepository.DecrementRegistrationHourSlot(slotHPrev);
                         await slotRepository.DecrementRegistrationDaySlot(slotDPrev);
+
+                        logger.LogInformation($"Decremented: M-{slotMPrev.SlotId}, {slotHPrev.SlotId}, {slotDPrev.SlotId}");
                     }
                     catch (Exception exc)
                     {
@@ -640,6 +646,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     await slotRepository.IncrementRegistration5MinSlot(slotM);
                     await slotRepository.IncrementRegistrationHourSlot(slotH);
                     await slotRepository.IncrementRegistrationDaySlot(slotD);
+
+                    logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
                 }
 
                 return ret;
