@@ -1,0 +1,56 @@
+{
+  "Redis": {
+    "AllowAdmin": true,
+    "ConnectTimeout": 6000,
+    "ConnectRetry": 2,
+    "Database": 0,
+    "Password": "",
+    "Hosts": [
+      {
+        "Host": "localhost",
+        "Port": "6379"
+      }
+    ]
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AdminUsers": [
+    {
+      "Name": "Admin",
+      "Email": "Admin@scholtz.sk",
+      "Password": "Test",
+      "Roles": "Admin"
+    },
+    {
+      "Name": "RegistrationManager",
+      "Email": "RegistrationManager@scholtz.sk",
+      "Password": "Test",
+      "Roles": "RegistrationManager"
+    },
+    {
+      "Name": "DocumentManager",
+      "Email": "DocumentManager@scholtz.sk",
+      "Password": "Test",
+      "Roles": "DocumentManager"
+    }
+  ],
+  "GoSMS": {
+    "ClientId": "",
+    "ClientSecret": "",
+    "Channel": ""
+  },
+  "AllowedHosts": "*",
+  "db-prefix": "DB1-",
+  "key": "6YfJAAoimCKsBpe70UveZgQNralsNkYIR+65wYa0jEE=",
+  "iv": "kphuYqbXr1bzeUDR+T775w==",
+  "JWTTokenSecret": "TmpPassword1TmpPassword1",
+  "Cors": [
+    "http://localhost:8080",
+    "https://scholtz.github.io/"
+  ]
+}

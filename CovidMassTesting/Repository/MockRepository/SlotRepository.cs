@@ -99,6 +99,17 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             return dataM.Values.Where(s => s.PlaceId == placeId && s.HourSlotId == hourSlotId);
         }
-
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <returns></returns>
+        public override async Task<int> DropAllData()
+        {
+            var ret = dataD.Count + dataH.Count + dataM.Count;
+            dataD.Clear();
+            dataH.Clear();
+            dataM.Clear();
+            return ret;
+        }
     }
 }

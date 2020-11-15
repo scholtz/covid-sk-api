@@ -76,5 +76,17 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="managerEmail"></param>
         /// <returns></returns>
         public Task<UserPublic> GetPublicUser(string managerEmail);
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public Task<bool> DropDatabaseAuthorize(string email, string hash);
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> DropAllData();
     }
 }

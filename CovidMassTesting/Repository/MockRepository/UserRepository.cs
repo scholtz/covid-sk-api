@@ -99,5 +99,15 @@ namespace CovidMassTesting.Repository.MockRepository
             data.TryRemove(email, out var _);
             return true;
         }
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <returns></returns>
+        public override async Task<int> DropAllData()
+        {
+            var ret = data.Count;
+            data.Clear();
+            return ret;
+        }
     }
 }

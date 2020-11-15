@@ -26,6 +26,7 @@ namespace CovidMassTesting.Controllers
         private readonly IPlaceRepository placeRepository;
         private readonly IUserRepository userRepository;
         private readonly IConfiguration configuration;
+        private readonly IVisitorRepository visitorRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -34,12 +35,14 @@ namespace CovidMassTesting.Controllers
         /// <param name="slotRepository"></param>
         /// <param name="placeRepository"></param>
         /// <param name="userRepository"></param>
+        /// <param name="visitorRepository"></param>
         public AdminController(
             IConfiguration configuration,
             ILogger<AdminController> logger,
             ISlotRepository slotRepository,
             IPlaceRepository placeRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IVisitorRepository visitorRepository
             )
         {
             this.logger = logger;
@@ -47,6 +50,7 @@ namespace CovidMassTesting.Controllers
             this.placeRepository = placeRepository;
             this.userRepository = userRepository;
             this.configuration = configuration;
+            this.visitorRepository = visitorRepository;
         }
         /// <summary>
         /// Shows available days per place
@@ -137,6 +141,36 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        [HttpPost("DropDatabase")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> DropDatabase([FromForm] string hash)
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to drop database");
+                var drop = await userRepository.DropDatabaseAuthorize(User.GetEmail(), hash);
+                if (!drop) throw new Exception("Invalid user or password");
 
+                var ret = 0;
+                ret += await placeRepository.DropAllData();
+                ret += await slotRepository.DropAllData();
+                ret += await visitorRepository.DropAllData();
+                ret += await userRepository.DropAllData();
+
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }

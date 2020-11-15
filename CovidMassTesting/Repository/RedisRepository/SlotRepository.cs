@@ -114,7 +114,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
             update.Registrations++;
-            await Set(slotD, false);
+            await Set(update, false);
         }
         public async Task IncrementRegistrationHourSlot(Slot1Hour slotH)
         {
@@ -125,7 +125,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
             update.Registrations++;
-            await Set(slotH, false);
+            await Set(update, false);
         }
 
         public async Task IncrementRegistration5MinSlot(Slot5Min slotM)
@@ -137,7 +137,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
             update.Registrations++;
-            await Set(slotM, false);
+            await Set(update, false);
         }
         public async Task DecrementRegistrationDaySlot(Slot1Day slotD)
         {
@@ -148,7 +148,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
             update.Registrations--;
-            await Set(slotD, false);
+            await Set(update, false);
         }
         public async Task DecrementRegistrationHourSlot(Slot1Hour slotH)
         {
@@ -159,7 +159,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
             update.Registrations--;
-            await Set(slotH, false);
+            await Set(update, false);
         }
 
         public async Task DecrementRegistration5MinSlot(Slot5Min slotM)
@@ -171,7 +171,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
             update.Registrations--;
-            await Set(slotM, false);
+            await Set(update, false);
         }
 
         public Task<bool> Add(Slot1Day slot)
@@ -191,7 +191,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             try
             {
-                var ret = !await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
+                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
                 if (newOnly && !ret)
                 {
                     throw new Exception("Error creating place");
@@ -295,6 +295,56 @@ namespace CovidMassTesting.Repository.RedisRepository
             var currentHour = hours.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
             var minutes = await ListMinuteSlotsByPlaceAndHourSlotId(place, currentHour.SlotId);
             return minutes.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+        }
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<int> DropAllData()
+        {
+            var ret = 0;
+
+            foreach (var slot in await redisCacheClient.Db0.HashValuesAsync<Slot1Day>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}"))
+            {
+                try
+                {
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D_BY_PLACE}_{slot.PlaceId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    ret++;
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, "Error while dropping slot data: {exc.Message}");
+                }
+            }
+            foreach (var slot in await redisCacheClient.Db0.HashValuesAsync<Slot1Hour>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}"))
+            {
+                try
+                {
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    ret++;
+
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, "Error while dropping slot data: {exc.Message}");
+                }
+            }
+            foreach (var slot in await redisCacheClient.Db0.HashValuesAsync<Slot5Min>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}"))
+            {
+                try
+                {
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR}_{slot.PlaceId}_{slot.HourSlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    ret++;
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, "Error while dropping slot data: {exc.Message}");
+                }
+            }
+            return ret;
         }
     }
 }

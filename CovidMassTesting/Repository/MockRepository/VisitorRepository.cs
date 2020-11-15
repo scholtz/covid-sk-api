@@ -127,5 +127,14 @@ namespace CovidMassTesting.Repository.MockRepository
             data.TryRemove(id, out var _);
             return true;
         }
+        public override async Task<int> DropAllData()
+        {
+            var ret = data.Count + testing2code.Count + pname2code.Count + docqueue.Count;
+            data.Clear();
+            testing2code.Clear();
+            pname2code.Clear();
+            docqueue.Clear();
+            return ret;
+        }
     }
 }

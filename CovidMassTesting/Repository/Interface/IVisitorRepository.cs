@@ -90,5 +90,10 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="testId"></param>
         /// <returns></returns>
         public Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId);
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> DropAllData();
     }
 }

@@ -9,7 +9,7 @@
             Administration methods
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository)">
             <summary>
             Constructor
             </summary>
@@ -18,6 +18,7 @@
             <param name="slotRepository"></param>
             <param name="placeRepository"></param>
             <param name="userRepository"></param>
+            <param name="visitorRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.CheckSlots(System.String,System.Int32,System.Int32)">
             <summary>
@@ -44,6 +45,13 @@
             <param name="email"></param>
             <param name="name"></param>
             <param name="roles"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.DropDatabase(System.String)">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <param name="hash"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
@@ -1160,6 +1168,18 @@
             <param name="place"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IUserRepository">
             <summary>
             User repository interface for dependency injection
@@ -1238,6 +1258,20 @@
             Get public user data.. eg location
             </summary>
             <param name="managerEmail"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.DropDatabaseAuthorize(System.String,System.String)">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <param name="email"></param>
+            <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.Interface.IVisitorRepository">
@@ -1335,6 +1369,18 @@
             <param name="testId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.UserRepository">
             <summary>
             In memory user repository
@@ -1379,6 +1425,12 @@
             <param name="email"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
             <summary>
             Checks if all slots for the day, and testing place has been created
@@ -1390,6 +1442,12 @@
             Get current slot
             </summary>
             <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.UserRepository">
@@ -1498,6 +1556,12 @@
             Returns public information about specific user
             </summary>
             <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.VisitorRepository">

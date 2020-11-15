@@ -287,6 +287,31 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 CoHash = cohash,
                                 PswHash = pass
                             };
+                            await Set(newUser, true);
+                        }
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(usr.Password))
+                        {
+                            // if password is defined (for testing), reset it on every app restart to config default
+
+                            var pass = usr.Password;
+                            var cohash = GenerateRandomPassword();
+
+                            for (int i = 0; i < RehashN; i++)
+                            {
+                                pass = Encoding.ASCII.GetBytes($"{pass}{cohash}").GetSHA256Hash();
+                            }
+
+                            var newUser = new User()
+                            {
+                                Email = usr.Email,
+                                Roles = usr.Roles == null ? new List<string>() { "Admin" } : usr.Roles.ToList(),
+                                Name = usr.Name,
+                                CoHash = cohash,
+                                PswHash = pass
+                            };
                             await Set(newUser, false);
                         }
                     }
@@ -422,6 +447,47 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<UserPublic> GetPublicUser(string email)
         {
             return (await Get(email)).ToPublic();
+        }
+        public async Task<bool> DropDatabaseAuthorize(string email, string hash)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException($"'{nameof(email)}' cannot be null or empty", nameof(email));
+            }
+
+            if (string.IsNullOrEmpty(hash))
+            {
+                throw new ArgumentException($"'{nameof(hash)}' cannot be null or empty", nameof(hash));
+            }
+            var user = await Get(email);
+            if (user == null) throw new Exception("User not found by email");
+            if (user.InvalidLogin.HasValue && user.InvalidLogin.Value.AddSeconds(1) > DateTimeOffset.UtcNow)
+            {
+                await SetInvalidLogin(user);
+                throw new Exception("Invalid user or password or attempt to login too fast after failed attempt");
+            }
+            var ourHash = Encoding.ASCII.GetBytes($"{user.PswHash}{user.CoData}").GetSHA256Hash();
+            if (ourHash != hash)
+            {
+                await SetInvalidLogin(user);
+                throw new Exception("Invalid user or password or attempt to login too fast after failed attempt");
+            }
+            return true;
+        }
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<int> DropAllData()
+        {
+            int ret = 0;
+            var list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
+            foreach (var item in list)
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", item);
+                ret++;
+            }
+            return ret;
         }
     }
 }
