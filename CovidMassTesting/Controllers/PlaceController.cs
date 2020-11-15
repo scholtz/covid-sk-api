@@ -91,7 +91,14 @@ namespace CovidMassTesting.Controllers
                 }
                 else
                 {
-                    oldPlace = await placeRepository.GetPlace(place.Id);
+                    try
+                    {
+                        oldPlace = await placeRepository.GetPlace(place.Id);
+                    }
+                    catch(Exception exc)
+                    {
+                        logger.LogError(exc, "Old place not found");
+                    }
                     if (oldPlace == null)
                     {
                         logger.LogInformation("Old place not found");

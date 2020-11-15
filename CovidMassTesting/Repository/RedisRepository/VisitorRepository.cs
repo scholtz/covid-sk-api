@@ -356,6 +356,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception("Invalid code");
             }
             var visitor = await Get(code);
+            if(visitor == null)
+            {
+                throw new Exception("Test does not exists");
+            }
             if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim()))
             {
                 throw new Exception("Invalid code");
