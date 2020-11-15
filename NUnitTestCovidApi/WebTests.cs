@@ -1165,7 +1165,7 @@ namespace NUnitTestCovidApi
                     .AddJsonFile(appSettings)
                     .Build();
                 builder.UseConfiguration(configuration);
-                var configfile = $"{System.Environment.CurrentDirectory}\\{appSettings}";
+                var configfile = $"{System.Environment.CurrentDirectory}/{appSettings}";
                 builder.ConfigureAppConfiguration(c =>
                 {
                     c.AddJsonFile(configfile);
