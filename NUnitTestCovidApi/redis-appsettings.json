@@ -42,7 +42,7 @@
   "GoSMS": {
     "ClientId": "",
     "ClientSecret": "",
-    "Channel": ""
+    "Channel": 123
   },
   "AllowedHosts": "*",
   "db-prefix": "DB1-",
