@@ -445,7 +445,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                         }
                     }
                 }
-                if (usr.Roles.Contains(role)) return true;
             }
 
             foreach (var role in roles)
