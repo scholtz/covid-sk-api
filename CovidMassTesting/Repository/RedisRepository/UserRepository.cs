@@ -433,6 +433,21 @@ namespace CovidMassTesting.Repository.RedisRepository
 
 
             var usr = await Get(email);
+            foreach (var role in usr.Roles.ToArray())
+            {
+                if (role.Contains(","))
+                {
+                    foreach (var addrole in role.Split(','))
+                    {
+                        if (!usr.Roles.Contains(addrole))
+                        {
+                            usr.Roles.Add(addrole);
+                        }
+                    }
+                }
+                if (usr.Roles.Contains(role)) return true;
+            }
+
             foreach (var role in roles)
             {
                 if (usr.Roles.Contains(role)) return true;

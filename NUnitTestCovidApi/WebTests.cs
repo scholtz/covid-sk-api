@@ -964,7 +964,7 @@ namespace NUnitTestCovidApi
             var minute = minutes.Values.First();
             var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
             Assert.IsTrue(registered.Count >= 2);
-            var registrationManager = users.First(u => u.Name == "RegistrationManager");
+            var registrationManager = users.First(u => u.Name == "MedicTester");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var registrationManagerToken = request.Content.ReadAsStringAsync().Result;
@@ -978,6 +978,15 @@ namespace NUnitTestCovidApi
             string test2 = "222-222-222";
             request = ConnectVisitorToTest(client, registered[1].Id.ToString(), test2);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
+            var medicLab = users.First(u => u.Name == "MedicLab");
+            request = AuthenticateUser(client, medicLab.Email, medicLab.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var medicLabToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabToken}");
 
             // TEST mark as sick
             request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
@@ -1069,6 +1078,14 @@ namespace NUnitTestCovidApi
             string test2 = "222-222-222";
             request = ConnectVisitorToTest(client, registered[1].Id.ToString(), test2);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            var medicLab = users.First(u => u.Name == "MedicLab");
+            request = AuthenticateUser(client, medicLab.Email, medicLab.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var medicLabToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabToken}");
 
             // TEST mark as sick
             request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
