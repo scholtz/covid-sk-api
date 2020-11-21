@@ -26,7 +26,9 @@ namespace CovidMassTesting.Helpers
         /// <returns></returns>
         public int Next(int minValue, int maxExclusiveValue)
         {
-            if (minValue >= maxExclusiveValue)
+            if (minValue == maxExclusiveValue) return minValue;
+
+            if (minValue > maxExclusiveValue)
             {
                 throw new ArgumentOutOfRangeException($"{nameof(minValue)} must be lower than {nameof(maxExclusiveValue)}");
             }
