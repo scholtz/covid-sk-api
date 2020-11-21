@@ -26,9 +26,7 @@ namespace CovidMassTesting.Controllers
         /// constructor
         /// </summary>
         /// <param name="logger"></param>
-        /// <param name="slotRepository"></param>
         /// <param name="visitorRepository"></param>
-        /// <param name="placeRepository"></param>
         public VisitorController(
             ILogger<VisitorController> logger,
             IVisitorRepository visitorRepository

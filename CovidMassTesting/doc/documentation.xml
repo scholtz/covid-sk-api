@@ -9,10 +9,11 @@
             Administration methods
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="localizer"></param>
             <param name="configuration"></param>
             <param name="logger"></param>
             <param name="slotRepository"></param>
@@ -43,8 +44,6 @@
             Administrator is allowed to invite other users and set their groups
             </summary>
             <param name="email"></param>
-            <param name="name"></param>
-            <param name="roles"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.DropDatabase(System.String)">
@@ -127,10 +126,11 @@
             Manages places
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="localizer"></param>
             <param name="logger"></param>
             <param name="placeRepository"></param>
             <param name="userRepository"></param>
@@ -162,10 +162,11 @@
             This controller manages test results
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.ResultController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="localizer"></param>
             <param name="logger"></param>
             <param name="visitorRepository"></param>
             <param name="userRepository"></param>
@@ -230,6 +231,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.SlotController">
+            <summary>
+            Slot controller manages time slots at the sampling places
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SlotController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.SlotController},CovidMassTesting.Repository.Interface.ISlotRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="logger"></param>
+            <param name="slotRepository"></param>
+        </member>
         <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String)">
             <summary>
             Shows available days per place
@@ -237,15 +250,32 @@
             <param name="placeId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.SlotController.ListHourSlotsByPlaceAndDaySlotId(System.String,System.Int64)">
+            <summary>
+            Shows available hours at specific day and place
+            </summary>
+            <param name="placeId"></param>
+            <param name="daySlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SlotController.ListMinuteSlotsByPlaceAndHourSlotId(System.String,System.Int64)">
+            <summary>
+            List specific minute slots at specific hour and place
+            </summary>
+            <param name="placeId"></param>
+            <param name="hourSlotId"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.SMS.GoSMSSender">
             <summary>
             https://doc.gosms.cz/#dokumentace-gosms-api
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.SMS.GoSMSSender.#ctor(Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.GoSMSConfiguration},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.SMS.GoSMSSender})">
+        <member name="M:CovidMassTesting.Controllers.SMS.GoSMSSender.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.SMS.GoSMSSender},Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.GoSMSConfiguration},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.SMS.GoSMSSender})">
             <summary>
             Constructor
             </summary>
+            <param name="localizer"></param>
             <param name="settings"></param>
             <param name="logger"></param>
         </member>
@@ -285,10 +315,11 @@
             Controller that manages user requests
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.UserController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="localizer"></param>
             <param name="logger"></param>
             <param name="userRepository"></param>
         </member>
@@ -349,9 +380,7 @@
             constructor
             </summary>
             <param name="logger"></param>
-            <param name="slotRepository"></param>
             <param name="visitorRepository"></param>
-            <param name="placeRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Register(CovidMassTesting.Model.Visitor)">
             <summary>
@@ -373,6 +402,73 @@
             <summary>
             https://gist.github.com/magicsih/be06c2f60288b54d9f52856feb96ce8c
             </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.#ctor">
+            <summary>
+            Aes256 helper
+            
+            No params constructor
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.#ctor(System.String,System.String)">
+            <summary>
+            Aes256 helper
+            
+            Key &amp; IV constructor .. base64
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.#ctor(System.Byte[],System.Byte[])">
+            <summary>
+            Aes256 helper
+            
+            Key &amp; IV constructor .. byte[]
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.Decrypt(System.Byte[])">
+            <summary>
+            Decrypts message
+            </summary>
+            <param name="cipher"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.DecryptFromBase64String(System.String)">
+            <summary>
+            Decrypts from base64
+            </summary>
+            <param name="base64cipher"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.EncryptToByte(System.String)">
+            <summary>
+            Encrypts message
+            </summary>
+            <param name="plain"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.EncryptToBase64String(System.String)">
+            <summary>
+            Encrypts base64
+            </summary>
+            <param name="plain"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.GetKey">
+            <summary>
+            Returns key
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.GetIV">
+            <summary>
+            returns IV
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Aes.ToString">
+            <summary>
+            Override to string
+            </summary>
+            <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Helpers.Aes.Dispose">
             <summary>
@@ -396,6 +492,37 @@
             </summary>
             <param name="data"></param>
             <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Helpers.RandomGenerator">
+            <summary>
+            Secure random generator
+            
+            https://stackoverflow.com/questions/42426420/how-to-generate-a-cryptographically-secure-random-integer-within-a-range
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.RandomGenerator.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.RandomGenerator.Next(System.Int32,System.Int32)">
+            <summary>
+            Get random value
+            </summary>
+            <param name="minValue"></param>
+            <param name="maxExclusiveValue"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.RandomGenerator.Dispose">
+            <summary>
+            Public implementation of Dispose pattern callable by consumers.
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.RandomGenerator.Dispose(System.Boolean)">
+            <summary>
+            Protected implementation of Dispose pattern.
+            </summary>
+            <param name="disposing"></param>
         </member>
         <member name="T:CovidMassTesting.Model.AuthData">
             <summary>
@@ -432,6 +559,21 @@
             Template identifier
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Email.InvitationEmail.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.InvitationEmail.Roles">
+            <summary>
+            Roles
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.InvitationEmail.Password">
+            <summary>
+            Password
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Email.PersonalDataRemovedEmail">
             <summary>
             Email sent when test was not positive not negative, and needs to be repeated
@@ -455,6 +597,26 @@
         <member name="P:CovidMassTesting.Model.Email.RolesUpdatedEmail.TemplateId">
             <summary>
             Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.RolesUpdatedEmail.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.RolesUpdatedEmail.Roles">
+            <summary>
+            Roles
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.RolesUpdatedEmail.Password">
+            <summary>
+            Password
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail">
+            <summary>
+            Email template for visitor change registration
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.TemplateId">
@@ -577,6 +739,21 @@
             Visitor name
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Place">
+            <summary>
+            This object holds all information about the testing place plus real time statistics about health/sick visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Id">
+            <summary>
+            Place id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Name">
+            <summary>
+            Place name
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Place.LimitPer5MinSlot">
             <summary>
             Registration in minute slot is rejected if more then this amount of people are registered
@@ -587,9 +764,69 @@
             Registration in hour slot is rejected if more then this amount of people are registered
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.Description">
+            <summary>
+            Description 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Address">
+            <summary>
+            Address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Lat">
+            <summary>
+            GPS lattitude
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Lng">
+            <summary>
+            GPS longtitude
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.IsDriveIn">
+            <summary>
+            Has drive in option
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.IsWalkIn">
+            <summary>
+            Has walk in option
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Registrations">
+            <summary>
+            Total number of registrations
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Healthy">
+            <summary>
+            Results of healthy results
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Sick">
+            <summary>
+            Results of covid positive results
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Result">
+            <summary>
+            This object hold the public information for the visitor result
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Result.State">
+            <summary>
+            State. Available states are listed in Model.TestResult
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.GoSMSConfiguration">
             <summary>
             GoSMS configuration https://doc.gosms.cz/
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.Endpoint">
+            <summary>
+            Endpoing
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.ClientId">
@@ -659,6 +896,116 @@
             If not defined, Admin role is set
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Slot1Day">
+            <summary>
+            Day slot at specific place with registration stats
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.SlotId">
+            <summary>
+            id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.PlaceId">
+            <summary>
+            place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.Time">
+            <summary>
+            Time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.Description">
+            <summary>
+            Description
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.Registrations">
+            <summary>
+            Registrations stats
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Slot1Hour">
+            <summary>
+            Slot 1 hour
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.SlotId">
+            <summary>
+            id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.PlaceId">
+            <summary>
+            Place id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.TestingDayId">
+            <summary>
+            Day id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.Time">
+            <summary>
+            Time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.DaySlotId">
+            <summary>
+            Day id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.Description">
+            <summary>
+            Description
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.Registrations">
+            <summary>
+            Registrations
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Slot5Min">
+            <summary>
+            5 minute slot
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.SlotId">
+            <summary>
+            Slot id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.PlaceId">
+            <summary>
+            place id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.TestingDayId">
+            <summary>
+            Day id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.Time">
+            <summary>
+            Slot time object
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.HourSlotId">
+            <summary>
+            Hour slot id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.Description">
+            <summary>
+            Formatted time. Eg. 15:00 - 20:00
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.Registrations">
+            <summary>
+            Registrations stats
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.SMS.GoSMSAuthMessage">
             <summary>
             https://doc.gosms.cz/#ziskani-access-tokenu
@@ -692,6 +1039,21 @@
              -H "Content-Type: application/json" \
              -H "Authorization: Bearer {token}" \
              -d '{"message":"Hello","recipients":"111222333","channel":1}'
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.GoSMSSendMessage.message">
+            <summary>
+            Message
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.GoSMSSendMessage.recipients">
+            <summary>
+            recipients
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SMS.GoSMSSendMessage.channel">
+            <summary>
+            Channel
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.SMS.ISMS">
@@ -800,6 +1162,23 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Model.SMS.Message">
+            <summary>
+            Generic sms 
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.Message.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="text"></param>
+        </member>
+        <member name="M:CovidMassTesting.Model.SMS.Message.GetText">
+            <summary>
+            Returns sms text
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Model.SMS.TestIsFinishedSMS">
             <summary>
             Test has been finished, person should take the certificate.
@@ -849,6 +1228,31 @@
             Generate sms message text
             </summary>
             <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.TestingDay">
+            <summary>
+            Registration day
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TestingDay.Time">
+            <summary>
+            Time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TestingDay.Registrations">
+            <summary>
+            Registrations stats
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TestingDay.Healthy">
+            <summary>
+            Healthy
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TestingDay.Sick">
+            <summary>
+            Sick
+            </summary>
         </member>
         <member name="T:CovidMassTesting.Model.TestResult">
             <summary>
@@ -1108,6 +1512,101 @@
             Stores personal data, contact data as well as medical condition
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Id">
+            <summary>
+            Registration code. 9-digit, formatted 000-000-000 for visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.PersonType">
+            <summary>
+            Type of person
+            
+            idcard|child|foreign
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Passport">
+            <summary>
+            Passport number if person type is foreigner
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.RC">
+            <summary>
+            Personal number if person type is idcard or child
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.FirstName">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.LastName">
+            <summary>
+            Last name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Address">
+            <summary>
+            Address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Phone">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Insurance">
+            <summary>
+            Insurance
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.ChosenSlot">
+            <summary>
+            Chosen time slot
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.ChosenPlaceId">
+            <summary>
+            Chosen place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Result">
+            <summary>
+            Test result. Available options are in Model.TestResult
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.TestingSet">
+            <summary>
+            Testing set identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.LastUpdate">
+            <summary>
+            Last change
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Program">
+            <summary>
+            App
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Program.Main(System.String[])">
+            <summary>
+            Main entry point
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:CovidMassTesting.Program.CreateHostBuilder(System.String[])">
+            <summary>
+            Creates web
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
             <summary>
             Place repository interface for dependency injection
@@ -1154,7 +1653,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.Set(CovidMassTesting.Model.Place)">
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.SetPlace(CovidMassTesting.Model.Place)">
             <summary>
             Set new place object
             </summary>
@@ -1174,6 +1673,138 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Repository.Interface.ISlotRepository">
+            <summary>
+            Slot repositotory interface
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.Add(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Add 1 day slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.Add(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Add 1 hour slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.Add(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Add 5 min slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DecrementRegistrationDaySlot(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Decrement registration
+            </summary>
+            <param name="slotD"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DecrementRegistrationHourSlot(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Decrement registration
+            </summary>
+            <param name="slotH"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DecrementRegistration5MinSlot(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Decrement registration
+            </summary>
+            <param name="slotM"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.IncrementRegistrationDaySlot(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Increment registration
+            </summary>
+            <param name="slotD"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.IncrementRegistrationHourSlot(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Increment registration
+            </summary>
+            <param name="slotH"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.IncrementRegistration5MinSlot(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Increment registration
+            </summary>
+            <param name="slotM"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.GetDaySlot(System.String,System.Int64)">
+            <summary>
+            Get day slot
+            </summary>
+            <param name="placeId"></param>
+            <param name="daySlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.ListDaySlotsByPlace(System.String)">
+            <summary>
+            List day slots by place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.GetHourSlot(System.String,System.Int64)">
+            <summary>
+            Get hour slot
+            </summary>
+            <param name="placeId"></param>
+            <param name="hourSlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.ListHourSlotsByPlaceAndDaySlotId(System.String,System.Int64)">
+            <summary>
+            List hour slots by place and day
+            </summary>
+            <param name="placeId"></param>
+            <param name="daySlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.Get5MinSlot(System.String,System.Int64)">
+            <summary>
+            Get 5 min slot
+            </summary>
+            <param name="placeId"></param>
+            <param name="minuteSlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.ListMinuteSlotsByPlaceAndHourSlotId(System.String,System.Int64)">
+            <summary>
+            List minute slots by hour and place
+            </summary>
+            <param name="placeId"></param>
+            <param name="hourSlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
+            <summary>
+            Checks slots by admin and creates them if any for any place is missing
+            </summary>
+            <param name="testingDay"></param>
+            <param name="placeId"></param>
+            <param name="testingFromHour"></param>
+            <param name="testingUntilHour"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.GetCurrentSlot(System.String)">
+            <summary>
+            Get current slot
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DropAllData">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
@@ -1189,7 +1820,7 @@
             <summary>
             Create user
             </summary>
-            <param name="place"></param>
+            <param name="user"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListAll">
@@ -1218,7 +1849,6 @@
             </summary>
             <param name="email"></param>
             <param name="hash"></param>
-            <param name="data"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ChangePassword(System.String,System.String,System.String)">
@@ -1249,7 +1879,7 @@
             <summary>
             Registration Manager can select place. All his registrations will be placed at this location
             </summary>
-            <param name="v"></param>
+            <param name="email"></param>
             <param name="placeId"></param>
             <returns></returns>
         </member>
@@ -1257,7 +1887,7 @@
             <summary>
             Get public user data.. eg location
             </summary>
-            <param name="managerEmail"></param>
+            <param name="email"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.DropDatabaseAuthorize(System.String,System.String)">
@@ -1286,7 +1916,7 @@
             <param name="visitor"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Set(CovidMassTesting.Model.Visitor,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>
             Sets the visitor to the database
             </summary>
@@ -1353,7 +1983,7 @@
             <summary>
             Get visitor by personal number
             </summary>
-            <param name="rc"></param>
+            <param name="personalNumber"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetNextTest">
@@ -1375,6 +2005,137 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Repository.MockRepository.PlaceRepository">
+            <summary>
+            Place mock repository
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="loggerFactory"></param>
+            <param name="redisCacheClient"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.SetPlace(CovidMassTesting.Model.Place)">
+            <summary>
+            Set place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.GetPlace(System.String)">
+            <summary>
+            Get place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.ListAll">
+            <summary>
+            List all
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.DeletePlace(CovidMassTesting.Model.Place)">
+            <summary>
+            Delete place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.DropAllData">
+            <summary>
+            Deletes all data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.MockRepository.SlotRepository">
+            <summary>
+            Slot mock repository
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.SlotRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+            <summary>
+            constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="configuration"></param>
+            <param name="loggerFactory"></param>
+            <param name="redisCacheClient"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.SetDaySlot(CovidMassTesting.Model.Slot1Day,System.Boolean)">
+            <summary>
+            Set
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.SetHourSlot(CovidMassTesting.Model.Slot1Hour,System.Boolean)">
+            <summary>
+            Set hour slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.SetMinuteSlot(CovidMassTesting.Model.Slot5Min,System.Boolean)">
+            <summary>
+            Set minute slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.Get5MinSlot(System.String,System.Int64)">
+            <summary>
+            Get
+            </summary>
+            <param name="placeId"></param>
+            <param name="minuteSlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.GetDaySlot(System.String,System.Int64)">
+            <summary>
+            Get
+            </summary>
+            <param name="placeId"></param>
+            <param name="daySlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.GetHourSlot(System.String,System.Int64)">
+            <summary>
+            Get
+            </summary>
+            <param name="placeId"></param>
+            <param name="hourSlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.ListDaySlotsByPlace(System.String)">
+            <summary>
+            List
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.ListHourSlotsByPlaceAndDaySlotId(System.String,System.Int64)">
+            <summary>
+            List
+            </summary>
+            <param name="placeId"></param>
+            <param name="daySlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.ListMinuteSlotsByPlaceAndHourSlotId(System.String,System.Int64)">
+            <summary>
+            List
+            </summary>
+            <param name="placeId"></param>
+            <param name="hourSlotId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.DropAllData">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
@@ -1386,10 +2147,12 @@
             In memory user repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.MockRepository.UserRepository},Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.UserRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             constructor
             </summary>
+            <param name="localizer"></param>
+            <param name="localizer2"></param>
             <param name="configuration"></param>
             <param name="loggerFactory"></param>
             <param name="redisCacheClient"></param>
@@ -1397,7 +2160,7 @@
             <param name="smsSender"></param>
             <param name="placeRepository"></param>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Set(CovidMassTesting.Model.User,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.SetUser(CovidMassTesting.Model.User,System.Boolean)">
             <summary>
             set user
             </summary>
@@ -1405,7 +2168,7 @@
             <param name="mustBeNew"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Get(System.String)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.GetUser(System.String)">
             <summary>
             Gets user
             </summary>
@@ -1431,10 +2194,349 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Repository.MockRepository.VisitorRepository">
+            <summary>
+            Visitor mock repository
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="configuration"></param>
+            <param name="loggerFactory"></param>
+            <param name="redisCacheClient"></param>
+            <param name="emailSender"></param>
+            <param name="smsSender"></param>
+            <param name="placeRepository"></param>
+            <param name="slotRepository"></param>
+            <param name="userRepository"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
+            <summary>
+            Set visitor
+            </summary>
+            <param name="visitor"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.RemoveFromDocQueue(System.String)">
+            <summary>
+            remove from doc queue
+            </summary>
+            <param name="testId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.AddToDocQueue(System.String)">
+            <summary>
+            add to doc queue
+            </summary>
+            <param name="testId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetFirstItemFromQueue">
+            <summary>
+            Get first item in doc queue
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetVisitor(System.Int32)">
+            <summary>
+            loads visitor by code
+            </summary>
+            <param name="codeInt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.ListAllKeys">
+            <summary>
+            List all keys
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GETVisitorCodeFromPersonalNumber(System.String)">
+            <summary>
+            Get
+            </summary>
+            <param name="personalNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GETVisitorCodeFromTesting(System.String)">
+            <summary>
+            Get
+            </summary>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.MapPersonalNumberToVisitorCode(System.String,System.Int32)">
+            <summary>
+            map personal number to visitor code
+            </summary>
+            <param name="personalNumber"></param>
+            <param name="visitorCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.MapTestingSetToVisitorCode(System.Int32,System.String)">
+            <summary>
+            Map testing set to visitor code
+            </summary>
+            <param name="codeInt"></param>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.UnMapPersonalNumber(System.String)">
+            <summary>
+            Unmap personal number
+            </summary>
+            <param name="personalNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.UnMapTestingSet(System.String)">
+            <summary>
+            Unmap testing set
+            </summary>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.Remove(System.Int32)">
+            <summary>
+            Removes id
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.DropAllData">
+            <summary>
+            delete all data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceRepository">
+            <summary>
+            Redis place repository
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.PlaceRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="redisCacheClient"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.SetPlace(CovidMassTesting.Model.Place)">
+            <summary>
+            Set place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.DecrementPlaceRegistrations(System.String)">
+            <summary>
+            Decrement registrations
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.IncrementPlaceRegistrations(System.String)">
+            <summary>
+            Increment registrations
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.IncrementPlaceHealthy(System.String)">
+            <summary>
+            increment health stats
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.IncrementPlaceSick(System.String)">
+            <summary>
+            Increment sick stats
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.GetPlace(System.String)">
+            <summary>
+            Get place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.ListAll">
+            <summary>
+            List all
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.Delete(CovidMassTesting.Model.Place)">
+            <summary>
+            Deletes place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.DropAllData">
+            <summary>
+            Drop all data in repository
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.RedisRepository.SlotRepository">
+            <summary>
+            Slot repository manages db of time slots for sampling places
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.SlotRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.SlotRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="redisCacheClient"></param>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
             <summary>
             Checks if all slots for the day, and testing place has been created
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.IncrementRegistrationDaySlot(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Increment registration for day slot
+            </summary>
+            <param name="slotD"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.IncrementRegistrationHourSlot(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Increment registrations for hour slot
+            </summary>
+            <param name="slotH"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.IncrementRegistration5MinSlot(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Increment registrations for minute slot
+            </summary>
+            <param name="slotM"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DecrementRegistrationDaySlot(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Decrement registrations for day slot
+            </summary>
+            <param name="slotD"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DecrementRegistrationHourSlot(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Decrement registrations for hour slot
+            </summary>
+            <param name="slotH"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DecrementRegistration5MinSlot(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Decrement registrations for minute slot
+            </summary>
+            <param name="slotM"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.Add(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Create day slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.Add(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Create hour slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.Add(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Create minute slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.SetDaySlot(CovidMassTesting.Model.Slot1Day,System.Boolean)">
+            <summary>
+            Updates day slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.SetHourSlot(CovidMassTesting.Model.Slot1Hour,System.Boolean)">
+            <summary>
+            Updates hour slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.SetMinuteSlot(CovidMassTesting.Model.Slot5Min,System.Boolean)">
+            <summary>
+            Updates minute slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetDaySlot(System.String,System.Int64)">
+            <summary>
+            Returns day slot
+            </summary>
+            <param name="placeId"></param>
+            <param name="daySlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.ListDaySlotsByPlace(System.String)">
+            <summary>
+            List day slots by place id
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetHourSlot(System.String,System.Int64)">
+            <summary>
+            List day slot
+            </summary>
+            <param name="placeId"></param>
+            <param name="hourSlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.ListHourSlotsByPlaceAndDaySlotId(System.String,System.Int64)">
+            <summary>
+            Lists hour slots by place and day
+            </summary>
+            <param name="placeId"></param>
+            <param name="daySlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.Get5MinSlot(System.String,System.Int64)">
+            <summary>
+            Loads minute slot
+            </summary>
+            <param name="placeId"></param>
+            <param name="minuteSlotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.ListMinuteSlotsByPlaceAndHourSlotId(System.String,System.Int64)">
+            <summary>
+            List all minute slots by hour and place
+            </summary>
+            <param name="placeId"></param>
+            <param name="hourSlotId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetCurrentSlot(System.String)">
@@ -1455,14 +2557,17 @@
             User repository manages users and stores user data securly in the database
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.UserRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="localizer"></param>
             <param name="configuration"></param>
             <param name="logger"></param>
             <param name="redisCacheClient"></param>
             <param name="emailSender"></param>
+            <param name="smsSender"></param>
+            <param name="placeRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Add(CovidMassTesting.Model.User)">
             <summary>
@@ -1480,7 +2585,7 @@
             containing the password strength requirements.</param>
             <returns>A random password</returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Set(CovidMassTesting.Model.User,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.SetUser(CovidMassTesting.Model.User,System.Boolean)">
             <summary>
             Set user. Encodes and stores to db.
             </summary>
@@ -1495,7 +2600,7 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Get(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GetUser(System.String)">
             <summary>
             Decode encrypted user data
             </summary>
@@ -1516,6 +2621,12 @@
             <param name="placeId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.CreateAdminUsersFromConfiguration">
+            <summary>
+            Create admin users from the configuration
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Preauthenticate(System.String)">
             <summary>
             Returns cohash
@@ -1529,7 +2640,6 @@
             </summary>
             <param name="email"></param>
             <param name="hash"></param>
-            <param name="data"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ChangePassword(System.String,System.String,System.String)">
@@ -1548,7 +2658,7 @@
             Checks if user with specified email has any of reqested groups
             </summary>
             <param name="email">User email</param>
-            <param name="roles">Search any of this roles</param>
+            <param name="role">Search any of this roles</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GetPublicUser(System.String)">
@@ -1556,6 +2666,14 @@
             Returns public information about specific user
             </summary>
             <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.DropDatabaseAuthorize(System.String,System.String)">
+            <summary>
+            Administrator is authorized to delete all data in the database
+            </summary>
+            <param name="email"></param>
+            <param name="hash"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.DropAllData">
@@ -1569,10 +2687,11 @@
             Visitor repository holds data about visitors
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.VisitorRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.VisitorRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="localizer"></param>
             <param name="configuration"></param>
             <param name="logger"></param>
             <param name="redisCacheClient"></param>
@@ -1582,6 +2701,13 @@
             <param name="slotRepository"></param>
             <param name="userRepository"></param>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Add(CovidMassTesting.Model.Visitor)">
+            <summary>
+            Creates new visitor registration
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Remove(System.Int32)">
             <summary>
             Remove visitor from redis
@@ -1589,19 +2715,164 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Get(System.Int32)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitor(System.Int32)">
             <summary>
             Decode visitor data from database
             </summary>
-            <param name="code"></param>
+            <param name="codeInt"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Set(CovidMassTesting.Model.Visitor,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>
             Encode visitor data and store to database
             </summary>
             <param name="visitor"></param>
             <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.MapTestingSetToVisitorCode(System.Int32,System.String)">
+            <summary>
+            Maps testing code to visitor code
+            </summary>
+            <param name="codeInt"></param>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UnMapTestingSet(System.String)">
+            <summary>
+            Removes testing code
+            </summary>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GETVisitorCodeFromTesting(System.String)">
+            <summary>
+            Returns visitor code from testing code
+            </summary>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.MapPersonalNumberToVisitorCode(System.String,System.Int32)">
+            <summary>
+            Maps personal number to visitor code
+            </summary>
+            <param name="personalNumber"></param>
+            <param name="visitorCode"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UnMapPersonalNumber(System.String)">
+            <summary>
+            Removes personal number
+            </summary>
+            <param name="personalNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GETVisitorCodeFromPersonalNumber(System.String)">
+            <summary>
+            Returns visitor code from personal number
+            </summary>
+            <param name="personalNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ConnectVisitorToTest(System.Int32,System.String)">
+            <summary>
+            Map visitor code to testing code
+            </summary>
+            <param name="codeInt"></param>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String)">
+            <summary>
+            Updates testing state
+            </summary>
+            <param name="code"></param>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.String)">
+            <summary>
+            Updates testing state
+            </summary>
+            <param name="code"></param>
+            <param name="state"></param>
+            <param name="testingSet"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetTest(System.Int32,System.String)">
+            <summary>
+            Returns test by code and password
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveTest(System.Int32,System.String)">
+            <summary>
+            Deletes the test
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.CreateNewVisitorId">
+            <summary>
+            Creates new unique visitor id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAllKeys">
+            <summary>
+            Lists all keys
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitorByPersonalNumber(System.String)">
+            <summary>
+            Returns visitor by personal number
+            </summary>
+            <param name="personalNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetTestResult(System.String,System.String)">
+            <summary>
+            Set test result
+            </summary>
+            <param name="testCode"></param>
+            <param name="result"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.AddToDocQueue(System.String)">
+            <summary>
+            Add test to document queue
+            </summary>
+            <param name="testId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveFromDocQueue(System.String)">
+            <summary>
+            Removes test from document queue
+            </summary>
+            <param name="testId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(System.String)">
+            <summary>
+            Removes document from queue and sets the test as taken
+            </summary>
+            <param name="testId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetFirstItemFromQueue">
+            <summary>
+            Seek first item from queue
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetNextTest">
+            <summary>
+            Fetch next test
+            </summary>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String)">
@@ -1628,6 +2899,424 @@
             <param name="number"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.DropAllData">
+            <summary>
+            Deletes all data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Resources.Controllers_AdminController">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.Invalid_user_or_password">
+            <summary>
+              Looks up a localized string similar to Invalid user or password.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.Only_admin_is_allowed_to_drop_database">
+            <summary>
+              Looks up a localized string similar to Only admin is allowed to drop database.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users">
+            <summary>
+              Looks up a localized string similar to Only admin is allowed to invite other users.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.Only_admin_is_allowed_to_manage_time">
+            <summary>
+              Looks up a localized string similar to Only admin is allowed to manage time.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.Only_admin_is_allowed_to_remove_users">
+            <summary>
+              Looks up a localized string similar to Only admin is allowed to remove users.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.This_user_is_protected_by_the_configuration">
+            <summary>
+              Looks up a localized string similar to This user is protected by the configuration.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_AdminController.You_cannot_remove_yourself">
+            <summary>
+              Looks up a localized string similar to You cannot remove yourself.
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Resources.Controllers_PlaceController">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_PlaceController.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_PlaceController.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_PlaceController.Old_place_not_found">
+            <summary>
+              Looks up a localized string similar to Old place not found.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places">
+            <summary>
+              Looks up a localized string similar to Only admin is allowed to manage testing places.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_PlaceController.Place_not_found">
+            <summary>
+              Looks up a localized string similar to Place not found.
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Resources.Controllers_ResultController">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Code_of_the_test_set_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Code of the test set must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Invalid_result_state">
+            <summary>
+              Looks up a localized string similar to Invalid result state.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Invalid_visitor_code">
+            <summary>
+              Looks up a localized string similar to Invalid visitor code.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Last 4 digits of personal number or declared passport for foreigner at registration must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data">
+            <summary>
+              Looks up a localized string similar to Only user with Document Manager role is allowed to fetch visitor data.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward">
+            <summary>
+              Looks up a localized string similar to Only user with Document Manager role is allowed to move the queue forward.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Only_user_with_Medic_Lab_role_is_allowed_to_set_results_of_tests">
+            <summary>
+              Looks up a localized string similar to Only user with Medic Lab role is allowed to set results of tests.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Only_user_with_Registration_Manager_role_or_Medic_Tester_role_is_allowed_to_fetch_data_of_visitors">
+            <summary>
+              Looks up a localized string similar to Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Personal_number_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Personal number must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Result_of_the_test_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Result of the test must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Test_code_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Test code must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Test_id_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Test id must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Visitor_code_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Visitor code must not be empty.
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Resources.Controllers_UserController">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_UserController.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_UserController.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_UserController.Email_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Email must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_UserController.Only_user_with_Admin_role_can_list_users">
+            <summary>
+              Looks up a localized string similar to Only user with Admin role can list users.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_UserController.Only_user_with_Registration_Manager_role_can_select_his_own_place_">
+            <summary>
+              Looks up a localized string similar to Only user with Registration Manager role can select his own place..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_UserController.Place_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Place must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_UserController.This_special_user_cannot_change_the_password_">
+            <summary>
+              Looks up a localized string similar to This special user cannot change the password..
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Resources.Repository_RedisRepository_SlotRepository">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_SlotRepository.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_SlotRepository.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_SlotRepository.Error_adding_the_slot_for_day">
+            <summary>
+              Looks up a localized string similar to Error adding the slot for day.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_SlotRepository.Error_creating_day_slot">
+            <summary>
+              Looks up a localized string similar to Error creating day slot.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_SlotRepository.Error_creating_hour_slot">
+            <summary>
+              Looks up a localized string similar to Error creating hour slot.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_SlotRepository.Error_creating_minute_slot">
+            <summary>
+              Looks up a localized string similar to Error creating minute slot.
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Dear__0___we_have_registered_you_into_mass_covid_testing_system__Please_check_your_email_">
+            <summary>
+              Looks up a localized string similar to Dear {0}, we have registered you into mass covid testing system. Please check your email..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Email_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Email must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Error_creating_record_in_the_database">
+            <summary>
+              Looks up a localized string similar to Error creating record in the database.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Hash_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Hash must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Invalid_old_password">
+            <summary>
+              Looks up a localized string similar to Invalid old password.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Invalid_place_provided">
+            <summary>
+              Looks up a localized string similar to Invalid place provided.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Invalid_user_or_password">
+            <summary>
+              Looks up a localized string similar to Invalid user or password.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Invalid_user_or_password_or_attempt_to_login_too_fast_after_failed_attempt">
+            <summary>
+              Looks up a localized string similar to Invalid user or password or attempt to login too fast after failed attempt.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.User_not_found_by_email">
+            <summary>
+              Looks up a localized string similar to User not found by email.
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_">
+            <summary>
+              Looks up a localized string similar to Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_">
+            <summary>
+              Looks up a localized string similar to Dear {0}, there were some technical issues with your test. Please visit the sampling place again and repeat the test procedure. You can use the same registration as before..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0___we_have_updated_your_registration__1___Time___2___Place___3_">
+            <summary>
+              Looks up a localized string similar to Dear {0}, we have updated your registration {1}. Time: {2}, Place: {3}.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_">
+            <summary>
+              Looks up a localized string similar to Dear {0}, your test is in processing. Please wait for further instructions in next sms message..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_">
+            <summary>
+              Looks up a localized string similar to Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0__We_have_removed_your_personal_data_from_the_database__Thank_you_for_taking_the_covid_test">
+            <summary>
+              Looks up a localized string similar to Dear {0},We have removed your personal data from the database. Thank you for taking the covid test.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Invalid_code">
+            <summary>
+              Looks up a localized string similar to Invalid code.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty">
+            <summary>
+              Looks up a localized string similar to Last 4 digits of personal number or declared passport for foreigner at registration must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_">
+            <summary>
+              Looks up a localized string similar to Personal data may be deleted only after the test has proven negative result and person receives the certificate..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Test_does_not_exists">
+            <summary>
+              Looks up a localized string similar to Test does not exists.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_">
+            <summary>
+              Looks up a localized string similar to This 1 hour time slot has reached the capacity..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_">
+            <summary>
+              Looks up a localized string similar to This 5 minute time slot has reached the capacity..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Unable_to_find_visitor_code_from_test_code__Are_you_sure_test_code_is_correct_">
+            <summary>
+              Looks up a localized string similar to Unable to find visitor code from test code. Are you sure test code is correct?.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Unknown_personal_number">
+            <summary>
+              Looks up a localized string similar to Unknown personal number.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found">
+            <summary>
+              Looks up a localized string similar to Visitor with code {0} not found.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_5_min__slot">
+            <summary>
+              Looks up a localized string similar to We are not able to find chosen 5 min. slot.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_hour_slot">
+            <summary>
+              Looks up a localized string similar to We are not able to find chosen hour slot.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_testing_place">
+            <summary>
+              Looks up a localized string similar to We are not able to find chosen testing place.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.You_can_remove_only_first_item_from_the_queue">
+            <summary>
+              Looks up a localized string similar to You can remove only first item from the queue.
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Startup">
             <summary>
             Startup class
@@ -1650,7 +3339,8 @@
             </summary>
             <param name="app"></param>
             <param name="env"></param>
-            <param name="userRepository"></param>        
+            <param name="userRepository"></param>
+            <param name="logger"></param>        
         </member>
     </members>
 </doc>

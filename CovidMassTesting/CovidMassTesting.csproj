@@ -37,6 +37,96 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\Controllers.AdminController.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Controllers.AdminController.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Controllers.PlaceController.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Controllers.PlaceController.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Controllers.ResultController.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Controllers.ResultController.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Controllers.UserController.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Controllers.UserController.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Repository.RedisRepository.SlotRepository.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Repository.RedisRepository.SlotRepository.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Repository.RedisRepository.UserRepository.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Repository.RedisRepository.UserRepository.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Resources\Repository.RedisRepository.VisitorRepository.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Repository.RedisRepository.VisitorRepository.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\Controllers.UserController.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.ResultController.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.PlaceController.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.AdminController.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.AdminController.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Controllers.AdminController.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.PlaceController.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Controllers.PlaceController.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.ResultController.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Controllers.ResultController.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.UserController.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Controllers.UserController.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.VisitorRepository.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.UserRepository.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.SlotRepository.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.SlotRepository.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Repository.RedisRepository.SlotRepository.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.UserRepository.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Repository.RedisRepository.UserRepository.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.VisitorRepository.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Repository.RedisRepository.VisitorRepository.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="doc\documentation.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

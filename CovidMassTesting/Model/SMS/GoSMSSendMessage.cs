@@ -15,8 +15,23 @@ namespace CovidMassTesting.Model.SMS
     /// </summary>
     public class GoSMSSendMessage
     {
+        /// <summary>
+        /// Message
+        /// </summary>
+#pragma warning disable IDE1006 // Naming Styles
         public string message { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+        /// <summary>
+        /// recipients
+        /// </summary>
+#pragma warning disable IDE1006 // Naming Styles
         public string recipients { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
+        /// <summary>
+        /// Channel
+        /// </summary>
+#pragma warning disable IDE1006 // Naming Styles
         public int channel { get; set; }
+#pragma warning restore IDE1006 // Naming Styles
     }
 }

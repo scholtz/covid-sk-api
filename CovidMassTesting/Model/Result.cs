@@ -5,8 +5,14 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model
 {
+    /// <summary>
+    /// This object hold the public information for the visitor result
+    /// </summary>
     public class Result
     {
+        /// <summary>
+        /// State. Available states are listed in Model.TestResult
+        /// </summary>
         public string State { get; set; }
     }
 }

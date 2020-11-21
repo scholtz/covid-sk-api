@@ -28,6 +28,8 @@ namespace CovidMassTesting.Controllers.Email
         /// <summary>
         /// templates
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public SendgridTemplate[] Templates { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
     }
 }

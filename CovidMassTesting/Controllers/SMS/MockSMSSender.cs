@@ -17,6 +17,16 @@ namespace CovidMassTesting.Controllers.SMS
         /// <returns></returns>
         public async Task<bool> SendSMS(string toPhone, ISMS data)
         {
+            if (string.IsNullOrEmpty(toPhone))
+            {
+                throw new System.ArgumentException($"'{nameof(toPhone)}' cannot be null or empty", nameof(toPhone));
+            }
+
+            if (data is null)
+            {
+                throw new System.ArgumentNullException(nameof(data));
+            }
+
             var msg = data.GetText();
             System.Console.WriteLine($"SMS: {msg}");
             await Task.Delay(1);

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model.Email
 {
+    /// <summary>
+    /// Email template for visitor change registration
+    /// </summary>
     public class VisitorChangeRegistrationEmail : IEmail
     {
         /// <summary>

@@ -14,7 +14,7 @@ namespace CovidMassTesting.Repository.Interface
         /// <summary>
         /// Create user
         /// </summary>
-        /// <param name="place"></param>
+        /// <param name="user"></param>
         /// <returns></returns>
         public Task<bool> Add(User user);
         /// <summary>
@@ -39,7 +39,6 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="email"></param>
         /// <param name="hash"></param>
-        /// <param name="data"></param>
         /// <returns></returns>
         public Task<string> Authenticate(string email, string hash);
         /// <summary>
@@ -66,16 +65,16 @@ namespace CovidMassTesting.Repository.Interface
         /// <summary>
         /// Registration Manager can select place. All his registrations will be placed at this location
         /// </summary>
-        /// <param name="v"></param>
+        /// <param name="email"></param>
         /// <param name="placeId"></param>
         /// <returns></returns>
-        public Task<bool> SetLocation(string v, string placeId);
+        public Task<bool> SetLocation(string email, string placeId);
         /// <summary>
         /// Get public user data.. eg location
         /// </summary>
-        /// <param name="managerEmail"></param>
+        /// <param name="email"></param>
         /// <returns></returns>
-        public Task<UserPublic> GetPublicUser(string managerEmail);
+        public Task<UserPublic> GetPublicUser(string email);
         /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>

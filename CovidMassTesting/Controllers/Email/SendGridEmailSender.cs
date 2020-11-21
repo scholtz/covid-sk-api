@@ -78,7 +78,12 @@ namespace CovidMassTesting.Controllers.Email
             )
         {
             if (data == null) throw new Exception("Please define data for email");
-            logger.LogInformation($"Sending {data?.TemplateId} email to {toEmail}");
+            if (string.IsNullOrEmpty(toEmail))
+            {
+                logger.LogDebug($"Message {data.TemplateId} not delivered because email is not defined");
+                return false;
+            }
+            logger.LogInformation($"Sending {data.TemplateId} email to {toEmail}");
             var msg = new SendGridMessage()
             {
 

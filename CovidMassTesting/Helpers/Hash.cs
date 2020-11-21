@@ -24,10 +24,12 @@ namespace CovidMassTesting.Helpers
             {
                 hashOut = hasher.ComputeHash(data);
             }
+#pragma warning disable CA1308 // Normalize strings to uppercase
             return BitConverter
                 .ToString(hashOut)
                 .Replace("-", "", true, CultureInfo.InvariantCulture)
                 .ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
         }
     }
 }
