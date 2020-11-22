@@ -30,6 +30,14 @@ namespace CovidMassTesting
     public class Startup
     {
         /// <summary>
+        /// Identifies specific run of the application.
+        /// </summary>
+        public readonly static string InstanceId = Guid.NewGuid().ToString();
+        /// <summary>
+        /// Identifies specific run of the application
+        /// </summary>
+        public readonly static DateTimeOffset Started = DateTimeOffset.Now;
+        /// <summary>
         /// Constructor
         /// </summary>
         /// <param name="configuration"></param>

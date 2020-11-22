@@ -370,6 +370,19 @@
             <param name="newHash"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.VersionController">
+            <summary>
+            This controller returns version of the current api
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VersionController.Get">
+            <summary>
+            Returns version of the current api
+            
+            For development purposes it returns version of assembly, for production purposes it returns string build by pipeline which contains project information, pipeline build version, assembly version, and build date
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.VisitorController">
             <summary>
             This controller manages public registrations
@@ -1504,6 +1517,60 @@
             <summary>
             Place at which person is assigned. All person's registrations will be placed to this location
             </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Version">
+            <summary>
+            API version information
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.InstanceIdentifier">
+            <summary>
+            Instance identifier. Every application runtime has its own guid. If 3 pods are launched in kubernetes, it is possible to identify instance by this identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.InstanceStartedAt">
+            <summary>
+            Last time when instance has been reset
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.ApplicationName">
+            <summary>
+            Application name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.DockerImageVersion">
+            <summary>
+            Docker image version
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.BuildNumber">
+            <summary>
+            Build number from devops or github actions
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.DLLVersion">
+            <summary>
+            Application dll version
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.BuildTime">
+            <summary>
+            Dll build time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.Culture">
+            <summary>
+            Culture info
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Version.GetVersion(System.String,System.DateTimeOffset,System.String)">
+            <summary>
+            Get version
+            </summary>
+            <param name="instanceId"></param>
+            <param name="start"></param>
+            <param name="dllVersion"></param>
+            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.Visitor">
             <summary>
@@ -3320,6 +3387,16 @@
         <member name="T:CovidMassTesting.Startup">
             <summary>
             Startup class
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Startup.InstanceId">
+            <summary>
+            Identifies specific run of the application.
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Startup.Started">
+            <summary>
+            Identifies specific run of the application
             </summary>
         </member>
         <member name="M:CovidMassTesting.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
