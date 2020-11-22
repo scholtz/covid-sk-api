@@ -11,13 +11,14 @@ namespace CovidMassTesting.Controllers.Email
         /// <summary>
         /// Act as email was sent. Log event to console
         /// </summary>
+        /// <param name="subject"></param>
         /// <param name="toEmail"></param>
         /// <param name="toName"></param>
         /// <param name="data"></param>
         /// <returns></returns>
-        public async Task<bool> SendEmail(string toEmail, string toName, IEmail data)
+        public async Task<bool> SendEmail(string subject, string toEmail, string toName, IEmail data)
         {
-            System.Console.WriteLine($"Email: {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
+            System.Console.WriteLine($"Email: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
             await Task.Delay(1);
             return true;
         }

@@ -129,6 +129,9 @@
   <data name="Last 4 digits of personal number or declared passport for foreigner at registration must not be empty" xml:space="preserve">
     <value>Last 4 digits of personal number or declared passport for foreigner at registration must not be empty</value>
   </data>
+  <data name="Only user with Data Exporter role is allowed to fetch all sick visitors" xml:space="preserve">
+    <value>Only user with Data Exporter role is allowed to fetch all sick visitors</value>
+  </data>
   <data name="Only user with Document Manager role is allowed to fetch visitor data" xml:space="preserve">
     <value>Only user with Document Manager role is allowed to fetch visitor data</value>
   </data>

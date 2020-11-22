@@ -58,7 +58,7 @@
             Interface for email client
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.IEmailSender.SendEmail(System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+        <member name="M:CovidMassTesting.Controllers.Email.IEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
             <summary>
             Send email
             </summary>
@@ -68,10 +68,11 @@
             If no email sender is defined
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.NoEmailSender.SendEmail(System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+        <member name="M:CovidMassTesting.Controllers.Email.NoEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
             <summary>
             Act as email was sent. Log event to console
             </summary>
+            <param name="subject"></param>
             <param name="toEmail"></param>
             <param name="toName"></param>
             <param name="data"></param>
@@ -87,7 +88,7 @@
             Constructor
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.SendEmail(System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
             <summary>
             Semd email
             </summary>
@@ -228,6 +229,16 @@
         <member name="M:CovidMassTesting.Controllers.ResultController.RemoveFromDocQueue(System.String)">
             <summary>
             This method removes test from queue
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.FinalDataExport(System.Int32,System.Int32)">
+            <summary>
+            This method exports data for healthy office
+            
+            Lists all visitor which were marked as sick. Exports all available data.
+            
+            returns CSV file as download
             </summary>
             <returns></returns>
         </member>
@@ -562,10 +573,47 @@
             Identifier of the template
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.IsEN">
+            <summary>
+            Is English
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.IsSK">
+            <summary>
+            Is Slovak language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.IsCS">
+            <summary>
+            Is Czech language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.IsDE">
+            <summary>
+            Is German language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.IsHU">
+            <summary>
+            Is hungarian language
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Email.IEmail.SetLanguage(System.String)">
+            <summary>
+            Set the language
+            </summary>
+            <param name="language"></param>
+        </member>
         <member name="T:CovidMassTesting.Model.Email.InvitationEmail">
             <summary>
             User with permissions to invite other people can invite them and 
             </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Email.InvitationEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.InvitationEmail.TemplateId">
             <summary>
@@ -592,6 +640,12 @@
             Email sent when test was not positive not negative, and needs to be repeated
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Model.Email.PersonalDataRemovedEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
+        </member>
         <member name="P:CovidMassTesting.Model.Email.PersonalDataRemovedEmail.TemplateId">
             <summary>
             Template identifier
@@ -606,6 +660,12 @@
             <summary>
             User with permissions to invite other people can invite them and 
             </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Email.RolesUpdatedEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.RolesUpdatedEmail.TemplateId">
             <summary>
@@ -631,6 +691,12 @@
             <summary>
             Email template for visitor change registration
             </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.TemplateId">
             <summary>
@@ -672,6 +738,12 @@
             Visitor registration email
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Model.Email.VisitorRegistrationEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
+        </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.TemplateId">
             <summary>
             Template identifier
@@ -712,6 +784,12 @@
             Sends information to visitor that his test has been processed
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
+        </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail.TemplateId">
             <summary>
             Template identifier
@@ -727,6 +805,12 @@
             Sends information to visitor that his test has been processed
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Model.Email.VisitorTestingResultEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
+        </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingResultEmail.TemplateId">
             <summary>
             Template identifier
@@ -741,6 +825,12 @@
             <summary>
             Email sent when test was not positive not negative, and needs to be repeated
             </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language"></param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.TemplateId">
             <summary>
@@ -1367,6 +1457,11 @@
             User with this role can set testing results
             </summary>
         </member>
+        <member name="F:CovidMassTesting.Model.Token.Groups.DataExporter">
+            <summary>
+            Person in this group is allowed to list all sick people and export data
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Model.Token.GetEmail(System.Security.Claims.ClaimsPrincipal)">
             <summary>
             Get email from claim
@@ -1424,6 +1519,14 @@
         <member name="M:CovidMassTesting.Model.Token.IsDocumentManager(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Check if user has role Document Manager
+            </summary>
+            <param name="user"></param>
+            <param name="userRepository"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsDataExporter(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Check if user has role Data exporter
             </summary>
             <param name="user"></param>
             <param name="userRepository"></param>
@@ -1582,6 +1685,13 @@
         <member name="P:CovidMassTesting.Model.Visitor.Id">
             <summary>
             Registration code. 9-digit, formatted 000-000-000 for visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Language">
+            <summary>
+            Language in which we will communicate to the visitor
+            
+            sk | en
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Visitor.PersonType">
@@ -2069,6 +2179,12 @@
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllData">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListSickVisitors(System.Int32,System.Int32)">
+            <summary>
+            Lists all sick visitors
             </summary>
             <returns></returns>
         </member>
@@ -2972,6 +3088,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListSickVisitors(System.Int32,System.Int32)">
+            <summary>
+            List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Resources.Controllers_AdminController">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
@@ -3088,6 +3212,11 @@
         <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty">
             <summary>
               Looks up a localized string similar to Last 4 digits of personal number or declared passport for foreigner at registration must not be empty.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors">
+            <summary>
+              Looks up a localized string similar to Only user with Data Exporter role is allowed to fetch all sick visitors.
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data">
@@ -3268,6 +3397,11 @@
               Looks up a localized string similar to Invalid user or password or attempt to login too fast after failed attempt.
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place">
+            <summary>
+              Looks up a localized string similar to Invitation to covid testing place.
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_UserRepository.User_not_found_by_email">
             <summary>
               Looks up a localized string similar to User not found by email.
@@ -3287,6 +3421,11 @@
             <summary>
               Overrides the current thread's CurrentUICulture property for all
               resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Covid_test">
+            <summary>
+              Looks up a localized string similar to Covid test.
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_">

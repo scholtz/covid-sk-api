@@ -129,6 +129,9 @@
   <data name="Last 4 digits of personal number or declared passport for foreigner at registration must not be empty" xml:space="preserve">
     <value>Posledné 4 číslice rodného čísla alebo pre cudzincov posledné 4 znaky zadaného cestovného dokladu</value>
   </data>
+  <data name="Only user with Data Exporter role is allowed to fetch all sick visitors" xml:space="preserve">
+    <value>Iba užívateľ s rolou Data Exporter môže vytvoriť zoznam chorých návštevníkov</value>
+  </data>
   <data name="Only user with Document Manager role is allowed to fetch visitor data" xml:space="preserve">
     <value>Iba užívateľ s rolou Správca Dokladov môže načítať dáta užívateľa</value>
   </data>

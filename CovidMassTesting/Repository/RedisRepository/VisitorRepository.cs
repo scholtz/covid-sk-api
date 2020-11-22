@@ -888,5 +888,29 @@ namespace CovidMassTesting.Repository.RedisRepository
             ret += (int)await redisCacheClient.Db0.SetRemoveAllAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}");
             return ret;
         }
+        /// <summary>
+        /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Visitor>> ListSickVisitors(int from = 0, int count = 9999999)
+        {
+            var ret = new List<Visitor>();
+            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    if (visitor.Result == TestResult.PositiveCertificateTaken ||
+                        visitor.Result == TestResult.PositiveWaitingForCertificate)
+                    {
+                        ret.Add(visitor);
+                    }
+                }
+            }
+            return ret;
+        }
     }
 }

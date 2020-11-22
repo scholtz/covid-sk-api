@@ -33,10 +33,28 @@
       "Roles": "RegistrationManager"
     },
     {
+      "Name": "MedicTester",
+      "Email": "MedicTester@scholtz.sk",
+      "Password": "MedicTester",
+      "Roles": [ "MedicTester,PasswordProtected" ]
+    },
+    {
+      "Name": "MedicLab",
+      "Email": "MedicLab@scholtz.sk",
+      "Password": "Test",
+      "Roles": [ "MedicLab", "PasswordProtected" ]
+    },
+    {
       "Name": "DocumentManager",
       "Email": "DocumentManager@scholtz.sk",
       "Password": "Test",
       "Roles": "DocumentManager"
+    },
+    {
+      "Name": "DataExporter",
+      "Email": "DataExporter@scholtz.sk",
+      "Password": "Test",
+      "Roles": [ "DataExporter", "PasswordProtected" ]
     }
   ],
   "GoSMS": {

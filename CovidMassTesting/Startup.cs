@@ -1,18 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CovidMassTesting.Controllers.Email;
-using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -21,6 +12,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Newtonsoft;
+using System;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace CovidMassTesting
 {
@@ -32,11 +27,11 @@ namespace CovidMassTesting
         /// <summary>
         /// Identifies specific run of the application.
         /// </summary>
-        public readonly static string InstanceId = Guid.NewGuid().ToString();
+        public static readonly string InstanceId = Guid.NewGuid().ToString();
         /// <summary>
         /// Identifies specific run of the application
         /// </summary>
-        public readonly static DateTimeOffset Started = DateTimeOffset.Now;
+        public static readonly DateTimeOffset Started = DateTimeOffset.Now;
         /// <summary>
         /// Constructor
         /// </summary>

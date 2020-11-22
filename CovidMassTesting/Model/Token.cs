@@ -63,6 +63,10 @@ namespace CovidMassTesting.Model
             /// User with this role can set testing results
             /// </summary>
             public const string MedicLab = "MedicLab";
+            /// <summary>
+            /// Person in this group is allowed to list all sick people and export data
+            /// </summary>
+            public const string DataExporter = "DataExporter";
         }
         /// <summary>
         /// Get email from claim
@@ -217,6 +221,27 @@ namespace CovidMassTesting.Model
 
             var email = user.GetEmail();
             return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.DocumentManager }).Result;
+        }
+        /// <summary>
+        /// Check if user has role Data exporter
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="userRepository"></param>
+        /// <returns></returns>
+        public static bool IsDataExporter(this ClaimsPrincipal user, IUserRepository userRepository)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+
+            var email = user.GetEmail();
+            return userRepository.InAnyGroup(email, new string[] { Groups.DataExporter }).Result;
         }
         /// <summary>
         /// Method creates jwt token

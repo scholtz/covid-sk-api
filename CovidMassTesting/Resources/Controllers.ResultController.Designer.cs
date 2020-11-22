@@ -98,6 +98,15 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Only user with Data Exporter role is allowed to fetch all sick visitors.
+        /// </summary>
+        internal static string Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors {
+            get {
+                return ResourceManager.GetString("Only user with Data Exporter role is allowed to fetch all sick visitors", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only user with Document Manager role is allowed to fetch visitor data.
         /// </summary>
         internal static string Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data {

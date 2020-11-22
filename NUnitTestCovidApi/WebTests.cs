@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -244,7 +245,13 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
-
+        private HttpResponseMessage FinalDataExport(HttpClient client, int from, int count)
+        {
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/csv"));
+            var ret = client.GetAsync($"Result/FinalDataExport?from={from}&count={count}").Result;
+            client.DefaultRequestHeaders.Accept.Clear();
+            return ret;
+        }
         private HttpResponseMessage SetLocation(HttpClient client, string placeId)
         {
             return client.PostAsync("User/SetLocation",
@@ -1160,6 +1167,191 @@ namespace NUnitTestCovidApi
             request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
+        }
+        [Test]
+        public void RoleDataExporterTest()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
+
+            var admin = users.First(u => u.Name == "Admin");
+            var request = AuthenticateUser(client, admin.Email, admin.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+            SetupDebugPlaces(client);
+
+            var dataexporter = users.First(u => u.Name == "DataExporter");
+            request = AuthenticateUser(client, dataexporter.Email, dataexporter.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var dataExporterToken = request.Content.ReadAsStringAsync().Result;
+
+            request = CheckSlotsDay1(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            client.DefaultRequestHeaders.Clear();
+
+            request = ListPlaces(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var places = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(places.Count > 0);
+            var place = places.First().Value;
+            request = ListDaySlotsByPlace(client, place.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(days.Count > 0);
+
+            var day = days.First().Value;
+            request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var hours = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(hours.Count > 0);
+
+            var hour = hours.First().Value;
+            request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(minutes.Count > 0);
+
+            var minute = minutes.Values.First();
+            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+            Assert.IsTrue(registered.Count >= 2);
+            var registrationManager = users.First(u => u.Name == "RegistrationManager");
+            request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var registrationManagerToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {registrationManagerToken}");
+
+            string test1 = "111-111-111";
+            request = ConnectVisitorToTest(client, registered[0].Id.ToString(), test1);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            string test2 = "222-222-222";
+            request = ConnectVisitorToTest(client, registered[1].Id.ToString(), test2);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            var medicLab = users.First(u => u.Name == "MedicLab");
+            request = AuthenticateUser(client, medicLab.Email, medicLab.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var medicLabToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabToken}");
+
+            // TEST mark as sick
+            request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
+
+            // TEST mark as healthy
+            request = SetResult(client, test2, TestResult.NegativeWaitingForCertificate);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, result.State);
+
+
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {dataExporterToken}");
+            request = FinalDataExport(client, 0, 100);
+            var stream = new MemoryStream();
+            request.Content.CopyToAsync(stream).Wait();
+            var resultExport = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.IsNotNull(resultExport);
+            Assert.IsTrue(resultExport.Contains("111111111"));
+            Assert.IsTrue(resultExport.Contains(registered[0].Id.ToString()));
+            Assert.IsTrue(resultExport.Contains(registered[0].Phone));
+            Assert.IsTrue(resultExport.Contains(registered[0].RC));
+            Assert.IsFalse(resultExport.Contains(registered[1].Id.ToString()));
+            Assert.IsFalse(resultExport.Contains(registered[1].RC));
+
+            client.DefaultRequestHeaders.Clear();
+
+            var documentManager = users.First(u => u.Name == "DocumentManager");
+            request = AuthenticateUser(client, documentManager.Email, documentManager.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var documentManagerToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {documentManagerToken}");
+
+            // Test fetch one document to fill in.
+            // It must be in queue, so the first one we have marked as result
+            request = GetNextTest(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var visitorForDocumenter = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(test1.Replace("-", ""), visitorForDocumenter.TestingSet);
+            Assert.AreEqual(TestResult.PositiveWaitingForCertificate, visitorForDocumenter.Result);
+            // Repeated request must return the same thing until we mark it as processed
+            request = GetNextTest(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            visitorForDocumenter = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(test1.Replace("-", ""), visitorForDocumenter.TestingSet);
+            Assert.AreEqual(TestResult.PositiveWaitingForCertificate, visitorForDocumenter.Result);
+
+            request = RemoveFromDocQueue(client, test1);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = GetNextTest(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            visitorForDocumenter = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(test2.Replace("-", ""), visitorForDocumenter.TestingSet);
+            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, visitorForDocumenter.Result);
+
+            request = RemoveFromDocQueue(client, test2);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = GetNextTest(client);
+            Assert.AreEqual(HttpStatusCode.NoContent, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            // When no other item is in queue, the server should return NoContent (204), with no data
+            Assert.IsNull(result);
+
+            // check public info
+            request = PublicGetTestResult(client, registered[0].Id.ToString(), registered[0].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.PositiveCertificateTaken, result.State);
+
+            request = PublicGetTestResult(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.NegativeCertificateTaken, result.State);
+
+            // remove my private information from system
+            request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            bool resultBool = Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(resultBool);
+
+            // unable to delete removed test
+            request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            // unauthorized request
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
+            //authorized data export
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {dataExporterToken}");
+            request = FinalDataExport(client, 0, 100);
+            stream = new MemoryStream();
+            request.Content.CopyToAsync(stream).Wait();
+            resultExport = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.IsNotNull(resultExport);
+            Assert.IsTrue(resultExport.Contains("111111111"));
+            Assert.IsTrue(resultExport.Contains(registered[0].Id.ToString()));
+            Assert.IsTrue(resultExport.Contains(registered[0].Phone));
+            Assert.IsTrue(resultExport.Contains(registered[0].RC));
+            Assert.IsFalse(resultExport.Contains(registered[1].Id.ToString()));
+            Assert.IsFalse(resultExport.Contains(registered[1].RC));
+            //Assert.AreEqual(1, resultExport.Count);
         }
 
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>

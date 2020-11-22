@@ -95,5 +95,10 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<int> DropAllData();
+        /// <summary>
+        /// Lists all sick visitors
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<Visitor>> ListSickVisitors(int from = 0, int count = 9999999);
     }
 }
