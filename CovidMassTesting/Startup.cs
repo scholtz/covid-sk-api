@@ -44,6 +44,7 @@ namespace CovidMassTesting
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddLocalization(options => options.ResourcesPath = "Resources");
 
             services.AddControllers(options =>
             {
@@ -129,7 +130,7 @@ namespace CovidMassTesting
             {
                 Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
             }
-            if (string.IsNullOrEmpty(redisConfiguration?.Hosts?.FirstOrDefault()?.Host))
+            if (string.IsNullOrEmpty(redisConfiguration.Hosts?.FirstOrDefault()?.Host))
             {
                 services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
 
@@ -189,7 +190,8 @@ namespace CovidMassTesting
         /// </summary>
         /// <param name="app"></param>
         /// <param name="env"></param>
-        /// <param name="userRepository"></param>        
+        /// <param name="userRepository"></param>
+        /// <param name="logger"></param>        
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IUserRepository userRepository, ILogger<Startup> logger)
         {
             if (app is null)
@@ -206,6 +208,14 @@ namespace CovidMassTesting
             {
                 throw new ArgumentNullException(nameof(userRepository));
             }
+
+            var supportedCultures = new[] { "en", "sk" };
+            var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
+                .AddSupportedCultures(supportedCultures)
+                .AddSupportedUICultures(supportedCultures);
+
+            app.UseRequestLocalization(localizationOptions);
+
 
             if (env.IsDevelopment())
             {

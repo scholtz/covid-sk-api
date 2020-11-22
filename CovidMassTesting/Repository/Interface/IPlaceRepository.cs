@@ -51,7 +51,7 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="place"></param>
         /// <returns></returns>
-        public Task<Place> Set(Place place);
+        public Task<Place> SetPlace(Place place);
         /// <summary>
         /// Admin can remove place
         /// </summary>

@@ -31,6 +31,8 @@ namespace CovidMassTesting.Model.Settings
         /// <summary>
         /// If not defined, Admin role is set
         /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public string[] Roles { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
     }
 }

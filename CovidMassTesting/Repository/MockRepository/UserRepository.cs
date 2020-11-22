@@ -3,6 +3,7 @@ using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
@@ -17,10 +18,13 @@ namespace CovidMassTesting.Repository.MockRepository
     /// </summary>
     public class UserRepository : Repository.RedisRepository.UserRepository
     {
+        private readonly IStringLocalizer<UserRepository> localizer;
         private readonly ConcurrentDictionary<string, User> data = new ConcurrentDictionary<string, User>();
         /// <summary>
         /// constructor
         /// </summary>
+        /// <param name="localizer"></param>
+        /// <param name="localizer2"></param>
         /// <param name="configuration"></param>
         /// <param name="loggerFactory"></param>
         /// <param name="redisCacheClient"></param>
@@ -28,6 +32,8 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="smsSender"></param>
         /// <param name="placeRepository"></param>
         public UserRepository(
+            IStringLocalizer<UserRepository> localizer,
+            IStringLocalizer<Repository.RedisRepository.UserRepository> localizer2,
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
             IRedisCacheClient redisCacheClient,
@@ -35,6 +41,7 @@ namespace CovidMassTesting.Repository.MockRepository
             ISMSSender smsSender,
             IPlaceRepository placeRepository
         ) : base(
+                localizer2,
                 configuration,
                 loggerFactory.CreateLogger<Repository.RedisRepository.UserRepository>(),
                 redisCacheClient,
@@ -43,6 +50,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 placeRepository
                 )
         {
+            this.localizer = localizer;
         }
         /// <summary>
         /// set user
@@ -50,7 +58,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="user"></param>
         /// <param name="mustBeNew"></param>
         /// <returns></returns>
-        public override async Task<bool> Set(User user, bool mustBeNew)
+        public override async Task<bool> SetUser(User user, bool mustBeNew)
         {
             if (user is null)
             {
@@ -60,7 +68,7 @@ namespace CovidMassTesting.Repository.MockRepository
             {
                 if (data.ContainsKey(user.Email))
                 {
-                    throw new Exception("User already exists");
+                    throw new Exception(localizer["User already exists"].Value);
                 }
             }
 
@@ -72,7 +80,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public override async Task<User> Get(string email)
+        public override async Task<User> GetUser(string email)
         {
             if (!data.ContainsKey(email))
             {

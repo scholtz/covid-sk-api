@@ -4,8 +4,10 @@ using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Model.SMS;
 using CovidMassTesting.Repository.Interface;
+using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
@@ -26,6 +28,7 @@ namespace CovidMassTesting.Repository.RedisRepository
     /// </summary>
     public class UserRepository : IUserRepository
     {
+        private readonly IStringLocalizer<UserRepository> localizer;
         private readonly ILogger<UserRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
         private readonly IEmailSender emailSender;
@@ -38,11 +41,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="localizer"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
         /// <param name="redisCacheClient"></param>
         /// <param name="emailSender"></param>
+        /// <param name="smsSender"></param>
+        /// <param name="placeRepository"></param>
         public UserRepository(
+            IStringLocalizer<UserRepository> localizer,
             IConfiguration configuration,
             ILogger<UserRepository> logger,
             IRedisCacheClient redisCacheClient,
@@ -51,6 +58,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             IPlaceRepository placeRepository
             )
         {
+            this.localizer = localizer;
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
             this.emailSender = emailSender;
@@ -81,9 +89,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             });
             if (!string.IsNullOrEmpty(user.Phone))
             {
-                await smsSender.SendSMS(user.Phone, new NewUserSMS() { User = user.Name });
+                await smsSender.SendSMS(user.Phone, new Message(string.Format(localizer[Repository_RedisRepository_UserRepository.Dear__0___we_have_registered_you_into_mass_covid_testing_system__Please_check_your_email_].Value, user.Name)));
             }
-            return await Set(user, true);
+            return await SetUser(user, true);
         }
         private (string pass, string hash, string cohash) GeneratePassword()
         {
@@ -118,13 +126,13 @@ namespace CovidMassTesting.Repository.RedisRepository
             };
 
             string[] randomChars = new[] {
-            "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
-            "abcdefghijkmnopqrstuvwxyz",    // lowercase
-            "0123456789",                   // digits
-            "!@$?_-"                        // non-alphanumeric
-        };
+                "ABCDEFGHJKLMNOPQRSTUVWXYZ",    // uppercase 
+                "abcdefghijkmnopqrstuvwxyz",    // lowercase
+                "0123456789",                   // digits
+                "!@$?_-"                        // non-alphanumeric
+            };
 
-            Random rand = new Random(Environment.TickCount);
+            using RandomGenerator rand = new RandomGenerator();
             List<char> chars = new List<char>();
 
             if (opts.RequireUppercase)
@@ -159,7 +167,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="user"></param>
         /// <param name="mustBeNew"></param>
         /// <returns></returns>
-        public virtual async Task<bool> Set(User user, bool mustBeNew)
+        public virtual async Task<bool> SetUser(User user, bool mustBeNew)
         {
             if (user is null)
             {
@@ -173,7 +181,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", user.Email, encoded, mustBeNew);
             if (mustBeNew && !ret)
             {
-                throw new Exception("Error creating record in the database");
+                throw new Exception(localizer[Repository_RedisRepository_UserRepository.Error_creating_record_in_the_database].Value);
             }
             return true;
         }
@@ -198,7 +206,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public virtual async Task<User> Get(string email)
+        public virtual async Task<User> GetUser(string email)
         {
             logger.LogInformation($"User loaded from database: {email}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", email);
@@ -219,7 +227,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    ret.Add(await Get(item));
+                    ret.Add(await GetUser(item));
                 }
                 catch (Exception exc)
                 {
@@ -236,17 +244,20 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<bool> SetLocation(string email, string placeId)
         {
-            if (string.IsNullOrEmpty(placeId)) throw new Exception("Invalid place provided");
+            if (string.IsNullOrEmpty(placeId)) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
             var place = await placeRepository.GetPlace(placeId);
-            if (place == null) throw new Exception("Invalid place provided");
-            var user = await Get(email);
+            if (place == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
+            var user = await GetUser(email);
             user.Place = placeId;
-            return await Set(user, false);
+            return await SetUser(user, false);
         }
-
+        /// <summary>
+        /// Create admin users from the configuration
+        /// </summary>
+        /// <returns></returns>
         public async Task CreateAdminUsersFromConfiguration()
         {
-            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();//.GetValue<List<CovidMassTesting.Model.Settings.User>>("AdminUsers");
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
             if (users == null)
             {
                 logger.LogInformation("No admin users are defined in the configuration");
@@ -256,7 +267,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    var user = await Get(usr.Email);
+                    var user = await GetUser(usr.Email);
                     if (user == null)
                     {
                         if (string.IsNullOrEmpty(usr.Password))
@@ -287,7 +298,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 CoHash = cohash,
                                 PswHash = pass
                             };
-                            await Set(newUser, true);
+                            await SetUser(newUser, true);
                         }
                     }
                     else
@@ -312,7 +323,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 CoHash = cohash,
                                 PswHash = pass
                             };
-                            await Set(newUser, false);
+                            await SetUser(newUser, false);
                         }
                     }
                 }
@@ -329,7 +340,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<AuthData> Preauthenticate(string email)
         {
-            var user = await Get(email);
+            var user = await GetUser(email);
             if (user == null)
             {
                 // invalid email .. we do not dispose usage of email on first sight so return valid answer
@@ -351,13 +362,13 @@ namespace CovidMassTesting.Repository.RedisRepository
         private async Task<User> GenerateCoData(User user)
         {
             user.CoData = GenerateRandomPassword();
-            await Set(user, false);
+            await SetUser(user, false);
             return user;
         }
         private async Task<User> SetInvalidLogin(User user)
         {
             user.InvalidLogin = DateTimeOffset.UtcNow;
-            await Set(user, false);
+            await SetUser(user, false);
             return user;
         }
         /// <summary>
@@ -365,25 +376,24 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="email"></param>
         /// <param name="hash"></param>
-        /// <param name="data"></param>
         /// <returns></returns>
         public async Task<string> Authenticate(string email, string hash)
         {
-            var usr = await Get(email);
+            var usr = await GetUser(email);
             if (usr == null)
             {
-                throw new Exception("Invalid user or password");
+                throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password].Value);
             }
             if (usr.InvalidLogin.HasValue && usr.InvalidLogin.Value.AddSeconds(1) > DateTimeOffset.UtcNow)
             {
                 await SetInvalidLogin(usr);
-                throw new Exception("Invalid user or password");
+                throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password].Value);
             }
             var ourHash = Encoding.ASCII.GetBytes($"{usr.PswHash}{usr.CoData}").GetSHA256Hash();
             if (ourHash != hash)
             {
                 await SetInvalidLogin(usr);
-                throw new Exception("Invalid user or password");
+                throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password].Value);
             }
 
             return Token.CreateToken(usr, configuration);
@@ -400,12 +410,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<string> ChangePassword(string email, string oldHash, string newHash)
         {
-            var user = await Get(email);
-            if (user == null) throw new Exception("User not found by email");
-            if (user.PswHash != oldHash) throw new Exception("Invalid old password");
+            var user = await GetUser(email);
+            if (user == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.User_not_found_by_email].Value);
+            if (user.PswHash != oldHash) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_old_password].Value);
             user.PswHash = newHash;
             user.CoHash = user.CoData;
-            if (await Set(user, false))
+            if (await SetUser(user, false))
             {
                 return Token.CreateToken(user, configuration);
             }
@@ -415,29 +425,29 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Checks if user with specified email has any of reqested groups
         /// </summary>
         /// <param name="email">User email</param>
-        /// <param name="roles">Search any of this roles</param>
+        /// <param name="role">Search any of this roles</param>
         /// <returns></returns>
-        public async Task<bool> InAnyGroup(string email, string[] roles)
+        public async Task<bool> InAnyGroup(string email, string[] role)
         {
             if (string.IsNullOrEmpty(email))
             {
-                throw new ArgumentException($"'{nameof(email)}' cannot be null or empty", nameof(email));
+                throw new ArgumentException(localizer[Repository_RedisRepository_UserRepository.Email_must_not_be_empty].Value);
             }
 
-            if (roles is null)
+            if (role is null)
             {
-                throw new ArgumentNullException(nameof(roles));
+                throw new ArgumentNullException(nameof(role));
             }
 
-            if (roles.Length == 0) return true;
+            if (role.Length == 0) return true;
 
 
-            var usr = await Get(email);
-            foreach (var role in usr.Roles.ToArray())
+            var usr = await GetUser(email);
+            foreach (var dbrole in usr.Roles.ToArray())
             {
-                if (role.Contains(","))
+                if (dbrole.Contains(","))
                 {
-                    foreach (var addrole in role.Split(','))
+                    foreach (var addrole in dbrole.Split(','))
                     {
                         if (!usr.Roles.Contains(addrole))
                         {
@@ -447,9 +457,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
 
-            foreach (var role in roles)
+            foreach (var lookupRole in role)
             {
-                if (usr.Roles.Contains(role)) return true;
+                if (usr.Roles.Contains(lookupRole)) return true;
             }
             return false;
         }
@@ -460,31 +470,37 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<UserPublic> GetPublicUser(string email)
         {
-            return (await Get(email)).ToPublic();
+            return (await GetUser(email)).ToPublic();
         }
+        /// <summary>
+        /// Administrator is authorized to delete all data in the database
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
         public async Task<bool> DropDatabaseAuthorize(string email, string hash)
         {
             if (string.IsNullOrEmpty(email))
             {
-                throw new ArgumentException($"'{nameof(email)}' cannot be null or empty", nameof(email));
+                throw new ArgumentException(localizer[Repository_RedisRepository_UserRepository.Email_must_not_be_empty].Value, nameof(email));
             }
 
             if (string.IsNullOrEmpty(hash))
             {
-                throw new ArgumentException($"'{nameof(hash)}' cannot be null or empty", nameof(hash));
+                throw new ArgumentException(localizer[Repository_RedisRepository_UserRepository.Hash_must_not_be_empty].Value, nameof(hash));
             }
-            var user = await Get(email);
-            if (user == null) throw new Exception("User not found by email");
+            var user = await GetUser(email);
+            if (user == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.User_not_found_by_email].Value);
             if (user.InvalidLogin.HasValue && user.InvalidLogin.Value.AddSeconds(1) > DateTimeOffset.UtcNow)
             {
                 await SetInvalidLogin(user);
-                throw new Exception("Invalid user or password or attempt to login too fast after failed attempt");
+                throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password_or_attempt_to_login_too_fast_after_failed_attempt].Value);
             }
             var ourHash = Encoding.ASCII.GetBytes($"{user.PswHash}{user.CoData}").GetSHA256Hash();
             if (ourHash != hash)
             {
                 await SetInvalidLogin(user);
-                throw new Exception("Invalid user or password or attempt to login too fast after failed attempt");
+                throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password_or_attempt_to_login_too_fast_after_failed_attempt].Value);
             }
             return true;
         }

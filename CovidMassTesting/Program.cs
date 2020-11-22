@@ -9,13 +9,24 @@ using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting
 {
+    /// <summary>
+    /// App
+    /// </summary>
     public static class Program
     {
+        /// <summary>
+        /// Main entry point
+        /// </summary>
+        /// <param name="args"></param>
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();
         }
-
+        /// <summary>
+        /// Creates web
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns></returns>
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>

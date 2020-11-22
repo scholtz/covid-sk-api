@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
+using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
@@ -19,21 +21,25 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class ResultController : ControllerBase
     {
+        private readonly IStringLocalizer<ResultController> localizer;
         private readonly ILogger<ResultController> logger;
         private readonly IVisitorRepository visitorRepository;
         private readonly IUserRepository userRepository;
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="localizer"></param>
         /// <param name="logger"></param>
         /// <param name="visitorRepository"></param>
         /// <param name="userRepository"></param>
         public ResultController(
+            IStringLocalizer<ResultController> localizer,
             ILogger<ResultController> logger,
             IVisitorRepository visitorRepository,
             IUserRepository userRepository
             )
         {
+            this.localizer = localizer;
             this.logger = logger;
             this.visitorRepository = visitorRepository;
             this.userRepository = userRepository;
@@ -51,11 +57,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
+                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Registration_Manager_role_or_Medic_Tester_role_is_allowed_to_fetch_data_of_visitors].Value);
 
                 if (string.IsNullOrEmpty(visitorCode))
                 {
-                    throw new ArgumentException($"'{nameof(visitorCode)}' cannot be null or empty", nameof(visitorCode));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Visitor_code_must_not_be_empty].Value);
                 }
 
                 var codeClear = FormatBarCode(visitorCode);
@@ -64,7 +70,7 @@ namespace CovidMassTesting.Controllers
                 {
                     return Ok(await visitorRepository.GetVisitor(codeInt));
                 }
-                throw new Exception("Invalid visitor code");
+                throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code].Value);
             }
             catch (Exception exc)
             {
@@ -86,11 +92,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors");
+                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors"].Value);
 
                 if (string.IsNullOrEmpty(rc))
                 {
-                    throw new ArgumentException($"'{nameof(rc)}' cannot be null or empty", nameof(rc));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Personal_number_must_not_be_empty].Value);
                 }
                 return Ok(await visitorRepository.GetVisitorByPersonalNumber(rc));
             }
@@ -116,17 +122,17 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user to test");
+                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to register user to test"].Value);
 
 
                 if (string.IsNullOrEmpty(visitorCode))
                 {
-                    throw new ArgumentException($"'{nameof(visitorCode)}' cannot be null or empty", nameof(visitorCode));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Visitor_code_must_not_be_empty].Value);
                 }
 
                 if (string.IsNullOrEmpty(testCode))
                 {
-                    throw new ArgumentException($"'{nameof(testCode)}' cannot be null or empty", nameof(testCode));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Test_code_must_not_be_empty].Value);
                 }
 
 
@@ -136,7 +142,7 @@ namespace CovidMassTesting.Controllers
                 {
                     return Ok(await visitorRepository.ConnectVisitorToTest(codeInt, testCodeClear));
                 }
-                throw new Exception("Invalid visitor code");
+                throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
             catch (Exception exc)
             {
@@ -161,19 +167,19 @@ namespace CovidMassTesting.Controllers
             {
                 if (string.IsNullOrEmpty(code))
                 {
-                    throw new ArgumentException($"'{nameof(code)}' cannot be null or empty", nameof(code));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Visitor_code_must_not_be_empty].Value);
                 }
 
                 if (string.IsNullOrEmpty(pass))
                 {
-                    throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
                 }
                 var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.GetTest(codeInt, pass));
                 }
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
             catch (Exception exc)
             {
@@ -200,19 +206,19 @@ namespace CovidMassTesting.Controllers
             {
                 if (string.IsNullOrEmpty(code))
                 {
-                    throw new ArgumentException($"'{nameof(code)}' cannot be null or empty", nameof(code));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Visitor_code_must_not_be_empty].Value);
                 }
 
                 if (string.IsNullOrEmpty(pass))
                 {
-                    throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
                 }
                 var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.RemoveTest(codeInt, pass));
                 }
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code].Value);
             }
             catch (Exception exc)
             {
@@ -235,16 +241,16 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsMedicLab(userRepository)) throw new Exception("Only user with Medic Lab role is allowed to set results of tests");
+                if (!User.IsMedicLab(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Medic_Lab_role_is_allowed_to_set_results_of_tests].Value);
 
                 if (string.IsNullOrEmpty(testCode))
                 {
-                    throw new ArgumentException($"'{nameof(testCode)}' cannot be null or empty", nameof(testCode));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Code_of_the_test_set_must_not_be_empty].Value);
                 }
 
                 if (string.IsNullOrEmpty(result))
                 {
-                    throw new ArgumentException($"'{nameof(result)}' cannot be null or empty", nameof(result));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Result_of_the_test_must_not_be_empty].Value);
                 }
 
                 switch (result)
@@ -254,7 +260,7 @@ namespace CovidMassTesting.Controllers
                     case TestResult.TestMustBeRepeated:
                         return Ok(await visitorRepository.SetTestResult(FormatBarCode(testCode), result));
                 }
-                throw new Exception("Invalid state");
+                throw new Exception(localizer[Controllers_ResultController.Invalid_result_state].Value);
             }
             catch (Exception exc)
             {
@@ -275,7 +281,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDocumentManager(userRepository)) throw new Exception("Only user with Document Manager role is allowed to fetch visitor data");
+                if (!User.IsDocumentManager(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data].Value);
 
                 return Ok(await visitorRepository.GetNextTest());
             }
@@ -299,10 +305,10 @@ namespace CovidMassTesting.Controllers
             {
                 if (string.IsNullOrEmpty(testId))
                 {
-                    throw new ArgumentException($"'{nameof(testId)}' cannot be null or empty", nameof(testId));
+                    throw new ArgumentException(localizer[Controllers_ResultController.Test_id_must_not_be_empty].Value);
                 }
 
-                if (!User.IsDocumentManager(userRepository)) throw new Exception("Only user with Document Manager role is allowed to fetch visitor data");
+                if (!User.IsDocumentManager(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
                 var code = FormatBarCode(testId);
                 var ret = await visitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(code);
                 return Ok(ret);

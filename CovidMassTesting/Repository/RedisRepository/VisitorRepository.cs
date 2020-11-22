@@ -3,8 +3,10 @@ using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
+using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using Swashbuckle.AspNetCore.Filters;
@@ -24,6 +26,7 @@ namespace CovidMassTesting.Repository.RedisRepository
     /// </summary>
     public class VisitorRepository : IVisitorRepository
     {
+        private readonly IStringLocalizer<VisitorRepository> localizer;
         private readonly IConfiguration configuration;
         private readonly ILogger<VisitorRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
@@ -39,6 +42,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="localizer"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
         /// <param name="redisCacheClient"></param>
@@ -48,6 +52,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="slotRepository"></param>
         /// <param name="userRepository"></param>
         public VisitorRepository(
+            IStringLocalizer<VisitorRepository> localizer,
             IConfiguration configuration,
             ILogger<VisitorRepository> logger,
             IRedisCacheClient redisCacheClient,
@@ -58,6 +63,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             IUserRepository userRepository
             )
         {
+            this.localizer = localizer;
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
             this.configuration = configuration;
@@ -67,6 +73,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.slotRepository = slotRepository;
             this.userRepository = userRepository;
         }
+        /// <summary>
+        /// Creates new visitor registration
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
         public async Task<Visitor> Add(Visitor visitor)
         {
             if (visitor is null)
@@ -111,15 +122,16 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (!string.IsNullOrEmpty(visitor.Phone))
             {
-                await smsSender.SendSMS(visitor.Phone, new Model.SMS.RegistrationSMS()
-                {
-                    Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
-                    Name = $"{visitor.FirstName} {visitor.LastName}",
-                    Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
-                    Place = place.Name
-                });
+                await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                    string.Format(
+                        Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_,
+                        $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                        $"{visitor.FirstName} {visitor.LastName}",
+                        slot.Time.ToString("dd.MM.yyyy H:mm"),
+                        place.Name
+                )));
             }
-            return await Set(visitor, true);
+            return await SetVisitor(visitor, true);
         }
         /// <summary>
         /// Remove visitor from redis
@@ -135,12 +147,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// Decode visitor data from database
         /// </summary>
-        /// <param name="code"></param>
+        /// <param name="codeInt"></param>
         /// <returns></returns>
-        public virtual async Task<Visitor> Get(int code)
+        public virtual async Task<Visitor> GetVisitor(int codeInt)
         {
-            logger.LogInformation($"Visitor loaded from database: {code.GetHashCode()}");
-            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", code.ToString());
+            logger.LogInformation($"Visitor loaded from database: {codeInt.GetHashCode()}");
+            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", codeInt.ToString());
             if (string.IsNullOrEmpty(encoded)) return null;
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
@@ -152,7 +164,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="visitor"></param>
         /// <param name="mustBeNew"></param>
         /// <returns></returns>
-        public virtual async Task<Visitor> Set(Visitor visitor, bool mustBeNew)
+        public virtual async Task<Visitor> SetVisitor(Visitor visitor, bool mustBeNew)
         {
             if (visitor is null)
             {
@@ -176,14 +188,30 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return visitor;
         }
+        /// <summary>
+        /// Maps testing code to visitor code
+        /// </summary>
+        /// <param name="codeInt"></param>
+        /// <param name="testCodeClear"></param>
+        /// <returns></returns>
         public virtual async Task MapTestingSetToVisitorCode(int codeInt, string testCodeClear)
         {
             await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", testCodeClear, codeInt);
         }
+        /// <summary>
+        /// Removes testing code
+        /// </summary>
+        /// <param name="testCodeClear"></param>
+        /// <returns></returns>
         public virtual async Task UnMapTestingSet(string testCodeClear)
         {
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", testCodeClear);
         }
+        /// <summary>
+        /// Returns visitor code from testing code
+        /// </summary>
+        /// <param name="testCodeClear"></param>
+        /// <returns></returns>
         public virtual Task<int?> GETVisitorCodeFromTesting(string testCodeClear)
         {
             return redisCacheClient.Db0.HashGetAsync<int?>(
@@ -191,6 +219,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                 testCodeClear
             );
         }
+        /// <summary>
+        /// Maps personal number to visitor code
+        /// </summary>
+        /// <param name="personalNumber"></param>
+        /// <param name="visitorCode"></param>
+        /// <returns></returns>
         public virtual async Task MapPersonalNumberToVisitorCode(string personalNumber, int visitorCode)
         {
             await redisCacheClient.Db0.HashSetAsync(
@@ -199,10 +233,20 @@ namespace CovidMassTesting.Repository.RedisRepository
                 visitorCode
             );
         }
+        /// <summary>
+        /// Removes personal number
+        /// </summary>
+        /// <param name="personalNumber"></param>
+        /// <returns></returns>
         public virtual async Task UnMapPersonalNumber(string personalNumber)
         {
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}", Encoding.ASCII.GetBytes($"{personalNumber}{configuration["key"]}").GetSHA256Hash());
         }
+        /// <summary>
+        /// Returns visitor code from personal number
+        /// </summary>
+        /// <param name="personalNumber"></param>
+        /// <returns></returns>
         public virtual Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
         {
             return redisCacheClient.Db0.HashGetAsync<int?>(
@@ -210,22 +254,40 @@ namespace CovidMassTesting.Repository.RedisRepository
                 Encoding.ASCII.GetBytes($"{personalNumber}{configuration["key"]}").GetSHA256Hash()
             );
         }
+        /// <summary>
+        /// Map visitor code to testing code
+        /// </summary>
+        /// <param name="codeInt"></param>
+        /// <param name="testCodeClear"></param>
+        /// <returns></returns>
         public async Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear)
         {
             await MapTestingSetToVisitorCode(codeInt, testCodeClear);
             await UpdateTestingState(codeInt, "test-not-processed", testCodeClear);
             return testCodeClear;
         }
-
+        /// <summary>
+        /// Updates testing state
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public Task<bool> UpdateTestingState(int code, string state)
         {
             return UpdateTestingState(code, state, "");
         }
+        /// <summary>
+        /// Updates testing state
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="state"></param>
+        /// <param name="testingSet"></param>
+        /// <returns></returns>
         public async Task<bool> UpdateTestingState(int code, string state, string testingSet = "")
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
-            var visitor = await Get(code);
-            if (visitor == null) throw new Exception($"Visitor with code {code} not found");
+            var visitor = await GetVisitor(code);
+            if (visitor == null) throw new Exception(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found].Value, code));
             if (visitor.Result == state)
             {
                 // repeated requests should not send emails
@@ -238,7 +300,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 visitor.TestingSet = testingSet;
             }
-            await Set(visitor, false);
+            await SetVisitor(visitor, false);
 
             try
             {
@@ -283,10 +345,9 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.TestToRepeatSMS()
-                        {
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                        });
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                            string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_,
+                            $"{visitor.FirstName} {visitor.LastName}")));
                     }
 
                     break;
@@ -298,10 +359,10 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.TestIsInProcessingSMS()
-                        {
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                        });
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(
+                            Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_,
+                            $"{visitor.FirstName} {visitor.LastName}"
+                            )));
                     }
                     break;
                 case TestResult.PositiveWaitingForCertificate:
@@ -313,10 +374,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     });
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.TestIsFinishedSMS()
-                        {
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                        });
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_, $"{visitor.FirstName} {visitor.LastName}")));
                     }
                     break;
                 default:
@@ -324,51 +382,63 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return true;
         }
+        /// <summary>
+        /// Returns test by code and password
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
         public async Task<Result> GetTest(int code, string pass)
         {
             if (string.IsNullOrEmpty(pass))
             {
-                throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
+                throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
             }
             if (pass.Length < 4)
             {
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
-            var visitor = await Get(code);
-            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim()))
+            var visitor = await GetVisitor(code);
+            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
             {
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
-            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim()))
+            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
             {
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
             return new Result { State = visitor.Result };
         }
+        /// <summary>
+        /// Deletes the test
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
         public async Task<bool> RemoveTest(int code, string pass)
         {
             if (string.IsNullOrEmpty(pass))
             {
-                throw new ArgumentException($"'{nameof(pass)}' cannot be null or empty", nameof(pass));
+                throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
             }
             if (pass.Length < 4)
             {
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
-            var visitor = await Get(code);
-            if(visitor == null)
+            var visitor = await GetVisitor(code);
+            if (visitor == null)
             {
-                throw new Exception("Test does not exists");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Test_does_not_exists].Value);
             }
-            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim()))
+            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
             {
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
-            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim()))
+            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
             {
-                throw new Exception("Invalid code");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
-            if (visitor.Result != TestResult.NegativeCertificateTaken) throw new Exception("Osobné údaje môžu byť vymazané iba pre testy s negatívnym výsledkom po prevzatí certifikátu");
+            if (visitor.Result != TestResult.NegativeCertificateTaken) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
 
             await Remove(visitor.Id);
             if (!string.IsNullOrEmpty(visitor.TestingSet))
@@ -401,17 +471,20 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (!string.IsNullOrEmpty(visitor.Phone))
             {
-                await smsSender.SendSMS(visitor.Phone, new Model.SMS.PersonalDataRemovedSMS()
-                {
-                    Name = $"{visitor.FirstName} {visitor.LastName}",
-                });
+                await smsSender.SendSMS(visitor.Phone,
+                    new Model.SMS.Message(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0__We_have_removed_your_personal_data_from_the_database__Thank_you_for_taking_the_covid_test].Value, $"{visitor.FirstName} {visitor.LastName}"))
+                );
             }
             return true;
         }
+        /// <summary>
+        /// Creates new unique visitor id
+        /// </summary>
+        /// <returns></returns>
         protected async Task<int> CreateNewVisitorId()
         {
             var existingIds = await ListAllKeys();
-            var rand = new Random();
+            using var rand = new RandomGenerator();
             var next = rand.Next(100000000, 999999999);
             while (existingIds.Contains(next.ToString(CultureInfo.InvariantCulture)))
             {
@@ -419,27 +492,35 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return next;
         }
-
+        /// <summary>
+        /// Lists all keys
+        /// </summary>
+        /// <returns></returns>
         public virtual Task<IEnumerable<string>> ListAllKeys()
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
         }
-
-        public Task<Visitor> GetVisitor(int codeInt)
-        {
-            return Get(codeInt);
-        }
+        /// <summary>
+        /// Returns visitor by personal number
+        /// </summary>
+        /// <param name="personalNumber"></param>
+        /// <returns></returns>
         public async Task<Visitor> GetVisitorByPersonalNumber(string personalNumber)
         {
             var code = await GETVisitorCodeFromPersonalNumber(personalNumber);
-            if (!code.HasValue) throw new Exception("Nezname rodne cislo");
-            return await Get(code.Value);
+            if (!code.HasValue) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Unknown_personal_number].Value);
+            return await GetVisitor(code.Value);
         }
-
+        /// <summary>
+        /// Set test result
+        /// </summary>
+        /// <param name="testCode"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
         public async Task<Result> SetTestResult(string testCode, string result)
         {
             var visitorCode = await GETVisitorCodeFromTesting(testCode);
-            if (!visitorCode.HasValue) throw new Exception("Unable to find visitor code from test code. Are you sure test code is correct?");
+            if (!visitorCode.HasValue) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Unable_to_find_visitor_code_from_test_code__Are_you_sure_test_code_is_correct_].Value);
 
             await UpdateTestingState(visitorCode.Value, result);
             return new Result()
@@ -447,22 +528,36 @@ namespace CovidMassTesting.Repository.RedisRepository
                 State = result
             };
         }
-
+        /// <summary>
+        /// Add test to document queue
+        /// </summary>
+        /// <param name="testId"></param>
+        /// <returns></returns>
         public virtual Task<bool> AddToDocQueue(string testId)
         {
             return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId, DateTimeOffset.UtcNow.Ticks);
         }
+        /// <summary>
+        /// Removes test from document queue
+        /// </summary>
+        /// <param name="testId"></param>
+        /// <returns></returns>
         public virtual Task<bool> RemoveFromDocQueue(string testId)
         {
             return redisCacheClient.Db0.SortedSetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId);
         }
+        /// <summary>
+        /// Removes document from queue and sets the test as taken
+        /// </summary>
+        /// <param name="testId"></param>
+        /// <returns></returns>
         public async Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId)
         {
             var first = await GetFirstItemFromQueue();
-            if (first != testId) throw new Exception("You can remove only first item from the queue");
+            if (first != testId) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.You_can_remove_only_first_item_from_the_queue].Value);
             var visitorCode = await GETVisitorCodeFromTesting(testId);
-            if (!visitorCode.HasValue) throw new Exception($"Visitor with code {visitorCode} not found");
-            var visitor = await Get(visitorCode.Value);
+            if (!visitorCode.HasValue) throw new Exception(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found].Value, visitorCode));
+            var visitor = await GetVisitor(visitorCode.Value);
             switch (visitor.Result)
             {
                 case TestResult.NegativeWaitingForCertificate:
@@ -474,10 +569,18 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return await RemoveFromDocQueue(testId);
         }
+        /// <summary>
+        /// Seek first item from queue
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task<string> GetFirstItemFromQueue()
         {
             return (await redisCacheClient.Db0.SortedSetRangeByScoreAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", take: 1, skip: 0)).FirstOrDefault();
         }
+        /// <summary>
+        /// Fetch next test
+        /// </summary>
+        /// <returns></returns>
         public async Task<Visitor> GetNextTest()
         {
             var firstTest = await GetFirstItemFromQueue();
@@ -489,7 +592,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 await RemoveFromDocQueue(firstTest);
                 return await GetNextTest();
             }
-            return await Get(visitor.Value);
+            return await GetVisitor(visitor.Value);
         }
 
         /// <summary>
@@ -535,20 +638,20 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
-            if (place == null) { throw new Exception("We are not able to find chosen testing place"); }
+            if (place == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_testing_place].Value); }
             var slotM = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
-            if (slotM == null) { throw new Exception("We are not able to find chosen slot"); }
+            if (slotM == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_5_min__slot].Value); }
             var slotH = await slotRepository.GetHourSlot(visitor.ChosenPlaceId, slotM.HourSlotId);
-            if (slotH == null) { throw new Exception("We are not able to find chosen hour slot"); }
+            if (slotH == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_hour_slot].Value); }
             var slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
 
             if (slotM.Registrations >= place.LimitPer5MinSlot)
             {
-                throw new Exception("Tento 5-minútový časový slot má kapacitu zaplnenú.");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value);
             }
             if (slotH.Registrations >= place.LimitPer1HourSlot)
             {
-                throw new Exception("Tento hodinový časový slot má kapacitu zaplnenú.");
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value);
             }
             Visitor previous = null;
             try
@@ -597,7 +700,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
                 var slot = slotM;
 
-                var ret = await Set(visitor, false);
+                var ret = await SetVisitor(visitor, false);
                 if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {
                     await placeRepository.DecrementPlaceRegistrations(previous.ChosenPlaceId);
@@ -619,13 +722,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                 if (!string.IsNullOrEmpty(visitor.Phone))
                 {
-                    await smsSender.SendSMS(visitor.Phone, new Model.SMS.RegistrationChangedSMS()
-                    {
-                        Code = codeFormatted,
-                        Name = $"{visitor.FirstName} {visitor.LastName}",
-                        Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
-                        Place = place.Name
-                    });
+                    await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                        string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0___we_have_updated_your_registration__1___Time___2___Place___3_].Value,
+                        $"{visitor.FirstName} {visitor.LastName}",
+                        codeFormatted,
+                        slot.Time.ToString("dd.MM.yyyy H:mm"),
+                        place.Name
+                    )));
                 }
 
                 if (previous.ChosenSlot != visitor.ChosenSlot || previous.ChosenPlaceId != visitor.ChosenPlaceId)
@@ -669,8 +772,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (number == null) number = "";
             number = number.Replace(" ", "");
             number = number.Replace("\t", "");
-            if (number.StartsWith("00")) number = "+" + number.Substring(2);
-            if (number.StartsWith("0")) number = "+421" + number.Substring(1);
+            if (number.StartsWith("00", true, CultureInfo.InvariantCulture)) number = "+" + number.Substring(2);
+            if (number.StartsWith("0", true, CultureInfo.InvariantCulture)) number = "+421" + number.Substring(1);
             return number;
         }
         /// <summary>
@@ -682,7 +785,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return Regex.Match(number, @"^(\+[0-9]{12})$").Success;
         }
-
+        /// <summary>
+        /// Deletes all data
+        /// </summary>
+        /// <returns></returns>
         public virtual async Task<int> DropAllData()
         {
             var ret = 0;

@@ -10,9 +10,18 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.MockRepository
 {
+    /// <summary>
+    /// Place mock repository
+    /// </summary>
     public class PlaceRepository : Repository.RedisRepository.PlaceRepository
     {
         private readonly ConcurrentDictionary<string, Place> data = new ConcurrentDictionary<string, Place>();
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="loggerFactory"></param>
+        /// <param name="redisCacheClient"></param>
         public PlaceRepository(
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
@@ -21,7 +30,12 @@ namespace CovidMassTesting.Repository.MockRepository
         {
 
         }
-        public override async Task<Place> Set(Place place)
+        /// <summary>
+        /// Set place
+        /// </summary>
+        /// <param name="place"></param>
+        /// <returns></returns>
+        public override async Task<Place> SetPlace(Place place)
         {
             if (place is null)
             {
@@ -31,6 +45,11 @@ namespace CovidMassTesting.Repository.MockRepository
             data[place.Id] = place;
             return place;
         }
+        /// <summary>
+        /// Get place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
         public override async Task<Place> GetPlace(string placeId)
         {
             if (string.IsNullOrEmpty(placeId))
@@ -40,11 +59,20 @@ namespace CovidMassTesting.Repository.MockRepository
 
             return data[placeId];
         }
+        /// <summary>
+        /// List all
+        /// </summary>
+        /// <returns></returns>
         public override async Task<IEnumerable<Place>> ListAll()
         {
             return data.Values;
         }
-        public virtual async Task Delete(Place place)
+        /// <summary>
+        /// Delete place
+        /// </summary>
+        /// <param name="place"></param>
+        /// <returns></returns>
+        public virtual async Task DeletePlace(Place place)
         {
             if (place is null)
             {
@@ -52,6 +80,10 @@ namespace CovidMassTesting.Repository.MockRepository
             }
             data.TryRemove(place.Id, out var _);
         }
+        /// <summary>
+        /// Deletes all data
+        /// </summary>
+        /// <returns></returns>
         public override async Task<int> DropAllData()
         {
             var ret = data.Count;

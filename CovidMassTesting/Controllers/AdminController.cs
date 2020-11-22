@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
+using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
@@ -21,6 +23,7 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class AdminController : ControllerBase
     {
+        private readonly IStringLocalizer<AdminController> localizer;
         private readonly ILogger<AdminController> logger;
         private readonly ISlotRepository slotRepository;
         private readonly IPlaceRepository placeRepository;
@@ -30,6 +33,7 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="localizer"></param>
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
         /// <param name="slotRepository"></param>
@@ -37,6 +41,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="userRepository"></param>
         /// <param name="visitorRepository"></param>
         public AdminController(
+            IStringLocalizer<AdminController> localizer,
             IConfiguration configuration,
             ILogger<AdminController> logger,
             ISlotRepository slotRepository,
@@ -45,6 +50,7 @@ namespace CovidMassTesting.Controllers
             IVisitorRepository visitorRepository
             )
         {
+            this.localizer = localizer;
             this.logger = logger;
             this.slotRepository = slotRepository;
             this.placeRepository = placeRepository;
@@ -66,7 +72,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to manage time");
+                if (!User.IsAdmin(userRepository))
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
 
                 var ret = 0;
                 foreach (var item in await placeRepository.ListAll())
@@ -96,7 +103,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to invite other users");
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
 
                 return Ok(await userRepository.Add(new Model.User()
                 {
@@ -116,8 +123,6 @@ namespace CovidMassTesting.Controllers
         /// Administrator is allowed to invite other users and set their groups
         /// </summary>
         /// <param name="email"></param>
-        /// <param name="name"></param>
-        /// <param name="roles"></param>
         /// <returns></returns>
         [HttpPost("RemoveUser")]
         [ProducesResponseType(200)]
@@ -126,11 +131,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to remove users");
-                if (User.GetEmail() == email) throw new Exception("You cannot remove yourself");
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_remove_users].Value);
+                if (User.GetEmail() == email) throw new Exception(localizer[Controllers_AdminController.You_cannot_remove_yourself].Value);
 
                 var mustKeepUsers = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
-                if (mustKeepUsers.Any(u => u.Email == email)) throw new Exception("This user is protected by the configuration");
+                if (mustKeepUsers.Any(u => u.Email == email)) throw new Exception(localizer[Controllers_AdminController.This_user_is_protected_by_the_configuration].Value);
 
                 return Ok(await userRepository.Remove(email));
             }
@@ -153,9 +158,9 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to drop database");
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_drop_database].Value);
                 var drop = await userRepository.DropDatabaseAuthorize(User.GetEmail(), hash);
-                if (!drop) throw new Exception("Invalid user or password");
+                if (!drop) throw new Exception(localizer[Controllers_AdminController.Invalid_user_or_password].Value);
 
                 var ret = 0;
                 ret += await placeRepository.DropAllData();

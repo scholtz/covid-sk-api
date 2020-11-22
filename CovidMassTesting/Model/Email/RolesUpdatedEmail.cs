@@ -14,9 +14,19 @@ namespace CovidMassTesting.Model.Email
         /// Template identifier
         /// </summary>
         public override string TemplateId => "Invitation";
-
+        /// <summary>
+        /// Name
+        /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Roles
+        /// </summary>
+#pragma warning disable CA1819 // Properties should not return arrays
         public string[] Roles { get; set; }
+#pragma warning restore CA1819 // Properties should not return arrays
+        /// <summary>
+        /// Password
+        /// </summary>
         public string Password { get; set; }
     }
 }

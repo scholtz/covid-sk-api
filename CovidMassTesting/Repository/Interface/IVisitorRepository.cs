@@ -23,7 +23,7 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="visitor"></param>
         /// <param name="mustBeNew"></param>
         /// <returns></returns>
-        public Task<Visitor> Set(Visitor visitor, bool mustBeNew);
+        public Task<Visitor> SetVisitor(Visitor visitor, bool mustBeNew);
         /// <summary>
         /// Get test result for public
         /// </summary>
@@ -76,9 +76,9 @@ namespace CovidMassTesting.Repository.Interface
         /// <summary>
         /// Get visitor by personal number
         /// </summary>
-        /// <param name="rc"></param>
+        /// <param name="personalNumber"></param>
         /// <returns></returns>
-        public Task<Visitor> GetVisitorByPersonalNumber(string rc);
+        public Task<Visitor> GetVisitorByPersonalNumber(string personalNumber);
         /// <summary>
         /// Document manager can fetch one visitor from executed tests
         /// </summary>

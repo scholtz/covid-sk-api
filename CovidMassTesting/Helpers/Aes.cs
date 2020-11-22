@@ -23,7 +23,11 @@ namespace CovidMassTesting.Helpers
             rijndael.Mode = CipherMode.CBC;
             rijndael.Padding = PaddingMode.PKCS7;
         }
-
+        /// <summary>
+        /// Aes256 helper
+        /// 
+        /// No params constructor
+        /// </summary>
         public Aes()
         {
             InitializeRijndael();
@@ -35,6 +39,11 @@ namespace CovidMassTesting.Helpers
             rijndael.GenerateIV();
         }
 
+        /// <summary>
+        /// Aes256 helper
+        /// 
+        /// Key &amp; IV constructor .. base64
+        /// </summary>
         public Aes(String base64key, String base64iv)
         {
             if (string.IsNullOrEmpty(base64key))
@@ -53,6 +62,11 @@ namespace CovidMassTesting.Helpers
             rijndael.IV = Convert.FromBase64String(base64iv);
         }
 
+        /// <summary>
+        /// Aes256 helper
+        /// 
+        /// Key &amp; IV constructor .. byte[]
+        /// </summary>
         public Aes(byte[] key, byte[] iv)
         {
             if (key is null)
@@ -70,7 +84,11 @@ namespace CovidMassTesting.Helpers
             rijndael.Key = key;
             rijndael.IV = iv;
         }
-
+        /// <summary>
+        /// Decrypts message
+        /// </summary>
+        /// <param name="cipher"></param>
+        /// <returns></returns>
         public string Decrypt(byte[] cipher)
         {
             if (cipher is null)
@@ -82,7 +100,11 @@ namespace CovidMassTesting.Helpers
             byte[] decryptedValue = transform.TransformFinalBlock(cipher, 0, cipher.Length);
             return unicodeEncoding.GetString(decryptedValue);
         }
-
+        /// <summary>
+        /// Decrypts from base64
+        /// </summary>
+        /// <param name="base64cipher"></param>
+        /// <returns></returns>
         public string DecryptFromBase64String(string base64cipher)
         {
             if (string.IsNullOrEmpty(base64cipher))
@@ -92,7 +114,11 @@ namespace CovidMassTesting.Helpers
 
             return Decrypt(Convert.FromBase64String(base64cipher));
         }
-
+        /// <summary>
+        /// Encrypts message
+        /// </summary>
+        /// <param name="plain"></param>
+        /// <returns></returns>
         public byte[] EncryptToByte(string plain)
         {
             if (string.IsNullOrEmpty(plain))
@@ -105,7 +131,11 @@ namespace CovidMassTesting.Helpers
             byte[] encryptedValue = encryptor.TransformFinalBlock(cipher, 0, cipher.Length);
             return encryptedValue;
         }
-
+        /// <summary>
+        /// Encrypts base64
+        /// </summary>
+        /// <param name="plain"></param>
+        /// <returns></returns>
         public string EncryptToBase64String(string plain)
         {
             if (string.IsNullOrEmpty(plain))
@@ -115,17 +145,26 @@ namespace CovidMassTesting.Helpers
 
             return Convert.ToBase64String(EncryptToByte(plain));
         }
-
+        /// <summary>
+        /// Returns key
+        /// </summary>
+        /// <returns></returns>
         public string GetKey()
         {
             return Convert.ToBase64String(rijndael.Key);
         }
-
+        /// <summary>
+        /// returns IV
+        /// </summary>
+        /// <returns></returns>
         public string GetIV()
         {
             return Convert.ToBase64String(rijndael.IV);
         }
-
+        /// <summary>
+        /// Override to string
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return "KEY:" + GetKey() + Environment.NewLine + "IV:" + GetIV();

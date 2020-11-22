@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
+using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
@@ -19,18 +21,22 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class UserController : ControllerBase
     {
+        private readonly IStringLocalizer<UserController> localizer;
         private readonly ILogger<PlaceController> logger;
         private readonly IUserRepository userRepository;
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="localizer"></param>
         /// <param name="logger"></param>
         /// <param name="userRepository"></param>
         public UserController(
+            IStringLocalizer<UserController> localizer,
             ILogger<PlaceController> logger,
             IUserRepository userRepository
             )
         {
+            this.localizer = localizer;
             this.logger = logger;
             this.userRepository = userRepository;
         }
@@ -47,7 +53,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception("Only user with Admin role can list users");
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Admin_role_can_list_users].Value);
 
                 return Ok((await userRepository.ListAll()).ToDictionary(p => p.Email, p => p.ToPublic()));
             }
@@ -73,10 +79,10 @@ namespace CovidMassTesting.Controllers
             {
                 if (string.IsNullOrEmpty(placeId))
                 {
-                    throw new ArgumentException($"'{nameof(placeId)}' cannot be null or empty", nameof(placeId));
+                    throw new ArgumentException(localizer[Controllers_UserController.Place_must_not_be_empty].Value);
                 }
 
-                if (!User.IsRegistrationManager(userRepository)) throw new Exception("Only RegistrationManager can select his place.");
+                if (!User.IsRegistrationManager(userRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Registration_Manager_role_can_select_his_own_place_].Value);
 
                 return Ok(await userRepository.SetLocation(User.GetEmail(), placeId));
             }
@@ -103,7 +109,7 @@ namespace CovidMassTesting.Controllers
             {
                 if (string.IsNullOrEmpty(email))
                 {
-                    throw new ArgumentException($"'{nameof(email)}' cannot be null or empty", nameof(email));
+                    throw new ArgumentException(localizer[Controllers_UserController.Email_must_not_be_empty].Value);
                 }
 
                 return Ok(await userRepository.Preauthenticate(email));
@@ -168,7 +174,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (User.IsPasswordProtected(userRepository)) { throw new Exception("This special user cannot change the password."); }
+                if (User.IsPasswordProtected(userRepository)) { throw new Exception(localizer[Controllers_UserController.This_special_user_cannot_change_the_password_].Value); }
 
                 return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash));
             }

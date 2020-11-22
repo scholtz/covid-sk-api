@@ -7,16 +7,25 @@ using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
 {
+    /// <summary>
+    /// Slot controller manages time slots at the sampling places
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
     public class SlotController : ControllerBase
     {
         private readonly ILogger<SlotController> logger;
         private readonly ISlotRepository slotRepository;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        /// <param name="slotRepository"></param>
         public SlotController(
             ILogger<SlotController> logger,
             ISlotRepository slotRepository
@@ -46,6 +55,12 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Shows available hours at specific day and place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <param name="daySlotId"></param>
+        /// <returns></returns>
         [HttpGet("ListHourSlotsByPlaceAndDaySlotId")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -62,6 +77,12 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// List specific minute slots at specific hour and place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <param name="hourSlotId"></param>
+        /// <returns></returns>
         [HttpGet("ListMinuteSlotsByPlaceAndHourSlotId")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]

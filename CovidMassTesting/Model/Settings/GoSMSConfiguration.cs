@@ -10,6 +10,9 @@ namespace CovidMassTesting.Model.Settings
     /// </summary>
     public class GoSMSConfiguration
     {
+        /// <summary>
+        /// Endpoing
+        /// </summary>
         public string Endpoint { get; set; } = "https://app.gosms.cz/";
         /// <summary>
         /// Client identifier

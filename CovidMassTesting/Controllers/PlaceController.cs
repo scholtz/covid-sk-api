@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
+using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
@@ -19,21 +21,25 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class PlaceController : ControllerBase
     {
+        private readonly IStringLocalizer<PlaceController> localizer;
         private readonly ILogger<PlaceController> logger;
         private readonly IPlaceRepository placeRepository;
         private readonly IUserRepository userRepository;
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="localizer"></param>
         /// <param name="logger"></param>
         /// <param name="placeRepository"></param>
         /// <param name="userRepository"></param>
         public PlaceController(
+            IStringLocalizer<PlaceController> localizer,
             ILogger<PlaceController> logger,
             IPlaceRepository placeRepository,
             IUserRepository userRepository
             )
         {
+            this.localizer = localizer;
             this.logger = logger;
             this.placeRepository = placeRepository;
             this.userRepository = userRepository;
@@ -76,7 +82,7 @@ namespace CovidMassTesting.Controllers
 
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to manage testing places");
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
 
                 if (place is null)
                 {
@@ -95,18 +101,18 @@ namespace CovidMassTesting.Controllers
                     {
                         oldPlace = await placeRepository.GetPlace(place.Id);
                     }
-                    catch(Exception exc)
+                    catch (Exception exc)
                     {
-                        logger.LogError(exc, "Old place not found");
+                        logger.LogError(exc, localizer[Controllers_PlaceController.Old_place_not_found].Value);
                     }
                     if (oldPlace == null)
                     {
-                        logger.LogInformation("Old place not found");
+                        logger.LogInformation(localizer[Controllers_PlaceController.Old_place_not_found].Value);
                         update = false;
                     }
                     else
                     {
-                        logger.LogInformation("Changing place: " + Newtonsoft.Json.JsonConvert.SerializeObject(oldPlace));
+                        logger.LogInformation($"Changing place: {Newtonsoft.Json.JsonConvert.SerializeObject(oldPlace)}");
                     }
                 }
 
@@ -116,7 +122,7 @@ namespace CovidMassTesting.Controllers
                 {
                     // new place
                     place.Id = Guid.NewGuid().ToString();
-                    await placeRepository.Set(place);
+                    await placeRepository.SetPlace(place);
                     logger.LogInformation($"Place {place.Name} has been created");
                 }
                 else
@@ -125,7 +131,7 @@ namespace CovidMassTesting.Controllers
                     place.Healthy = oldPlace.Healthy;
                     place.Sick = oldPlace.Sick;
                     place.Registrations = oldPlace.Registrations;
-                    place = await placeRepository.Set(place);
+                    place = await placeRepository.SetPlace(place);
                     logger.LogInformation($"Place {place.Name} has been updated");
                 }
 
@@ -153,7 +159,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception("Only admin is allowed to manage testing places");
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
 
                 if (place is null)
                 {
@@ -163,7 +169,7 @@ namespace CovidMassTesting.Controllers
                 if (string.IsNullOrEmpty(place.Id) || await placeRepository.GetPlace(place.Id) == null)
                 {
                     // new place
-                    throw new Exception("Place not found");
+                    throw new Exception(localizer[Controllers_PlaceController.Place_not_found].Value);
                 }
                 else
                 {

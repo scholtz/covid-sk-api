@@ -1,5 +1,6 @@
 ﻿using CovidMassTesting.Model.SMS;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -16,6 +17,7 @@ namespace CovidMassTesting.Controllers.SMS
     /// </summary>
     public class GoSMSSender : ISMSSender
     {
+        private readonly IStringLocalizer<GoSMSSender> localizer;
         private readonly ILogger<GoSMSSender> logger;
         private readonly IOptions<Model.Settings.GoSMSConfiguration> settings;
         private readonly RestClient smsApiRestClient;
@@ -24,16 +26,19 @@ namespace CovidMassTesting.Controllers.SMS
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="localizer"></param>
         /// <param name="settings"></param>
         /// <param name="logger"></param>
         public GoSMSSender(
+            IStringLocalizer<GoSMSSender> localizer,
             IOptions<Model.Settings.GoSMSConfiguration> settings,
             ILogger<GoSMSSender> logger
             )
         {
+            this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            if (string.IsNullOrEmpty(settings.Value.Endpoint)) throw new Exception("Invalid SMS endpoint");
+            if (string.IsNullOrEmpty(settings.Value.Endpoint)) throw new Exception(localizer["Invalid SMS endpoint"].Value);
             smsApiRestClient = new RestClient(settings.Value.Endpoint);
         }
 
@@ -50,12 +55,12 @@ namespace CovidMassTesting.Controllers.SMS
             {
                 if (string.IsNullOrEmpty(toPhone))
                 {
-                    throw new ArgumentException($"'{nameof(toPhone)}' cannot be null or empty", nameof(toPhone));
+                    throw new ArgumentException(localizer["Phone must not be empty"].Value);
                 }
 
                 if (data is null)
                 {
-                    throw new ArgumentNullException(nameof(data));
+                    throw new ArgumentNullException(localizer["SMS data must not be empty"].Value);
                 }
 
                 var token = await GetToken();
@@ -113,7 +118,7 @@ namespace CovidMassTesting.Controllers.SMS
                 return token;
             }
 
-            throw new Exception($"Unable to parse access token: {response.Content}");
+            throw new Exception(string.Format(localizer["Unable to parse access token: {0}"], response.Content));
         }
     }
 }
