@@ -22,7 +22,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Application name
         /// </summary>
-        public string ApplicationName { get; set; } = "CovidMassTestingAPI"
+        public string ApplicationName { get; set; } = "CovidMassTestingAPI";
         /// <summary>
         /// Docker image version
         /// </summary>
