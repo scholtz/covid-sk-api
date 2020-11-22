@@ -72,6 +72,7 @@ namespace CovidMassTesting.Controllers.Email
         /// <param name="data"></param>
         /// <returns></returns>
         public async Task<bool> SendEmail(
+            string subject,
             string toEmail,
             string toName,
             IEmail data

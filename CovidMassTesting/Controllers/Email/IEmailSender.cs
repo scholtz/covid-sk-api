@@ -12,6 +12,7 @@ namespace CovidMassTesting.Controllers.Email
         /// Send email
         /// </summary>
         Task<bool> SendEmail(
+            string subject,
             string toEmail,
             string toName,
             IEmail data

@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Covid test" xml:space="preserve">
+    <value>Covid test</value>
+  </data>
   <data name="Dear {0}, there were some technical issues with your test. Please visit the sampling place again and repeat the test procedure. You can use the same registration as before." xml:space="preserve">
     <value>Dear {0}, there were some technical issues with your test. Please visit the sampling place again and repeat the test procedure. You can use the same registration as before.</value>
   </data>

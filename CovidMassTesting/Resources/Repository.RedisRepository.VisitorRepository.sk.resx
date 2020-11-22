@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Covid test" xml:space="preserve">
+    <value>Testovanie covidu</value>
+  </data>
   <data name="Dear {0}, there were some technical issues with your test. Please visit the sampling place again and repeat the test procedure. You can use the same registration as before." xml:space="preserve">
     <value>{0}, vyskytol sa technický problém s Vašim testom a test bude musieť byť vykonaný znovu. Dostavte sa znovu na odber vzorky. Môžete použíť rovnaký kód registrácie ako pri odoberaní prvej vzorky</value>
   </data>

@@ -141,6 +141,9 @@
   <data name="Invalid user or password or attempt to login too fast after failed attempt" xml:space="preserve">
     <value>Neplatný email alebo heslo, alebo pokus o prihlásenie príliš rýchlo po zadaní neplatných údajov</value>
   </data>
+  <data name="Invitation to covid testing place" xml:space="preserve">
+    <value>Pozvánka do systému na hromadné testeovanie proti covidu</value>
+  </data>
   <data name="User not found by email" xml:space="preserve">
     <value>Užívateľ s daným emailom nebol nájdený</value>
   </data>

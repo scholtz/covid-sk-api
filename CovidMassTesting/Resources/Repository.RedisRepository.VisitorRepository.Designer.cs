@@ -61,6 +61,15 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Covid test.
+        /// </summary>
+        internal static string Covid_test {
+            get {
+                return ResourceManager.GetString("Covid test", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}.
         /// </summary>
         internal static string Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_ {

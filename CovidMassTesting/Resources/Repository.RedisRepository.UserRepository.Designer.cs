@@ -134,6 +134,15 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Invitation to covid testing place.
+        /// </summary>
+        internal static string Invitation_to_covid_testing_place {
+            get {
+                return ResourceManager.GetString("Invitation to covid testing place", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User not found by email.
         /// </summary>
         internal static string User_not_found_by_email {

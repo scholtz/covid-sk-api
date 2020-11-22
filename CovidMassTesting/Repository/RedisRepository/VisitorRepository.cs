@@ -111,24 +111,28 @@ namespace CovidMassTesting.Repository.RedisRepository
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
 
-            await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorRegistrationEmail(visitor.Language)
-            {
-                Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
-                Name = $"{visitor.FirstName} {visitor.LastName}",
-                Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
-                Place = place.Name,
-                PlaceDescription = place.Description
-                ///@TODO BAR CODE
-            });
+            var oldCulture = CultureInfo.CurrentCulture;
+            var oldUICulture = CultureInfo.CurrentUICulture;
+            var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+            CultureInfo.CurrentCulture = specifiedCulture;
+            CultureInfo.CurrentUICulture = specifiedCulture;
+
+            await emailSender.SendEmail(
+                localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                visitor.Email,
+                $"{visitor.FirstName} {visitor.LastName}",
+                new Model.Email.VisitorRegistrationEmail(visitor.Language)
+                {
+                    Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                    Name = $"{visitor.FirstName} {visitor.LastName}",
+                    Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
+                    Place = place.Name,
+                    PlaceDescription = place.Description
+                    ///@TODO BAR CODE
+                });
 
             if (!string.IsNullOrEmpty(visitor.Phone))
             {
-                var oldCulture = CultureInfo.CurrentCulture;
-                var oldUICulture = CultureInfo.CurrentUICulture;
-                var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                CultureInfo.CurrentCulture = specifiedCulture;
-                CultureInfo.CurrentUICulture = specifiedCulture;
-
                 await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
                     string.Format(
                         Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_,
@@ -137,11 +141,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                         slot.Time.ToString("dd.MM.yyyy H:mm"),
                         place.Name
                 )));
-
-                CultureInfo.CurrentCulture = oldCulture;
-                CultureInfo.CurrentUICulture = oldUICulture;
-
             }
+            CultureInfo.CurrentCulture = oldCulture;
+            CultureInfo.CurrentUICulture = oldUICulture;
             return await SetVisitor(visitor, true);
         }
         /// <summary>
@@ -349,71 +351,86 @@ namespace CovidMassTesting.Repository.RedisRepository
             switch (state)
             {
                 case TestResult.TestMustBeRepeated:
-                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingToBeRepeatedEmail(visitor.Language)
-                    {
-                        Name = $"{visitor.FirstName} {visitor.LastName}",
-                    });
+                    var oldCulture = CultureInfo.CurrentCulture;
+                    var oldUICulture = CultureInfo.CurrentUICulture;
+                    var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                    CultureInfo.CurrentCulture = specifiedCulture;
+                    CultureInfo.CurrentUICulture = specifiedCulture;
+
+                    await emailSender.SendEmail(
+                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                        visitor.Email,
+                        $"{visitor.FirstName} {visitor.LastName}",
+                        new Model.Email.VisitorTestingToBeRepeatedEmail(visitor.Language)
+                        {
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                        });
 
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-                        var oldCulture = CultureInfo.CurrentCulture;
-                        var oldUICulture = CultureInfo.CurrentUICulture;
-                        var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                        CultureInfo.CurrentCulture = specifiedCulture;
-                        CultureInfo.CurrentUICulture = specifiedCulture;
-
                         await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
                             string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_,
                             $"{visitor.FirstName} {visitor.LastName}")));
 
-                        CultureInfo.CurrentCulture = oldCulture;
-                        CultureInfo.CurrentUICulture = oldUICulture;
                     }
+
+                    CultureInfo.CurrentCulture = oldCulture;
+                    CultureInfo.CurrentUICulture = oldUICulture;
 
                     break;
                 case TestResult.TestIsBeingProcessing:
-                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingInProcessEmail(visitor.Language)
-                    {
-                        Name = $"{visitor.FirstName} {visitor.LastName}",
-                    });
+                    oldCulture = CultureInfo.CurrentCulture;
+                    oldUICulture = CultureInfo.CurrentUICulture;
+                    specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                    CultureInfo.CurrentCulture = specifiedCulture;
+                    CultureInfo.CurrentUICulture = specifiedCulture;
+
+                    await emailSender.SendEmail(
+                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                        visitor.Email,
+                        $"{visitor.FirstName} {visitor.LastName}",
+                        new Model.Email.VisitorTestingInProcessEmail(visitor.Language)
+                        {
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                        });
 
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-                        var oldCulture = CultureInfo.CurrentCulture;
-                        var oldUICulture = CultureInfo.CurrentUICulture;
-                        var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                        CultureInfo.CurrentCulture = specifiedCulture;
-                        CultureInfo.CurrentUICulture = specifiedCulture;
 
                         await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(
                             Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_,
                             $"{visitor.FirstName} {visitor.LastName}"
                             )));
 
-                        CultureInfo.CurrentCulture = oldCulture;
-                        CultureInfo.CurrentUICulture = oldUICulture;
                     }
+                    CultureInfo.CurrentCulture = oldCulture;
+                    CultureInfo.CurrentUICulture = oldUICulture;
                     break;
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
-                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingResultEmail(visitor.Language)
-                    {
-                        Name = $"{visitor.FirstName} {visitor.LastName}",
+                    oldCulture = CultureInfo.CurrentCulture;
+                    oldUICulture = CultureInfo.CurrentUICulture;
+                    specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                    CultureInfo.CurrentCulture = specifiedCulture;
+                    CultureInfo.CurrentUICulture = specifiedCulture;
 
-                    });
+                    await emailSender.SendEmail(
+                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                        visitor.Email,
+                        $"{visitor.FirstName} {visitor.LastName}",
+                        new Model.Email.VisitorTestingResultEmail(visitor.Language)
+                        {
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+
+                        });
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-                        var oldCulture = CultureInfo.CurrentCulture;
-                        var oldUICulture = CultureInfo.CurrentUICulture;
-                        var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                        CultureInfo.CurrentCulture = specifiedCulture;
-                        CultureInfo.CurrentUICulture = specifiedCulture;
 
                         await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_, $"{visitor.FirstName} {visitor.LastName}")));
 
-                        CultureInfo.CurrentCulture = oldCulture;
-                        CultureInfo.CurrentUICulture = oldUICulture;
                     }
+                    CultureInfo.CurrentCulture = oldCulture;
+                    CultureInfo.CurrentUICulture = oldUICulture;
                     break;
                 default:
                     break;
@@ -501,7 +518,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
             }
 
-            await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}",
+            var oldCulture = CultureInfo.CurrentCulture;
+            var oldUICulture = CultureInfo.CurrentUICulture;
+            var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+            CultureInfo.CurrentCulture = specifiedCulture;
+            CultureInfo.CurrentUICulture = specifiedCulture;
+
+            await emailSender.SendEmail(
+                localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                visitor.Email,
+                $"{visitor.FirstName} {visitor.LastName}",
                 new Model.Email.PersonalDataRemovedEmail(visitor.Language)
                 {
                     Name = $"{visitor.FirstName} {visitor.LastName}",
@@ -509,19 +535,14 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (!string.IsNullOrEmpty(visitor.Phone))
             {
-                var oldCulture = CultureInfo.CurrentCulture;
-                var oldUICulture = CultureInfo.CurrentUICulture;
-                var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                CultureInfo.CurrentCulture = specifiedCulture;
-                CultureInfo.CurrentUICulture = specifiedCulture;
 
                 await smsSender.SendSMS(visitor.Phone,
                     new Model.SMS.Message(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0__We_have_removed_your_personal_data_from_the_database__Thank_you_for_taking_the_covid_test].Value, $"{visitor.FirstName} {visitor.LastName}"))
                 );
 
-                CultureInfo.CurrentCulture = oldCulture;
-                CultureInfo.CurrentUICulture = oldUICulture;
             }
+            CultureInfo.CurrentCulture = oldCulture;
+            CultureInfo.CurrentUICulture = oldUICulture;
             return true;
         }
         /// <summary>
@@ -756,7 +777,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var code = visitor.Id.ToString();
                 var codeFormatted = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}";
 
-                await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}",
+                var oldCulture = CultureInfo.CurrentCulture;
+                var oldUICulture = CultureInfo.CurrentUICulture;
+                var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                CultureInfo.CurrentCulture = specifiedCulture;
+                CultureInfo.CurrentUICulture = specifiedCulture;
+
+                await emailSender.SendEmail(
+                    localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                    visitor.Email,
+                    $"{visitor.FirstName} {visitor.LastName}",
                     new Model.Email.VisitorChangeRegistrationEmail(visitor.Language)
                     {
                         Code = codeFormatted,
@@ -769,11 +799,6 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                 if (!string.IsNullOrEmpty(visitor.Phone))
                 {
-                    var oldCulture = CultureInfo.CurrentCulture;
-                    var oldUICulture = CultureInfo.CurrentUICulture;
-                    var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                    CultureInfo.CurrentCulture = specifiedCulture;
-                    CultureInfo.CurrentUICulture = specifiedCulture;
 
                     await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
                         string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0___we_have_updated_your_registration__1___Time___2___Place___3_].Value,
@@ -783,9 +808,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                         place.Name
                     )));
 
-                    CultureInfo.CurrentCulture = oldCulture;
-                    CultureInfo.CurrentUICulture = oldUICulture;
                 }
+                CultureInfo.CurrentCulture = oldCulture;
+                CultureInfo.CurrentUICulture = oldUICulture;
 
                 if (previous.ChosenSlot != visitor.ChosenSlot || previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {

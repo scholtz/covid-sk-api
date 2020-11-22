@@ -81,12 +81,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             (string pass, string hash, string cohash) = GeneratePassword();
             user.PswHash = hash;
             user.CoHash = cohash;
-            await emailSender.SendEmail(user.Email, user.Name, new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name)
-            {
-                Name = user.Name,
-                Password = pass,
-                Roles = user.Roles.ToArray(),
-            });
+            await emailSender.SendEmail(
+                localizer[Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place],
+                user.Email,
+                user.Name,
+                new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name)
+                {
+                    Name = user.Name,
+                    Password = pass,
+                    Roles = user.Roles.ToArray(),
+                });
             if (!string.IsNullOrEmpty(user.Phone))
             {
                 await smsSender.SendSMS(user.Phone, new Message(string.Format(localizer[Repository_RedisRepository_UserRepository.Dear__0___we_have_registered_you_into_mass_covid_testing_system__Please_check_your_email_].Value, user.Name)));

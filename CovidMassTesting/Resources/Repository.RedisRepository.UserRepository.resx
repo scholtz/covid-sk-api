@@ -141,6 +141,9 @@
   <data name="Invalid user or password or attempt to login too fast after failed attempt" xml:space="preserve">
     <value>Invalid user or password or attempt to login too fast after failed attempt</value>
   </data>
+  <data name="Invitation to covid testing place" xml:space="preserve">
+    <value>Invitation to covid testing place</value>
+  </data>
   <data name="User not found by email" xml:space="preserve">
     <value>User not found by email</value>
   </data>
