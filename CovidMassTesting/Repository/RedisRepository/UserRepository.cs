@@ -81,7 +81,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             (string pass, string hash, string cohash) = GeneratePassword();
             user.PswHash = hash;
             user.CoHash = cohash;
-            await emailSender.SendEmail(user.Email, user.Name, new Model.Email.InvitationEmail()
+            await emailSender.SendEmail(user.Email, user.Name, new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name)
             {
                 Name = user.Name,
                 Password = pass,

@@ -6,6 +6,14 @@
     public class PersonalDataRemovedEmail : IEmail
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="language"></param>
+        public PersonalDataRemovedEmail(string language)
+        {
+            SetLanguage(language);
+        }
+        /// <summary>
         /// Template identifier
         /// </summary>
         public override string TemplateId => "PersonalDataRemoved";

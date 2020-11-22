@@ -17,6 +17,12 @@ namespace CovidMassTesting.Model
         /// </summary>
         public int Id { get; set; }
         /// <summary>
+        /// Language in which we will communicate to the visitor
+        /// 
+        /// sk | en
+        /// </summary>
+        public string Language { get; set; } = "sk";
+        /// <summary>
         /// Type of person
         /// 
         /// idcard|child|foreign

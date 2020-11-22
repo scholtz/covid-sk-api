@@ -6,6 +6,14 @@
     public class VisitorTestingToBeRepeatedEmail : IEmail
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="language"></param>
+        public VisitorTestingToBeRepeatedEmail(string language)
+        {
+            SetLanguage(language);
+        }
+        /// <summary>
         /// Template identifier
         /// </summary>
         public override string TemplateId => "TestingToRepeat";

@@ -11,6 +11,14 @@ namespace CovidMassTesting.Model.Email
     public class RolesUpdatedEmail : IEmail
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="language"></param>
+        public RolesUpdatedEmail(string language)
+        {
+            SetLanguage(language);
+        }
+        /// <summary>
         /// Template identifier
         /// </summary>
         public override string TemplateId => "Invitation";

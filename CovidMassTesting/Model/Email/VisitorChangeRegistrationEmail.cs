@@ -11,6 +11,14 @@ namespace CovidMassTesting.Model.Email
     public class VisitorChangeRegistrationEmail : IEmail
     {
         /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="language"></param>
+        public VisitorChangeRegistrationEmail(string language)
+        {
+            SetLanguage(language);
+        }
+        /// <summary>
         /// Template identifier
         /// </summary>
         public override string TemplateId => "VisitorChangeRegistration";

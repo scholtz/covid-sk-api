@@ -88,6 +88,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             visitor.LastUpdate = DateTimeOffset.Now;
             visitor.Result = TestResult.NotTaken;
             visitor.TestingSet = "";
+            visitor.Language = CultureInfo.CurrentCulture.Name;
 
             var code = visitor.Id.ToString();
             switch (visitor.PersonType)
@@ -110,7 +111,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
 
-            await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorRegistrationEmail()
+            await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorRegistrationEmail(visitor.Language)
             {
                 Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                 Name = $"{visitor.FirstName} {visitor.LastName}",
@@ -338,7 +339,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             switch (state)
             {
                 case TestResult.TestMustBeRepeated:
-                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingToBeRepeatedEmail()
+                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingToBeRepeatedEmail(visitor.Language)
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
                     });
@@ -352,7 +353,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     break;
                 case TestResult.TestIsBeingProcessing:
-                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingInProcessEmail()
+                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingInProcessEmail(visitor.Language)
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
                     });
@@ -367,7 +368,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
-                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingResultEmail()
+                    await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}", new Model.Email.VisitorTestingResultEmail(visitor.Language)
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
 
@@ -464,7 +465,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}",
-                new Model.Email.PersonalDataRemovedEmail()
+                new Model.Email.PersonalDataRemovedEmail(visitor.Language)
                 {
                     Name = $"{visitor.FirstName} {visitor.LastName}",
                 });
@@ -699,7 +700,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 // update registration
                 visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
                 var slot = slotM;
-
+                visitor.Language = CultureInfo.CurrentCulture.Name;
                 var ret = await SetVisitor(visitor, false);
                 if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {
@@ -710,7 +711,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var codeFormatted = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}";
 
                 await emailSender.SendEmail(visitor.Email, $"{visitor.FirstName} {visitor.LastName}",
-                    new Model.Email.VisitorChangeRegistrationEmail()
+                    new Model.Email.VisitorChangeRegistrationEmail(visitor.Language)
                     {
                         Code = codeFormatted,
                         Name = $"{visitor.FirstName} {visitor.LastName}",
