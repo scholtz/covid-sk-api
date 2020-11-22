@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
+[assembly: System.Reflection.AssemblyVersionAttribute("1.0.*")]
+[assembly: System.Reflection.AssemblyCompanyAttribute("Scholtz & Company, jsa")]
+
 namespace CovidMassTesting
 {
     /// <summary>
