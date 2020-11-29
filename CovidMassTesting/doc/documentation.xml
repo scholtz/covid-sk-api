@@ -386,6 +386,13 @@
             This controller returns version of the current api
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Controllers.VersionController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,CovidMassTesting.Repository.Interface.IVisitorRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="visitorRepository"></param>
+        </member>
         <member name="M:CovidMassTesting.Controllers.VersionController.Get">
             <summary>
             Returns version of the current api
@@ -1666,13 +1673,35 @@
             Culture info
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Version.GetVersion(System.String,System.DateTimeOffset,System.String)">
+        <member name="P:CovidMassTesting.Model.Version.EmailConfigured">
+            <summary>
+            Shows info weather email service is configured
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.RedisConfigured">
+            <summary>
+            Shows info weather persistant redis service is configured
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.SMSConfigured">
+            <summary>
+            Shows info weather SMS service is configured
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Version.StorageTest">
+            <summary>
+            Storage test
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Version.GetVersion(System.String,System.DateTimeOffset,System.String,Microsoft.Extensions.Configuration.IConfiguration,CovidMassTesting.Repository.Interface.IVisitorRepository)">
             <summary>
             Get version
             </summary>
             <param name="instanceId"></param>
             <param name="start"></param>
             <param name="dllVersion"></param>
+            <param name="configuration"></param>
+            <param name="visitorRepository"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.Visitor">
@@ -2188,6 +2217,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.TestStorage">
+            <summary>
+            Test storage
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceRepository">
             <summary>
             Place mock repository
@@ -2491,6 +2526,12 @@
         <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.DropAllData">
             <summary>
             delete all data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.TestStorage">
+            <summary>
+            Tests the storage
             </summary>
             <returns></returns>
         </member>
@@ -3094,6 +3135,12 @@
             </summary>
             <param name="from"></param>
             <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.TestStorage">
+            <summary>
+            Tests the storage
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Resources.Controllers_AdminController">

@@ -31,7 +31,10 @@ namespace NUnitTestCovidApi
                 .AddJsonFile(AppSettings)
                 .Build();
         }
-
+        protected HttpResponseMessage CheckVersion(HttpClient client)
+        {
+            return client.GetAsync("Version").Result;
+        }
         private HttpResponseMessage AuthenticateUser(HttpClient client, string email, string password)
         {
             var request = Preauthenticate(client, email);
@@ -66,7 +69,7 @@ namespace NUnitTestCovidApi
                     })
                     ).Result;
         }
-        private HttpResponseMessage DropDatabase(HttpClient client, string hash)
+        protected HttpResponseMessage DropDatabase(HttpClient client, string hash)
         {
             return client.PostAsync("Admin/DropDatabase",
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
@@ -261,7 +264,7 @@ namespace NUnitTestCovidApi
                 ).Result;
         }
 
-        private void DropDatabase()
+        protected void DropDatabase()
         {
             using var web = new MockWebApp(AppSettings);
             var client = web.CreateClient();
@@ -1354,6 +1357,21 @@ namespace NUnitTestCovidApi
             //Assert.AreEqual(1, resultExport.Count);
         }
 
+        [Test]
+        public virtual void TestVersion()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var request = CheckVersion(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            var version = Newtonsoft.Json.JsonConvert.DeserializeObject<CovidMassTesting.Model.Version>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(false, version.SMSConfigured);
+            Assert.AreEqual(false, version.EmailConfigured);
+            Assert.AreEqual(false, version.RedisConfigured);
+        }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;

@@ -912,5 +912,18 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return ret;
         }
+        /// <summary>
+        /// Tests the storage
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<int> TestStorage()
+        {
+            using var rand = new RandomGenerator();
+            var toSave = rand.Next(100000, 900000);
+            await redisCacheClient.Db0.AddAsync("TEST", toSave);
+            var ret = await redisCacheClient.Db0.GetAsync<int>("TEST");
+            if (toSave != ret) throw new Exception("Storage does not work");
+            return ret;
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Controllers.SMS;
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
@@ -24,6 +25,7 @@ namespace CovidMassTesting.Repository.MockRepository
         private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
         private readonly SortedSet<string> docqueue = new SortedSet<string>();
         private readonly ILogger<VisitorRepository> logger;
+        private int TestInt { get; set; }
         /// <summary>
         /// Constructor
         /// </summary>
@@ -217,6 +219,19 @@ namespace CovidMassTesting.Repository.MockRepository
             pname2code.Clear();
             docqueue.Clear();
             return ret;
+        }
+
+        /// <summary>
+        /// Tests the storage
+        /// </summary>
+        /// <returns></returns>
+        public override async Task<int> TestStorage()
+        {
+            using var rand = new RandomGenerator();
+            var toSave = rand.Next(100000, 900000);
+            this.TestInt = toSave;
+            if (toSave != TestInt) throw new Exception("Storage does not work");
+            return toSave;
         }
     }
 }

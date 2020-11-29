@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CovidMassTesting.Repository.Interface;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,18 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class VersionController : ControllerBase
     {
+        private readonly IConfiguration configuration;
+        private readonly IVisitorRepository visitorRepository;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="visitorRepository"></param>
+        public VersionController(IConfiguration configuration, IVisitorRepository visitorRepository)
+        {
+            this.configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            this.visitorRepository = visitorRepository ?? throw new ArgumentNullException(nameof(visitorRepository));
+        }
         /// <summary>
         /// Returns version of the current api
         /// 
@@ -23,14 +37,16 @@ namespace CovidMassTesting.Controllers
         [HttpGet]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public ActionResult<Model.Version> Get()
+        public async Task<ActionResult<Model.Version>> Get()
         {
             try
             {
-                var ret = Model.Version.GetVersion(
+                var ret = await Model.Version.GetVersion(
                     Startup.InstanceId,
                     Startup.Started,
-                    GetType().Assembly.GetName().Version.ToString()
+                    GetType().Assembly.GetName().Version.ToString(),
+                    configuration,
+                    visitorRepository
                 );
                 return Ok(ret);
             }
