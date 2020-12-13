@@ -138,6 +138,7 @@ namespace CovidMassTesting
                 services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
 
 
+                services.AddSingleton<IPlaceProviderRepository, Repository.MockRepository.PlaceProviderRepository>();
                 services.AddSingleton<IPlaceRepository, Repository.MockRepository.PlaceRepository>();
                 services.AddSingleton<ISlotRepository, Repository.MockRepository.SlotRepository>();
                 services.AddSingleton<IUserRepository, Repository.MockRepository.UserRepository>();
@@ -147,6 +148,7 @@ namespace CovidMassTesting
             {
                 services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
 
+                services.AddSingleton<IPlaceProviderRepository, Repository.RedisRepository.PlaceProviderRepository>();
                 services.AddSingleton<IPlaceRepository, Repository.RedisRepository.PlaceRepository>();
                 services.AddSingleton<ISlotRepository, Repository.RedisRepository.SlotRepository>();
                 services.AddSingleton<IUserRepository, Repository.RedisRepository.UserRepository>();

@@ -2753,6 +2753,38 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
+            <summary>
+            Place mock repository
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="loggerFactory"></param>
+            <param name="redisCacheClient"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.ListAll">
+            <summary>
+            List all
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.DeletePlace(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Delete place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.DropAllData">
+            <summary>
+            Deletes all data
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceRepository">
             <summary>
             Place mock repository
