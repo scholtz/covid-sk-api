@@ -31,7 +31,7 @@ jobs:
         with:
           context: .
           file: ./CovidMassTesting/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/386,linux/amd64
           push: true
           tags: |
             scholtz2/mass-covid-testing-api:latest
