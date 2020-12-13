@@ -3291,6 +3291,15 @@
             <param name="country"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.InAnyGroup(System.String,System.String,System.String[])">
+            <summary>
+            Check if user is in specified group in place provider company
+            </summary>
+            <param name="email"></param>
+            <param name="placeProviderId"></param>
+            <param name="role"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceRepository">
             <summary>
             Redis place repository

@@ -23,10 +23,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_REAL_INVOICES_OBJECTS = "PP_REAL_INVOICE";
         private readonly string REDIS_KEY_LAST_PRO_INVOICE = "PP_LAST_PRO_INVOICE";
         private readonly string REDIS_KEY_LAST_REAL_INVOICE = "PP_LAST_REAL_INVOICE";
-        private int ProInvoiceFormat = 2010100000;
-        private int RealInvoiceFormat = 2010200000;
-        private decimal TaxRate = 1.20M;
-        private string TaxDomicil = "SK";
+        private readonly int ProInvoiceFormat = 2010100000;
+        private readonly int RealInvoiceFormat = 2010200000;
+        private readonly decimal TaxRate = 1.20M;
+        private readonly string TaxDomicil = "SK";
         /// <summary>
         /// Constructor
         /// </summary>
@@ -279,10 +279,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             switch (currency)
             {
                 case Currency.USD:
-                    price = price * 1.3M;
+                    price *= 1.3M;
                     break;
                 case Currency.CZK:
-                    price = price * 27M;
+                    price *= 27M;
                     break;
             }
 
@@ -301,10 +301,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             switch (currency)
             {
                 case Currency.USD:
-                    price = price * 1.3M;
+                    price *= 1.3M;
                     break;
                 case Currency.CZK:
-                    price = price * 27M;
+                    price *= 27M;
                     break;
             }
             return Math.Round(price, 2);
@@ -423,7 +423,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 BuyerName = placeProvider.CompanyName,
                 BuyerVAT = placeProvider.VAT,
                 Currency = currency,
-                Description = $"SLA: {slaLevel} {slaFrom.ToString("dd.MM.yyyy")} {slaUntil.ToString("dd.MM.yyyy")} Registrations {registrations}",
+                Description = $"SLA: {slaLevel} {slaFrom:dd.MM.yyyy} {slaUntil:dd.MM.yyyy} Registrations {registrations}",
                 IssuedOn = DateTimeOffset.Now,
                 Payable = DateTimeOffset.Now.AddDays(14),
                 PlaceProviderId = placeProviderId,
@@ -523,7 +523,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 BuyerName = placeProvider.CompanyName,
                 BuyerVAT = placeProvider.VAT,
                 Currency = currency,
-                Description = $"SLA: {slaLevel} {slaFrom.ToString("dd.MM.yyyy")} {slaUntil.ToString("dd.MM.yyyy")} Registrations {registrations}",
+                Description = $"SLA: {slaLevel} {slaFrom:dd.MM.yyyy} {slaUntil:dd.MM.yyyy} Registrations {registrations}",
                 IssuedOn = DateTimeOffset.Now,
                 Payable = DateTimeOffset.Now.AddDays(14),
                 PlaceProviderId = placeProviderId,
@@ -549,6 +549,13 @@ namespace CovidMassTesting.Repository.RedisRepository
             return 1;
         }
 
+        /// <summary>
+        /// Check if user is in specified group in place provider company
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
+        /// <param name="role"></param>
+        /// <returns></returns>
         public async Task<bool> InAnyGroup(string email, string placeProviderId, string[] role)
         {
             if (string.IsNullOrEmpty(email))
