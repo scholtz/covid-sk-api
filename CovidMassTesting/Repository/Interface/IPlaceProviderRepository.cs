@@ -90,5 +90,13 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="country"></param>
         /// <returns></returns>
         public decimal GetVATMultiplier(string country);
+        /// <summary>
+        /// Check permissions
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
+        /// <param name="vs"></param>
+        /// <returns></returns>
+        public Task<bool> InAnyGroup(string email, string placeProviderId, string[] vs);
     }
 }

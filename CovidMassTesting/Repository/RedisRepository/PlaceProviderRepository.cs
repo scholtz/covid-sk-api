@@ -548,5 +548,35 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (country == TaxDomicil) return TaxRate;
             return 1;
         }
+
+        public async Task<bool> InAnyGroup(string email, string placeProviderId, string[] role)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentException($"'{nameof(email)}' cannot be null or empty", nameof(email));
+            }
+
+            if (string.IsNullOrEmpty(placeProviderId))
+            {
+                throw new ArgumentException($"'{nameof(placeProviderId)}' cannot be null or empty", nameof(placeProviderId));
+            }
+
+            if (role is null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+
+            if (role.Length == 0) return true;
+            var place = await GetPlaceProvider(placeProviderId);
+            foreach (var group in role)
+            {
+                if (place.Group2Emails.ContainsKey(group))
+                {
+                    if (place.Group2Emails[group].Contains(email)) return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
