@@ -1,11 +1,11 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:3.1-focal AS base
 WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/aspnet:3.1 AS build
+FROM mcr.microsoft.com/dotnet/aspnet:3.1-focal AS build
 WORKDIR /src
 COPY ["CovidMassTesting/CovidMassTesting.csproj", "CovidMassTesting/"]
 RUN dotnet restore "CovidMassTesting/CovidMassTesting.csproj"
