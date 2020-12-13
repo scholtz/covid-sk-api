@@ -54,8 +54,9 @@ namespace CovidMassTesting
                 options.RespectBrowserAcceptHeader = true; // false by default
             })
                 .AddNewtonsoftJson()
-                .AddXmlSerializerFormatters()
-                .AddXmlDataContractSerializerFormatters();
+                //.AddXmlSerializerFormatters()
+                //.AddXmlDataContractSerializerFormatters()
+                ;
 
             services.AddSwaggerGen(c =>
             {
