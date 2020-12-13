@@ -25,7 +25,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_LAST_REAL_INVOICE = "PP_LAST_REAL_INVOICE";
         private int ProInvoiceFormat = 2010100000;
         private int RealInvoiceFormat = 2010200000;
-        private decimal TaxRate = 1.2M;
+        private decimal TaxRate = 1.20M;
         private string TaxDomicil = "SK";
         /// <summary>
         /// Constructor
