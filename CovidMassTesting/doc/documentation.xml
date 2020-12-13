@@ -92,6 +92,7 @@
             <summary>
             Semd email
             </summary>
+            <param name="subject"></param>
             <param name="toEmail"></param>
             <param name="toName"></param>
             <param name="data"></param>
@@ -156,6 +157,85 @@
             Admin can delete testing location
             </summary>
             <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.PlaceProviderController">
+            <summary>
+            Manages place provider companies
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceProviderController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceProviderController},CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="logger"></param>
+            <param name="placeProviderRepository"></param>
+            <param name="placeRepository"></param>
+            <param name="userRepository"></param>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.Register(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            List places
+            
+            Contains live statistics of users, registered, infected and healthy visitors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPublic">
+            <summary>
+            List places
+            
+            Contains live statistics of users, registered, infected and healthy visitors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPrivate">
+            <summary>
+            List places
+            
+            Contains live statistics of users, registered, infected and healthy visitors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.GetPrice(System.String,System.DateTimeOffset,System.DateTimeOffset,System.Int32,System.String,System.String,System.Boolean,System.Boolean,System.Boolean)">
+            <summary>
+            Public method to calculate costs
+            </summary>
+            <param name="currency"></param>
+            <param name="country"></param>
+            <param name="includeVAT"></param>
+            <param name="includeSLA"></param>
+            <param name="includeRegistrations"></param>
+            <param name="slaFrom"></param>
+            <param name="slaUntil"></param>
+            <param name="slaLevel"></param>
+            <param name="registrations"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.OrderRegistrations(System.String,System.Int32,System.String)">
+            <summary>
+            Administrator or accountant can issue proforma invoice. This is not real invoice but the document to be able to process the payment in the companies where legislation process does not allow prepayments.
+            
+            We issue real invoices only after the payment is processed.
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.IssueProformaInvoice(System.String,System.String,System.DateTimeOffset,System.DateTimeOffset,System.Int32,System.String)">
+            <summary>
+            Administrator or accountant can issue proforma invoice. This is not real invoice but the document to be able to process the payment in the companies where legislation process does not allow prepayments.
+            
+            We issue real invoices only after the payment is processed.
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="slaLevel"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <param name="slaFrom"></param>
+            <param name="slaUntil"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.ResultController">
@@ -570,6 +650,33 @@
             CoData is unique per sign in request. Server generated
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Currency">
+            <summary>
+            Currency validator
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Currency.EUR">
+            <summary>
+            shared infrastructure
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Currency.USD">
+            <summary>
+            bronze infrastructure
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Currency.CZK">
+            <summary>
+            silver infrastructure
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Currency.ValidateCurrency(System.String)">
+            <summary>
+            validates sla level
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Model.Email.IEmail">
             <summary>
             Email abstraction class
@@ -849,6 +956,153 @@
             Visitor name
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Groups">
+            <summary>
+            List of roles/groups
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.Admin">
+            <summary>
+            Admin can create users, places, set dates, and all methods with other roles
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.Accountant">
+            <summary>
+            Accountant is able to list invoices to the hospital or issue new one
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.PasswordProtected">
+            <summary>
+            User with this role can not change password
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.RegistrationManager">
+            <summary>
+            User in this role can fetch users by the registration code
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.MedicTester">
+            <summary>
+            User with this role can assign test bar code to the registed user
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.DocumentManager">
+            <summary>
+            User with this role can export data of all infected users and pass them to covid center
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.MedicLab">
+            <summary>
+            User with this role can set testing results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.DataExporter">
+            <summary>
+            Person in this group is allowed to list all sick people and export data
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Groups.ValidateGroupName(System.String)">
+            <summary>
+            Validates input
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.Invoice">
+            <summary>
+            Invoice issued by the provider company to the PlaceProvider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.InvoiceId">
+            <summary>
+            ID eg 2010100001 .. the invoice number must be increment by one
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.IssuedOn">
+            <summary>
+            Date of issueance
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.Payable">
+            <summary>
+            Date when invoice must be payable
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.Currency">
+            <summary>
+            Currency
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.PriceNoVATTotal">
+            <summary>
+            Total price without VAT
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.PriceWithVATTotal">
+            <summary>
+            Total price with VAT
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.BuyerVAT">
+            <summary>
+            Buyer VAT
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.BuyerName">
+            <summary>
+            Buyer name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.BuyerID">
+            <summary>
+            Buyer trade registry ID
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.PlaceProviderId">
+            <summary>
+            PlaceProvider identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.Description">
+            <summary>
+            Invoice description
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.SLAId">
+            <summary>
+            SLA id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.PriceNoVATSLA">
+            <summary>
+            SLA no vat price
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.PriceWithVATSLA">
+            <summary>
+            SLA vat price
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.Registrations">
+            <summary>
+            Number of registrations purchased
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.PriceNoVATRegistrations">
+            <summary>
+            Registrations no vat price
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invoice.PriceWithVATRegistrations">
+            <summary>
+            Registrations w vat price
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.ProformaInvoice">
+            <summary>
+            Prepayment invoice
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Place">
             <summary>
             This object holds all information about the testing place plus real time statistics about health/sick visitors
@@ -857,6 +1111,11 @@
         <member name="P:CovidMassTesting.Model.Place.Id">
             <summary>
             Place id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.PlaceProviderId">
+            <summary>
+            Id of the hospital or other place provider
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Place.Name">
@@ -917,6 +1176,132 @@
         <member name="P:CovidMassTesting.Model.Place.Sick">
             <summary>
             Results of covid positive results
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.PlaceProvider">
+            <summary>
+            Place provider is hospital or company prividing testing place. One hospital can have multiple testing places.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.PlaceProviderId">
+            <summary>
+            ID 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.CompanyName">
+            <summary>
+            Hospital name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.CompanyId">
+            <summary>
+            hospital/company registration identifier from trade registry
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.VAT">
+            <summary>
+            VAT identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.Country">
+            <summary>
+            Country
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.MainEmail">
+            <summary>
+            Admin email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.MainEmailConfirmed">
+            <summary>
+            Email is confirmed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.PrivatePhone">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.PhoneConfirmed">
+            <summary>
+            Phone confirmed by sms
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.PublicEmail">
+            <summary>
+            Public email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.PublicPhone">
+            <summary>
+            Public phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.Web">
+            <summary>
+            Web
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.Logo">
+            <summary>
+            Logo in base64
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.CSS">
+            <summary>
+            Custom CSS
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.Group2Emails">
+            <summary>
+            Users in groups. Dictionary key is the group id, value is list of users in that group
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.PlaceProvider.ToPublic">
+            <summary>
+            Convert to public info
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.PlaceProviderPublic">
+            <summary>
+            Public place provider information
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.CompanyName">
+            <summary>
+            Company name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.Country">
+            <summary>
+            Country
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.PublicEmail">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.PublicPhone">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.Logo">
+            <summary>
+            Logo
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.CSS">
+            <summary>
+            CSS
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.Web">
+            <summary>
+            Web
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Result">
@@ -1005,6 +1390,78 @@
             <summary>
             If not defined, Admin role is set
             </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.SLA">
+            <summary>
+            Hospitals can negotiate multiple level of service level agreement
+            
+            This determines how much hardware is allocated to the place provider and his minimum level of requests per seconds.
+            
+            Shared means no hosting costs with no guarantee
+            Bronze means low costs eg 20 EUR per day with dedicated hw. Usually purchased by small testing locations.
+            Silver means mid costs eg 100 EUR per day with dedicated HW. Usually purchased by big testing locations or cities with multiple places.
+            Gold means max availablilty dedicated for full scale government testing. For example 5 mil. people per two days.
+            
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SLA.SLAId">
+            <summary>
+            ID
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SLA.PlaceProviderId">
+            <summary>
+            Provider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SLA.SLAType">
+            <summary>
+            Purchased SLA Type 
+            
+            Shared | Bronze | Silver | Gold
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SLA.From">
+            <summary>
+            Valid From
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.SLA.Until">
+            <summary>
+            Valid Until
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.SLALevel">
+            <summary>
+            SLA constants
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.SLALevel.Shared">
+            <summary>
+            shared infrastructure
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.SLALevel.Bronze">
+            <summary>
+            bronze infrastructure
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.SLALevel.Silver">
+            <summary>
+            silver infrastructure
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.SLALevel.Gold">
+            <summary>
+            gold infrastructure
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.SLALevel.ValidateSLA(System.String)">
+            <summary>
+            validates sla level
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.Slot1Day">
             <summary>
@@ -1429,46 +1886,6 @@
             Email claim identifier
             </summary>
         </member>
-        <member name="T:CovidMassTesting.Model.Token.Groups">
-            <summary>
-            List of roles
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Token.Groups.Admin">
-            <summary>
-            Admin can create users, places, set dates, and all methods with other roles
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Token.Groups.PasswordProtected">
-            <summary>
-            User with this role can not change password
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Token.Groups.RegistrationManager">
-            <summary>
-            User in this role can fetch users by the registration code
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Token.Groups.MedicTester">
-            <summary>
-            User with this role can assign test bar code to the registed user
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Token.Groups.DocumentManager">
-            <summary>
-            User with this role can export data of all infected users and pass them to covid center
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Token.Groups.MedicLab">
-            <summary>
-            User with this role can set testing results
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Token.Groups.DataExporter">
-            <summary>
-            Person in this group is allowed to list all sick people and export data
-            </summary>
-        </member>
         <member name="M:CovidMassTesting.Model.Token.GetEmail(System.Security.Claims.ClaimsPrincipal)">
             <summary>
             Get email from claim
@@ -1537,6 +1954,16 @@
             </summary>
             <param name="user"></param>
             <param name="userRepository"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.IsAuthorizedToIssueInvoice(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,System.String)">
+            <summary>
+            Accountant or admin is authorized to issue invoice
+            </summary>
+            <param name="user"></param>
+            <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Model.Token.CreateToken(CovidMassTesting.Model.User,Microsoft.Extensions.Configuration.IConfiguration)">
@@ -1811,6 +2238,109 @@
             Creates web
             </summary>
             <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.Interface.IPlaceProviderRepository">
+            <summary>
+            Place repository interface for dependency injection
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.Delete(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Admin can remove place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.Register(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Registers place provider
+            </summary>
+            <param name="testingPlaceProvider"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListPublic">
+            <summary>
+            Returns list of public information of test providers
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListPrivate(System.String)">
+            <summary>
+            Returns list of test providers with full information
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetPriceWithoutVAT(System.String,System.Int32,System.String,System.DateTimeOffset,System.DateTimeOffset)">
+            <summary>
+            Get price
+            </summary>
+            <param name="slaLevel"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <param name="from"></param>
+            <param name="until"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetPriceWithoutVATSLA(System.String,System.String,System.DateTimeOffset,System.DateTimeOffset)">
+            <summary>
+            PriceWithoutVAT SLA
+            </summary>
+            <param name="slaLevel"></param>
+            <param name="currency"></param>
+            <param name="from"></param>
+            <param name="until"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetPriceWithoutVATRegistrations(System.Int32,System.String)">
+            <summary>
+            PriceWithoutVAT Registrations
+            </summary>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.IssueProformaInvoice(System.String,System.String,System.Int32,System.String,System.DateTimeOffset,System.DateTimeOffset)">
+            <summary>
+            issues proforma invoice
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="slaLevel"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <param name="slaFrom"></param>
+            <param name="slaUntil"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.IssueProformaInvoiceRegistrations(System.String,System.Int32,System.String)">
+            <summary>
+            issues proforma invoice only for registrations
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetVATMultiplier(System.String)">
+            <summary>
+            GetVATMultiplier
+            </summary>
+            <param name="country"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.InAnyGroup(System.String,System.String,System.String[])">
+            <summary>
+            Check permissions
+            </summary>
+            <param name="email"></param>
+            <param name="placeProviderId"></param>
+            <param name="vs"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
@@ -2533,6 +3063,200 @@
             <summary>
             Tests the storage
             </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository">
+            <summary>
+            Redis place repository
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="configuration"></param>
+            <param name="logger"></param>
+            <param name="redisCacheClient"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.SetProInvoice(CovidMassTesting.Model.ProformaInvoice)">
+            <summary>
+            Set place
+            </summary>
+            <param name="invoice"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ProInvoiceGetLastId">
+            <summary>
+            Get last id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ProInvoiceSetLastId(System.Int32)">
+            <summary>
+            Get last id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListAllProInvoices">
+            <summary>
+            List all
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.SetRealInvoice(CovidMassTesting.Model.Invoice)">
+            <summary>
+            Set real invoice
+            </summary>
+            <param name="invoice"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.RealInvoiceGetLastId">
+            <summary>
+            Get last id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.RealInvoiceSetLastId(System.Int32)">
+            <summary>
+            Get last id
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListAllRealInvoices">
+            <summary>
+            List all
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetPlaceProvider(System.String)">
+            <summary>
+            Get place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.SetPlaceProvider(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Set place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.Delete(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Deletes place
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListAll">
+            <summary>
+            List all
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.DropAllData">
+            <summary>
+            Drop all data in repository
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetPriceWithoutVAT(System.String,System.Int32,System.String,System.DateTimeOffset,System.DateTimeOffset)">
+            <summary>
+            Calculate price of service
+            </summary>
+            <param name="slaLevel"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <param name="from"></param>
+            <param name="until"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetPriceWithoutVATSLA(System.String,System.String,System.DateTimeOffset,System.DateTimeOffset)">
+            <summary>
+            Calculate price of service
+            </summary>
+            <param name="slaLevel"></param>
+            <param name="currency"></param>
+            <param name="from"></param>
+            <param name="until"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetPriceWithoutVATRegistrations(System.Int32,System.String)">
+            <summary>
+            Calculate price of service
+            </summary>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListPrivate(System.String)">
+            <summary>
+            Admin can list private info
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListPublic">
+            <summary>
+            Public info of all place providers
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.Register(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Registers as place provider
+            </summary>
+            <param name="placeProvider"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.IssueProformaInvoiceRegistrations(System.String,System.Int32,System.String)">
+            <summary>
+            Issues the proforma invoice for registrations
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.IssueProformaInvoice(System.String,System.String,System.Int32,System.String,System.DateTimeOffset,System.DateTimeOffset)">
+            <summary>
+            Issues the proforma invoice
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="slaLevel"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <param name="slaFrom"></param>
+            <param name="slaUntil"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.IssueRealInvoiceRegistrations(System.String,System.Int32,System.String)">
+            <summary>
+            Issues the proforma invoice for registrations
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.IssueRealInvoice(System.String,System.String,System.Int32,System.String,System.DateTimeOffset,System.DateTimeOffset)">
+            <summary>
+            Issues the proforma invoice
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="slaLevel"></param>
+            <param name="registrations"></param>
+            <param name="currency"></param>
+            <param name="slaFrom"></param>
+            <param name="slaUntil"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetVATMultiplier(System.String)">
+            <summary>
+            Return tax multiplier
+            </summary>
+            <param name="country"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceRepository">
