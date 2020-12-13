@@ -15,6 +15,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Id { get; set; }
         /// <summary>
+        /// Id of the hospital or other place provider
+        /// </summary>
+        public string PlaceProviderId { get; set; }
+        /// <summary>
         /// Place name
         /// </summary>
         public string Name { get; set; }
@@ -62,6 +66,5 @@ namespace CovidMassTesting.Model
         /// Results of covid positive results
         /// </summary>
         public int Sick { get; set; }
-
     }
 }

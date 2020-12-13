@@ -35,40 +35,6 @@ namespace CovidMassTesting.Model
             public const string Email = "nameid";
         }
         /// <summary>
-        /// List of roles
-        /// </summary>
-        internal static class Groups
-        {
-            /// <summary>
-            /// Admin can create users, places, set dates, and all methods with other roles
-            /// </summary>
-            public const string Admin = "Admin";
-            /// <summary>
-            /// User with this role can not change password
-            /// </summary>
-            public const string PasswordProtected = "PasswordProtected";
-            /// <summary>
-            /// User in this role can fetch users by the registration code
-            /// </summary>
-            public const string RegistrationManager = "RegistrationManager";
-            /// <summary>
-            /// User with this role can assign test bar code to the registed user
-            /// </summary>
-            public const string MedicTester = "MedicTester";
-            /// <summary>
-            /// User with this role can export data of all infected users and pass them to covid center
-            /// </summary>
-            public const string DocumentManager = "DocumentManager";
-            /// <summary>
-            /// User with this role can set testing results
-            /// </summary>
-            public const string MedicLab = "MedicLab";
-            /// <summary>
-            /// Person in this group is allowed to list all sick people and export data
-            /// </summary>
-            public const string DataExporter = "DataExporter";
-        }
-        /// <summary>
         /// Get email from claim
         /// </summary>
         /// <param name="user"></param>
@@ -243,6 +209,39 @@ namespace CovidMassTesting.Model
             var email = user.GetEmail();
             return userRepository.InAnyGroup(email, new string[] { Groups.DataExporter }).Result;
         }
+        /// <summary>
+        /// Accountant or admin is authorized to issue invoice
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public static bool IsAuthorizedToIssueInvoice(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository, string placeProviderId)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+            if (placeProviderRepository is null)
+            {
+                throw new ArgumentNullException(nameof(placeProviderRepository));
+            }
+            if (string.IsNullOrEmpty(placeProviderId))
+            {
+                throw new ArgumentNullException(nameof(placeProviderId));
+            }
+
+            var email = user.GetEmail();
+
+            return placeProviderRepository.InAnyGroup(email, placeProviderId, new string[] { Groups.Admin, Groups.Accountant }).Result;
+        }
+
         /// <summary>
         /// Method creates jwt token
         /// </summary>

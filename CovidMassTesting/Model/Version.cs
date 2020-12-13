@@ -106,7 +106,7 @@ namespace CovidMassTesting.Model
                     if (pos > 0)
                     {
                         ret.ApplicationName = versionData[0].Substring(0, pos - 1).Trim();
-                        ret.BuildNumber = versionData[0].Substring(pos + 1).Trim();
+                        ret.BuildNumber = versionData[0][(pos + 1)..].Trim();
                     }
                     ret.DLLVersion = versionData[1].Trim();
                     ret.BuildTime = versionData[2].Trim();

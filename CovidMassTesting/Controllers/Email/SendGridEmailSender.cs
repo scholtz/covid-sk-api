@@ -67,6 +67,7 @@ namespace CovidMassTesting.Controllers.Email
         /// <summary>
         /// Semd email
         /// </summary>
+        /// <param name="subject"></param>
         /// <param name="toEmail"></param>
         /// <param name="toName"></param>
         /// <param name="data"></param>

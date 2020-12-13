@@ -853,8 +853,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (number == null) number = "";
             number = number.Replace(" ", "");
             number = number.Replace("\t", "");
-            if (number.StartsWith("00", true, CultureInfo.InvariantCulture)) number = "+" + number.Substring(2);
-            if (number.StartsWith("0", true, CultureInfo.InvariantCulture)) number = "+421" + number.Substring(1);
+            if (number.StartsWith("00", true, CultureInfo.InvariantCulture)) number = "+" + number[2..];
+            if (number.StartsWith("0", true, CultureInfo.InvariantCulture)) number = "+421" + number[1..];
             return number;
         }
         /// <summary>
