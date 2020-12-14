@@ -159,6 +159,10 @@ namespace NUnitTestCovidApi
         {
             return client.GetAsync($"Slot/ListDaySlotsByPlace?placeId={placeId}").Result;
         }
+        private HttpResponseMessage PlaceProviderListPublic(HttpClient client)
+        {
+            return client.GetAsync($"PlaceProvider/ListPublic").Result;
+        }
         private HttpResponseMessage ListHourSlotsByPlaceAndDaySlotId(HttpClient client, string placeId, string daySlotId)
         {
             return client.GetAsync($"Slot/ListHourSlotsByPlaceAndDaySlotId?placeId={placeId}&daySlotId={daySlotId}").Result;
@@ -248,6 +252,14 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
+        private HttpResponseMessage PlaceProviderRegistration(HttpClient client, PlaceProvider pp)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(pp);
+            return client.PostAsync("PlaceProvider/Register",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+
         private HttpResponseMessage FinalDataExport(HttpClient client, int from, int count)
         {
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/csv"));
@@ -1355,6 +1367,40 @@ namespace NUnitTestCovidApi
             Assert.IsFalse(resultExport.Contains(registered[1].Id.ToString()));
             Assert.IsFalse(resultExport.Contains(registered[1].RC));
             //Assert.AreEqual(1, resultExport.Count);
+        }
+
+        [Test]
+        public void PlaceProviderTests()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+
+            var request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(0, result.Count);
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123",
+                Country = "SK",
+                MainEmail = "ludovit@scholtz.sk",
+            };
+
+            request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            data = request.Content.ReadAsStringAsync().Result;
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(1, result.Count);
         }
 
         [Test]

@@ -335,7 +335,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             if (string.IsNullOrEmpty(placeProvider?.CompanyId)) throw new Exception("Company trade registry ID has not been entered");
             placeProvider.PlaceProviderId = placeProvider.CompanyId.Trim();
-            var place = await GetPlaceProvider(placeProvider.PlaceProviderId);
+            PlaceProvider place = null;
+            try
+            {
+                place = await GetPlaceProvider(placeProvider.PlaceProviderId);
+            }
+            catch (Exception exc) { logger.LogError(exc, exc.Message); }
             if (place != null) { throw new Exception("Place provider with the specified company id already exists. Please contact administrator"); }
             return await SetPlaceProvider(placeProvider);
         }

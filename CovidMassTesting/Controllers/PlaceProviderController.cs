@@ -57,11 +57,15 @@ namespace CovidMassTesting.Controllers
         [HttpPost("Register")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<PlaceProvider>> Register([FromForm] PlaceProvider testingPlaceProvider)
+        public async Task<ActionResult<PlaceProvider>> Register([FromBody] PlaceProvider testingPlaceProvider)
         {
             try
             {
-                return Ok(placeProviderRepository.Register(testingPlaceProvider));
+                if (testingPlaceProvider is null)
+                {
+                    throw new ArgumentNullException(nameof(testingPlaceProvider));
+                }
+                return Ok(await placeProviderRepository.Register(testingPlaceProvider));
             }
             catch (Exception exc)
             {
@@ -83,7 +87,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                return Ok(placeProviderRepository.ListPublic());
+                return Ok(await placeProviderRepository.ListPublic());
             }
             catch (Exception exc)
             {

@@ -2766,6 +2766,20 @@
             <param name="loggerFactory"></param>
             <param name="redisCacheClient"></param>
         </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.SetPlaceProvider(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            set
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.GetPlaceProvider(System.String)">
+            <summary>
+            get
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.ListAll">
             <summary>
             List all
