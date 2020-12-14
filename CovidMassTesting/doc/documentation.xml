@@ -406,7 +406,7 @@
             Controller that manages user requests
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.UserController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.UserController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Constructor
             </summary>
@@ -459,6 +459,13 @@
             </summary>
             <param name="oldHash"></param>
             <param name="newHash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.SetPlaceProvider(System.String)">
+            <summary>
+            Set place provider
+            </summary>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.VersionController">
@@ -964,6 +971,11 @@
         <member name="F:CovidMassTesting.Model.Groups.Admin">
             <summary>
             Admin can create users, places, set dates, and all methods with other roles
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.PPAdmin">
+            <summary>
+            Place provider Admin can create users, places, set dates, and all methods with other roles within scope of the place provider
             </summary>
         </member>
         <member name="F:CovidMassTesting.Model.Groups.Accountant">
@@ -1886,9 +1898,21 @@
             Email claim identifier
             </summary>
         </member>
+        <member name="F:CovidMassTesting.Model.Token.Claims.PlaceProvider">
+            <summary>
+            Place provider claim identifier
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Model.Token.GetEmail(System.Security.Claims.ClaimsPrincipal)">
             <summary>
             Get email from claim
+            </summary>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.GetPlaceProvider(System.Security.Claims.ClaimsPrincipal)">
+            <summary>
+            Get place provider from claim
             </summary>
             <param name="user"></param>
             <returns></returns>
@@ -1966,7 +1990,17 @@
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.CreateToken(CovidMassTesting.Model.User,Microsoft.Extensions.Configuration.IConfiguration)">
+        <member name="M:CovidMassTesting.Model.Token.IsAuthorizedToLogAsCompany(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,System.String)">
+            <summary>
+            Log in as company
+            </summary>
+            <param name="user"></param>
+            <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Model.Token.CreateToken(CovidMassTesting.Model.User,Microsoft.Extensions.Configuration.IConfiguration,System.String)">
             <summary>
             Method creates jwt token
             </summary>
@@ -2626,6 +2660,14 @@
             <param name="email"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.SetPlaceProvider(System.String,System.String)">
+            <summary>
+            Issue token with new place provider
+            </summary>
+            <param name="email"></param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.DropDatabaseAuthorize(System.String,System.String)">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
@@ -2941,7 +2983,7 @@
             In memory user repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.MockRepository.UserRepository},Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.UserRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.MockRepository.UserRepository},Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.UserRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             constructor
             </summary>
@@ -2953,6 +2995,7 @@
             <param name="emailSender"></param>
             <param name="smsSender"></param>
             <param name="placeRepository"></param>
+            <param name="placeProviderRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.SetUser(CovidMassTesting.Model.User,System.Boolean)">
             <summary>
@@ -3560,7 +3603,7 @@
             User repository manages users and stores user data securly in the database
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.UserRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.UserRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.UserRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Constructor
             </summary>
@@ -3654,6 +3697,16 @@
             <param name="email">Email</param>
             <param name="oldHash">Old password</param>
             <param name="newHash">New password</param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.SetPlaceProvider(System.String,System.String)">
+            <summary>
+            Change password
+            
+            If successful, returns new JWT token
+            </summary>
+            <param name="email">Email</param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.InAnyGroup(System.String,System.String[])">

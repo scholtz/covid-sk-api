@@ -31,6 +31,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="emailSender"></param>
         /// <param name="smsSender"></param>
         /// <param name="placeRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         public UserRepository(
             IStringLocalizer<UserRepository> localizer,
             IStringLocalizer<Repository.RedisRepository.UserRepository> localizer2,
@@ -39,7 +40,8 @@ namespace CovidMassTesting.Repository.MockRepository
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
             ISMSSender smsSender,
-            IPlaceRepository placeRepository
+            IPlaceRepository placeRepository,
+            IPlaceProviderRepository placeProviderRepository
         ) : base(
                 localizer2,
                 configuration,
@@ -47,7 +49,8 @@ namespace CovidMassTesting.Repository.MockRepository
                 redisCacheClient,
                 emailSender,
                 smsSender,
-                placeRepository
+                placeRepository,
+                placeProviderRepository
                 )
         {
             this.localizer = localizer;
