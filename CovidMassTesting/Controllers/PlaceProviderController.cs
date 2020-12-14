@@ -110,7 +110,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                return Ok(placeProviderRepository.ListPrivate(User.GetEmail()));
+                return Ok(await placeProviderRepository.ListPrivate(User.GetEmail()));
             }
             catch (Exception exc)
             {
