@@ -33,6 +33,10 @@ namespace CovidMassTesting.Model
             /// Email claim identifier
             /// </summary>
             public const string Email = "nameid";
+            /// <summary>
+            /// Place provider claim identifier
+            /// </summary>
+            public const string PlaceProvider = "pp";
         }
         /// <summary>
         /// Get email from claim
@@ -47,6 +51,20 @@ namespace CovidMassTesting.Model
             }
 
             return user.Claims.FirstOrDefault(c => c.Type == Claims.Email || c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+        }
+        /// <summary>
+        /// Get place provider from claim
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public static string GetPlaceProvider(this ClaimsPrincipal user)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            return user.Claims.FirstOrDefault(c => c.Type == Claims.PlaceProvider)?.Value ?? "";
         }
         /// <summary>
         /// Get name from claim
@@ -241,14 +259,50 @@ namespace CovidMassTesting.Model
 
             return placeProviderRepository.InAnyGroup(email, placeProviderId, new string[] { Groups.Admin, Groups.Accountant }).Result;
         }
+        /// <summary>
+        /// Log in as company
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public static bool IsAuthorizedToLogAsCompany(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository, string placeProviderId)
+        {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
 
+            if (userRepository is null)
+            {
+                throw new ArgumentNullException(nameof(userRepository));
+            }
+            if (user.IsAdmin(userRepository))
+            {
+                return true;
+            }
+
+            if (placeProviderRepository is null)
+            {
+                throw new ArgumentNullException(nameof(placeProviderRepository));
+            }
+            if (string.IsNullOrEmpty(placeProviderId))
+            {
+                throw new ArgumentNullException(nameof(placeProviderId));
+            }
+
+            var email = user.GetEmail();
+
+            return placeProviderRepository.InAnyGroup(email, placeProviderId, new string[] { Groups.Admin, Groups.PPAdmin, Groups.Accountant, Groups.DataExporter, Groups.DocumentManager, Groups.MedicLab, Groups.MedicTester, Groups.RegistrationManager }).Result;
+        }
         /// <summary>
         /// Method creates jwt token
         /// </summary>
         /// <param name="usr">User object</param>
         /// <param name="configuration">APP Configuran</param>
         /// <returns></returns>
-        public static string CreateToken(User usr, IConfiguration configuration)
+        public static string CreateToken(User usr, IConfiguration configuration, string placeProviderId)
         {
             if (usr is null)
             {
@@ -273,6 +327,10 @@ namespace CovidMassTesting.Model
                   {
                     Token.Claims.Role,
                      usr.Roles
+                  },
+                  {
+                    Token.Claims.PlaceProvider,
+                     placeProviderId
                   },
                   {
                     "nbf",

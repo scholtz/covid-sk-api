@@ -15,6 +15,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public const string Admin = "Admin";
         /// <summary>
+        /// Place provider Admin can create users, places, set dates, and all methods with other roles within scope of the place provider
+        /// </summary>
+        public const string PPAdmin = "PPAdmin";
+        /// <summary>
         /// Accountant is able to list invoices to the hospital or issue new one
         /// </summary>
         public const string Accountant = "Accountant";

@@ -24,6 +24,7 @@ namespace CovidMassTesting.Controllers
         private readonly IStringLocalizer<UserController> localizer;
         private readonly ILogger<PlaceController> logger;
         private readonly IUserRepository userRepository;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -33,12 +34,14 @@ namespace CovidMassTesting.Controllers
         public UserController(
             IStringLocalizer<UserController> localizer,
             ILogger<PlaceController> logger,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IPlaceProviderRepository placeProviderRepository
             )
         {
             this.localizer = localizer;
             this.logger = logger;
             this.userRepository = userRepository;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// List all public information of all users
@@ -177,6 +180,32 @@ namespace CovidMassTesting.Controllers
                 if (User.IsPasswordProtected(userRepository)) { throw new Exception(localizer[Controllers_UserController.This_special_user_cannot_change_the_password_].Value); }
 
                 return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Set place provider
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("SetPlaceProvider")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<string>> SetPlaceProvider(
+            [FromForm] string placeProviderId
+            )
+        {
+            try
+            {
+                if (User.IsAuthorizedToLogAsCompany(userRepository, placeProviderRepository, placeProviderId)) { throw new Exception(localizer[Controllers_UserController.This_special_user_cannot_change_the_password_].Value); }
+
+                return Ok(await userRepository.SetPlaceProvider(User.GetEmail(), placeProviderId));
             }
             catch (Exception exc)
             {

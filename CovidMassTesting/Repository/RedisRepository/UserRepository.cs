@@ -35,6 +35,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly ISMSSender smsSender;
         private readonly IConfiguration configuration;
         private readonly IPlaceRepository placeRepository;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly string REDIS_KEY_USERS_OBJECTS = "USERS";
 
         private readonly int RehashN = 99;
@@ -55,7 +56,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             IRedisCacheClient redisCacheClient,
             IEmailSender emailSender,
             ISMSSender smsSender,
-            IPlaceRepository placeRepository
+            IPlaceRepository placeRepository,
+            IPlaceProviderRepository placeProviderRepository
             )
         {
             this.localizer = localizer;
@@ -65,6 +67,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.smsSender = smsSender;
             this.configuration = configuration;
             this.placeRepository = placeRepository;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// Inserts new user
@@ -399,8 +402,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                 await SetInvalidLogin(usr);
                 throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password].Value);
             }
-
-            return Token.CreateToken(usr, configuration);
+            var places = await placeProviderRepository.ListPrivate(usr.Email);
+            return Token.CreateToken(usr, configuration, places?.FirstOrDefault()?.PlaceProviderId);
         }
 
         /// <summary>
@@ -421,9 +424,24 @@ namespace CovidMassTesting.Repository.RedisRepository
             user.CoHash = user.CoData;
             if (await SetUser(user, false))
             {
-                return Token.CreateToken(user, configuration);
+                var places = await placeProviderRepository.ListPrivate(user.Email);
+                return Token.CreateToken(user, configuration, places?.FirstOrDefault()?.PlaceProviderId);
             }
             return "";
+        }
+        /// <summary>
+        /// Change password
+        /// 
+        /// If successful, returns new JWT token
+        /// </summary>
+        /// <param name="email">Email</param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public async Task<string> SetPlaceProvider(string email, string placeProviderId)
+        {
+            var user = await GetUser(email);
+            if (user == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.User_not_found_by_email].Value);
+            return Token.CreateToken(user, configuration, placeProviderId);
         }
         /// <summary>
         /// Checks if user with specified email has any of reqested groups

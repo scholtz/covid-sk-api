@@ -76,6 +76,13 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<UserPublic> GetPublicUser(string email);
         /// <summary>
+        /// Issue token with new place provider
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public Task<string> SetPlaceProvider(string email, string placeProviderId);
+        /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>
         /// <param name="email"></param>
