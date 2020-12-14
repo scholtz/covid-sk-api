@@ -580,6 +580,10 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (role.Length == 0) return true;
             var place = await GetPlaceProvider(placeProviderId);
+            if (role.Contains(Groups.PPAdmin))
+            {
+                if (place.MainEmail == email) return true;
+            }
             foreach (var group in role)
             {
                 if (place.Group2Emails.ContainsKey(group))
