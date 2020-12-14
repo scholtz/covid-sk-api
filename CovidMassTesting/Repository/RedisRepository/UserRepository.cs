@@ -49,6 +49,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="emailSender"></param>
         /// <param name="smsSender"></param>
         /// <param name="placeRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         public UserRepository(
             IStringLocalizer<UserRepository> localizer,
             IConfiguration configuration,

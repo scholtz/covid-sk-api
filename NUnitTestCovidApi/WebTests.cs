@@ -60,6 +60,14 @@ namespace NUnitTestCovidApi
                     })
                     ).Result;
         }
+        private HttpResponseMessage SetPlaceProvider(HttpClient client, string placeProviderId)
+        {
+            return client.PostAsync("User/SetPlaceProvider",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("placeProviderId",placeProviderId),
+                    })
+                    ).Result;
+        }
         private HttpResponseMessage ChangePassword(HttpClient client, string oldHash, string newHash)
         {
             return client.PostAsync("User/ChangePassword",
@@ -1382,6 +1390,8 @@ namespace NUnitTestCovidApi
             var data = request.Content.ReadAsStringAsync().Result;
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
             Assert.AreEqual(0, result.Count);
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
+            var admin = users.First(u => u.Name == "Admin");
 
             var obj = new PlaceProvider()
             {
@@ -1390,7 +1400,7 @@ namespace NUnitTestCovidApi
                 CompanyId = "123",
                 CompanyName = "123",
                 Country = "SK",
-                MainEmail = "ludovit@scholtz.sk",
+                MainEmail = admin.Email,
             };
 
             request = PlaceProviderRegistration(client, obj);
@@ -1401,6 +1411,18 @@ namespace NUnitTestCovidApi
             data = request.Content.ReadAsStringAsync().Result;
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
             Assert.AreEqual(1, result.Count);
+
+
+            request = AuthenticateUser(client, admin.Email, admin.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            request = SetPlaceProvider(client, "123");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            adminToken = request.Content.ReadAsStringAsync().Result;
+
         }
 
         [Test]

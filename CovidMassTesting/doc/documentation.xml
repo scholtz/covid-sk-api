@@ -3614,6 +3614,7 @@
             <param name="emailSender"></param>
             <param name="smsSender"></param>
             <param name="placeRepository"></param>
+            <param name="placeProviderRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Add(CovidMassTesting.Model.User)">
             <summary>

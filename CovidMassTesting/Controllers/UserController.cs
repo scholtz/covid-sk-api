@@ -203,7 +203,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (User.IsAuthorizedToLogAsCompany(userRepository, placeProviderRepository, placeProviderId)) { throw new Exception(localizer[Controllers_UserController.This_special_user_cannot_change_the_password_].Value); }
+                if (!User.IsAuthorizedToLogAsCompany(userRepository, placeProviderRepository, placeProviderId)) { throw new Exception("Nie je možné autorizovať užívateľa za vybranú spoločnosť"); }
 
                 return Ok(await userRepository.SetPlaceProvider(User.GetEmail(), placeProviderId));
             }
