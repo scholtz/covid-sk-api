@@ -24,6 +24,7 @@ namespace CovidMassTesting.Controllers
         private readonly IStringLocalizer<PlaceController> localizer;
         private readonly ILogger<PlaceController> logger;
         private readonly IPlaceRepository placeRepository;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly IUserRepository userRepository;
         /// <summary>
         /// Constructor
@@ -32,17 +33,20 @@ namespace CovidMassTesting.Controllers
         /// <param name="logger"></param>
         /// <param name="placeRepository"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         public PlaceController(
             IStringLocalizer<PlaceController> localizer,
             ILogger<PlaceController> logger,
             IPlaceRepository placeRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IPlaceProviderRepository placeProviderRepository
             )
         {
             this.localizer = localizer;
             this.logger = logger;
             this.placeRepository = placeRepository;
             this.userRepository = userRepository;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// List places
@@ -82,7 +86,7 @@ namespace CovidMassTesting.Controllers
 
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                if (!User.IsAdmin(userRepository) && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
 
                 if (place is null)
                 {

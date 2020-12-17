@@ -1474,6 +1474,56 @@ namespace NUnitTestCovidApi
             adminToken = request.Content.ReadAsStringAsync().Result;
 
         }
+
+
+
+        [Test]
+        public void PlaceProviderRegisterPlace()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+
+            var request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(0, result.Count);
+            var email = "place.provider@scholtz.sk";
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123",
+                Country = "SK",
+                MainEmail = email,
+            };
+
+            request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            data = request.Content.ReadAsStringAsync().Result;
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(1, result.Count);
+
+            var emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
+            var noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+            var emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
+            request = AuthenticateUser(client, email, emailData.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            SetupDebugPlaces(client);
+        }
+
         [Test]
         public virtual void TestVersion()
         {

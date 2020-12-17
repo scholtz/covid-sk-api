@@ -101,6 +101,14 @@ namespace CovidMassTesting.Model
             var email = user.GetEmail();
             return userRepository.InAnyGroup(email, new string[] { Groups.Admin }).Result;
         }
+
+        public static async Task<bool> IsPlaceProviderAdmin(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository)
+        {
+            if (user.IsAdmin(userRepository)) return true;
+            var pp = GetPlaceProvider(user);
+            return await placeProviderRepository.InAnyGroup(user.GetEmail(), pp, new string[] { Groups.PPAdmin });
+        }
+
         /// <summary>
         /// Check if user has password protected .. Created for demo users
         /// </summary>

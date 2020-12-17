@@ -133,7 +133,7 @@
             Manages places
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Constructor
             </summary>
@@ -141,6 +141,7 @@
             <param name="logger"></param>
             <param name="placeRepository"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceController.List">
             <summary>
