@@ -68,6 +68,11 @@
             If no email sender is defined
             </summary>
         </member>
+        <member name="F:CovidMassTesting.Controllers.Email.NoEmailSender.Data">
+            <summary>
+            For unit tests
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Controllers.Email.NoEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
             <summary>
             Act as email was sent. Log event to console
@@ -1190,6 +1195,61 @@
             Results of covid positive results
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.OpeningHoursWorkDay">
+            <summary>
+            Standard opening hours
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.OpeningHoursOther1">
+            <summary>
+            non Standard opening hours - weekend
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.OpeningHoursOther2">
+            <summary>
+            non Standard opening hours - holidays
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasPCRTestFree">
+            <summary>
+            Place does the PCR tests paid by insurance
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasPCRTestSelf">
+            <summary>
+            Self paying pcr test
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasPCRTestSelfPrice">
+            <summary>
+            Self paying pcr test price
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasPCRTestSelfPriceCurrency">
+            <summary>
+            Self paying pcr test currency
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasAntTestFree">
+            <summary>
+            Place does the antigen tests paid by insurance or government
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasAntTestSelf">
+            <summary>
+            Place does the antigen tests paid by visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasAntTestSelfPrice">
+            <summary>
+            Self paying antigen test price
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.HasAntTestSelfPriceCurrency">
+            <summary>
+            Self paying antigen test currency
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProvider">
             <summary>
             Place provider is hospital or company prividing testing place. One hospital can have multiple testing places.
@@ -1268,6 +1328,11 @@
         <member name="P:CovidMassTesting.Model.PlaceProvider.Group2Emails">
             <summary>
             Users in groups. Dictionary key is the group id, value is list of users in that group
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.MainContact">
+            <summary>
+            Place provider private main contact name
             </summary>
         </member>
         <member name="M:CovidMassTesting.Model.PlaceProvider.ToPublic">

@@ -65,7 +65,17 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentNullException(nameof(testingPlaceProvider));
                 }
-                return Ok(await placeProviderRepository.Register(testingPlaceProvider));
+                var ret = await placeProviderRepository.Register(testingPlaceProvider);
+                if (ret != null)
+                {
+                    await userRepository.Add(new Model.User()
+                    {
+                        Email = ret.MainEmail,
+                        Phone = ret.PrivatePhone,
+                        Name = ret.MainContact
+                    });
+                }
+                return Ok(ret);
             }
             catch (Exception exc)
             {

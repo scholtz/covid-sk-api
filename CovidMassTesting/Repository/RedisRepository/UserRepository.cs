@@ -93,7 +93,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     Name = user.Name,
                     Password = pass,
-                    Roles = user.Roles.ToArray(),
+                    Roles = user.Roles?.ToArray(),
                 });
             if (!string.IsNullOrEmpty(user.Phone))
             {
@@ -466,23 +466,26 @@ namespace CovidMassTesting.Repository.RedisRepository
 
 
             var usr = await GetUser(email);
-            foreach (var dbrole in usr.Roles.ToArray())
+            if (usr.Roles != null)
             {
-                if (dbrole.Contains(","))
+                foreach (var dbrole in usr.Roles?.ToArray())
                 {
-                    foreach (var addrole in dbrole.Split(','))
+                    if (dbrole.Contains(","))
                     {
-                        if (!usr.Roles.Contains(addrole))
+                        foreach (var addrole in dbrole.Split(','))
                         {
-                            usr.Roles.Add(addrole);
+                            if (!usr.Roles.Contains(addrole))
+                            {
+                                usr.Roles.Add(addrole);
+                            }
                         }
                     }
                 }
-            }
 
-            foreach (var lookupRole in role)
-            {
-                if (usr.Roles.Contains(lookupRole)) return true;
+                foreach (var lookupRole in role)
+                {
+                    if (usr.Roles.Contains(lookupRole)) return true;
+                }
             }
             return false;
         }

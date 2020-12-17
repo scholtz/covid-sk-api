@@ -71,6 +71,11 @@ namespace CovidMassTesting.Model
         /// </summary>
         public Dictionary<string, List<string>> Group2Emails { get; set; } = new Dictionary<string, List<string>>();
         /// <summary>
+        /// Place provider private main contact name
+        /// </summary>
+        public string MainContact { get; set; }
+
+        /// <summary>
         /// Convert to public info
         /// </summary>
         /// <returns></returns>
