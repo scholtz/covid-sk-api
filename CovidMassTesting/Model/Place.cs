@@ -66,5 +66,17 @@ namespace CovidMassTesting.Model
         /// Results of covid positive results
         /// </summary>
         public int Sick { get; set; }
+        /// <summary>
+        /// Standard opening hours
+        /// </summary>
+        public string OpeningHoursWorkDay { get; set; }
+        /// <summary>
+        /// non Standard opening hours - weekend
+        /// </summary>
+        public string OpeningHoursOther1 { get; set; }
+        /// <summary>
+        /// non Standard opening hours - holidays
+        /// </summary>
+        public string OpeningHoursOther2 { get; set; }
     }
 }
