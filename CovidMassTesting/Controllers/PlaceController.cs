@@ -86,7 +86,8 @@ namespace CovidMassTesting.Controllers
 
             try
             {
-                if (!User.IsAdmin(userRepository) && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                var isGlobalAdmin = User.IsAdmin(userRepository);
+                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
 
                 if (place is null)
                 {
@@ -126,12 +127,15 @@ namespace CovidMassTesting.Controllers
                 {
                     // new place
                     place.Id = Guid.NewGuid().ToString();
+                    place.PlaceProviderId = User.GetPlaceProvider();
                     await placeRepository.SetPlace(place);
                     logger.LogInformation($"Place {place.Name} has been created");
                 }
                 else
                 {
                     // update existing
+                    if (!isGlobalAdmin && string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("You are not allowed to manage this place");
+                    if (!isGlobalAdmin && place.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You are not allowed to manage this place");
                     place.Healthy = oldPlace.Healthy;
                     place.Sick = oldPlace.Sick;
                     place.Registrations = oldPlace.Registrations;
