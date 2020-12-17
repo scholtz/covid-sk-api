@@ -71,6 +71,33 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// List places
+        /// 
+        /// Contains live statistics of users, registered, infected and healthy visitors
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("PrivateList")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Dictionary<string, Place>>> PrivateList()
+        {
+            try
+            {
+                var isGlobalAdmin = User.IsAdmin(userRepository);
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) return Ok(null);
+                var list = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                if (isGlobalAdmin) return Ok(list);
+                return Ok(list.Values.Where(p => p.PlaceProviderId == User.GetPlaceProvider()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// Admin can insert new testing location
         /// </summary>
         /// <param name="place"></param>
