@@ -165,7 +165,7 @@ namespace CovidMassTesting.Controllers
                         }
                     }
                 }
-
+                int ret = 0;
 
                 foreach (var action in actions)
                 {
@@ -195,11 +195,11 @@ namespace CovidMassTesting.Controllers
                             hours = "";
                         }
 
-                        await slotRepository.CheckSlots(dayTicks, placeId, hours, action.OpeningHoursTemplateId);
+                        ret += await slotRepository.CheckSlots(dayTicks, placeId, hours, action.OpeningHoursTemplateId);
                     }
                 }
 
-                return Ok();
+                return Ok(ret);
             }
             catch (Exception exc)
             {
@@ -208,7 +208,87 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Set openning hours for branches.
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListScheduledDays")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<DayTimeManagement>>> ListScheduledDays([FromQuery] string placeId = "")
+        {
+            try
+            {
+                var isGlobalAdmin = User.IsAdmin(userRepository);
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception("You must be place provider admin to be able to set openning hours");
 
+                IEnumerable<Place> list;
+                if (string.IsNullOrEmpty(placeId) || placeId == "__ALL__")
+                {
+                    list = (await placeRepository.ListAll());
+                }
+                else
+                {
+                    list = new List<Place>() { await placeRepository.GetPlace(placeId) };
+                }
+
+                if (!isGlobalAdmin)
+                {
+                    list = list.Where(p => p.PlaceProviderId == User.GetPlaceProvider());
+                }
+                var ids = list.Select(i => i.Id).Distinct().ToHashSet();
+
+                if (string.IsNullOrEmpty(placeId) || placeId == "__ALL__")
+                {
+                    if (!list.Any()) throw new Exception("Create place first");
+                }
+                else
+                {
+                    if (!ids.Contains(placeId)) throw new Exception("You are not allowed to manage this place");
+                }
+
+                var ret = new Dictionary<long, DayTimeManagement>();
+                foreach (var id in ids)
+                {
+                    var daySlots = await slotRepository.ListDaySlotsByPlace(id);
+                    foreach (var daySlot in daySlots)
+                    {
+                        if (ret.ContainsKey(daySlot.SlotId))
+                        {
+                            ret[daySlot.SlotId].Count++;
+                            if (!ret[daySlot.SlotId].OpeningHours.Contains(daySlot.OpeningHours))
+                            {
+                                ret[daySlot.SlotId].OpeningHours.Add(daySlot.OpeningHours);
+                            }
+                            if (!ret[daySlot.SlotId].OpeningHoursTemplates.Contains(daySlot.OpeningHoursTemplate))
+                            {
+                                ret[daySlot.SlotId].OpeningHoursTemplates.Add(daySlot.OpeningHoursTemplate);
+                            }
+                        }
+                        else
+                        {
+                            ret[daySlot.SlotId] = new DayTimeManagement()
+                            {
+                                SlotId = daySlot.SlotId,
+                                Count = 1,
+                                Day = daySlot.Time,
+                                OpeningHours = new HashSet<string>() { daySlot.OpeningHours },
+                                OpeningHoursTemplates = new HashSet<int>() { daySlot.OpeningHoursTemplate }
+                            };
+                        }
+                    }
+                }
+                return Ok(ret.Values);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 
         /// <summary>
         /// Admin can insert new testing location

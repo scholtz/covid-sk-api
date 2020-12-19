@@ -167,6 +167,13 @@
             <param name="actions"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.ListScheduledDays(System.String)">
+            <summary>
+            Set openning hours for branches.
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.PlaceController.InsertOrUpdate(CovidMassTesting.Model.Place)">
             <summary>
             Admin can insert new testing location
@@ -742,6 +749,36 @@
             </summary>
             <param name="input"></param>
             <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.DayTimeManagement">
+            <summary>
+            For admin overview statistics of opening hours
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.DayTimeManagement.SlotId">
+            <summary>
+            slot id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.DayTimeManagement.Day">
+            <summary>
+            day in iso format
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.DayTimeManagement.OpeningHoursTemplates">
+            <summary>
+            List of used templates
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.DayTimeManagement.OpeningHours">
+            <summary>
+            List of opening hours in standardized format
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.DayTimeManagement.Count">
+            <summary>
+            Number of places accounted
+            </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Email.IEmail">
             <summary>

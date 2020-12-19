@@ -209,6 +209,10 @@ namespace NUnitTestCovidApi
                                 new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                 ).Result;
         }
+        private HttpResponseMessage ListScheduledDays(HttpClient client)
+        {
+            return client.GetAsync("Place/ListScheduledDays").Result;
+        }
 
         private HttpResponseMessage ConnectVisitorToTest(HttpClient client, string visitorCode, string testCode)
         {
@@ -1562,6 +1566,12 @@ namespace NUnitTestCovidApi
                     Type = "delete"
                 }
             };
+
+            request = ListScheduledDays(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var daysData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DayTimeManagement>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(0, daysData.Count);
+
             request = ScheduleOpenningHours(client, actions);
 
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -1610,7 +1620,19 @@ namespace NUnitTestCovidApi
             minutesDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(6, minutesDictionary.Count);
 
+            request = ListScheduledDays(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            daysData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DayTimeManagement>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, daysData.Count);
 
+            var keys = daysData.Select(d => d.SlotId).OrderBy(d => d).ToArray();
+            var day1 = daysData.First(d => d.SlotId == keys[0]);
+            Assert.IsTrue(day1.OpeningHours.Contains("08:30-22:00"));
+            Assert.IsTrue(day1.OpeningHours.Contains("08:00-09:00"));
+            Assert.IsTrue(day1.OpeningHoursTemplates.Contains(1));
+            var day2 = daysData.First(d => d.SlotId == keys[1]);
+            Assert.IsTrue(day2.OpeningHours.Contains("11:45-11:50"));
+            Assert.IsTrue(day2.OpeningHoursTemplates.Contains(2));
         }
 
         [Test]
