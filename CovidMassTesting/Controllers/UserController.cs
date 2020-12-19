@@ -31,6 +31,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="localizer"></param>
         /// <param name="logger"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         public UserController(
             IStringLocalizer<UserController> localizer,
             ILogger<PlaceController> logger,

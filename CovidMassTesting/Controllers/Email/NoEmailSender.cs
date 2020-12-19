@@ -13,7 +13,7 @@ namespace CovidMassTesting.Controllers.Email
         /// <summary>
         /// For unit tests
         /// </summary>
-        public ConcurrentDictionary<long, (string subject, string toEmail, string toName, IEmail data)> Data = new ConcurrentDictionary<long, (string, string, string, IEmail)>();
+        public ConcurrentDictionary<long, (string subject, string toEmail, string toName, IEmail data)> Data { get; private set; } = new ConcurrentDictionary<long, (string, string, string, IEmail)>();
         /// <summary>
         /// Act as email was sent. Log event to console
         /// </summary>

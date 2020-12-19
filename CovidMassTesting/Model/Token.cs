@@ -101,7 +101,13 @@ namespace CovidMassTesting.Model
             var email = user.GetEmail();
             return userRepository.InAnyGroup(email, new string[] { Groups.Admin }).Result;
         }
-
+        /// <summary>
+        /// Returns true if the user is currently in the role of PP Admin.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
+        /// <returns></returns>
         public static async Task<bool> IsPlaceProviderAdmin(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository)
         {
             if (user.IsAdmin(userRepository)) return true;
@@ -309,6 +315,7 @@ namespace CovidMassTesting.Model
         /// </summary>
         /// <param name="usr">User object</param>
         /// <param name="configuration">APP Configuran</param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
         public static string CreateToken(User usr, IConfiguration configuration, string placeProviderId)
         {
