@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
@@ -26,6 +27,8 @@ namespace CovidMassTesting.Controllers
         private readonly IPlaceRepository placeRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly IUserRepository userRepository;
+        private readonly ISlotRepository slotRepository;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -34,12 +37,14 @@ namespace CovidMassTesting.Controllers
         /// <param name="placeRepository"></param>
         /// <param name="userRepository"></param>
         /// <param name="placeProviderRepository"></param>
+        /// <param name="slotRepository"></param>
         public PlaceController(
             IStringLocalizer<PlaceController> localizer,
             ILogger<PlaceController> logger,
             IPlaceRepository placeRepository,
             IUserRepository userRepository,
-            IPlaceProviderRepository placeProviderRepository
+            IPlaceProviderRepository placeProviderRepository,
+            ISlotRepository slotRepository
             )
         {
             this.localizer = localizer;
@@ -47,6 +52,7 @@ namespace CovidMassTesting.Controllers
             this.placeRepository = placeRepository;
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
+            this.slotRepository = slotRepository;
         }
         /// <summary>
         /// List places
@@ -86,9 +92,9 @@ namespace CovidMassTesting.Controllers
             {
                 var isGlobalAdmin = User.IsAdmin(userRepository);
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) return Ok(null);
-                var list = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
-                if (isGlobalAdmin) return Ok(list);
-                return Ok(list.Values.Where(p => p.PlaceProviderId == User.GetPlaceProvider()));
+                var list = (await placeRepository.ListAll());
+                if (isGlobalAdmin) return Ok(list.ToDictionary(p => p.Id, p => p));
+                return Ok(list.Where(p => p.PlaceProviderId == User.GetPlaceProvider()).ToDictionary(p => p.Id, p => p));
             }
             catch (Exception exc)
             {
@@ -97,6 +103,113 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Set openning hours for branches.
+        /// </summary>
+        /// <param name="actions"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("ScheduleOpenningHours")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> ScheduleOpenningHours([FromBody] TimeUpdate[] actions = null)
+        {
+            try
+            {
+                if (actions is null)
+                {
+                    throw new ArgumentNullException(nameof(actions));
+                }
+                var isGlobalAdmin = User.IsAdmin(userRepository);
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception("You must be place provider admin to be able to set openning hours");
+                var list = (await placeRepository.ListAll());
+                if (!isGlobalAdmin)
+                {
+                    list = list.Where(p => p.PlaceProviderId == User.GetPlaceProvider());
+                }
+                var ids = list.Select(i => i.Id).Distinct().ToHashSet();
+                if (actions.Any(a => string.IsNullOrEmpty(a.PlaceId) || (a.PlaceId != "__ALL__" && !ids.Contains(a.PlaceId))))
+                {
+                    throw new Exception("You cannot manage all places you have selected");
+                }
+                Dictionary<string, Place> places = new Dictionary<string, Place>();
+                foreach (var placeId in ids)
+                {
+                    places[placeId] = await placeRepository.GetPlace(placeId);
+                    if (places[placeId] == null) throw new Exception($"Invalid place with id {placeId}");
+                    foreach (var action in actions.Where(a => a.PlaceId == placeId))
+                    {
+                        if (action.Type == "set")
+                        {
+                            if (action.OpeningHoursTemplateId == 1)
+                            {
+                                if (!places[placeId].OpeningHoursWorkDay.ValidateOpeningHours())
+                                {
+                                    throw new Exception($"Place {places[placeId].Name} does not have valid opening hours: {places[placeId].OpeningHoursWorkDay}");
+                                }
+                            }
+                            if (action.OpeningHoursTemplateId == 2)
+                            {
+                                if (!places[placeId].OpeningHoursOther1.ValidateOpeningHours())
+                                {
+                                    throw new Exception($"Place {places[placeId].Name} does not have valid opening hours: {places[placeId].OpeningHoursOther1}");
+                                }
+                            }
+                            if (action.OpeningHoursTemplateId == 3)
+                            {
+                                if (!places[placeId].OpeningHoursOther2.ValidateOpeningHours())
+                                {
+                                    throw new Exception($"Place {places[placeId].Name} does not have valid opening hours: {places[placeId].OpeningHoursOther2}");
+                                }
+                            }
+                        }
+                    }
+                }
+
+
+                foreach (var action in actions)
+                {
+                    foreach (var placeId in ids)
+                    {
+                        if (action.PlaceId != "__ALL__" && action.PlaceId != placeId) continue;
+                        var hours = "";
+                        var dayTicks = DateTimeOffset.Parse(action.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
+                        if (action.Type == "set")
+                        {
+                            if (action.OpeningHoursTemplateId == 1)
+                            {
+                                hours = places[placeId].OpeningHoursWorkDay;
+                            }
+                            if (action.OpeningHoursTemplateId == 2)
+                            {
+                                hours = places[placeId].OpeningHoursOther1;
+                            }
+                            if (action.OpeningHoursTemplateId == 3)
+                            {
+                                hours = places[placeId].OpeningHoursOther2;
+                            }
+                        }
+                        else if (action.Type == "delete")
+                        {
+
+                            hours = "";
+                        }
+
+                        await slotRepository.CheckSlots(dayTicks, placeId, hours, action.OpeningHoursTemplateId);
+                    }
+                }
+
+                return Ok();
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+
         /// <summary>
         /// Admin can insert new testing location
         /// </summary>
@@ -155,7 +268,7 @@ namespace CovidMassTesting.Controllers
                     // new place
                     place.Id = Guid.NewGuid().ToString();
                     place.PlaceProviderId = User.GetPlaceProvider();
-                    await placeRepository.SetPlace(place);
+                    place = await placeRepository.SetPlace(place);
                     logger.LogInformation($"Place {place.Name} has been created");
                 }
                 else

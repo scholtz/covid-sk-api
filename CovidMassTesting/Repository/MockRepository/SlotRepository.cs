@@ -39,6 +39,66 @@ namespace CovidMassTesting.Repository.MockRepository
         {
         }
         /// <summary>
+        /// Deletes single day slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public async override Task<bool> DeleteDaySlot(Slot1Day slot)
+        {
+            if (slot is null)
+            {
+                throw new ArgumentNullException(nameof(slot));
+            }
+
+            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            if (dataD.ContainsKey(key))
+            {
+                dataD.TryRemove(key, out var _);
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Deletes single hour slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public async override Task<bool> DeleteHourSlot(Slot1Hour slot)
+        {
+            if (slot is null)
+            {
+                throw new ArgumentNullException(nameof(slot));
+            }
+
+            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            if (dataH.ContainsKey(key))
+            {
+                dataH.TryRemove(key, out var _);
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Deletes single minute slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public async override Task<bool> DeleteMinuteSlot(Slot5Min slot)
+        {
+            if (slot is null)
+            {
+                throw new ArgumentNullException(nameof(slot));
+            }
+
+            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            if (dataM.ContainsKey(key))
+            {
+                dataM.TryRemove(key, out var _);
+                return true;
+            }
+            return false;
+        }
+        /// <summary>
         /// Set
         /// </summary>
         /// <param name="slot"></param>

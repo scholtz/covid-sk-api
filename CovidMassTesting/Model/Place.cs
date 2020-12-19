@@ -111,6 +111,10 @@ namespace CovidMassTesting.Model
         /// Self paying antigen test currency
         /// </summary>
         public string HasAntTestSelfPriceCurrency { get; set; }
+        /// <summary>
+        /// Place does the covid vaccine paid by insurance or government
+        /// </summary>
+        public bool HasVaccineFree { get; set; }
 
     }
 }

@@ -111,10 +111,10 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="testingDay"></param>
         /// <param name="placeId"></param>
-        /// <param name="testingFromHour"></param>
-        /// <param name="testingUntilHour"></param>
+        /// <param name="openingHours"></param>
+        /// <param name="openingHoursTemplate"></param>
         /// <returns></returns>
-        public Task<int> CheckSlots(long testingDay, string placeId, int testingFromHour = 9, int testingUntilHour = 20);
+        public Task<int> CheckSlots(long testingDay, string placeId, string openingHours = "09:00-20:00", int openingHoursTemplate = 0);
         /// <summary>
         /// Get current slot
         /// </summary>

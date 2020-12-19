@@ -1,4 +1,5 @@
-﻿using CovidMassTesting.Model;
+﻿using CovidMassTesting.Helpers;
+using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.Extensions.Configuration;
@@ -55,53 +56,108 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Checks if all slots for the day, and testing place has been created
         /// </summary>
         /// <returns></returns>
-        public async Task<int> CheckSlots(long testingDay, string placeId, int testingFromHour = 9, int testingUntilHour = 20)
+        public async Task<int> CheckSlots(long testingDay, string placeId, string openingHours = "09:00-20:00", int openingHoursTemplate = 0)
         {
             int ret = 0;
             var day = new DateTimeOffset(testingDay, TimeSpan.Zero);
             var list = await ListDaySlotsByPlace(placeId);
-            if (!list.Any(d => d.Time.Ticks == testingDay))
+            if (string.IsNullOrEmpty(openingHours))
             {
-                ret++;
-                var result = await Add(new Slot1Day()
+                //delete place
+                var dayslot = list.FirstOrDefault(d => d.Time.Ticks == testingDay);
+                if (dayslot != null)
                 {
-                    PlaceId = placeId,
-                    Registrations = 0,
-                    Time = day,
-                    Description = (day + TimeZoneInfo.Local.GetUtcOffset(day)).ToString("dd.MM.yyyy", CultureInfo.CurrentCulture)
-                });
-                if (!result)
-                {
-                    throw new Exception(localizer[Repository_RedisRepository_SlotRepository.Error_adding_the_slot_for_day].Value);
+                    await DeleteDaySlot(dayslot);
                 }
             }
-
-
-            var listH = (await ListHourSlotsByPlaceAndDaySlotId(placeId, testingDay)).ToDictionary(t => t.Time.Ticks, t => t);
-            for (int hour = testingFromHour; hour < testingUntilHour; hour++)
+            else
             {
-                var t = day + TimeSpan.FromHours(hour);
-                var tNext = t.AddHours(1);
-                if (!listH.ContainsKey(t.Ticks))
+                if (!list.Any(d => d.Time.Ticks == testingDay))
                 {
                     ret++;
-                    await Add(new Slot1Hour()
+                    var result = await Add(new Slot1Day()
                     {
                         PlaceId = placeId,
                         Registrations = 0,
-                        Time = t,
-                        DaySlotId = day.Ticks,
-                        TestingDayId = testingDay,
-                        Description = $"{(t).ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tNext).ToString("HH:mm", CultureInfo.CurrentCulture)}"
+                        Time = day,
+                        OpeningHours = openingHours,
+                        OpeningHoursTemplate = openingHoursTemplate,
+
+                        Description = (day + TimeZoneInfo.Local.GetUtcOffset(day)).ToString("dd.MM.yyyy", CultureInfo.CurrentCulture)
                     });
+                    if (!result)
+                    {
+                        throw new Exception(localizer[Repository_RedisRepository_SlotRepository.Error_adding_the_slot_for_day].Value);
+                    }
+                }
+                else
+                {
+
+                }
+            }
+
+            var start = day;
+            var end = day.AddDays(1);
+            var iterator = TimeSpan.Zero;
+
+            var listH = (await ListHourSlotsByPlaceAndDaySlotId(placeId, testingDay)).ToDictionary(t => t.Time.Ticks, t => t);
+            var hoursParsed = openingHours.ParseOpeningHours();
+            var t = start + iterator;
+            while (t < end)
+            {
+                var tNext = t.AddHours(1);
+
+
+                if (hoursParsed.HasAnySlotWithinHourOpen(iterator))
+                {
+                    if (!listH.ContainsKey(t.Ticks))
+                    {
+                        ret++;
+                        await Add(new Slot1Hour()
+                        {
+                            PlaceId = placeId,
+                            Registrations = 0,
+                            Time = t,
+                            DaySlotId = day.Ticks,
+                            TestingDayId = testingDay,
+                            Description = $"{(t).ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tNext).ToString("HH:mm", CultureInfo.CurrentCulture)}"
+                        });
+                    }
+                }
+                else
+                {
+                    // remove slot
+                    if (listH.ContainsKey(t.Ticks))
+                    {
+                        ret++;
+                        await DeleteHourSlot(listH[t.Ticks]);
+                    }
                 }
 
-                var listM = (await ListMinuteSlotsByPlaceAndHourSlotId(placeId, t.Ticks)).ToDictionary(t => t.Time.Ticks, t => t);
-                for (int minute = 0; minute < 60; minute += 5)
+                iterator = iterator.Add(TimeSpan.FromHours(1));
+                t = start + iterator;
+            }
+
+            iterator = TimeSpan.Zero;
+            var tMin = start + iterator;
+            t = tMin;
+            var tMinNext = tMin.AddMinutes(5);
+            var listM = (await ListMinuteSlotsByPlaceAndHourSlotId(placeId, t.Ticks)).ToDictionary(t => t.Time.Ticks, t => t);
+            var lastH = tMin.Hour;
+            while (tMin < end)
+            {
+                tMinNext = tMin.AddMinutes(5);
+
+                if (lastH != tMin.Hour)
                 {
-                    var tMin = day + TimeSpan.FromHours(hour) + TimeSpan.FromMinutes(minute);
-                    var tMinNext = tMin.AddMinutes(5);
-                    if (!listH.ContainsKey(tMin.Ticks))
+                    listM = (await ListMinuteSlotsByPlaceAndHourSlotId(placeId, tMin.Ticks)).ToDictionary(t => t.Time.Ticks, t => t);
+                    t = tMin;
+                    lastH = tMin.Hour;
+                }
+
+                if (hoursParsed.IsTimeWhenIsOpen(iterator))
+                {
+                    if (!listM.ContainsKey(tMin.Ticks))
                     {
                         ret++;
                         await Add(new Slot5Min()
@@ -115,7 +171,20 @@ namespace CovidMassTesting.Repository.RedisRepository
                         });
                     }
                 }
+                else
+                {
+                    // remove slot
+                    if (listM.ContainsKey(tMin.Ticks))
+                    {
+                        ret++;
+                        await DeleteMinuteSlot(listM[tMin.Ticks]);
+                    }
+                }
+
+                iterator = iterator.Add(TimeSpan.FromMinutes(5));
+                tMin = start + iterator;
             }
+
             return ret;
         }
         /// <summary>
@@ -241,6 +310,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return SetMinuteSlot(slot, true);
         }
+
         /// <summary>
         /// Updates day slot
         /// </summary>
@@ -328,6 +398,79 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return false;
             }
         }
+
+
+
+        /// <summary>
+        /// Deletes day slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> DeleteDaySlot(Slot1Day slot)
+        {
+            if (slot is null)
+            {
+                throw new ArgumentNullException(nameof(slot));
+            }
+
+            try
+            {
+                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                return true;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return false;
+            }
+        }
+        /// <summary>
+        /// Deletes hour slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> DeleteHourSlot(Slot1Hour slot)
+        {
+            if (slot is null)
+            {
+                throw new ArgumentNullException(nameof(slot));
+            }
+
+            try
+            {
+                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                return true;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return false;
+            }
+        }
+        /// <summary>
+        /// Updates minute slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> DeleteMinuteSlot(Slot5Min slot)
+        {
+            if (slot is null)
+            {
+                throw new ArgumentNullException(nameof(slot));
+            }
+
+            try
+            {
+                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                return true;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return false;
+            }
+        }
+
         /// <summary>
         /// Returns day slot
         /// </summary>

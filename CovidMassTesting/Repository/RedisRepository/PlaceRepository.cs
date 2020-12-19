@@ -52,7 +52,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", place.Id.ToString(), place);
 
-                return place;
+                return await GetPlace(place.Id);
             }
             catch (Exception exc)
             {

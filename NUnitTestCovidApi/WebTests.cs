@@ -117,7 +117,7 @@ namespace NUnitTestCovidApi
         {
             return client.GetAsync("Place/List").Result;
         }
-        private void SetupDebugPlaces(HttpClient client)
+        private Place[] SetupDebugPlaces(HttpClient client)
         {
             var places = new Place[] {
                 new Place()
@@ -130,7 +130,9 @@ namespace NUnitTestCovidApi
                     Lng = 17.256517410278324M,
                     IsDriveIn = true,
                     IsWalkIn = false,
-                    Registrations = 0
+                    Registrations = 0,
+                    OpeningHoursWorkDay = "10:00-12:00",
+                    OpeningHoursOther1 = "11:45-11:50",
                },new Place()
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -140,7 +142,9 @@ namespace NUnitTestCovidApi
                     Lng = 17.26587295532227M,
                     IsDriveIn = false,
                     IsWalkIn = true,
-                    Registrations = 0
+                    Registrations = 0,
+                    OpeningHoursWorkDay = "08:30-22:00",
+                    OpeningHoursOther1 = "11:00-13:00",
                 },new Place()
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -150,9 +154,12 @@ namespace NUnitTestCovidApi
                     Lng = 17.272996902465824M,
                     IsDriveIn = true,
                     IsWalkIn = true,
-                    Registrations = 0
+                    Registrations = 0,
+                    OpeningHoursWorkDay = "08:00-09:00",
+                    OpeningHoursOther1 = "09:00-10:00",
                 }
             };
+            var ret = new List<Place>();
             foreach (var place in places)
             {
                 var body = Newtonsoft.Json.JsonConvert.SerializeObject(place);
@@ -160,8 +167,9 @@ namespace NUnitTestCovidApi
                                     new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                     ).Result;
                 Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+                ret.Add(JsonConvert.DeserializeObject<Place>(response.Content.ReadAsStringAsync().Result));
             }
-
+            return ret.ToArray();
         }
         private HttpResponseMessage ListDaySlotsByPlace(HttpClient client, string placeId)
         {
@@ -191,6 +199,13 @@ namespace NUnitTestCovidApi
         {
             var body = Newtonsoft.Json.JsonConvert.SerializeObject(visitor);
             return client.PostAsync("Visitor/RegisterByManager",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+        private HttpResponseMessage ScheduleOpenningHours(HttpClient client, TimeUpdate[] actions)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(actions);
+            return client.PostAsync("Place/ScheduleOpenningHours",
                                 new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                 ).Result;
         }
@@ -1475,8 +1490,6 @@ namespace NUnitTestCovidApi
 
         }
 
-
-
         [Test]
         public void PlaceProviderRegisterPlace()
         {
@@ -1521,7 +1534,83 @@ namespace NUnitTestCovidApi
             Assert.IsFalse(string.IsNullOrEmpty(adminToken));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
 
-            SetupDebugPlaces(client);
+            var places = SetupDebugPlaces(client);
+            var place = places.First();
+            var second = places.Skip(1).First();
+            var actions = new TimeUpdate[]
+            {
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now,
+                    OpeningHoursTemplateId= 1,
+                    PlaceId = "__ALL__",
+                    Type = "set"
+                },
+
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now.AddDays(1),
+                    OpeningHoursTemplateId= 2,
+                    PlaceId = place.Id,
+                    Type = "set"
+                },
+
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now,
+                    PlaceId = place.Id,
+                    Type = "delete"
+                }
+            };
+            request = ScheduleOpenningHours(client, actions);
+
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = ListDaySlotsByPlace(client, place.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            var daysDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, daysDictionary.Count);
+            var daySlot = daysDictionary.Values.First();
+            Assert.AreEqual("11:45-11:50", daySlot.OpeningHours);
+            Assert.AreEqual(2, daySlot.OpeningHoursTemplate);
+            request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, daySlot.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            var hoursDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, hoursDictionary.Count);
+            var hourSlot = hoursDictionary.Values.First();
+
+            request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hourSlot.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            var minutesDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, minutesDictionary.Count);
+
+
+
+            request = ListDaySlotsByPlace(client, second.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            daysDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, daysDictionary.Count);
+            daySlot = daysDictionary.Values.First();
+            Assert.AreEqual("08:30-22:00", daySlot.OpeningHours);
+            Assert.AreEqual(1, daySlot.OpeningHoursTemplate);
+            request = ListHourSlotsByPlaceAndDaySlotId(client, second.Id, daySlot.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            hoursDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(14, hoursDictionary.Count);
+            hourSlot = hoursDictionary.Values.First();
+
+            request = ListMinuteSlotsByPlaceAndHourSlotId(client, second.Id, hourSlot.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            minutesDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(6, minutesDictionary.Count);
+
+
         }
 
         [Test]

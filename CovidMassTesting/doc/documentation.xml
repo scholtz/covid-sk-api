@@ -133,7 +133,7 @@
             Manages places
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.ISlotRepository)">
             <summary>
             Constructor
             </summary>
@@ -142,6 +142,7 @@
             <param name="placeRepository"></param>
             <param name="userRepository"></param>
             <param name="placeProviderRepository"></param>
+            <param name="slotRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceController.List">
             <summary>
@@ -149,6 +150,21 @@
             
             Contains live statistics of users, registered, infected and healthy visitors
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.PrivateList">
+            <summary>
+            List places
+            
+            Contains live statistics of users, registered, infected and healthy visitors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.ScheduleOpenningHours(CovidMassTesting.Model.TimeUpdate[])">
+            <summary>
+            Set openning hours for branches.
+            </summary>
+            <param name="actions"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceController.InsertOrUpdate(CovidMassTesting.Model.Place)">
@@ -615,6 +631,43 @@
             Allows to make hash of any string
             </summary>
             <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Helpers.OpeningHours">
+            <summary>
+            OpeningHours extension
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.OpeningHours.ParseOpeningHours(System.String)">
+            <summary>
+            Parse opening hours
+            
+            09:00 - 10:00, 10:05 - 20:00
+            </summary>
+            <param name="openingHours"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.OpeningHours.ValidateOpeningHours(System.String)">
+            <summary>
+            Validates the opening hours format
+            </summary>
+            <param name="openingHours"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.OpeningHours.IsTimeWhenIsOpen(System.Collections.Generic.SortedDictionary{System.Int64,System.Boolean},System.TimeSpan)">
+            <summary>
+            Checks if time is within the range
+            </summary>
+            <param name="hours"></param>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.OpeningHours.HasAnySlotWithinHourOpen(System.Collections.Generic.SortedDictionary{System.Int64,System.Boolean},System.TimeSpan)">
+            <summary>
+            Checks if time is within the range
+            </summary>
+            <param name="hours"></param>
+            <param name="time"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Helpers.RandomGenerator">
@@ -1251,6 +1304,11 @@
             Self paying antigen test currency
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.HasVaccineFree">
+            <summary>
+            Place does the covid vaccine paid by insurance or government
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProvider">
             <summary>
             Place provider is hospital or company prividing testing place. One hospital can have multiple testing places.
@@ -1569,6 +1627,16 @@
         <member name="P:CovidMassTesting.Model.Slot1Day.Registrations">
             <summary>
             Registrations stats
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.OpeningHours">
+            <summary>
+            Opening hours in format 09:00-10:00
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.OpeningHoursTemplate">
+            <summary>
+            Template id to place opening hours definition
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Slot1Hour">
@@ -1937,6 +2005,31 @@
         <member name="F:CovidMassTesting.Model.TestResult.NegativeCertificateTaken">
             <summary>
             Test result is negative. Certificate has been given to visitor.
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.TimeUpdate">
+            <summary>
+            Time update action
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TimeUpdate.Type">
+            <summary>
+            Type - set | delete
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TimeUpdate.Date">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TimeUpdate.PlaceId">
+            <summary>
+            Place .. If for all places, __ALL__ is defined
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TimeUpdate.OpeningHoursTemplateId">
+            <summary>
+            Opening hours 1-3
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Token">
@@ -2624,14 +2717,14 @@
             <param name="hourSlotId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.CheckSlots(System.Int64,System.String,System.String,System.Int32)">
             <summary>
             Checks slots by admin and creates them if any for any place is missing
             </summary>
             <param name="testingDay"></param>
             <param name="placeId"></param>
-            <param name="testingFromHour"></param>
-            <param name="testingUntilHour"></param>
+            <param name="openingHours"></param>
+            <param name="openingHoursTemplate"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.GetCurrentSlot(System.String)">
@@ -2966,6 +3059,27 @@
             <param name="configuration"></param>
             <param name="loggerFactory"></param>
             <param name="redisCacheClient"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.DeleteDaySlot(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Deletes single day slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.DeleteHourSlot(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Deletes single hour slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.DeleteMinuteSlot(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Deletes single minute slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.SetDaySlot(CovidMassTesting.Model.Slot1Day,System.Boolean)">
             <summary>
@@ -3511,7 +3625,7 @@
             <param name="logger"></param>
             <param name="redisCacheClient"></param>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.CheckSlots(System.Int64,System.String,System.String,System.Int32)">
             <summary>
             Checks if all slots for the day, and testing place has been created
             </summary>
@@ -3602,6 +3716,27 @@
             </summary>
             <param name="slot"></param>
             <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DeleteDaySlot(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Deletes day slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DeleteHourSlot(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Deletes hour slot
+            </summary>
+            <param name="slot"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DeleteMinuteSlot(CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Updates minute slot
+            </summary>
+            <param name="slot"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetDaySlot(System.String,System.Int64)">

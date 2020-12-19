@@ -78,7 +78,8 @@ namespace CovidMassTesting.Controllers
                 var ret = 0;
                 foreach (var item in await placeRepository.ListAll())
                 {
-                    ret += await slotRepository.CheckSlots(DateTimeOffset.Parse(testingDay, CultureInfo.InvariantCulture).Ticks, item.Id, from, until);
+                    var time = $"{TimeSpan.FromHours(from)}-{TimeSpan.FromHours(until)}";
+                    ret += await slotRepository.CheckSlots(DateTimeOffset.Parse(testingDay, CultureInfo.InvariantCulture).Ticks, item.Id, time);
                 }
                 return Ok(ret);
             }

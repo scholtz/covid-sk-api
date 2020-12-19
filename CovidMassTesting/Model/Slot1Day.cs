@@ -30,5 +30,13 @@ namespace CovidMassTesting.Model
         /// Registrations stats
         /// </summary>
         public int Registrations { get; set; }
+        /// <summary>
+        /// Opening hours in format 09:00-10:00
+        /// </summary>
+        public string OpeningHours { get; set; }
+        /// <summary>
+        /// Template id to place opening hours definition
+        /// </summary>
+        public int OpeningHoursTemplate { get; set; }
     }
 }
