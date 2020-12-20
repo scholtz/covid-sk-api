@@ -48,7 +48,6 @@ namespace CovidMassTesting.Controllers
         /// List all public information of all users
         /// </summary>
         /// <returns></returns>
-
         [Authorize]
         [HttpGet("List")]
         [ProducesResponseType(200)]
@@ -60,6 +59,52 @@ namespace CovidMassTesting.Controllers
                 if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Admin_role_can_list_users].Value);
 
                 return Ok((await userRepository.ListAll()).ToDictionary(p => p.Email, p => p.ToPublic()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// List invitations to place provider for generic users
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListUserInvites")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<Invitation>>> ListUserInvites()
+        {
+            try
+            {
+                return Ok(await userRepository.ListInvitationsByEmail(User.GetEmail()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// List invitations to place provider for generic users
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListPPInvites")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<Invitation>>> ListPPInvites()
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+
+                return Ok(await userRepository.ListInvitationsByPP(User.GetPlaceProvider()));
             }
             catch (Exception exc)
             {
@@ -88,7 +133,7 @@ namespace CovidMassTesting.Controllers
 
                 if (!User.IsRegistrationManager(userRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Registration_Manager_role_can_select_his_own_place_].Value);
 
-                return Ok(await userRepository.SetLocation(User.GetEmail(), placeId));
+                return Ok(await userRepository.SetLocation(User.GetEmail(), placeId, User.GetPlaceProvider()));
             }
             catch (Exception exc)
             {
@@ -180,7 +225,7 @@ namespace CovidMassTesting.Controllers
             {
                 if (User.IsPasswordProtected(userRepository)) { throw new Exception(localizer[Controllers_UserController.This_special_user_cannot_change_the_password_].Value); }
 
-                return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash));
+                return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash, User.GetPlaceProvider()));
             }
             catch (Exception exc)
             {

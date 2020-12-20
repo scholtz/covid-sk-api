@@ -594,5 +594,20 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return false;
         }
+
+        /// <summary>
+        /// Return user groups scoped to place provider
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public async Task<HashSet<string>> GetUserGroups(string email, string placeProviderId)
+        {
+            var pp = await GetPlaceProvider(placeProviderId);
+            var ret = new HashSet<string>();
+            if (pp == null) return ret;
+            if (pp.MainEmail == email) ret.Add(Groups.PPAdmin);
+            return ret;
+        }
     }
 }

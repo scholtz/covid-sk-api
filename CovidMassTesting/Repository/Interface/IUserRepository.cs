@@ -15,8 +15,10 @@ namespace CovidMassTesting.Repository.Interface
         /// Create user
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="inviterName"></param>
+        /// <param name="companyName"></param>
         /// <returns></returns>
-        public Task<bool> Add(User user);
+        public Task<bool> Add(User user, string inviterName, string companyName);
         /// <summary>
         /// List all users
         /// </summary>
@@ -47,8 +49,9 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="email"></param>
         /// <param name="oldHash"></param>
         /// <param name="newHash"></param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public Task<string> ChangePassword(string email, string oldHash, string newHash);
+        public Task<string> ChangePassword(string email, string oldHash, string newHash, string placeProviderId);
         /// <summary>
         /// Deletes user
         /// </summary>
@@ -61,14 +64,14 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="email"></param>
         /// <param name="role"></param>
         /// <returns></returns>
-        public Task<bool> InAnyGroup(string email, string[] role);
+        public Task<bool> InAnyGroup(string email, string[] role, string placeProviderId);
         /// <summary>
         /// Registration Manager can select place. All his registrations will be placed at this location
         /// </summary>
         /// <param name="email"></param>
         /// <param name="placeId"></param>
         /// <returns></returns>
-        public Task<bool> SetLocation(string email, string placeId);
+        public Task<bool> SetLocation(string email, string placeId, string placeProviderId);
         /// <summary>
         /// Get public user data.. eg location
         /// </summary>
@@ -94,5 +97,23 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<int> DropAllData();
+        /// <summary>
+        /// Invite person to the place provider company
+        /// </summary>
+        /// <param name="invitation"></param>
+        /// <returns></returns>
+        public Task<Invitation> Invite(Invitation invitation);
+        /// <summary>
+        /// ListInvitationsByEmail
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<Invitation>> ListInvitationsByEmail(string email);
+        /// <summary>
+        /// ListInvitationsByEmail
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<Invitation>> ListInvitationsByPP(string placeProviderId);
     }
 }

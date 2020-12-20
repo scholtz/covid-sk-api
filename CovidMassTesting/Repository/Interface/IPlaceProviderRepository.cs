@@ -98,5 +98,18 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="vs"></param>
         /// <returns></returns>
         public Task<bool> InAnyGroup(string email, string placeProviderId, string[] vs);
+        /// <summary>
+        /// Returns place provider
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public Task<PlaceProvider> GetPlaceProvider(string placeProviderId);
+        /// <summary>
+        /// Return user groups scoped to place provider
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public Task<HashSet<string>> GetUserGroups(string email, string placeProviderId);
     }
 }

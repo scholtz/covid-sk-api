@@ -99,7 +99,7 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
-            return userRepository.InAnyGroup(email, new string[] { Groups.Admin }).Result;
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
         /// Returns true if the user is currently in the role of PP Admin.
@@ -134,7 +134,7 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
-            return userRepository.InAnyGroup(email, new string[] { Groups.PasswordProtected }).Result;
+            return userRepository.InAnyGroup(email, new string[] { Groups.PasswordProtected }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
         /// Checks if user has role Registration Manager
@@ -155,7 +155,7 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
-            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.RegistrationManager }).Result;
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.RegistrationManager }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
         /// Checks if user has role Medic Tester
@@ -176,7 +176,7 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
-            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicTester }).Result;
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicTester }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
         /// Checks if user has role Medic Lab
@@ -197,7 +197,7 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
-            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicLab }).Result;
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicLab }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
         /// Check if user has role Document Manager
@@ -218,7 +218,7 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
-            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.DocumentManager }).Result;
+            return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.DocumentManager }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
         /// Check if user has role Data exporter
@@ -239,7 +239,7 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
-            return userRepository.InAnyGroup(email, new string[] { Groups.DataExporter }).Result;
+            return userRepository.InAnyGroup(email, new string[] { Groups.DataExporter }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
         /// Accountant or admin is authorized to issue invoice

@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -179,6 +180,15 @@ namespace NUnitTestCovidApi
         {
             return client.GetAsync($"PlaceProvider/ListPublic").Result;
         }
+        private HttpResponseMessage ListPPInvites(HttpClient client)
+        {
+            return client.GetAsync($"User/ListPPInvites").Result;
+        }
+        private HttpResponseMessage ListUserInvites(HttpClient client)
+        {
+            return client.GetAsync($"User/ListUserInvites").Result;
+        }
+
         private HttpResponseMessage ListHourSlotsByPlaceAndDaySlotId(HttpClient client, string placeId, string daySlotId)
         {
             return client.GetAsync($"Slot/ListHourSlotsByPlaceAndDaySlotId?placeId={placeId}&daySlotId={daySlotId}").Result;
@@ -279,6 +289,17 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
+        private HttpResponseMessage InviteUserToPP(HttpClient client, string email, string name, string phone)
+        {
+            return client.PostAsync("PlaceProvider/InviteUserToPP",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("email",email),
+                        new KeyValuePair<string, string>("name",name),
+                        new KeyValuePair<string, string>("phone",phone),
+                    })
+                ).Result;
+        }
+
         private HttpResponseMessage PlaceProviderRegistration(HttpClient client, PlaceProvider pp)
         {
             var body = Newtonsoft.Json.JsonConvert.SerializeObject(pp);
@@ -1420,6 +1441,8 @@ namespace NUnitTestCovidApi
                 CompanyName = "123",
                 Country = "SK",
                 MainEmail = admin.Email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
             };
 
             request = PlaceProviderRegistration(client, obj);
@@ -1467,6 +1490,8 @@ namespace NUnitTestCovidApi
                 CompanyName = "123",
                 Country = "SK",
                 MainEmail = email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
             };
 
             request = PlaceProviderRegistration(client, obj);
@@ -1517,6 +1542,8 @@ namespace NUnitTestCovidApi
                 CompanyName = "123",
                 Country = "SK",
                 MainEmail = email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
             };
 
             request = PlaceProviderRegistration(client, obj);
@@ -1635,6 +1662,96 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(day2.OpeningHoursTemplates.Contains(2));
         }
 
+        [Test]
+        public void PlaceProviderHumanResourcesManagement()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+
+            var request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(0, result.Count);
+            var email = "place.provider@scholtz.sk";
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123",
+                Country = "SK",
+                MainEmail = email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
+
+            };
+
+            request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            data = request.Content.ReadAsStringAsync().Result;
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(1, result.Count);
+
+            var emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
+            var noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+            var emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
+            noEmailSender.Data.Clear();
+            request = AuthenticateUser(client, email, emailData.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+
+            var handler = new JwtSecurityTokenHandler();
+            var tokenS = handler.ReadToken(adminToken) as JwtSecurityToken;
+            var jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == "PPAdmin");
+            Assert.IsNotNull(jti);
+
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            var places = SetupDebugPlaces(client);
+            var firstPlace = places.First();
+            var secondPlace = places.Skip(1).First();
+
+            var medicPersonEmail = "person1@scholtz.sk";
+            request = InviteUserToPP(client, medicPersonEmail, "Person 1", "+421 907 000 000");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+
+
+            request = ListPPInvites(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, invites.Count);
+
+            emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
+            noEmailSender.Data.Clear();
+            request = AuthenticateUser(client, medicPersonEmail, emailData.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var medicPersonToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(medicPersonToken));
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+
+
+            request = ListUserInvites(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, invites.Count);
+
+
+            request = ListPPInvites(client);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+        }
         [Test]
         public virtual void TestVersion()
         {

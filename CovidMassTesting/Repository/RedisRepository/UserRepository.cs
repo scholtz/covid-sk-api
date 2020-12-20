@@ -37,6 +37,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IPlaceRepository placeRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly string REDIS_KEY_USERS_OBJECTS = "USERS";
+        private readonly string REDIS_KEY_INVITATION_OBJECTS = "INVITATIONS";
 
         private readonly int RehashN = 99;
         /// <summary>
@@ -70,16 +71,29 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.placeRepository = placeRepository;
             this.placeProviderRepository = placeProviderRepository;
         }
+
         /// <summary>
         /// Inserts new user
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="inviterName"></param>
+        /// <param name="companyName"></param>
         /// <returns></returns>
-        public async Task<bool> Add(User user)
+        public async Task<bool> Add(User user, string inviterName, string companyName)
         {
             if (user is null)
             {
                 throw new ArgumentNullException(nameof(user));
+            }
+
+            if (string.IsNullOrEmpty(inviterName))
+            {
+                throw new ArgumentNullException(nameof(inviterName));
+            }
+
+            if (string.IsNullOrEmpty(companyName))
+            {
+                throw new ArgumentNullException(nameof(companyName));
             }
 
             (string pass, string hash, string cohash) = GeneratePassword();
@@ -94,6 +108,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     Name = user.Name,
                     Password = pass,
                     Roles = user.Roles?.ToArray(),
+                    InviterName = inviterName,
+                    CompanyName = companyName,
                 });
             if (!string.IsNullOrEmpty(user.Phone))
             {
@@ -194,6 +210,26 @@ namespace CovidMassTesting.Repository.RedisRepository
             return true;
         }
         /// <summary>
+        /// Set user. Encodes and stores to db.
+        /// </summary>
+        /// <param name="invitation"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        public virtual async Task<Invitation> SetInvitation(Invitation invitation, bool mustBeNew)
+        {
+            if (invitation is null)
+            {
+                throw new ArgumentNullException(nameof(invitation));
+            }
+
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}", invitation.InvitationId, invitation, mustBeNew);
+            if (mustBeNew && !ret)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_UserRepository.Error_creating_record_in_the_database].Value);
+            }
+            return invitation;
+        }
+        /// <summary>
         /// Removes user.
         /// </summary>
         /// <param name="email"></param>
@@ -213,16 +249,38 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Decode encrypted user data
         /// </summary>
         /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public virtual async Task<User> GetUser(string email)
+        public virtual async Task<User> GetUser(string email, string placeProviderId)
         {
             logger.LogInformation($"User loaded from database: {email}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", email);
             if (string.IsNullOrEmpty(encoded)) return null;
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<User>(decoded);
+            User ret = Newtonsoft.Json.JsonConvert.DeserializeObject<User>(decoded);
+            // enhance user object for place provider groups
+            if (!string.IsNullOrEmpty(placeProviderId))
+            {
+                var groups = await placeProviderRepository.GetUserGroups(email, placeProviderId);
+                if (ret.Roles == null) ret.Roles = new List<string>();
+                foreach (var group in groups)
+                {
+                    if (!ret.Roles.Contains(group)) ret.Roles.Add(group);
+                }
+            }
+            return ret;
         }
+        /// <summary>
+        /// GetInvitation
+        /// </summary>
+        /// <param name="invitationId"></param>
+        /// <returns></returns>
+        public virtual Task<Invitation> GetInvitation(string invitationId)
+        {
+            return redisCacheClient.Db0.HashGetAsync<Invitation>($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}", invitationId);
+        }
+
         /// <summary>
         /// Lists all users 
         /// </summary>
@@ -235,7 +293,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    ret.Add(await GetUser(item));
+                    ret.Add(await GetUser(item, null));
                 }
                 catch (Exception exc)
                 {
@@ -245,17 +303,70 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
         /// <summary>
+        /// Lists invitations by pp
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<IEnumerable<Invitation>> ListInvitationsByPP(string placeProviderId)
+        {
+            if (string.IsNullOrEmpty(placeProviderId))
+            {
+                throw new ArgumentNullException(nameof(placeProviderId));
+            }
+
+            var ret = new List<Invitation>();
+            var list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}");
+            foreach (var item in list)
+            {
+                try
+                {
+                    ret.Add(await GetInvitation(item));
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, $"Unable to deserialize user: {item}");
+                }
+            }
+            return ret.Where(i => i.PlaceProviderId == placeProviderId).OrderByDescending(i => i.LastUpdate);
+        }
+        /// <summary>
+        /// Lists invitations by email
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<IEnumerable<Invitation>> ListInvitationsByEmail(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                throw new ArgumentNullException(nameof(email));
+            }
+
+            var ret = new List<Invitation>();
+            var list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}");
+            foreach (var item in list)
+            {
+                try
+                {
+                    ret.Add(await GetInvitation(item));
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, $"Unable to deserialize user: {item}");
+                }
+            }
+            return ret.Where(i => i.Email == email).OrderByDescending(i => i.LastUpdate);
+        }
+        /// <summary>
         /// Registration manager can set his place at which he performs tests
         /// </summary>
         /// <param name="email"></param>
         /// <param name="placeId"></param>
+        /// <param name="placeProviderId">PP id for user token pp scope groups</param>
         /// <returns></returns>
-        public async Task<bool> SetLocation(string email, string placeId)
+        public async Task<bool> SetLocation(string email, string placeId, string placeProviderId)
         {
             if (string.IsNullOrEmpty(placeId)) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
             var place = await placeRepository.GetPlace(placeId);
             if (place == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
-            var user = await GetUser(email);
+            var user = await GetUser(email, placeProviderId);
             user.Place = placeId;
             return await SetUser(user, false);
         }
@@ -275,7 +386,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    var user = await GetUser(usr.Email);
+                    var user = await GetUser(usr.Email, null);
                     if (user == null)
                     {
                         if (string.IsNullOrEmpty(usr.Password))
@@ -286,7 +397,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 Phone = usr.Phone,
                                 Roles = usr.Roles == null ? new List<string>() { "Admin" } : usr.Roles.ToList(),
                                 Name = usr.Name
-                            });
+                            }, "System", "Global admin");
                         }
                         else
                         {
@@ -348,7 +459,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<AuthData> Preauthenticate(string email)
         {
-            var user = await GetUser(email);
+            var user = await GetUser(email, null);
             if (user == null)
             {
                 // invalid email .. we do not dispose usage of email on first sight so return valid answer
@@ -387,7 +498,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<string> Authenticate(string email, string hash)
         {
-            var usr = await GetUser(email);
+            var places = await placeProviderRepository.ListPrivate(email);
+            var placeProviderId = places?.FirstOrDefault()?.PlaceProviderId;
+            var usr = await GetUser(email, placeProviderId);
             if (usr == null)
             {
                 throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password].Value);
@@ -403,8 +516,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 await SetInvalidLogin(usr);
                 throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_user_or_password].Value);
             }
-            var places = await placeProviderRepository.ListPrivate(usr.Email);
-            return Token.CreateToken(usr, configuration, places?.FirstOrDefault()?.PlaceProviderId);
+            return Token.CreateToken(usr, configuration, placeProviderId);
         }
 
         /// <summary>
@@ -415,10 +527,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="email">Email</param>
         /// <param name="oldHash">Old password</param>
         /// <param name="newHash">New password</param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public async Task<string> ChangePassword(string email, string oldHash, string newHash)
+        public async Task<string> ChangePassword(string email, string oldHash, string newHash, string placeProviderId)
         {
-            var user = await GetUser(email);
+            var user = await GetUser(email, placeProviderId);
             if (user == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.User_not_found_by_email].Value);
             if (user.PswHash != oldHash) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_old_password].Value);
             user.PswHash = newHash;
@@ -440,7 +553,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<string> SetPlaceProvider(string email, string placeProviderId)
         {
-            var user = await GetUser(email);
+            var user = await GetUser(email, placeProviderId);
             if (user == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.User_not_found_by_email].Value);
             return Token.CreateToken(user, configuration, placeProviderId);
         }
@@ -450,7 +563,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="email">User email</param>
         /// <param name="role">Search any of this roles</param>
         /// <returns></returns>
-        public async Task<bool> InAnyGroup(string email, string[] role)
+        public async Task<bool> InAnyGroup(string email, string[] role, string placeProviderId)
         {
             if (string.IsNullOrEmpty(email))
             {
@@ -465,7 +578,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (role.Length == 0) return true;
 
 
-            var usr = await GetUser(email);
+            var usr = await GetUser(email, placeProviderId);
             if (usr.Roles != null)
             {
                 foreach (var dbrole in usr.Roles?.ToArray())
@@ -496,7 +609,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<UserPublic> GetPublicUser(string email)
         {
-            return (await GetUser(email)).ToPublic();
+            return (await GetUser(email, null)).ToPublic();
         }
         /// <summary>
         /// Administrator is authorized to delete all data in the database
@@ -515,7 +628,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new ArgumentException(localizer[Repository_RedisRepository_UserRepository.Hash_must_not_be_empty].Value, nameof(hash));
             }
-            var user = await GetUser(email);
+            var user = await GetUser(email, null);
             if (user == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.User_not_found_by_email].Value);
             if (user.InvalidLogin.HasValue && user.InvalidLogin.Value.AddSeconds(1) > DateTimeOffset.UtcNow)
             {
@@ -543,6 +656,56 @@ namespace CovidMassTesting.Repository.RedisRepository
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", item);
                 ret++;
             }
+            list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}");
+            foreach (var item in list)
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}", item);
+                ret++;
+            }
+            return ret;
+        }
+        /// <summary>
+        /// invites person
+        /// </summary>
+        /// <param name="invitation"></param>
+        /// <returns></returns>
+        public async Task<Invitation> Invite(Invitation invitation)
+        {
+            invitation.InvitationId = Guid.NewGuid().ToString();
+            var ret = await SetInvitation(invitation, true);
+            var user = await GetUser(invitation.Email, invitation.PlaceProviderId);
+            var pp = await placeProviderRepository.GetPlaceProvider(invitation.PlaceProviderId);
+            if (user == null)
+            {
+                // invitation with new user
+                await Add(
+                    new User()
+                    {
+                        Email = invitation.Email,
+                        Phone = invitation.Phone,
+                        Name = invitation.Name,
+                    },
+                    invitation.InviterName,
+                    pp.CompanyName
+                );
+            }
+            else
+            {
+                // invitation of existing user
+
+                await emailSender.SendEmail(
+                    localizer[Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place],
+                    user.Email,
+                    user.Name,
+                    new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name)
+                    {
+                        Name = user.Name,
+                        Roles = user.Roles?.ToArray(),
+                        InviterName = invitation.InviterName,
+                        CompanyName = pp.CompanyName
+                    });
+            }
+
             return ret;
         }
     }

@@ -36,5 +36,13 @@ namespace CovidMassTesting.Model.Email
         /// Password
         /// </summary>
         public string Password { get; set; }
+        /// <summary>
+        /// Name of person who inveted user
+        /// </summary>
+        public string InviterName { get; set; }
+        /// <summary>
+        /// Company name
+        /// </summary>
+        public string CompanyName { get; set; }
     }
 }

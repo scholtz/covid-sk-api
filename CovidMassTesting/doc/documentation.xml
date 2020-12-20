@@ -68,7 +68,7 @@
             If no email sender is defined
             </summary>
         </member>
-        <member name="F:CovidMassTesting.Controllers.Email.NoEmailSender.Data">
+        <member name="P:CovidMassTesting.Controllers.Email.NoEmailSender.Data">
             <summary>
             For unit tests
             </summary>
@@ -209,6 +209,15 @@
             
             Contains live statistics of users, registered, infected and healthy visitors
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.InviteUserToPP(System.String,System.String,System.String)">
+            <summary>
+            Administrator is allowed to invite other users and set their groups
+            </summary>
+            <param name="email"></param>
+            <param name="name"></param>
+            <param name="phone"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPublic">
@@ -442,10 +451,23 @@
             <param name="localizer"></param>
             <param name="logger"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.UserController.List">
             <summary>
             List all public information of all users
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.ListUserInvites">
+            <summary>
+            List invitations to place provider for generic users
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.ListPPInvites">
+            <summary>
+            List invitations to place provider for generic users
             </summary>
             <returns></returns>
         </member>
@@ -708,6 +730,34 @@
             </summary>
             <param name="disposing"></param>
         </member>
+        <member name="T:CovidMassTesting.Helpers.Validators">
+            <summary>
+            Validator helpers
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Validators.IsValidEmail(System.String)">
+            <summary>
+            Checks if email is valid
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Validators.FormatPhone(System.String)">
+            <summary>
+            Format phone to slovak standard
+            
+            0800 123 456 convers to +421800123456
+            </summary>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Validators.IsValidPhoneNumber(System.String)">
+            <summary>
+            Validates the phone number +421800123456
+            </summary>
+            <param name="number"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Model.AuthData">
             <summary>
             Preauthenticate data to be hashed with password
@@ -850,6 +900,16 @@
         <member name="P:CovidMassTesting.Model.Email.InvitationEmail.Password">
             <summary>
             Password
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.InvitationEmail.InviterName">
+            <summary>
+            Name of person who inveted user
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.InvitationEmail.CompanyName">
+            <summary>
+            Company name
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Email.PersonalDataRemovedEmail">
@@ -1115,6 +1175,83 @@
             </summary>
             <param name="input"></param>
             <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.Invitation">
+            <summary>
+            Admin can invite person to the place provider (company which manages the testing places)
+            
+            After user accepts invitation, admin can allocate him to the testing place at specific time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.InvitationId">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.Phone">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.InviterName">
+            <summary>
+            Inviter
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.PlaceProviderId">
+            <summary>
+            Place provider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.Status">
+            <summary>
+            Invitation status - invited | accepted | declined
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.InvitationTime">
+            <summary>
+            Time of the invitation
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.StatusTime">
+            <summary>
+            Time of the invitation
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.LastUpdate">
+            <summary>
+            Returns last update of the invitation
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.InvitationStatus">
+            <summary>
+            Invitation.Status valid values
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.InvitationStatus.Invited">
+            <summary>
+            Invited
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.InvitationStatus.Accepted">
+            <summary>
+            Accepted
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.InvitationStatus.Declined">
+            <summary>
+            Declined
+            </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Invoice">
             <summary>
@@ -2128,6 +2265,15 @@
             <param name="userRepository"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Model.Token.IsPlaceProviderAdmin(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+            <summary>
+            Returns true if the user is currently in the role of PP Admin.
+            </summary>
+            <param name="user"></param>
+            <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Model.Token.IsPasswordProtected(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Check if user has password protected .. Created for demo users
@@ -2202,6 +2348,7 @@
             </summary>
             <param name="usr">User object</param>
             <param name="configuration">APP Configuran</param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.User">
@@ -2573,6 +2720,21 @@
             <param name="vs"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetPlaceProvider(System.String)">
+            <summary>
+            Returns place provider
+            </summary>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetUserGroups(System.String,System.String)">
+            <summary>
+            Return user groups scoped to place provider
+            </summary>
+            <param name="email"></param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
             <summary>
             Place repository interface for dependency injection
@@ -2782,11 +2944,13 @@
             User repository interface for dependency injection
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Add(CovidMassTesting.Model.User)">
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Add(CovidMassTesting.Model.User,System.String,System.String)">
             <summary>
             Create user
             </summary>
             <param name="user"></param>
+            <param name="inviterName"></param>
+            <param name="companyName"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListAll">
@@ -2817,13 +2981,14 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ChangePassword(System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ChangePassword(System.String,System.String,System.String,System.String)">
             <summary>
             Change user password
             </summary>
             <param name="email"></param>
             <param name="oldHash"></param>
             <param name="newHash"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Remove(System.String)">
@@ -2833,7 +2998,7 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.InAnyGroup(System.String,System.String[])">
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.InAnyGroup(System.String,System.String[],System.String)">
             <summary>
             Checks if user is in any of selected groups
             </summary>
@@ -2841,7 +3006,7 @@
             <param name="role"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.SetLocation(System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.SetLocation(System.String,System.String,System.String)">
             <summary>
             Registration Manager can select place. All his registrations will be placed at this location
             </summary>
@@ -2876,6 +3041,27 @@
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Invite(CovidMassTesting.Model.Invitation)">
+            <summary>
+            Invite person to the place provider company
+            </summary>
+            <param name="invitation"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListInvitationsByEmail(System.String)">
+            <summary>
+            ListInvitationsByEmail
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListInvitationsByPP(System.String)">
+            <summary>
+            ListInvitationsByEmail
+            </summary>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.Interface.IVisitorRepository">
@@ -3222,17 +3408,47 @@
             <param name="mustBeNew"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.GetUser(System.String)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.GetUser(System.String,System.String)">
             <summary>
             Gets user
             </summary>
             <param name="email"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.ListAll">
             <summary>
             Returns all users
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.GetInvitation(System.String)">
+            <summary>
+            Get invitation
+            </summary>
+            <param name="invitationId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.ListInvitationsByPP(System.String)">
+            <summary>
+            List invitations for place provider
+            </summary>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.ListInvitationsByEmail(System.String)">
+            <summary>
+            List user invitations
+            </summary>
+            <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.SetInvitation(CovidMassTesting.Model.Invitation,System.Boolean)">
+            <summary>
+            New invitation
+            </summary>
+            <param name="invitation"></param>
+            <param name="mustBeNew"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.Remove(System.String)">
@@ -3574,6 +3790,14 @@
             <param name="role"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetUserGroups(System.String,System.String)">
+            <summary>
+            Return user groups scoped to place provider
+            </summary>
+            <param name="email"></param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceRepository">
             <summary>
             Redis place repository
@@ -3854,11 +4078,13 @@
             <param name="placeRepository"></param>
             <param name="placeProviderRepository"></param>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Add(CovidMassTesting.Model.User)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Add(CovidMassTesting.Model.User,System.String,System.String)">
             <summary>
             Inserts new user
             </summary>
             <param name="user"></param>
+            <param name="inviterName"></param>
+            <param name="companyName"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GenerateRandomPassword(Microsoft.AspNetCore.Identity.PasswordOptions)">
@@ -3878,6 +4104,14 @@
             <param name="mustBeNew"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.SetInvitation(CovidMassTesting.Model.Invitation,System.Boolean)">
+            <summary>
+            Set user. Encodes and stores to db.
+            </summary>
+            <param name="invitation"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Remove(System.String)">
             <summary>
             Removes user.
@@ -3885,11 +4119,19 @@
             <param name="email"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GetUser(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GetUser(System.String,System.String)">
             <summary>
             Decode encrypted user data
             </summary>
             <param name="email"></param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GetInvitation(System.String)">
+            <summary>
+            GetInvitation
+            </summary>
+            <param name="invitationId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ListAll">
@@ -3898,12 +4140,25 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.SetLocation(System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ListInvitationsByPP(System.String)">
+            <summary>
+            Lists invitations by pp
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ListInvitationsByEmail(System.String)">
+            <summary>
+            Lists invitations by email
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.SetLocation(System.String,System.String,System.String)">
             <summary>
             Registration manager can set his place at which he performs tests
             </summary>
             <param name="email"></param>
             <param name="placeId"></param>
+            <param name="placeProviderId">PP id for user token pp scope groups</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.CreateAdminUsersFromConfiguration">
@@ -3927,7 +4182,7 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ChangePassword(System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ChangePassword(System.String,System.String,System.String,System.String)">
             <summary>
             Change password
             
@@ -3936,6 +4191,7 @@
             <param name="email">Email</param>
             <param name="oldHash">Old password</param>
             <param name="newHash">New password</param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.SetPlaceProvider(System.String,System.String)">
@@ -3948,7 +4204,7 @@
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.InAnyGroup(System.String,System.String[])">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.InAnyGroup(System.String,System.String[],System.String)">
             <summary>
             Checks if user with specified email has any of reqested groups
             </summary>
@@ -3975,6 +4231,13 @@
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Invite(CovidMassTesting.Model.Invitation)">
+            <summary>
+            invites person
+            </summary>
+            <param name="invitation"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.VisitorRepository">

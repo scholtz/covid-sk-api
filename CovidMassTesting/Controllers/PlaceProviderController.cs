@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
@@ -65,6 +66,21 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentNullException(nameof(testingPlaceProvider));
                 }
+
+                if (string.IsNullOrEmpty(testingPlaceProvider.MainContact))
+                {
+                    throw new Exception("Place provide your name in the registration form");
+                }
+                if (string.IsNullOrEmpty(testingPlaceProvider.MainEmail) || !testingPlaceProvider.MainEmail.IsValidEmail())
+                {
+                    throw new Exception("Place provide valid main email");
+                }
+                testingPlaceProvider.PrivatePhone = testingPlaceProvider.PrivatePhone.FormatPhone();
+                if (string.IsNullOrEmpty(testingPlaceProvider.PrivatePhone) || !testingPlaceProvider.PrivatePhone.IsValidPhoneNumber())
+                {
+                    throw new Exception("Place provide valid contact phone number in form +421 907 000 000");
+                }
+
                 var ret = await placeProviderRepository.Register(testingPlaceProvider);
                 if (ret != null)
                 {
@@ -75,7 +91,7 @@ namespace CovidMassTesting.Controllers
                             Email = ret.MainEmail,
                             Phone = ret.PrivatePhone,
                             Name = ret.MainContact
-                        });
+                        }, "System administrator", testingPlaceProvider.CompanyName);
                     }
                     catch (Exception exc)
                     {
@@ -92,6 +108,59 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+
+
+        /// <summary>
+        /// Administrator is allowed to invite other users and set their groups
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("InviteUserToPP")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> InviteUserToPP([FromForm] string email, [FromForm] string name, [FromForm] string phone)
+        {
+
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+
+                if (!email.IsValidEmail())
+                {
+                    throw new Exception("Email is in invalid format");
+                }
+                var phoneFormatted = phone.FormatPhone();
+                if (!phoneFormatted.IsValidPhoneNumber())
+                {
+                    throw new Exception("Phone number seems to be invalid");
+                }
+                var addr = new System.Net.Mail.MailAddress(email);
+
+
+                return Ok(await userRepository.Invite(
+                    new Model.Invitation()
+                    {
+                        Email = addr.Address,
+                        Name = name,
+                        InviterName = User.GetName(),
+                        InvitationTime = DateTimeOffset.Now,
+                        Phone = phoneFormatted,
+                        PlaceProviderId = User.GetPlaceProvider(),
+                        Status = InvitationStatus.Invited,
+                    }));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
         /// <summary>
         /// List places
         /// 

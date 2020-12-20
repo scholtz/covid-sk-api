@@ -9,6 +9,7 @@ using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.MockRepository
@@ -19,7 +20,9 @@ namespace CovidMassTesting.Repository.MockRepository
     public class UserRepository : Repository.RedisRepository.UserRepository
     {
         private readonly IStringLocalizer<UserRepository> localizer;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly ConcurrentDictionary<string, User> data = new ConcurrentDictionary<string, User>();
+        private readonly ConcurrentDictionary<string, Invitation> invitaions = new ConcurrentDictionary<string, Invitation>();
         /// <summary>
         /// constructor
         /// </summary>
@@ -54,6 +57,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 )
         {
             this.localizer = localizer;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// set user
@@ -82,15 +86,25 @@ namespace CovidMassTesting.Repository.MockRepository
         /// Gets user
         /// </summary>
         /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public override async Task<User> GetUser(string email)
+        public override async Task<User> GetUser(string email, string placeProviderId)
         {
             if (!data.ContainsKey(email))
             {
                 return null;
             }
-
-            return data[email];
+            var ret = data[email];
+            if (!string.IsNullOrEmpty(placeProviderId))
+            {
+                var groups = await placeProviderRepository.GetUserGroups(email, placeProviderId);
+                if (ret.Roles == null) ret.Roles = new List<string>();
+                foreach (var group in groups)
+                {
+                    if (!ret.Roles.Contains(group)) ret.Roles.Add(group);
+                }
+            }
+            return ret;
         }
         /// <summary>
         /// Returns all users
@@ -100,6 +114,49 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             return data.Values;
         }
+        /// <summary>
+        /// Get invitation
+        /// </summary>
+        /// <param name="invitationId"></param>
+        /// <returns></returns>
+        public async override Task<Invitation> GetInvitation(string invitationId)
+        {
+            if (invitaions.TryGetValue(invitationId, out var inv))
+            {
+                return inv;
+            }
+            return null;
+        }
+        /// <summary>
+        /// List invitations for place provider
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public async override Task<IEnumerable<Invitation>> ListInvitationsByPP(string placeProviderId)
+        {
+            return invitaions.Values.Where(i => i.PlaceProviderId == placeProviderId).OrderByDescending(i => i.LastUpdate);
+        }
+        /// <summary>
+        /// List user invitations
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns></returns>
+        public async override Task<IEnumerable<Invitation>> ListInvitationsByEmail(string email)
+        {
+            return invitaions.Values.Where(i => i.Email == email).OrderByDescending(i => i.LastUpdate);
+        }
+        /// <summary>
+        /// New invitation
+        /// </summary>
+        /// <param name="invitation"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        public async override Task<Invitation> SetInvitation(Invitation invitation, bool mustBeNew)
+        {
+            invitaions[invitation.InvitationId] = invitation;
+            return invitation;
+        }
+
         /// <summary>
         /// Removes user
         /// </summary>
@@ -118,6 +175,7 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             var ret = data.Count;
             data.Clear();
+            invitaions.Clear();
             return ret;
         }
     }

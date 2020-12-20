@@ -111,7 +111,7 @@ namespace CovidMassTesting.Controllers
                     Email = email,
                     Name = name,
                     Roles = roles.ToList()
-                }));
+                }, User.GetName(), ""));
             }
             catch (Exception exc)
             {
@@ -120,6 +120,8 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+
         /// <summary>
         /// Administrator is allowed to invite other users and set their groups
         /// </summary>
