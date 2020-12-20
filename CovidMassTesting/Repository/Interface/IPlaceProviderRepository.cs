@@ -111,5 +111,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="placeProviderId"></param>
         /// <returns></returns>
         public Task<HashSet<string>> GetUserGroups(string email, string placeProviderId);
+        /// <summary>
+        /// Save place provider
+        /// </summary>
+        /// <param name="place"></param>
+        /// <returns></returns>
+        public Task<PlaceProvider> SetPlaceProvider(PlaceProvider place);
     }
 }

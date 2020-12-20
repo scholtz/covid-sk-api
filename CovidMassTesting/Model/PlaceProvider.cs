@@ -74,6 +74,10 @@ namespace CovidMassTesting.Model
         /// Place provider private main contact name
         /// </summary>
         public string MainContact { get; set; }
+        /// <summary>
+        /// List of accepted invitations - users who can hr manage to places
+        /// </summary>
+        public List<Invitation> Users { get; set; }
 
         /// <summary>
         /// Convert to public info

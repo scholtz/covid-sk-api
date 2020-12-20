@@ -465,6 +465,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.ProcessInvitation(System.String,System.Boolean)">
+            <summary>
+            List invitations to place provider for generic users
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.UserController.ListPPInvites">
             <summary>
             List invitations to place provider for generic users
@@ -1566,6 +1572,11 @@
         <member name="P:CovidMassTesting.Model.PlaceProvider.MainContact">
             <summary>
             Place provider private main contact name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.Users">
+            <summary>
+            List of accepted invitations - users who can hr manage to places
             </summary>
         </member>
         <member name="M:CovidMassTesting.Model.PlaceProvider.ToPublic">
@@ -2735,6 +2746,13 @@
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.SetPlaceProvider(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Save place provider
+            </summary>
+            <param name="place"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
             <summary>
             Place repository interface for dependency injection
@@ -3035,6 +3053,15 @@
             </summary>
             <param name="email"></param>
             <param name="hash"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ProcessInvitation(System.String,System.Boolean,System.String)">
+            <summary>
+            Accept or deny invitation
+            </summary>
+            <param name="invitationId"></param>
+            <param name="accepted"></param>
+            <param name="userEmail"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.DropAllData">
@@ -4238,6 +4265,15 @@
             invites person
             </summary>
             <param name="invitation"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ProcessInvitation(System.String,System.Boolean,System.String)">
+            <summary>
+            Accept/Deny the invitation. Stores accepted invitation to pp.
+            </summary>
+            <param name="invitationId"></param>
+            <param name="accepted"></param>
+            <param name="userEmail"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.VisitorRepository">

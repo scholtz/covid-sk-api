@@ -93,6 +93,15 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<bool> DropDatabaseAuthorize(string email, string hash);
         /// <summary>
+        /// Accept or deny invitation
+        /// </summary>
+        /// <param name="invitationId"></param>
+        /// <param name="accepted"></param>
+        /// <param name="userEmail"></param>
+        /// <returns></returns>
+        public Task<Invitation> ProcessInvitation(string invitationId, bool accepted, string userEmail);
+
+        /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>
         /// <returns></returns>

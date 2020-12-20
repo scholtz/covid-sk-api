@@ -289,6 +289,16 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
+        private HttpResponseMessage ProcessInvitation(HttpClient client, string invitationId, bool accepted)
+        {
+            return client.PostAsync("User/ProcessInvitation",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("invitationId",invitationId),
+                        new KeyValuePair<string, string>("accepted",accepted.ToString()),
+                    })
+                ).Result;
+        }
+
         private HttpResponseMessage InviteUserToPP(HttpClient client, string email, string name, string phone)
         {
             return client.PostAsync("PlaceProvider/InviteUserToPP",
@@ -1750,6 +1760,10 @@ namespace NUnitTestCovidApi
 
             request = ListPPInvites(client);
             Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = ProcessInvitation(client, invites.First().InvitationId, true);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
 
         }
         [Test]

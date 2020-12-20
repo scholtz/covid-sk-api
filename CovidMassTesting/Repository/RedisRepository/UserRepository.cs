@@ -708,5 +708,45 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+        /// <summary>
+        /// Accept/Deny the invitation. Stores accepted invitation to pp.
+        /// </summary>
+        /// <param name="invitationId"></param>
+        /// <param name="accepted"></param>
+        /// <param name="userEmail"></param>
+        /// <returns></returns>
+        public async Task<Invitation> ProcessInvitation(string invitationId, bool accepted, string userEmail)
+        {
+            var invitation = await GetInvitation(invitationId);
+            if (invitation == null) throw new Exception("Invitation not found");
+
+            var pp = await placeProviderRepository.GetPlaceProvider(invitation.PlaceProviderId);
+            if (pp == null) throw new Exception("Invitation place provider has not been found");
+
+            if (invitation.Status != InvitationStatus.Invited) throw new Exception("Invitation has been already processed");
+            if (invitation.Email != userEmail) throw new Exception("Invitation has been sent to someone else");
+
+            invitation.StatusTime = DateTimeOffset.Now;
+            if (accepted)
+            {
+                invitation.Status = InvitationStatus.Accepted;
+            }
+            else
+            {
+                invitation.Status = InvitationStatus.Declined;
+            }
+            invitation = await SetInvitation(invitation, false);
+            if (accepted)
+            {
+                if (pp.Users == null) pp.Users = new List<Invitation>();
+                if (!pp.Users.Any(p => p.Email == userEmail))
+                {
+                    pp.Users.Add(invitation);
+                    await placeProviderRepository.SetPlaceProvider(pp);
+                }
+            }
+
+            return invitation;
+        }
     }
 }

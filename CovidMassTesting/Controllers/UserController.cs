@@ -95,6 +95,33 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize]
+        [HttpPost("ProcessInvitation")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Invitation>> ProcessInvitation([FromForm] string invitationId, [FromForm] bool accepted)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(invitationId))
+                {
+                    throw new ArgumentException("Please provide invitationId");
+                }
+
+
+                return Ok(await userRepository.ProcessInvitation(invitationId, accepted, User.GetEmail()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// List invitations to place provider for generic users
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
         [HttpGet("ListPPInvites")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
