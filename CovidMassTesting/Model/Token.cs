@@ -281,7 +281,7 @@ namespace CovidMassTesting.Model
         /// <param name="placeProviderRepository"></param>
         /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public static bool IsAuthorizedToLogAsCompany(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository, string placeProviderId)
+        public static async Task<bool> IsAuthorizedToLogAsCompany(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository, string placeProviderId)
         {
             if (user is null)
             {
@@ -308,7 +308,10 @@ namespace CovidMassTesting.Model
 
             var email = user.GetEmail();
 
-            return placeProviderRepository.InAnyGroup(email, placeProviderId, new string[] { Groups.Admin, Groups.PPAdmin, Groups.Accountant, Groups.DataExporter, Groups.DocumentManager, Groups.MedicLab, Groups.MedicTester, Groups.RegistrationManager }).Result;
+            var pp = await placeProviderRepository.GetPlaceProvider(placeProviderId);
+            if (pp == null) return false;
+            if (pp.Users?.Any(u => u.Email == email) == true) return true;
+            return await placeProviderRepository.InAnyGroup(email, placeProviderId, new string[] { Groups.Admin, Groups.PPAdmin, Groups.Accountant, Groups.DataExporter, Groups.DocumentManager, Groups.MedicLab, Groups.MedicTester, Groups.RegistrationManager });
         }
         /// <summary>
         /// Method creates jwt token

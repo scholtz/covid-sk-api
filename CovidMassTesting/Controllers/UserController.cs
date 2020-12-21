@@ -276,7 +276,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAuthorizedToLogAsCompany(userRepository, placeProviderRepository, placeProviderId)) { throw new Exception("Nie je možné autorizovať užívateľa za vybranú spoločnosť"); }
+                if (!await User.IsAuthorizedToLogAsCompany(userRepository, placeProviderRepository, placeProviderId)) { throw new Exception("Nie je možné autorizovať užívateľa za vybranú spoločnosť"); }
 
                 return Ok(await userRepository.SetPlaceProvider(User.GetEmail(), placeProviderId));
             }
