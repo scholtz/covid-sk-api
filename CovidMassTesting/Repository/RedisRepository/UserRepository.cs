@@ -675,6 +675,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = await SetInvitation(invitation, true);
             var user = await GetUser(invitation.Email, invitation.PlaceProviderId);
             var pp = await placeProviderRepository.GetPlaceProvider(invitation.PlaceProviderId);
+            if (pp == null) throw new Exception("Place provider has not been found");
+            invitation.CompanyName = pp.CompanyName;
             if (user == null)
             {
                 // invitation with new user
@@ -725,7 +727,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (invitation.Status != InvitationStatus.Invited) throw new Exception("Invitation has been already processed");
             if (invitation.Email != userEmail) throw new Exception("Invitation has been sent to someone else");
-
+            invitation.CompanyName = pp.CompanyName;
             invitation.StatusTime = DateTimeOffset.Now;
             if (accepted)
             {

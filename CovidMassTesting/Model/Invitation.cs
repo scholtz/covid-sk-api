@@ -33,6 +33,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string InviterName { get; set; }
         /// <summary>
+        /// Inviter
+        /// </summary>
+        public string CompanyName { get; set; }
+        /// <summary>
         /// Place provider
         /// </summary>
         public string PlaceProviderId { get; set; }
