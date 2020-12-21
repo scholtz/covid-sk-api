@@ -86,6 +86,11 @@ namespace CovidMassTesting.Controllers.Email
                 return false;
             }
             logger.LogInformation($"Sending {data.TemplateId} email to {toEmail}");
+            if (!Name2Id.ContainsKey(data.TemplateId))
+            {
+                System.Console.WriteLine($"Template not found: {data.TemplateId}: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
+                return false;
+            }
             var msg = new SendGridMessage()
             {
 

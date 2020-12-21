@@ -316,7 +316,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<IEnumerable<PlaceProvider>> ListPrivate(string email)
         {
-            return (await ListAll()).Where(p => p.MainEmail == email || (p.Group2Emails.ContainsKey(Groups.Admin) && p.Group2Emails[Groups.Admin].Contains(email)));
+            return (await ListAll()).Where(
+                p => p.MainEmail == email
+                    || (p.Group2Emails.ContainsKey(Groups.Admin) && p.Group2Emails[Groups.Admin].Contains(email))
+                    || ((p.Users?.Any(u => u.Email == email) == true)
+            ));
         }
         /// <summary>
         /// Public info of all place providers
