@@ -211,13 +211,14 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.InviteUserToPP(System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.InviteUserToPP(System.String,System.String,System.String,System.String)">
             <summary>
             Administrator is allowed to invite other users and set their groups
             </summary>
             <param name="email"></param>
             <param name="name"></param>
             <param name="phone"></param>
+            <param name="message"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPublic">
@@ -1212,6 +1213,16 @@
         <member name="P:CovidMassTesting.Model.Invitation.InviterName">
             <summary>
             Inviter
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.CompanyName">
+            <summary>
+            Inviter
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Invitation.InvitationMessage">
+            <summary>
+            invitation message
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Invitation.PlaceProviderId">

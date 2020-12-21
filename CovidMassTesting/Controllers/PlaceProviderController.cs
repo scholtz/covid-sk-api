@@ -117,12 +117,13 @@ namespace CovidMassTesting.Controllers
         /// <param name="email"></param>
         /// <param name="name"></param>
         /// <param name="phone"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
         [Authorize]
         [HttpPost("InviteUserToPP")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> InviteUserToPP([FromForm] string email, [FromForm] string name, [FromForm] string phone)
+        public async Task<ActionResult<bool>> InviteUserToPP([FromForm] string email, [FromForm] string name, [FromForm] string phone, [FromForm] string message)
         {
 
             try
@@ -146,6 +147,7 @@ namespace CovidMassTesting.Controllers
                     {
                         Email = addr.Address,
                         Name = name,
+                        InvitationMessage = message,
                         InviterName = User.GetName(),
                         InvitationTime = DateTimeOffset.Now,
                         Phone = phoneFormatted,

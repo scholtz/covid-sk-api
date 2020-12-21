@@ -299,13 +299,14 @@ namespace NUnitTestCovidApi
                 ).Result;
         }
 
-        private HttpResponseMessage InviteUserToPP(HttpClient client, string email, string name, string phone)
+        private HttpResponseMessage InviteUserToPP(HttpClient client, string email, string name, string phone, string message)
         {
             return client.PostAsync("PlaceProvider/InviteUserToPP",
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
                         new KeyValuePair<string, string>("email",email),
                         new KeyValuePair<string, string>("name",name),
                         new KeyValuePair<string, string>("phone",phone),
+                        new KeyValuePair<string, string>("message",message),
                     })
                 ).Result;
         }
@@ -1692,7 +1693,7 @@ namespace NUnitTestCovidApi
                 VAT = "123",
                 Web = "123",
                 CompanyId = "123",
-                CompanyName = "123",
+                CompanyName = "123, s.r.o.",
                 Country = "SK",
                 MainEmail = email,
                 PrivatePhone = "+421 907 000000",
@@ -1731,7 +1732,7 @@ namespace NUnitTestCovidApi
             var secondPlace = places.Skip(1).First();
 
             var medicPersonEmail = "person1@scholtz.sk";
-            request = InviteUserToPP(client, medicPersonEmail, "Person 1", "+421 907 000 000");
+            request = InviteUserToPP(client, medicPersonEmail, "Person 1", "+421 907 000 000", "MyMessage");
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, noEmailSender.Data.Count);
 
@@ -1756,7 +1757,8 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, invites.Count);
-
+            Assert.AreEqual("MyMessage", invites[0].InvitationMessage);
+            Assert.AreEqual("123, s.r.o.", invites[0].CompanyName);
 
             request = ListPPInvites(client);
             Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
