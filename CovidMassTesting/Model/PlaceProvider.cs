@@ -78,6 +78,10 @@ namespace CovidMassTesting.Model
         /// List of accepted invitations - users who can hr manage to places
         /// </summary>
         public List<Invitation> Users { get; set; }
+        /// <summary>
+        /// List of person allocations
+        /// </summary>
+        public List<PersonAllocation> Allocations { get; set; } = new List<PersonAllocation>();
 
         /// <summary>
         /// Convert to public info

@@ -107,7 +107,6 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException("Please provide invitationId");
                 }
 
-
                 return Ok(await userRepository.ProcessInvitation(invitationId, accepted, User.GetEmail()));
             }
             catch (Exception exc)

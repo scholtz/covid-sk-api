@@ -116,6 +116,32 @@ namespace CovidMassTesting.Model
         }
 
         /// <summary>
+        /// Returns true if the user is currently in the role of PP Admin and acts on behalf of specific place.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
+        /// <param name="placeRepository"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public static async Task<bool> IsPlaceAdmin(
+            this ClaimsPrincipal user,
+            IUserRepository userRepository,
+            IPlaceProviderRepository placeProviderRepository,
+            IPlaceRepository placeRepository,
+            string placeId
+            )
+        {
+            var place = await placeRepository.GetPlace(placeId);
+            if (place == null) return false;
+            if (user.IsAdmin(userRepository)) return true;
+            var pp = GetPlaceProvider(user);
+            if (pp != place.PlaceProviderId) return false;
+            return await placeProviderRepository.InAnyGroup(user.GetEmail(), pp, new string[] { Groups.PPAdmin });
+        }
+
+
+        /// <summary>
         /// Check if user has password protected .. Created for demo users
         /// </summary>
         /// <param name="user"></param>

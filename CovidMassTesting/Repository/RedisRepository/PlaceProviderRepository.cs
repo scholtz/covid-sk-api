@@ -17,12 +17,14 @@ namespace CovidMassTesting.Repository.RedisRepository
     {
         private readonly ILogger<PlaceProviderRepository> logger;
         private readonly IRedisCacheClient redisCacheClient;
+        private readonly IPlaceRepository placeRepository;
         private readonly IConfiguration configuration;
         private readonly string REDIS_KEY_PLACES_OBJECTS = "PP";
         private readonly string REDIS_KEY_PRO_INVOICES_OBJECTS = "PP_PRO_INVOICE";
         private readonly string REDIS_KEY_REAL_INVOICES_OBJECTS = "PP_REAL_INVOICE";
         private readonly string REDIS_KEY_LAST_PRO_INVOICE = "PP_LAST_PRO_INVOICE";
         private readonly string REDIS_KEY_LAST_REAL_INVOICE = "PP_LAST_REAL_INVOICE";
+
         private readonly int ProInvoiceFormat = 2010100000;
         private readonly int RealInvoiceFormat = 2010200000;
         private readonly decimal TaxRate = 1.20M;
@@ -33,15 +35,18 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="configuration"></param>
         /// <param name="logger"></param>
         /// <param name="redisCacheClient"></param>
+        /// <param name="placeRepository"></param>
         public PlaceProviderRepository(
             IConfiguration configuration,
             ILogger<PlaceProviderRepository> logger,
-            IRedisCacheClient redisCacheClient
+            IRedisCacheClient redisCacheClient,
+            IPlaceRepository placeRepository
             )
         {
             this.logger = logger;
             this.redisCacheClient = redisCacheClient;
             this.configuration = configuration;
+            this.placeRepository = placeRepository;
         }
 
         #region PRO INVOICE
@@ -611,7 +616,54 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = new HashSet<string>();
             if (pp == null) return ret;
             if (pp.MainEmail == email) ret.Add(Groups.PPAdmin);
+            foreach (var group in pp.Allocations?.Select(a => a.Role).Distinct())
+            {
+                if (!ret.Contains(group)) ret.Add(group);
+            }
             return ret;
+        }
+        /// <summary>
+        /// Allocate person to place provider
+        /// </summary>
+        /// <param name="allocation"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public async Task<PersonAllocation> AllocatePerson(PersonAllocation allocation, string placeId)
+        {
+            if (allocation.Role != Groups.DataExporter &&
+                allocation.Role != Groups.DocumentManager &&
+                allocation.Role != Groups.MedicLab &&
+                allocation.Role != Groups.MedicTester &&
+                allocation.Role != Groups.RegistrationManager &&
+                allocation.Role != Groups.Helper
+                )
+            {
+                throw new Exception("Wrong role defined in the allocation");
+            }
+            var place = await placeRepository.GetPlace(placeId);
+            if (place == null) throw new Exception("Place not found");
+            if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Unable to find place within scope of place provider");
+            var pp = await GetPlaceProvider(place.PlaceProviderId);
+            if (pp == null) throw new Exception("Unable to find place provider");
+            if (pp.Allocations == null) pp.Allocations = new List<PersonAllocation>();
+            allocation.Id = Guid.NewGuid().ToString();
+            allocation.PlaceId = placeId;
+            pp.Allocations.Add(allocation);
+            await SetPlaceProvider(pp);
+            return allocation;
+        }
+        /// <summary>
+        /// List allocations
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PersonAllocation>> ListAllocations(string placeId)
+        {
+            var place = await placeRepository.GetPlace(placeId);
+            if (place == null) throw new Exception("Place not found");
+            if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Unable to find place within scope of place provider");
+            var pp = await GetPlaceProvider(place.PlaceProviderId);
+            return pp.Allocations?.Where(p => p.PlaceId == placeId);
         }
     }
 }

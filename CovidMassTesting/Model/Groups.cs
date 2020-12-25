@@ -46,6 +46,10 @@ namespace CovidMassTesting.Model
         /// Person in this group is allowed to list all sick people and export data
         /// </summary>
         public const string DataExporter = "DataExporter";
+        /// <summary>
+        /// Person who does not have any rights, but helps with the sampling process
+        /// </summary>
+        public const string Helper = "Helper";
 
         /// <summary>
         /// Validates input

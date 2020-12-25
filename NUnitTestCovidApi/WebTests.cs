@@ -212,6 +212,21 @@ namespace NUnitTestCovidApi
                                 new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                 ).Result;
         }
+
+
+
+        private HttpResponseMessage AllocatePersonsToPlace(HttpClient client, PersonAllocation[] allocations, string place)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(allocations);
+            return client.PostAsync($"PlaceProvider/AllocatePersonsToPlace?placeId={place}",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+
+        private HttpResponseMessage ListPlaceAllocations(HttpClient client, string place)
+        {
+            return client.GetAsync($"PlaceProvider/ListPlaceAllocations?placeId={place}").Result;
+        }
         private HttpResponseMessage ScheduleOpenningHours(HttpClient client, TimeUpdate[] actions)
         {
             var body = Newtonsoft.Json.JsonConvert.SerializeObject(actions);
@@ -1766,6 +1781,41 @@ namespace NUnitTestCovidApi
             request = ProcessInvitation(client, invites.First().InvitationId, true);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            var allocations = new PersonAllocation[]
+            {
+                new PersonAllocation()
+                {
+                    Start = DateTimeOffset.Now,
+                    End = DateTimeOffset.Now.AddDays(1),
+                    Role = Groups.MedicLab,
+                    User = medicPersonEmail
+                }
+            };
+            request = AllocatePersonsToPlace(client, allocations, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = ListPlaceAllocations(client, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            var allocationsParsed = JsonConvert.DeserializeObject<List<PersonAllocation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, allocationsParsed.Count);
+
+
+            request = AuthenticateUser(client, medicPersonEmail, emailData.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            medicPersonToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(medicPersonToken));
+
+
+            handler = new JwtSecurityTokenHandler();
+            tokenS = handler.ReadToken(medicPersonToken) as JwtSecurityToken;
+            jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == Groups.PPAdmin);
+            Assert.IsNull(jti);
+            jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == Groups.MedicLab);
+            Assert.IsNotNull(jti);
 
         }
         [Test]

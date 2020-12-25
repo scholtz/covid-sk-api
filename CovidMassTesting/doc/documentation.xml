@@ -277,6 +277,21 @@
             <param name="slaUntil"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.AllocatePersonsToPlace(CovidMassTesting.Model.PersonAllocation[],System.String)">
+            <summary>
+            Allocate 
+            </summary>
+            <param name="allocations"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPlaceAllocations(System.String)">
+            <summary>
+            List HR allocations to specific place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.ResultController">
             <summary>
             This controller manages test results
@@ -1176,6 +1191,11 @@
             Person in this group is allowed to list all sick people and export data
             </summary>
         </member>
+        <member name="F:CovidMassTesting.Model.Groups.Helper">
+            <summary>
+            Person who does not have any rights, but helps with the sampling process
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Model.Groups.ValidateGroupName(System.String)">
             <summary>
             Validates input
@@ -1363,6 +1383,36 @@
         <member name="T:CovidMassTesting.Model.ProformaInvoice">
             <summary>
             Prepayment invoice
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.PersonAllocation">
+            <summary>
+            Allocate person to the testing place with specified role
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PersonAllocation.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PersonAllocation.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PersonAllocation.Role">
+            <summary>
+            Role
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PersonAllocation.Start">
+            <summary>
+            Start
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PersonAllocation.End">
+            <summary>
+            End
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Place">
@@ -1588,6 +1638,11 @@
         <member name="P:CovidMassTesting.Model.PlaceProvider.Users">
             <summary>
             List of accepted invitations - users who can hr manage to places
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.Allocations">
+            <summary>
+            List of person allocations
             </summary>
         </member>
         <member name="M:CovidMassTesting.Model.PlaceProvider.ToPublic">
@@ -2296,6 +2351,17 @@
             <param name="placeProviderRepository"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Model.Token.IsPlaceAdmin(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,System.String)">
+            <summary>
+            Returns true if the user is currently in the role of PP Admin and acts on behalf of specific place.
+            </summary>
+            <param name="user"></param>
+            <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
+            <param name="placeRepository"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Model.Token.IsPasswordProtected(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Check if user has password protected .. Created for demo users
@@ -2764,6 +2830,21 @@
             <param name="place"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.AllocatePerson(CovidMassTesting.Model.PersonAllocation,System.String)">
+            <summary>
+            Allocates person to place provider
+            </summary>
+            <param name="allocation"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListAllocations(System.String)">
+            <summary>
+            List allocations
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
             <summary>
             Place repository interface for dependency injection
@@ -3220,13 +3301,14 @@
             Place mock repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             Constructor
             </summary>
             <param name="configuration"></param>
             <param name="loggerFactory"></param>
             <param name="redisCacheClient"></param>
+            <param name="placeRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.SetPlaceProvider(CovidMassTesting.Model.PlaceProvider)">
             <summary>
@@ -3630,13 +3712,14 @@
             Redis place repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             Constructor
             </summary>
             <param name="configuration"></param>
             <param name="logger"></param>
             <param name="redisCacheClient"></param>
+            <param name="placeRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.SetProInvoice(CovidMassTesting.Model.ProformaInvoice)">
             <summary>
@@ -3834,6 +3917,21 @@
             </summary>
             <param name="email"></param>
             <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.AllocatePerson(CovidMassTesting.Model.PersonAllocation,System.String)">
+            <summary>
+            Allocate person to place provider
+            </summary>
+            <param name="allocation"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListAllocations(System.String)">
+            <summary>
+            List allocations
+            </summary>
+            <param name="placeId"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceRepository">

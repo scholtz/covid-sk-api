@@ -353,5 +353,82 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// Allocate 
+        /// </summary>
+        /// <param name="allocations"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("AllocatePersonsToPlace")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<PersonAllocation>>> AllocatePersonsToPlace(
+            [FromBody] PersonAllocation[] allocations,
+            [FromQuery] string placeId
+            )
+        {
+
+            try
+            {
+                if (allocations is null || allocations.Length == 0)
+                {
+                    throw new ArgumentNullException(nameof(allocations));
+                }
+
+                if (string.IsNullOrEmpty(placeId))
+                {
+                    throw new ArgumentNullException(nameof(placeId));
+                }
+
+
+                if (!await User.IsPlaceAdmin(userRepository, placeProviderRepository, placeRepository, placeId)) throw new Exception("Only place provider admin can assign person to place");
+
+                var ret = new List<PersonAllocation>();
+                foreach (var allocation in allocations)
+                {
+                    ret.Add(await placeProviderRepository.AllocatePerson(allocation, placeId));
+                }
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+        /// <summary>
+        /// List HR allocations to specific place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListPlaceAllocations")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<PersonAllocation>>> ListPlaceAllocations(
+            [FromQuery] string placeId
+            )
+        {
+
+            try
+            {
+                if (string.IsNullOrEmpty(placeId))
+                {
+                    throw new ArgumentNullException(nameof(placeId));
+                }
+
+                if (!await User.IsPlaceAdmin(userRepository, placeProviderRepository, placeRepository, placeId)) throw new Exception("Only place provider admin can assign person to place");
+
+                return Ok(await placeProviderRepository.ListAllocations(placeId));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }

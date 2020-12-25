@@ -117,5 +117,19 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="place"></param>
         /// <returns></returns>
         public Task<PlaceProvider> SetPlaceProvider(PlaceProvider place);
+        /// <summary>
+        /// Allocates person to place provider
+        /// </summary>
+        /// <param name="allocation"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public Task<PersonAllocation> AllocatePerson(PersonAllocation allocation, string placeId);
+        /// <summary>
+        /// List allocations
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<PersonAllocation>> ListAllocations(string placeId);
+
     }
 }

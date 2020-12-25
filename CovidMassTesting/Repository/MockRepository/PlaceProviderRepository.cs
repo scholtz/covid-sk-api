@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Model;
+using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
@@ -22,11 +23,17 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="configuration"></param>
         /// <param name="loggerFactory"></param>
         /// <param name="redisCacheClient"></param>
+        /// <param name="placeRepository"></param>
         public PlaceProviderRepository(
             IConfiguration configuration,
             ILoggerFactory loggerFactory,
-            IRedisCacheClient redisCacheClient
-            ) : base(configuration, loggerFactory.CreateLogger<Repository.RedisRepository.PlaceProviderRepository>(), redisCacheClient)
+            IRedisCacheClient redisCacheClient,
+            IPlaceRepository placeRepository
+            ) : base(
+                configuration,
+                loggerFactory.CreateLogger<Repository.RedisRepository.PlaceProviderRepository>(),
+                redisCacheClient,
+                placeRepository)
         {
 
         }
