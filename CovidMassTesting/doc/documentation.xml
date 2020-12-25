@@ -285,6 +285,14 @@
             <param name="placeId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.RemoveAllocationAtPlace(System.String,System.String)">
+            <summary>
+            Allocate 
+            </summary>
+            <param name="allocationId"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPlaceAllocations(System.String)">
             <summary>
             List HR allocations to specific place
@@ -2845,6 +2853,14 @@
             <param name="placeId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.RemovePersonAllocation(System.String,System.String)">
+            <summary>
+            Removes allocation
+            </summary>
+            <param name="allocationId"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
             <summary>
             Place repository interface for dependency injection
@@ -3921,9 +3937,17 @@
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.AllocatePerson(CovidMassTesting.Model.PersonAllocation,System.String)">
             <summary>
-            Allocate person to place provider
+            Allocate person to place
             </summary>
             <param name="allocation"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.RemovePersonAllocation(System.String,System.String)">
+            <summary>
+            Removes person allocation at place
+            </summary>
+            <param name="allocationId"></param>
             <param name="placeId"></param>
             <returns></returns>
         </member>

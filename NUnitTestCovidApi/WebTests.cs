@@ -222,6 +222,15 @@ namespace NUnitTestCovidApi
                                 new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                 ).Result;
         }
+        private HttpResponseMessage RemoveAllocationAtPlace(HttpClient client, string allocationId, string placeId)
+        {
+            return client.PostAsync("PlaceProvider/RemoveAllocationAtPlace",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("allocationId",allocationId),
+                        new KeyValuePair<string, string>("placeId",placeId),
+                    })
+                ).Result;
+        }
 
         private HttpResponseMessage ListPlaceAllocations(HttpClient client, string place)
         {
@@ -1816,6 +1825,17 @@ namespace NUnitTestCovidApi
             Assert.IsNull(jti);
             jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == Groups.MedicLab);
             Assert.IsNotNull(jti);
+
+            request = RemoveAllocationAtPlace(client, allocationsParsed[0].Id, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = ListPlaceAllocations(client, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            allocationsParsed = JsonConvert.DeserializeObject<List<PersonAllocation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(0, allocationsParsed.Count);
+
+
 
         }
         [Test]

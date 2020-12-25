@@ -399,6 +399,45 @@ namespace CovidMassTesting.Controllers
             }
         }
 
+
+        /// <summary>
+        /// Allocate 
+        /// </summary>
+        /// <param name="allocationId"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("RemoveAllocationAtPlace")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> RemoveAllocationAtPlace(
+            [FromForm] string allocationId,
+            [FromForm] string placeId
+            )
+        {
+
+            try
+            {
+                if (string.IsNullOrEmpty(allocationId))
+                {
+                    throw new ArgumentNullException(nameof(allocationId));
+                }
+                if (string.IsNullOrEmpty(placeId))
+                {
+                    throw new ArgumentNullException(nameof(placeId));
+                }
+
+
+                if (!await User.IsPlaceAdmin(userRepository, placeProviderRepository, placeRepository, placeId)) throw new Exception("Only place provider admin can assign person to place");
+
+                return Ok(await placeProviderRepository.RemovePersonAllocation(allocationId, placeId));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// List HR allocations to specific place
         /// </summary>

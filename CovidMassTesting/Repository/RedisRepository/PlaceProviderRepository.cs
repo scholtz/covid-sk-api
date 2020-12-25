@@ -623,7 +623,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
         /// <summary>
-        /// Allocate person to place provider
+        /// Allocate person to place
         /// </summary>
         /// <param name="allocation"></param>
         /// <param name="placeId"></param>
@@ -652,6 +652,28 @@ namespace CovidMassTesting.Repository.RedisRepository
             await SetPlaceProvider(pp);
             return allocation;
         }
+
+        /// <summary>
+        /// Removes person allocation at place
+        /// </summary>
+        /// <param name="allocationId"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public async Task<bool> RemovePersonAllocation(string allocationId, string placeId)
+        {
+            var place = await placeRepository.GetPlace(placeId);
+            if (place == null) throw new Exception("Place not found");
+            if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Unable to find place within scope of place provider");
+            var pp = await GetPlaceProvider(place.PlaceProviderId);
+            if (pp == null) throw new Exception("Unable to find place provider");
+            if (pp.Allocations == null) pp.Allocations = new List<PersonAllocation>();
+            var allocationToRemove = pp.Allocations.FirstOrDefault(a => a.Id == allocationId);
+            if (allocationToRemove == null) throw new Exception("Allocation not found");
+            pp.Allocations.Remove(allocationToRemove);
+            await SetPlaceProvider(pp);
+            return true;
+        }
+
         /// <summary>
         /// List allocations
         /// </summary>

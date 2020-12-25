@@ -130,6 +130,12 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="placeId"></param>
         /// <returns></returns>
         public Task<IEnumerable<PersonAllocation>> ListAllocations(string placeId);
-
+        /// <summary>
+        /// Removes allocation
+        /// </summary>
+        /// <param name="allocationId"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public Task<bool> RemovePersonAllocation(string allocationId, string placeId);
     }
 }
