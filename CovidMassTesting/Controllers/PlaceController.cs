@@ -358,6 +358,10 @@ namespace CovidMassTesting.Controllers
                     if (!isGlobalAdmin && place.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You are not allowed to manage this place");
                     place.Healthy = oldPlace.Healthy;
                     place.Sick = oldPlace.Sick;
+                    if (string.IsNullOrEmpty(place.PlaceProviderId))
+                    {
+                        place.PlaceProviderId = User.GetPlaceProvider();
+                    }
                     place.Registrations = oldPlace.Registrations;
                     place = await placeRepository.SetPlace(place);
                     logger.LogInformation($"Place {place.Name} has been updated");
