@@ -86,12 +86,19 @@ namespace CovidMassTesting.Controllers
                 {
                     try
                     {
-                        await userRepository.Add(new Model.User()
+                        await userRepository.Invite(new Invitation()
                         {
-                            Email = ret.MainEmail,
-                            Phone = ret.PrivatePhone,
-                            Name = ret.MainContact
-                        }, "System administrator", testingPlaceProvider.CompanyName);
+                            CompanyName = testingPlaceProvider.CompanyName,
+                            Email = testingPlaceProvider.MainEmail,
+                            InvitationMessage = "Registrácia správcu odberných miest",
+                            InvitationTime = DateTimeOffset.Now,
+                            InviterName = "System administrator",
+                            Name = testingPlaceProvider.MainContact,
+                            Phone = testingPlaceProvider.PrivatePhone,
+                            PlaceProviderId = ret.PlaceProviderId,
+                            Status = InvitationStatus.Invited,
+                        });
+
                     }
                     catch (Exception exc)
                     {
@@ -108,7 +115,103 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Updates updatable information about place provider
+        /// </summary>
+        /// <param name="placeProvider"></param>
+        /// <returns></returns>
+        [HttpPost("UpdatePP")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<PlaceProvider>> UpdatePP([FromBody] PlaceProvider placeProvider)
+        {
+            try
+            {
+                if (placeProvider is null)
+                {
+                    throw new ArgumentNullException(nameof(placeProvider));
+                }
 
+                if (string.IsNullOrEmpty(placeProvider.PlaceProviderId))
+                {
+                    throw new Exception("Invalid data has been received");
+                }
+                if (string.IsNullOrEmpty(placeProvider.MainContact))
+                {
+                    throw new Exception("Place provide your name in the registration form");
+                }
+                if (string.IsNullOrEmpty(placeProvider.MainEmail) || !placeProvider.MainEmail.IsValidEmail())
+                {
+                    throw new Exception("Place provide valid main email");
+                }
+                placeProvider.PrivatePhone = placeProvider.PrivatePhone.FormatPhone();
+                if (string.IsNullOrEmpty(placeProvider.PrivatePhone) || !placeProvider.PrivatePhone.IsValidPhoneNumber())
+                {
+                    throw new Exception("Place provide valid contact phone number in form +421 907 000 000");
+                }
+
+                var toUpdate = await placeProviderRepository.GetPlaceProvider(placeProvider.PlaceProviderId);
+                if (toUpdate == null) throw new Exception("Place provider has not been found");
+
+                if (!string.IsNullOrEmpty(placeProvider.CompanyId))
+                {
+                    toUpdate.CompanyId = placeProvider.CompanyId;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.CompanyName))
+                {
+                    toUpdate.CompanyName = placeProvider.CompanyName;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.Country))
+                {
+                    toUpdate.Country = placeProvider.Country;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.CSS))
+                {
+                    toUpdate.CSS = placeProvider.CSS;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.Logo))
+                {
+                    toUpdate.Logo = placeProvider.Logo;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.MainContact))
+                {
+                    toUpdate.MainContact = placeProvider.MainContact;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.MainEmail))
+                {
+                    toUpdate.MainEmail = placeProvider.MainEmail;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.PrivatePhone))
+                {
+                    toUpdate.PrivatePhone = placeProvider.PrivatePhone;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.PublicEmail))
+                {
+                    toUpdate.PublicEmail = placeProvider.PublicEmail;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.PublicPhone))
+                {
+                    toUpdate.PublicPhone = placeProvider.PublicPhone;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.VAT))
+                {
+                    toUpdate.VAT = placeProvider.VAT;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.Web))
+                {
+                    toUpdate.Web = placeProvider.Web;
+                }
+
+                return Ok(await placeProviderRepository.SetPlaceProvider(toUpdate));
+
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 
 
         /// <summary>

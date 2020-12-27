@@ -211,6 +211,13 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.UpdatePP(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            Updates updatable information about place provider
+            </summary>
+            <param name="placeProvider"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.InviteUserToPP(System.String,System.String,System.String,System.String)">
             <summary>
             Administrator is allowed to invite other users and set their groups
