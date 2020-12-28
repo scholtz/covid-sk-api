@@ -312,7 +312,7 @@
             This controller manages test results
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.ResultController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.ResultController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Constructor
             </summary>
@@ -2390,44 +2390,49 @@
             <param name="userRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsRegistrationManager(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Model.Token.IsRegistrationManager(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Checks if user has role Registration Manager
             </summary>
             <param name="user"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsMedicTester(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Model.Token.IsMedicTester(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Checks if user has role Medic Tester
             </summary>
             <param name="user"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsMedicLab(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Model.Token.IsMedicLab(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Checks if user has role Medic Lab
             </summary>
             <param name="user"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsDocumentManager(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Model.Token.IsDocumentManager(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Check if user has role Document Manager
             </summary>
             <param name="user"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Model.Token.IsDataExporter(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Model.Token.IsDataExporter(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Check if user has role Data exporter
             </summary>
             <param name="user"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Model.Token.IsAuthorizedToIssueInvoice(System.Security.Claims.ClaimsPrincipal,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,System.String)">

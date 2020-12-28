@@ -580,6 +580,22 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (place.MainEmail == email) return true;
             }
+
+            if (place.Allocations != null)
+            {
+                foreach (var allocation in place.Allocations)
+                {
+                    if (allocation.User != email) continue;
+                    foreach (var group in role)
+                    {
+                        if (allocation.Role == group)
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
             foreach (var group in role)
             {
                 if (place.Group2Emails.ContainsKey(group))

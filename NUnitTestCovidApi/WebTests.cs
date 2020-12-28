@@ -1838,6 +1838,332 @@ namespace NUnitTestCovidApi
 
 
         }
+
+
+        [Test]
+        public void RoleMedicTesterPPTest()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+
+
+            var request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(0, result.Count);
+            var email = "place.provider@scholtz.sk";
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
+
+            };
+
+            request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            data = request.Content.ReadAsStringAsync().Result;
+
+            var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
+            Assert.AreEqual(obj.VAT, pp.VAT);
+            Assert.AreEqual(obj.Web, pp.Web);
+            Assert.AreEqual(obj.CompanyId, pp.CompanyId);
+            Assert.AreEqual(obj.CompanyName, pp.CompanyName);
+            Assert.AreEqual(obj.Country, pp.Country);
+            Assert.AreEqual(obj.MainEmail, pp.MainEmail);
+            Assert.AreEqual("+421907000000", pp.PrivatePhone);
+            Assert.AreEqual(obj.MainContact, pp.MainContact);
+
+            request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            data = request.Content.ReadAsStringAsync().Result;
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(1, result.Count);
+
+            var emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
+            var noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+            var emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
+            noEmailSender.Data.Clear();
+            request = AuthenticateUser(client, email, emailData.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+
+            var handler = new JwtSecurityTokenHandler();
+            var tokenS = handler.ReadToken(adminToken) as JwtSecurityToken;
+            var jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == "PPAdmin");
+            Assert.IsNotNull(jti);
+
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            // setup places
+            var debugPlaces = SetupDebugPlaces(client);
+            var firstPlace = debugPlaces.First();
+            var secondPlace = debugPlaces.Skip(1).First();
+
+            // invite tester
+            var medicPersonEmail = "person1tester@scholtz.sk";
+            request = InviteUserToPP(client, medicPersonEmail, "Person 1", "+421 907 000 000", "MyMessage");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+
+            request = ListPPInvites(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, invites.Count);
+
+            emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
+            noEmailSender.Data.Clear();
+            var medicPersonPass = emailData.Password;
+            request = AuthenticateUser(client, medicPersonEmail, medicPersonPass);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var medicPersonToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(medicPersonToken));
+
+
+            // invite lab user
+            var medicLabPersonEmail = "person1lab@scholtz.sk";
+            request = InviteUserToPP(client, medicLabPersonEmail, "Person 2", "+421 907 000 000", "MyMessage");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+
+            request = ListPPInvites(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(3, invites.Count);
+
+            emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
+            noEmailSender.Data.Clear();
+            request = AuthenticateUser(client, medicLabPersonEmail, emailData.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var medicLabPersonToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(medicLabPersonToken));
+
+
+            // open testing for public
+
+            var actions = new TimeUpdate[]
+            {
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now,
+                    OpeningHoursTemplateId= 1,
+                    PlaceId = "__ALL__",
+                    Type = "set"
+                },
+
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now.AddDays(1),
+                    OpeningHoursTemplateId= 2,
+                    PlaceId = firstPlace.Id,
+                    Type = "set"
+                },
+
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now,
+                    PlaceId = firstPlace.Id,
+                    Type = "delete"
+                }
+            };
+
+            request = ListScheduledDays(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var daysData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DayTimeManagement>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(0, daysData.Count);
+
+            request = ScheduleOpenningHours(client, actions);
+
+
+            // accept invitations
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+
+            request = ListUserInvites(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, invites.Count);
+            request = ProcessInvitation(client, invites[0].InvitationId, true);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
+
+            request = ListUserInvites(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, invites.Count);
+            request = ProcessInvitation(client, invites[0].InvitationId, true);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
+            client.DefaultRequestHeaders.Clear();
+            // check slots
+            request = ListPlaces(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var places = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(places.Count > 0);
+            var place = places.First().Value;
+            request = ListDaySlotsByPlace(client, place.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(days.Count > 0);
+
+            var day = days.First().Value;
+            request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var hours = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(hours.Count > 0);
+
+            var hour = hours.First().Value;
+            request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(minutes.Count > 0);
+
+            var minute = minutes.Values.First();
+            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+            Assert.IsTrue(registered.Count >= 2);
+
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+            // test authentication when user has not yet been assigned to the place
+            var user1 = registered[0];
+            request = GetVisitor(client, user1.Id.ToString());
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            request = GetVisitorByRC(client, user1.RC);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            // assign person to pp
+
+            var allocations = new PersonAllocation[]
+            {
+                new PersonAllocation()
+                {
+                    Start = DateTimeOffset.Now,
+                    End = DateTimeOffset.Now.AddDays(1),
+                    Role = Groups.MedicTester,
+                    User = medicPersonEmail
+                },
+                new PersonAllocation()
+                {
+                    Start = DateTimeOffset.Now,
+                    End = DateTimeOffset.Now.AddDays(1),
+                    Role = Groups.MedicLab,
+                    User = medicLabPersonEmail
+                }
+            };
+            request = AllocatePersonsToPlace(client, allocations, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            // login again, check tokens
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+            request = SetPlaceProvider(client, pp.PlaceProviderId);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            medicPersonToken = request.Content.ReadAsStringAsync().Result;
+
+            handler = new JwtSecurityTokenHandler();
+            tokenS = handler.ReadToken(medicPersonToken) as JwtSecurityToken;
+            jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == Groups.MedicTester);
+            Assert.IsNotNull(jti);
+            jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == Token.Claims.PlaceProvider);
+            Assert.IsNotNull(jti);
+            Assert.AreEqual(pp.PlaceProviderId, jti.Value);
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
+            request = SetPlaceProvider(client, pp.PlaceProviderId);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            medicLabPersonToken = request.Content.ReadAsStringAsync().Result;
+
+            handler = new JwtSecurityTokenHandler();
+            tokenS = handler.ReadToken(medicLabPersonToken) as JwtSecurityToken;
+            jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == Groups.MedicLab);
+            Assert.IsNotNull(jti);
+            jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == Token.Claims.PlaceProvider);
+            Assert.IsNotNull(jti);
+            Assert.AreEqual(pp.PlaceProviderId, jti.Value);
+
+            // perform fetch data by personal number, by reg code, assign the test set
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+            request = GetVisitor(client, user1.Id.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var responseVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(user1.RC, responseVisitor.RC);
+            Assert.AreEqual(user1.FirstName, responseVisitor.FirstName);
+            Assert.AreEqual(user1.LastName, responseVisitor.LastName);
+            Assert.AreEqual(user1.Address, responseVisitor.Address);
+
+
+            request = GetVisitorByRC(client, user1.RC);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            responseVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(user1.RC, responseVisitor.RC);
+            Assert.AreEqual(user1.FirstName, responseVisitor.FirstName);
+            Assert.AreEqual(user1.LastName, responseVisitor.LastName);
+            Assert.AreEqual(user1.Address, responseVisitor.Address);
+
+            string test1 = "111-111-111";
+            request = ConnectVisitorToTest(client, registered[0].Id.ToString(), test1);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            string test2 = "222-222-222";
+            request = ConnectVisitorToTest(client, registered[1].Id.ToString(), test2);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
+
+
+            // TEST mark as sick
+            request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.PositiveWaitingForCertificate, testResult.State);
+
+            // TEST mark as wrong code
+            request = SetResult(client, test1, TestResult.PositiveCertificateTaken);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
+            // TEST mark as sick
+            request = SetResult(client, test2, TestResult.NegativeWaitingForCertificate);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, testResult.State);
+            client.DefaultRequestHeaders.Clear();
+
+            request = PublicGetTestResult(client, registered[0].Id.ToString(), registered[0].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.PositiveWaitingForCertificate, testResult.State);
+
+            request = PublicGetTestResult(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, testResult.State);
+        }
+
         [Test]
         public virtual void TestVersion()
         {

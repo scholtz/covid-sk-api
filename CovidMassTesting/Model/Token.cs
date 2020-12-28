@@ -19,7 +19,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Claim names
         /// </summary>
-        internal static class Claims
+        public static class Claims
         {
             /// <summary>
             /// Roles claim identifier
@@ -167,8 +167,9 @@ namespace CovidMassTesting.Model
         /// </summary>
         /// <param name="user"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <returns></returns>
-        public static bool IsRegistrationManager(this ClaimsPrincipal user, IUserRepository userRepository)
+        public static bool IsRegistrationManager(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository)
         {
             if (user is null)
             {
@@ -181,6 +182,14 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
+            var pp = user.GetPlaceProvider();
+            if (!string.IsNullOrEmpty(pp))
+            {
+                if (placeProviderRepository.InAnyGroup(email, pp, new string[] { Groups.RegistrationManager }).Result)
+                {
+                    return true;
+                }
+            }
             return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.RegistrationManager }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
@@ -188,8 +197,9 @@ namespace CovidMassTesting.Model
         /// </summary>
         /// <param name="user"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <returns></returns>
-        public static bool IsMedicTester(this ClaimsPrincipal user, IUserRepository userRepository)
+        public static bool IsMedicTester(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository)
         {
             if (user is null)
             {
@@ -202,6 +212,14 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
+            var pp = user.GetPlaceProvider();
+            if (!string.IsNullOrEmpty(pp))
+            {
+                if (placeProviderRepository.InAnyGroup(email, pp, new string[] { Groups.MedicTester }).Result)
+                {
+                    return true;
+                }
+            }
             return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicTester }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
@@ -209,8 +227,9 @@ namespace CovidMassTesting.Model
         /// </summary>
         /// <param name="user"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <returns></returns>
-        public static bool IsMedicLab(this ClaimsPrincipal user, IUserRepository userRepository)
+        public static bool IsMedicLab(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository)
         {
             if (user is null)
             {
@@ -223,6 +242,15 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
+            var pp = user.GetPlaceProvider();
+
+            if (!string.IsNullOrEmpty(pp))
+            {
+                if (placeProviderRepository.InAnyGroup(email, pp, new string[] { Groups.MedicLab }).Result)
+                {
+                    return true;
+                }
+            }
             return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.MedicLab }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
@@ -230,8 +258,9 @@ namespace CovidMassTesting.Model
         /// </summary>
         /// <param name="user"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <returns></returns>
-        public static bool IsDocumentManager(this ClaimsPrincipal user, IUserRepository userRepository)
+        public static bool IsDocumentManager(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository)
         {
             if (user is null)
             {
@@ -244,6 +273,15 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
+            var pp = user.GetPlaceProvider();
+
+            if (!string.IsNullOrEmpty(pp))
+            {
+                if (placeProviderRepository.InAnyGroup(email, pp, new string[] { Groups.DocumentManager }).Result)
+                {
+                    return true;
+                }
+            }
             return userRepository.InAnyGroup(email, new string[] { Groups.Admin, Groups.DocumentManager }, user.GetPlaceProvider()).Result;
         }
         /// <summary>
@@ -251,8 +289,9 @@ namespace CovidMassTesting.Model
         /// </summary>
         /// <param name="user"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <returns></returns>
-        public static bool IsDataExporter(this ClaimsPrincipal user, IUserRepository userRepository)
+        public static bool IsDataExporter(this ClaimsPrincipal user, IUserRepository userRepository, IPlaceProviderRepository placeProviderRepository)
         {
             if (user is null)
             {
@@ -265,6 +304,15 @@ namespace CovidMassTesting.Model
             }
 
             var email = user.GetEmail();
+            var pp = user.GetPlaceProvider();
+
+            if (!string.IsNullOrEmpty(pp))
+            {
+                if (placeProviderRepository.InAnyGroup(email, pp, new string[] { Groups.DataExporter }).Result)
+                {
+                    return true;
+                }
+            }
             return userRepository.InAnyGroup(email, new string[] { Groups.DataExporter }, user.GetPlaceProvider()).Result;
         }
         /// <summary>

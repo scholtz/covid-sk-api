@@ -27,6 +27,7 @@ namespace CovidMassTesting.Controllers
         private readonly ILogger<ResultController> logger;
         private readonly IVisitorRepository visitorRepository;
         private readonly IUserRepository userRepository;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -38,13 +39,15 @@ namespace CovidMassTesting.Controllers
             IStringLocalizer<ResultController> localizer,
             ILogger<ResultController> logger,
             IVisitorRepository visitorRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IPlaceProviderRepository placeProviderRepository
             )
         {
             this.localizer = localizer;
             this.logger = logger;
             this.visitorRepository = visitorRepository;
             this.userRepository = userRepository;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// Testing personell can load data by the code, so that they can verify that the code is the specific user
@@ -59,7 +62,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Registration_Manager_role_or_Medic_Tester_role_is_allowed_to_fetch_data_of_visitors].Value);
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository) && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Registration_Manager_role_or_Medic_Tester_role_is_allowed_to_fetch_data_of_visitors].Value);
+                }
 
                 if (string.IsNullOrEmpty(visitorCode))
                 {
@@ -94,7 +100,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors"].Value);
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository) && !User.IsMedicTester(userRepository, placeProviderRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors"].Value);
 
                 if (string.IsNullOrEmpty(rc))
                 {
@@ -124,7 +130,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository) && !User.IsMedicTester(userRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to register user to test"].Value);
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository) && !User.IsMedicTester(userRepository, placeProviderRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to register user to test"].Value);
 
 
                 if (string.IsNullOrEmpty(visitorCode))
@@ -243,7 +249,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsMedicLab(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Medic_Lab_role_is_allowed_to_set_results_of_tests].Value);
+                if (!User.IsMedicLab(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Medic_Lab_role_is_allowed_to_set_results_of_tests].Value);
 
                 if (string.IsNullOrEmpty(testCode))
                 {
@@ -283,7 +289,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDocumentManager(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data].Value);
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data].Value);
 
                 return Ok(await visitorRepository.GetNextTest());
             }
@@ -310,7 +316,7 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException(localizer[Controllers_ResultController.Test_id_must_not_be_empty].Value);
                 }
 
-                if (!User.IsDocumentManager(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
                 var code = FormatBarCode(testId);
                 var ret = await visitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(code);
                 return Ok(ret);
@@ -337,7 +343,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
 
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);

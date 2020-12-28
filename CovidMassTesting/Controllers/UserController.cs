@@ -157,7 +157,7 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException(localizer[Controllers_UserController.Place_must_not_be_empty].Value);
                 }
 
-                if (!User.IsRegistrationManager(userRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Registration_Manager_role_can_select_his_own_place_].Value);
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Registration_Manager_role_can_select_his_own_place_].Value);
 
                 return Ok(await userRepository.SetLocation(User.GetEmail(), placeId, User.GetPlaceProvider()));
             }
