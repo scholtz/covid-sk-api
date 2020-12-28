@@ -46,7 +46,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                return Ok((await slotRepository.ListDaySlotsByPlace(placeId)).OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
+                return Ok((
+                    await slotRepository.ListDaySlotsByPlace(placeId))
+                        .Where(s => s != null)
+                        .OrderBy(s => s.SlotId)
+                        .ToDictionary(p => p.Time.Ticks, p => p));
             }
             catch (Exception exc)
             {

@@ -491,7 +491,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = new List<Slot1Day>();
             foreach (var slot in (await redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D_BY_PLACE}_{placeId}")))
             {
-                ret.Add(await redisCacheClient.Db0.HashGetAsync<Slot1Day>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", slot));
+                var daySlot = await redisCacheClient.Db0.HashGetAsync<Slot1Day>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", slot);
+                if (daySlot != null)
+                {
+                    ret.Add(daySlot);
+                }
             }
             return ret;
         }
@@ -516,7 +520,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = new List<Slot1Hour>();
             foreach (var slot in await redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{placeId}_{daySlotId}"))
             {
-                ret.Add(await redisCacheClient.Db0.HashGetAsync<Slot1Hour>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", slot));
+                var hourSlot = await redisCacheClient.Db0.HashGetAsync<Slot1Hour>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", slot);
+                if (hourSlot != null)
+                {
+                    ret.Add(hourSlot);
+                }
             }
             return ret;
         }
@@ -541,7 +549,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = new List<Slot5Min>();
             foreach (var slot in await redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR}_{placeId}_{hourSlotId}"))
             {
-                ret.Add(await redisCacheClient.Db0.HashGetAsync<Slot5Min>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", slot));
+                var minSlot = await redisCacheClient.Db0.HashGetAsync<Slot5Min>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", slot);
+                if (minSlot != null)
+                {
+                    ret.Add(minSlot);
+                }
             }
             return ret;
         }

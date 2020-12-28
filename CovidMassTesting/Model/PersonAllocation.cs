@@ -30,6 +30,9 @@ namespace CovidMassTesting.Model
         /// End
         /// </summary>
         public DateTimeOffset End { get; set; }
-        public string PlaceId { get; internal set; }
+        /// <summary>
+        /// Allocated place id
+        /// </summary>
+        public string PlaceId { get; set; }
     }
 }

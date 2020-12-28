@@ -243,11 +243,13 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Phone number seems to be invalid");
                 }
                 var addr = new System.Net.Mail.MailAddress(email);
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
 
 
                 return Ok(await userRepository.Invite(
                     new Model.Invitation()
                     {
+                        CompanyName = pp.CompanyName,
                         Email = addr.Address,
                         Name = name,
                         InvitationMessage = message,

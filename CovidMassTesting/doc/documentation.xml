@@ -9,7 +9,7 @@
             Administration methods
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
             <summary>
             Constructor
             </summary>
@@ -1428,6 +1428,11 @@
         <member name="P:CovidMassTesting.Model.PersonAllocation.End">
             <summary>
             End
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PersonAllocation.PlaceId">
+            <summary>
+            Allocated place id
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Place">
@@ -3821,12 +3826,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.DropAllData">
-            <summary>
-            Drop all data in repository
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetPriceWithoutVAT(System.String,System.Int32,System.String,System.DateTimeOffset,System.DateTimeOffset)">
             <summary>
             Calculate price of service
@@ -3963,6 +3962,12 @@
             List allocations
             </summary>
             <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.DropAllData">
+            <summary>
+            Drop all data in repository
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceRepository">
@@ -4394,12 +4399,6 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.DropAllData">
-            <summary>
-            Administrator has power to delete everything in the database. Password confirmation is required.
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Invite(CovidMassTesting.Model.Invitation)">
             <summary>
             invites person
@@ -4414,6 +4413,12 @@
             <param name="invitationId"></param>
             <param name="accepted"></param>
             <param name="userEmail"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.DropAllData">
+            <summary>
+            Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.VisitorRepository">

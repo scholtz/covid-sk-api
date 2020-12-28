@@ -644,27 +644,6 @@ namespace CovidMassTesting.Repository.RedisRepository
             return true;
         }
         /// <summary>
-        /// Administrator has power to delete everything in the database. Password confirmation is required.
-        /// </summary>
-        /// <returns></returns>
-        public virtual async Task<int> DropAllData()
-        {
-            int ret = 0;
-            var list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
-            foreach (var item in list)
-            {
-                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", item);
-                ret++;
-            }
-            list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}");
-            foreach (var item in list)
-            {
-                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}", item);
-                ret++;
-            }
-            return ret;
-        }
-        /// <summary>
         /// invites person
         /// </summary>
         /// <param name="invitation"></param>
@@ -749,6 +728,27 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             return invitation;
+        }
+        /// <summary>
+        /// Administrator has power to delete everything in the database. Password confirmation is required.
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<int> DropAllData()
+        {
+            int ret = 0;
+            var list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
+            foreach (var item in list)
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}", item);
+                ret++;
+            }
+            list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}");
+            foreach (var item in list)
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_INVITATION_OBJECTS}", item);
+                ret++;
+            }
+            return ret;
         }
     }
 }

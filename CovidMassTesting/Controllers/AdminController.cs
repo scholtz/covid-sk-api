@@ -30,6 +30,7 @@ namespace CovidMassTesting.Controllers
         private readonly IUserRepository userRepository;
         private readonly IConfiguration configuration;
         private readonly IVisitorRepository visitorRepository;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -47,7 +48,8 @@ namespace CovidMassTesting.Controllers
             ISlotRepository slotRepository,
             IPlaceRepository placeRepository,
             IUserRepository userRepository,
-            IVisitorRepository visitorRepository
+            IVisitorRepository visitorRepository,
+            IPlaceProviderRepository placeProviderRepository
             )
         {
             this.localizer = localizer;
@@ -57,6 +59,7 @@ namespace CovidMassTesting.Controllers
             this.userRepository = userRepository;
             this.configuration = configuration;
             this.visitorRepository = visitorRepository;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// Shows available days per place
@@ -170,6 +173,7 @@ namespace CovidMassTesting.Controllers
                 ret += await slotRepository.DropAllData();
                 ret += await visitorRepository.DropAllData();
                 ret += await userRepository.DropAllData();
+                ret += await placeProviderRepository.DropAllData();
 
                 return Ok(ret);
             }

@@ -228,20 +228,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return redisCacheClient.Db0.HashValuesAsync<PlaceProvider>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}");
         }
-        /// <summary>
-        /// Drop all data in repository
-        /// </summary>
-        /// <returns></returns>
-        public virtual async Task<int> DropAllData()
-        {
-            var ret = 0;
-            foreach (var place in await ListAll())
-            {
-                ret++;
-                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", place.PlaceProviderId);
-            }
-            return ret;
-        }
+
         /// <summary>
         /// Calculate price of service
         /// </summary>
@@ -686,6 +673,33 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Unable to find place within scope of place provider");
             var pp = await GetPlaceProvider(place.PlaceProviderId);
             return pp.Allocations?.Where(p => p.PlaceId == placeId);
+        }
+        /// <summary>
+        /// Drop all data in repository
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<int> DropAllData()
+        {
+            var ret = 0;
+            foreach (var place in await ListAll())
+            {
+                ret++;
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", place.PlaceProviderId);
+            }
+            foreach (var invoice in await ListAllProInvoices())
+            {
+                ret++;
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRO_INVOICES_OBJECTS}", invoice.InvoiceId.ToString());
+            }
+            foreach (var invoice in await ListAllRealInvoices())
+            {
+                ret++;
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_REAL_INVOICES_OBJECTS}", invoice.InvoiceId.ToString());
+            }
+
+            await redisCacheClient.Db0.RemoveAsync(REDIS_KEY_LAST_PRO_INVOICE);
+            await redisCacheClient.Db0.RemoveAsync(REDIS_KEY_LAST_REAL_INVOICE);
+            return ret;
         }
     }
 }

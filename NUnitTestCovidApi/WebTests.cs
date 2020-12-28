@@ -1764,7 +1764,7 @@ namespace NUnitTestCovidApi
             request = ListPPInvites(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(1, invites.Count);
+            Assert.AreEqual(2, invites.Count);
 
             emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
             noEmailSender.Data.Clear();
