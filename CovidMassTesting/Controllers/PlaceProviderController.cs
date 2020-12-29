@@ -574,5 +574,100 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Administrator is allowed to create product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("CreateProduct")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Product>> CreateProduct([FromBody] Product product)
+        {
+
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                product.Id = Guid.NewGuid().ToString();
+                return Ok(await placeProviderRepository.AddProduct(User.GetPlaceProvider(), product));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Administrator is allowed to update product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("UpdateProduct")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Product>> UpdateProduct([FromBody] Product product)
+        {
+
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                return Ok(await placeProviderRepository.SetProduct(User.GetPlaceProvider(), product));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Administrator is allowed to delete product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("DeleteProduct")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> DeleteProduct([FromBody] Product product)
+        {
+
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                return Ok(await placeProviderRepository.DeleteProduct(User.GetPlaceProvider(), product));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Administrator is allowed to list pp products
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListProducts")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<Product>>> ListProducts()
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                return Ok(await placeProviderRepository.ListProducts(User.GetPlaceProvider()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }

@@ -82,6 +82,10 @@ namespace CovidMassTesting.Model
         /// List of person allocations
         /// </summary>
         public List<PersonAllocation> Allocations { get; set; } = new List<PersonAllocation>();
+        /// <summary>
+        /// List of products served by place provider
+        /// </summary>
+        public List<Product> Products { get; set; } = new List<Product>();
 
         /// <summary>
         /// Convert to public info

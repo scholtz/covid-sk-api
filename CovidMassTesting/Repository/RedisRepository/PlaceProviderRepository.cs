@@ -691,6 +691,77 @@ namespace CovidMassTesting.Repository.RedisRepository
             return pp.Allocations?.Where(p => p.PlaceId == placeId);
         }
         /// <summary>
+        /// Administrator is allowed to list pp products
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Product>> ListProducts(string placeProviderId)
+        {
+            var pp = await GetPlaceProvider(placeProviderId);
+            if (pp == null) throw new Exception("Unable to find place provider");
+
+            return pp.Products;
+        }
+
+        /// <summary>
+        /// Administrator is allowed to create product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        public async Task<Product> AddProduct(string placeProviderId, Product product)
+        {
+            var pp = await GetPlaceProvider(placeProviderId);
+            if (pp == null) throw new Exception("Unable to find place provider");
+
+            if (pp.Products == null) pp.Products = new List<Product>();
+            if (pp.Products.Any(p => p.Id == product.Id)) throw new Exception("Product with same ID already exists");
+
+            pp.Products.Add(product);
+            await SetPlaceProvider(pp);
+            return product;
+        }
+        /// <summary>
+        /// Administrator is allowed to update product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="product"></param>
+        /// <returns></returns>
+
+        public async Task<Product> SetProduct(string placeProviderId, Product product)
+        {
+            var pp = await GetPlaceProvider(placeProviderId);
+            if (pp == null) throw new Exception("Unable to find place provider");
+
+            if (pp.Products == null) pp.Products = new List<Product>();
+            var old = pp.Products.FirstOrDefault(p => p.Id == product.Id);
+            if (old != null)
+            {
+                pp.Products.Remove(old);
+            }
+            pp.Products.Add(product);
+            await SetPlaceProvider(pp);
+            return product;
+        }
+
+        /// <summary>
+        /// Administrator is allowed to delete product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="product"></param>
+        public async Task<bool> DeleteProduct(string placeProviderId, Product product)
+        {
+            var pp = await GetPlaceProvider(placeProviderId);
+            if (pp == null) throw new Exception("Unable to find place provider");
+
+            if (pp.Products == null) pp.Products = new List<Product>();
+            var old = pp.Products.FirstOrDefault(p => p.Id == product.Id);
+            if (old == null) throw new Exception("Product does not exists");
+            pp.Products.Remove(old);
+            await SetPlaceProvider(pp);
+            return true;
+        }
+        /// <summary>
         /// Drop all data in repository
         /// </summary>
         /// <returns></returns>
@@ -717,5 +788,6 @@ namespace CovidMassTesting.Repository.RedisRepository
             await redisCacheClient.Db0.RemoveAsync(REDIS_KEY_LAST_REAL_INVOICE);
             return ret;
         }
+
     }
 }

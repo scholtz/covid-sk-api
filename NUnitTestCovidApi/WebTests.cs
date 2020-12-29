@@ -342,6 +342,32 @@ namespace NUnitTestCovidApi
                                 new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                 ).Result;
         }
+        private HttpResponseMessage CreateProduct(HttpClient client, Product product)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(product);
+            return client.PostAsync("PlaceProvider/CreateProduct",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+        private HttpResponseMessage UpdateProduct(HttpClient client, Product product)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(product);
+            return client.PostAsync("PlaceProvider/UpdateProduct",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+        private HttpResponseMessage DeleteProduct(HttpClient client, Product product)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(product);
+            return client.PostAsync("PlaceProvider/DeleteProduct",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+
+        private HttpResponseMessage ListProducts(HttpClient client)
+        {
+            return client.GetAsync("PlaceProvider/ListProducts").Result;
+        }
 
         private HttpResponseMessage FinalDataExport(HttpClient client, int from, int count)
         {
@@ -1889,6 +1915,7 @@ namespace NUnitTestCovidApi
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
             Assert.AreEqual(1, result.Count);
 
+
             var emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
             var noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
             Assert.AreEqual(1, noEmailSender.Data.Count);
@@ -1905,6 +1932,42 @@ namespace NUnitTestCovidApi
             Assert.IsNotNull(jti);
 
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            // Test product management
+            request = CreateProduct(client, new Product()
+            {
+                Name = "Drahá vakcína",
+                Description = "Vakcína ktorá nie je hradená poisťovňou",
+                DefaultPrice = 100M,
+                DefaultPriceCurrency = "EUR",
+            });
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var pr1 = JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(100, pr1.DefaultPrice);
+            request = CreateProduct(client, new Product()
+            {
+                Name = "Vakcína zadarmo",
+                Description = "Vakcína ktorá je hradená poisťovňou",
+                DefaultPrice = 0,
+            });
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var pr2 = JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
+
+            pr1.DefaultPrice = 99;
+            request = UpdateProduct(client, pr1);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = ListProducts(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var prList = JsonConvert.DeserializeObject<List<Product>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, prList.Count);
+
+            request = DeleteProduct(client, pr2);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            request = ListProducts(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            prList = JsonConvert.DeserializeObject<List<Product>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, prList.Count);
 
             // setup places
             var debugPlaces = SetupDebugPlaces(client);

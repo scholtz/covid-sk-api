@@ -137,5 +137,31 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="placeId"></param>
         /// <returns></returns>
         public Task<bool> RemovePersonAllocation(string allocationId, string placeId);
+        /// <summary>
+        /// Administrator is allowed to list pp products
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Product>> ListProducts(string placeProviderId);
+        /// <summary>
+        /// Administrator is allowed to create product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        Task<Product> AddProduct(string placeProviderId, Product product);
+        /// <summary>
+        /// Administrator is allowed to update product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        Task<Product> SetProduct(string placeProviderId, Product product);
+        /// <summary>
+        /// Administrator is allowed to delete product or service which he sells or serve at the testing place
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="product"></param>
+        Task<bool> DeleteProduct(string placeProviderId, Product product);
     }
 }

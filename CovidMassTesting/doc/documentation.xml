@@ -307,6 +307,33 @@
             <param name="placeId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.CreateProduct(CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to create product or service which he sells or serve at the testing place
+            </summary>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.UpdateProduct(CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to update product or service which he sells or serve at the testing place
+            </summary>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.DeleteProduct(CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to delete product or service which he sells or serve at the testing place
+            </summary>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListProducts">
+            <summary>
+            Administrator is allowed to list pp products
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.ResultController">
             <summary>
             This controller manages test results
@@ -1665,6 +1692,11 @@
             List of person allocations
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.Products">
+            <summary>
+            List of products served by place provider
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Model.PlaceProvider.ToPublic">
             <summary>
             Convert to public info
@@ -1709,6 +1741,46 @@
         <member name="P:CovidMassTesting.Model.PlaceProviderPublic.Web">
             <summary>
             Web
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Product">
+            <summary>
+            Product or service served by the place provider at testing places
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.Name">
+            <summary>
+            Name of the product or service
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.Description">
+            <summary>
+            Description
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.DefaultPrice">
+            <summary>
+            Default price. Admin can set the pricing other then default at the specific places
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.DefaultPriceCurrency">
+            <summary>
+            Price currency
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.CreatedOn">
+            <summary>
+            When the resource was created
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.LastUpdate">
+            <summary>
+            Time when resource was last updated
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Result">
@@ -2878,6 +2950,36 @@
             <param name="placeId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListProducts(System.String)">
+            <summary>
+            Administrator is allowed to list pp products
+            </summary>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.AddProduct(System.String,CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to create product or service which he sells or serve at the testing place
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.SetProduct(System.String,CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to update product or service which he sells or serve at the testing place
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.DeleteProduct(System.String,CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to delete product or service which he sells or serve at the testing place
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="product"></param>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
             <summary>
             Place repository interface for dependency injection
@@ -3968,6 +4070,36 @@
             </summary>
             <param name="placeId"></param>
             <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListProducts(System.String)">
+            <summary>
+            Administrator is allowed to list pp products
+            </summary>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.AddProduct(System.String,CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to create product or service which he sells or serve at the testing place
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.SetProduct(System.String,CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to update product or service which he sells or serve at the testing place
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.DeleteProduct(System.String,CovidMassTesting.Model.Product)">
+            <summary>
+            Administrator is allowed to delete product or service which he sells or serve at the testing place
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="product"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.DropAllData">
             <summary>
