@@ -19,6 +19,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// Applied for all places
+        /// </summary>
+        public bool All { get; set; }
+        /// <summary>
         /// Description
         /// </summary>
         public string Description { get; set; }
