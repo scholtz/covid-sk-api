@@ -188,6 +188,21 @@
             <param name="place"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.InsertOrUpdatePlaceProduct(System.String,CovidMassTesting.Model.PlaceProduct)">
+            <summary>
+            Creates product at specified place with special price valid from until as specified in PlaceProduct object 
+            </summary>
+            <param name="placeId"></param>
+            <param name="placeProduct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.DeletePlaceProduct(System.String)">
+            <summary>
+            Admin can delete testing location
+            </summary>
+            <param name="placeProductid"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.PlaceProviderController">
             <summary>
             Manages place provider companies
@@ -1597,6 +1612,56 @@
             Place does the covid vaccine paid by insurance or government
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.PlaceProduct">
+            <summary>
+            Product specified for specific place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.Id">
+            <summary>
+            Record Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.PlaceId">
+            <summary>
+            Place id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.ProductId">
+            <summary>
+            Product id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.From">
+            <summary>
+            Time from when the product is provided
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.Until">
+            <summary>
+            Time until when the product is provided
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.CustomPrice">
+            <summary>
+            Has custom price. If true, the price from this object is applied. If false, default price from product is applied
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.Price">
+            <summary>
+            Price
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.PriceCurrency">
+            <summary>
+            Currency
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.PlaceProviderId">
+            <summary>
+            Place provider
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProvider">
             <summary>
             Place provider is hospital or company prividing testing place. One hospital can have multiple testing places.
@@ -1753,9 +1818,24 @@
             Id
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Product.Category">
+            <summary>
+            Category
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Product.Name">
             <summary>
             Name of the product or service
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.InsuranceOnly">
+            <summary>
+            Insurance only
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.All">
+            <summary>
+            Applied for all places
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Product.Description">
@@ -3046,6 +3126,27 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.SetProductPlace(CovidMassTesting.Model.PlaceProduct)">
+            <summary>
+            Create/Update product place
+            </summary>
+            <param name="placeProduct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.DeletePlaceProduct(System.String)">
+            <summary>
+            Delete product place
+            </summary>
+            <param name="placeProductid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.GetPlaceProduct(System.String)">
+            <summary>
+            Get product place
+            </summary>
+            <param name="placeProductid"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.ISlotRepository">
             <summary>
             Slot repositotory interface
@@ -3516,6 +3617,27 @@
             Delete place
             </summary>
             <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.GetPlaceProduct(System.String)">
+            <summary>
+            Get
+            </summary>
+            <param name="placeProductid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.SetProductPlace(CovidMassTesting.Model.PlaceProduct)">
+            <summary>
+            Set
+            </summary>
+            <param name="placeProduct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.DeletePlaceProduct(System.String)">
+            <summary>
+            DeleteProductPlace
+            </summary>
+            <param name="placeProductid"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.DropAllData">
@@ -4173,6 +4295,27 @@
             Deletes place
             </summary>
             <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.SetProductPlace(CovidMassTesting.Model.PlaceProduct)">
+            <summary>
+            Create/Update product place
+            </summary>
+            <param name="placeProduct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.DeletePlaceProduct(System.String)">
+            <summary>
+            Delete product place
+            </summary>
+            <param name="placeProductid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.GetPlaceProduct(System.String)">
+            <summary>
+            Get product place
+            </summary>
+            <param name="placeProductid"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.DropAllData">

@@ -420,5 +420,97 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+
+        /// <summary>
+        /// Creates product at specified place with special price valid from until as specified in PlaceProduct object 
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <param name="placeProduct"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("InsertOrUpdatePlaceProduct")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<PlaceProduct>> InsertOrUpdatePlaceProduct(
+            [FromForm] string placeId,
+            [FromForm] PlaceProduct placeProduct
+            )
+        {
+
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                var place = await placeRepository.GetPlace(placeId);
+                if (place == null) throw new Exception("Place not found");
+                if (place.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define product only for your places");
+
+                var update = true;
+                if (string.IsNullOrEmpty(placeProduct.Id))
+                {
+                    update = false;
+                }
+
+                logger.LogInformation($"InsertOrUpdatePlaceProduct : {placeId} {update}");
+
+                if (!update)
+                {
+                    // new place
+                    placeProduct.Id = Guid.NewGuid().ToString();
+                    placeProduct.PlaceProviderId = User.GetPlaceProvider();
+                    placeProduct = await placeRepository.SetProductPlace(placeProduct);
+                    logger.LogInformation($"ProductPlace {place.Name} has been created");
+                }
+                else
+                {
+                    // update existing
+                    if (placeProduct.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define place products only for your places");
+
+                    var oldPlaceProduct = await placeRepository.GetPlaceProduct(placeProduct.Id);
+
+                    placeProduct = await placeRepository.SetProductPlace(placeProduct);
+                    logger.LogInformation($"Place {place.Name} has been updated");
+                }
+
+                return Ok(placeProduct);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Admin can delete testing location
+        /// </summary>
+        /// <param name="placeProductid"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("DeletePlaceProduct")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Place>> DeletePlaceProduct(
+            [FromForm] string placeProductid
+            )
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                var productPlace = await placeRepository.GetPlaceProduct(placeProductid);
+                if (productPlace == null) throw new Exception("Place not found");
+                if (productPlace.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define product only for your places");
+
+
+                return Ok(placeRepository.DeletePlaceProduct(placeProductid));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
     }
 }

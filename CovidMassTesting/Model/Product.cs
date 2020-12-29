@@ -15,9 +15,17 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Id { get; set; }
         /// <summary>
+        /// Category
+        /// </summary>
+        public string Category { get; set; }
+        /// <summary>
         /// Name of the product or service
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Insurance only
+        /// </summary>
+        public bool InsuranceOnly { get; set; }
         /// <summary>
         /// Applied for all places
         /// </summary>
