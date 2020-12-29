@@ -737,8 +737,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             var old = pp.Products.FirstOrDefault(p => p.Id == product.Id);
             if (old != null)
             {
+                product.CreatedOn = old.CreatedOn;
                 pp.Products.Remove(old);
             }
+            product.LastUpdate = DateTimeOffset.Now;
             pp.Products.Add(product);
             await SetPlaceProvider(pp);
             return product;

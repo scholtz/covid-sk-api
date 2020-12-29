@@ -590,6 +590,8 @@ namespace CovidMassTesting.Controllers
             {
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 product.Id = Guid.NewGuid().ToString();
+                product.CreatedOn = DateTimeOffset.Now;
+                product.LastUpdate = product.CreatedOn;
                 return Ok(await placeProviderRepository.AddProduct(User.GetPlaceProvider(), product));
             }
             catch (Exception exc)
@@ -614,6 +616,8 @@ namespace CovidMassTesting.Controllers
             try
             {
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+
+                product.LastUpdate = DateTimeOffset.Now;
                 return Ok(await placeProviderRepository.SetProduct(User.GetPlaceProvider(), product));
             }
             catch (Exception exc)
