@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="ChoETL" Version="1.2.1.5" />
     <PackageReference Include="CsvHelper" Version="19.0.0" />
-    <PackageReference Include="GoPay.NET" Version="1.1.14" />
+    <PackageReference Include="GoPay.NetStandard" Version="1.1.14" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
