@@ -485,7 +485,7 @@ namespace NUnitTestCovidApi
             request = Authenticate(client, user.Email, pass);
             Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
-            Task.Delay(1000).Wait();
+            Task.Delay(2000).Wait();
             request = Authenticate(client, user.Email, pass);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 

@@ -13,7 +13,7 @@ namespace NUnitTestCovidApi
     {
         public override string AppSettings { get; set; } = "redis-appsettings.json";
 
-
+        1
         [Test]
         public override void TestVersion()
         {
