@@ -7,14 +7,13 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0-focal AS build
 WORKDIR /src
-COPY ["CovidMassTesting/CovidMassTesting.csproj", "CovidMassTesting/"]
-RUN dotnet restore "CovidMassTesting/CovidMassTesting.csproj"
 COPY . .
-WORKDIR "/src/CovidMassTesting"
-RUN dotnet build "CovidMassTesting.csproj" -c Release -o /app/build
+RUN dotnet restore "CovidMassTesting.sln"
+RUN dotnet build "CovidMassTesting.sln" -c Release -o /app/build
+RUN dotnet test "CovidMassTesting.sln" -c Release 
 
 FROM build AS publish
-RUN dotnet publish "CovidMassTesting.csproj" -c Release -o /app/publish
+RUN dotnet publish "CovidMassTesting.sln" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
