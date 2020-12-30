@@ -384,6 +384,11 @@ namespace NUnitTestCovidApi
         {
             return client.GetAsync($"PlaceProvider/ListPlaceProductByPlace?placeId={placeId}").Result;
         }
+        private HttpResponseMessage ListPlaceProduct(HttpClient client)
+        {
+            return client.GetAsync($"PlaceProvider/ListPlaceProduct").Result;
+        }
+
         private HttpResponseMessage DeletePlaceProduct(HttpClient client, string placeProductid)
         {
             return client.PostAsync("Place/DeletePlaceProduct",
@@ -2058,6 +2063,10 @@ namespace NUnitTestCovidApi
             placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(2, placeProducts.Count);
 
+            request = ListPlaceProduct(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(4, placeProducts.Count);
 
             request = DeletePlaceProduct(client, placeProduct1.Id);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);

@@ -200,7 +200,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
         public virtual Task<PlaceProduct> GetPlaceProduct(string placeProductid)
         {
-            return redisCacheClient.Db0.HashGetAsync<PlaceProduct>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", placeProductid);
+            return redisCacheClient.Db0.HashGetAsync<PlaceProduct>($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_OBJECTS}", placeProductid);
         }
         /// <summary>
         /// List by place

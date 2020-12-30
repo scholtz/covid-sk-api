@@ -500,7 +500,7 @@ namespace CovidMassTesting.Controllers
                 if (productPlace == null) throw new Exception("Place not found");
                 if (productPlace.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define product only for your places");
 
-                return Ok(placeRepository.DeletePlaceProduct(productPlace));
+                return Ok(await placeRepository.DeletePlaceProduct(productPlace));
             }
             catch (Exception exc)
             {
