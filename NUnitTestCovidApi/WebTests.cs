@@ -384,6 +384,14 @@ namespace NUnitTestCovidApi
         {
             return client.GetAsync($"PlaceProvider/ListPlaceProductByPlace?placeId={placeId}").Result;
         }
+        private HttpResponseMessage DeletePlaceProduct(HttpClient client, string placeProductid)
+        {
+            return client.PostAsync("Place/DeletePlaceProduct",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("placeProductid",placeProductid),
+                    })
+                ).Result;
+        }
 
         private HttpResponseMessage ListProducts(HttpClient client)
         {
@@ -2044,7 +2052,20 @@ namespace NUnitTestCovidApi
                 ProductId = pr1.Id,
             });
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var placeProduct1 = JsonConvert.DeserializeObject<PlaceProduct>(request.Content.ReadAsStringAsync().Result);
+            request = ListPlaceProductByPlace(client, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, placeProducts.Count);
 
+
+            request = DeletePlaceProduct(client, placeProduct1.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = ListPlaceProductByPlace(client, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, placeProducts.Count);
 
             // invite tester
             var medicPersonEmail = "person1tester@scholtz.sk";
