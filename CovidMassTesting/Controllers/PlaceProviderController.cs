@@ -738,6 +738,32 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Everyone can list place products at place provider
         /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListPlaceProduct")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> ListPlaceProduct()
+        {
+            try
+            {
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                if (pp == null) throw new Exception("Place provider not found");
+                var ret = await placeRepository.ListPlaceProductByPlaceProvider(pp);
+                var places = await placeRepository.ListAll();
+
+                return Ok(IPlaceProviderRepository.ExtendByAllProducts(ret, pp, places.Where(pp => pp.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToArray()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Everyone can list place products at place provider
+        /// </summary>
         /// <param name="category"></param>
         /// <returns></returns>
         [HttpGet("ListPlaceProductByCategory")]
