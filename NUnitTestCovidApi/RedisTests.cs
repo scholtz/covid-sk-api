@@ -1,4 +1,4 @@
-﻿#define DoRedisTests
+﻿//#define DoRedisTests
 
 using NUnit.Framework;
 using System;
