@@ -189,7 +189,7 @@
             <param name="place"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceController.InsertOrUpdatePlaceProduct(System.String,CovidMassTesting.Model.PlaceProduct)">
+        <member name="M:CovidMassTesting.Controllers.PlaceController.InsertOrUpdatePlaceProduct(CovidMassTesting.Model.PlaceProduct)">
             <summary>
             Creates product at specified place with special price valid from until as specified in PlaceProduct object 
             </summary>
@@ -362,6 +362,12 @@
             Everyone can list place products at place provider
             </summary>
             <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPlaceProduct">
+            <summary>
+            Everyone can list place products at place provider
+            </summary>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPlaceProductByCategory(System.String)">

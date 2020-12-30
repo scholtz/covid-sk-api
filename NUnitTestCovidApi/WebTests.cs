@@ -349,6 +349,14 @@ namespace NUnitTestCovidApi
                                 new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
                                 ).Result;
         }
+        private HttpResponseMessage InsertOrUpdatePlaceProduct(HttpClient client, PlaceProduct placeProduct)
+        {
+            var body = Newtonsoft.Json.JsonConvert.SerializeObject(placeProduct);
+            return client.PostAsync("Place/InsertOrUpdatePlaceProduct",
+                                new System.Net.Http.StringContent(body, Encoding.UTF8, "application/json")
+                                ).Result;
+        }
+
         private HttpResponseMessage UpdateProduct(HttpClient client, Product product)
         {
             var body = Newtonsoft.Json.JsonConvert.SerializeObject(product);
@@ -2024,6 +2032,18 @@ namespace NUnitTestCovidApi
             placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(3, placeProducts.Count);
 
+            request = InsertOrUpdatePlaceProduct(client, new PlaceProduct()
+            {
+                PlaceId = firstPlace.Id,
+                PlaceProviderId = pp.PlaceProviderId,
+                CustomPrice = true,
+                Price = 100M,
+                PriceCurrency = "EUR",
+                From = DateTimeOffset.Now.AddDays(1),
+                Until = DateTimeOffset.Now.AddDays(8),
+                ProductId = pr1.Id,
+            });
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
 
             // invite tester

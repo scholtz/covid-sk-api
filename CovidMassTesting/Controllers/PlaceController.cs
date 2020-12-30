@@ -433,15 +433,14 @@ namespace CovidMassTesting.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<PlaceProduct>> InsertOrUpdatePlaceProduct(
-            [FromForm] string placeId,
-            [FromForm] PlaceProduct placeProduct
+            [FromBody] PlaceProduct placeProduct
             )
         {
 
             try
             {
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
-                var place = await placeRepository.GetPlace(placeId);
+                var place = await placeRepository.GetPlace(placeProduct.PlaceId);
                 if (place == null) throw new Exception("Place not found");
                 if (place.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define product only for your places");
 
@@ -451,7 +450,7 @@ namespace CovidMassTesting.Controllers
                     update = false;
                 }
 
-                logger.LogInformation($"InsertOrUpdatePlaceProduct : {placeId} {update}");
+                logger.LogInformation($"InsertOrUpdatePlaceProduct : {placeProduct.PlaceId} {update}");
 
                 if (!update)
                 {
