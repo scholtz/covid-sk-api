@@ -20,6 +20,7 @@
             <param name="placeRepository"></param>
             <param name="userRepository"></param>
             <param name="visitorRepository"></param>
+            <param name="placeProviderRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.CheckSlots(System.String,System.Int32,System.Int32)">
             <summary>
@@ -347,6 +348,27 @@
             <summary>
             Administrator is allowed to list pp products
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPlaceProductByPlace(System.String)">
+            <summary>
+            Everyone can list place products at place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPlaceProductByPlaceProvider(System.String)">
+            <summary>
+            Everyone can list place products at place provider
+            </summary>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListPlaceProductByCategory(System.String)">
+            <summary>
+            Everyone can list place products at place provider
+            </summary>
+            <param name="category"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.ResultController">
@@ -3060,6 +3082,22 @@
             <param name="placeProviderId"></param>
             <param name="product"></param>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListPlaceProductByCategory(System.String)">
+            <summary>
+            ListPlaceProductByCategory
+            </summary>
+            <param name="category"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ExtendByAllProducts(System.Collections.Generic.List{CovidMassTesting.Model.PlaceProduct},CovidMassTesting.Model.PlaceProvider,System.String[])">
+            <summary>
+            Add to export the all products
+            </summary>
+            <param name="ret"></param>
+            <param name="pp"></param>
+            <param name="placeIds"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IPlaceRepository">
             <summary>
             Place repository interface for dependency injection
@@ -3133,11 +3171,25 @@
             <param name="placeProduct"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.DeletePlaceProduct(System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.DeletePlaceProduct(CovidMassTesting.Model.PlaceProduct)">
             <summary>
             Delete product place
             </summary>
-            <param name="placeProductid"></param>
+            <param name="placeProduct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.ListPlaceProductByPlace(System.String)">
+            <summary>
+            List by place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.ListPlaceProductByPlaceProvider(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            List by pp
+            </summary>
+            <param name="placeProvider"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IPlaceRepository.GetPlaceProduct(System.String)">
@@ -3350,6 +3402,7 @@
             </summary>
             <param name="email"></param>
             <param name="role"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.SetLocation(System.String,System.String,System.String)">
@@ -3358,6 +3411,7 @@
             </summary>
             <param name="email"></param>
             <param name="placeId"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.GetPublicUser(System.String)">
@@ -3573,6 +3627,21 @@
             <param name="place"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.CombinePPWithCategory(System.String,System.String)">
+            <summary>
+            CombinePPWithCategory
+            </summary>
+            <param name="category"></param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.ListPPIdsByCategory(System.String)">
+            <summary>
+            ListPPIdsByCategory
+            </summary>
+            <param name="category"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository.DropAllData">
             <summary>
             Deletes all data
@@ -3633,11 +3702,25 @@
             <param name="placeProduct"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.DeletePlaceProduct(System.String)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.DeletePlaceProduct(CovidMassTesting.Model.PlaceProduct)">
             <summary>
             DeleteProductPlace
             </summary>
-            <param name="placeProductid"></param>
+            <param name="placeProduct"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.ListPlaceProductByPlace(System.String)">
+            <summary>
+            List by place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.ListPlaceProductByPlaceProvider(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            list by pp
+            </summary>
+            <param name="placeProvider"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.PlaceRepository.DropAllData">
@@ -4223,6 +4306,28 @@
             <param name="placeProviderId"></param>
             <param name="product"></param>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.CombinePPWithCategory(System.String,System.String)">
+            <summary>
+            Add pp with category
+            </summary>
+            <param name="category"></param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListPPIdsByCategory(System.String)">
+            <summary>
+            ListPPIdsByCategory
+            </summary>
+            <param name="category"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListPlaceProductByCategory(System.String)">
+            <summary>
+            ListPlaceProductByCategory
+            </summary>
+            <param name="category"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.DropAllData">
             <summary>
             Drop all data in repository
@@ -4304,11 +4409,11 @@
             <param name="placeProduct"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.DeletePlaceProduct(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.DeletePlaceProduct(CovidMassTesting.Model.PlaceProduct)">
             <summary>
             Delete product place
             </summary>
-            <param name="placeProductid"></param>
+            <param name="placeProduct"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.GetPlaceProduct(System.String)">
@@ -4316,6 +4421,20 @@
             Get product place
             </summary>
             <param name="placeProductid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.ListPlaceProductByPlace(System.String)">
+            <summary>
+            List by place
+            </summary>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.ListPlaceProductByPlaceProvider(CovidMassTesting.Model.PlaceProvider)">
+            <summary>
+            List by pp
+            </summary>
+            <param name="placeProvider"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceRepository.DropAllData">

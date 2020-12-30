@@ -72,9 +72,21 @@ namespace CovidMassTesting.Repository.Interface
         /// <summary>
         /// Delete product place
         /// </summary>
-        /// <param name="placeProductid"></param>
+        /// <param name="placeProduct"></param>
         /// <returns></returns>
-        public Task<bool> DeletePlaceProduct(string placeProductid);
+        public Task<bool> DeletePlaceProduct(PlaceProduct placeProduct);
+        /// <summary>
+        /// List by place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public Task<List<PlaceProduct>> ListPlaceProductByPlace(string placeId);
+        /// <summary>
+        /// List by pp
+        /// </summary>
+        /// <param name="placeProvider"></param>
+        /// <returns></returns>
+        public Task<List<PlaceProduct>> ListPlaceProductByPlaceProvider(PlaceProvider placeProvider);
         /// <summary>
         /// Get product place
         /// </summary>

@@ -63,6 +63,7 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="email"></param>
         /// <param name="role"></param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
         public Task<bool> InAnyGroup(string email, string[] role, string placeProviderId);
         /// <summary>
@@ -70,6 +71,7 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="email"></param>
         /// <param name="placeId"></param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
         public Task<bool> SetLocation(string email, string placeId, string placeProviderId);
         /// <summary>

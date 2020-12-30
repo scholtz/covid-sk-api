@@ -25,11 +25,11 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Time from when the product is provided
         /// </summary>
-        public DateTimeOffset From { get; set; }
+        public DateTimeOffset? From { get; set; }
         /// <summary>
         /// Time until when the product is provided
         /// </summary>
-        public DateTimeOffset Until { get; set; }
+        public DateTimeOffset? Until { get; set; }
         /// <summary>
         /// Has custom price. If true, the price from this object is applied. If false, default price from product is applied
         /// </summary>

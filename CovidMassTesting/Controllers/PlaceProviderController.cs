@@ -673,5 +673,90 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// Everyone can list place products at place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        [HttpGet("ListPlaceProductByPlace")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<PlaceProduct>>> ListPlaceProductByPlace(
+            [FromQuery] string placeId
+            )
+        {
+            try
+            {
+                var place = await placeRepository.GetPlace(placeId);
+                if (place == null) throw new Exception("Place not found");
+                var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
+                if (pp == null) throw new Exception("Place provider not found");
+                var ret = await placeRepository.ListPlaceProductByPlace(placeId);
+
+                return Ok(IPlaceProviderRepository.ExtendByAllProducts(ret, pp, new string[] { placeId }));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Everyone can list place products at place provider
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        [HttpGet("ListPlaceProductByPlaceProvider")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> ListPlaceProductByPlaceProvider(
+            [FromQuery] string placeProviderId
+            )
+        {
+            try
+            {
+                var pp = await placeProviderRepository.GetPlaceProvider(placeProviderId);
+                if (pp == null) throw new Exception("Place provider not found");
+                var ret = await placeRepository.ListPlaceProductByPlaceProvider(pp);
+                var places = await placeRepository.ListAll();
+
+                return Ok(IPlaceProviderRepository.ExtendByAllProducts(ret, pp, places.Where(pp => pp.PlaceProviderId == placeProviderId).Select(p => p.Id).ToArray()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// Everyone can list place products at place provider
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        [HttpGet("ListPlaceProductByCategory")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> ListPlaceProductByCategory(
+            [FromQuery] string category
+            )
+        {
+            try
+            {
+                return Ok(await placeProviderRepository.ListPlaceProductByCategory(category));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }

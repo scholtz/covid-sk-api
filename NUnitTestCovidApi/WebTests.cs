@@ -364,6 +364,19 @@ namespace NUnitTestCovidApi
                                 ).Result;
         }
 
+        private HttpResponseMessage ListPlaceProductByCategory(HttpClient client, string category)
+        {
+            return client.GetAsync($"PlaceProvider/ListPlaceProductByCategory?category={category}").Result;
+        }
+        private HttpResponseMessage ListPlaceProductByPlaceProvider(HttpClient client, string placeProviderId)
+        {
+            return client.GetAsync($"PlaceProvider/ListPlaceProductByPlaceProvider?placeProviderId={placeProviderId}").Result;
+        }
+        private HttpResponseMessage ListPlaceProductByPlace(HttpClient client, string placeId)
+        {
+            return client.GetAsync($"PlaceProvider/ListPlaceProductByPlace?placeId={placeId}").Result;
+        }
+
         private HttpResponseMessage ListProducts(HttpClient client)
         {
             return client.GetAsync("PlaceProvider/ListProducts").Result;
@@ -1940,6 +1953,9 @@ namespace NUnitTestCovidApi
                 Description = "Vakcína ktorá nie je hradená poisťovňou",
                 DefaultPrice = 100M,
                 DefaultPriceCurrency = "EUR",
+                Category = "vac",
+                All = false,
+                InsuranceOnly = false,
             });
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var pr1 = JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
@@ -1949,6 +1965,10 @@ namespace NUnitTestCovidApi
                 Name = "Vakcína zadarmo",
                 Description = "Vakcína ktorá je hradená poisťovňou",
                 DefaultPrice = 0,
+                DefaultPriceCurrency = "EUR",
+                Category = "vac",
+                All = true,
+                InsuranceOnly = true,
             });
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var pr2 = JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
@@ -1969,10 +1989,42 @@ namespace NUnitTestCovidApi
             prList = JsonConvert.DeserializeObject<List<Product>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, prList.Count);
 
+            request = CreateProduct(client, new Product()
+            {
+                Name = "Vakcína zadarmo",
+                Description = "Vakcína ktorá je hradená poisťovňou",
+                DefaultPrice = 0,
+                DefaultPriceCurrency = "EUR",
+                Category = "vac",
+                All = true,
+                InsuranceOnly = true,
+            });
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            pr2 = JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
+
             // setup places
             var debugPlaces = SetupDebugPlaces(client);
             var firstPlace = debugPlaces.First();
             var secondPlace = debugPlaces.Skip(1).First();
+
+
+            // test productplace
+            request = ListPlaceProductByPlaceProvider(client, pp.PlaceProviderId);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(3, placeProducts.Count);
+
+            request = ListPlaceProductByPlace(client, firstPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, placeProducts.Count);
+
+            request = ListPlaceProductByCategory(client, "vac");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(3, placeProducts.Count);
+
+
 
             // invite tester
             var medicPersonEmail = "person1tester@scholtz.sk";

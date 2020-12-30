@@ -41,6 +41,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="placeRepository"></param>
         /// <param name="userRepository"></param>
         /// <param name="visitorRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         public AdminController(
             IStringLocalizer<AdminController> localizer,
             IConfiguration configuration,

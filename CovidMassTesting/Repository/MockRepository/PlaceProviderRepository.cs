@@ -88,6 +88,26 @@ namespace CovidMassTesting.Repository.MockRepository
             data.TryRemove(place.PlaceProviderId, out var _);
         }
         /// <summary>
+        /// CombinePPWithCategory
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public override async Task<bool> CombinePPWithCategory(string category, string placeProviderId)
+        {
+            return true;
+        }
+        /// <summary>
+        /// ListPPIdsByCategory
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        public override async Task<IEnumerable<string>> ListPPIdsByCategory(string category)
+        {
+            return data.Values.Where(pp => pp.Products?.Any(prod => prod.Category == category) == true).Select(pp => pp.PlaceProviderId);
+        }
+
+        /// <summary>
         /// Deletes all data
         /// </summary>
         /// <returns></returns>

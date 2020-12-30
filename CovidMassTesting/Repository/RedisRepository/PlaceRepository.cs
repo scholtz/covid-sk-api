@@ -20,6 +20,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IConfiguration configuration;
         private readonly string REDIS_KEY_PLACES_OBJECTS = "PLACE";
         private readonly string REDIS_KEY_PRODUCT_PLACES_OBJECTS = "PRODUCT_PLACE";
+        private readonly string REDIS_KEY_PRODUCT_PLACES_BY_PP = "PRODUCT_PLACE_BY_PP";
+        private readonly string REDIS_KEY_PRODUCT_PLACES_BY_PLACE = "PRODUCT_PLACE_BY_PLACE";
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -148,9 +151,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new ArgumentNullException(nameof(placeProduct));
             }
+            if (string.IsNullOrEmpty(placeProduct.PlaceProviderId)) throw new Exception("Place provider is empty");
+            if (string.IsNullOrEmpty(placeProduct.PlaceId)) throw new Exception("Place is empty");
+
             try
             {
-                await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_OBJECTS}", placeProduct.Id.ToString(), placeProduct);
+                await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_OBJECTS}", placeProduct.Id, placeProduct);
+                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PP}_{placeProduct.PlaceProviderId}", placeProduct.Id);
+                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PLACE}_{placeProduct.PlaceId}", placeProduct.Id);
                 return placeProduct;
             }
             catch (Exception exc)
@@ -163,19 +171,20 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// Delete product place
         /// </summary>
-        /// <param name="placeProductid"></param>
+        /// <param name="placeProduct"></param>
         /// <returns></returns>
-        public virtual async Task<bool> DeletePlaceProduct(string placeProductid)
+        public virtual async Task<bool> DeletePlaceProduct(PlaceProduct placeProduct)
         {
 
-            if (string.IsNullOrEmpty(placeProductid))
+            if (placeProduct == null)
             {
-                throw new ArgumentNullException(nameof(placeProductid));
+                throw new ArgumentNullException(nameof(placeProduct));
             }
             try
             {
-                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_OBJECTS}", placeProductid);
-                return true;
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_OBJECTS}", placeProduct.Id);
+                await redisCacheClient.Db0.SetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PLACE}_{placeProduct.PlaceId}", placeProduct.Id);
+                await redisCacheClient.Db0.SetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PP}_{placeProduct.PlaceProviderId}", placeProduct.Id); return true;
             }
             catch (Exception exc)
             {
@@ -194,6 +203,45 @@ namespace CovidMassTesting.Repository.RedisRepository
             return redisCacheClient.Db0.HashGetAsync<PlaceProduct>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", placeProductid);
         }
         /// <summary>
+        /// List by place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public async virtual Task<List<PlaceProduct>> ListPlaceProductByPlace(string placeId)
+        {
+            var ret = new List<PlaceProduct>();
+            var place = await GetPlace(placeId);
+            if (place == null) throw new Exception("Place not found");
+            foreach (var id in (await redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PLACE}_{placeId}")))
+            {
+                var item = await GetPlaceProduct(id);
+                if (item != null)
+                {
+                    ret.Add(item);
+                }
+            }
+            return ret;
+        }
+        /// <summary>
+        /// List by pp
+        /// </summary>
+        /// <param name="placeProvider"></param>
+        /// <returns></returns>
+        public async virtual Task<List<PlaceProduct>> ListPlaceProductByPlaceProvider(PlaceProvider placeProvider)
+        {
+            var ret = new List<PlaceProduct>();
+            foreach (var id in (await redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PP}_{placeProvider.PlaceProviderId}")))
+            {
+                var item = await GetPlaceProduct(id);
+                if (item != null)
+                {
+                    ret.Add(item);
+                }
+            }
+            return ret;
+        }
+
+        /// <summary>
         /// Drop all data in repository
         /// </summary>
         /// <returns></returns>
@@ -208,8 +256,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             foreach (var place in await redisCacheClient.Db0.HashValuesAsync<PlaceProduct>($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_OBJECTS}"))
             {
                 ret++;
-                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_OBJECTS}", place.Id);
+                await DeletePlaceProduct(place);
             }
+
+
             return ret;
         }
 

@@ -490,7 +490,7 @@ namespace CovidMassTesting.Controllers
         [HttpPost("DeletePlaceProduct")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Place>> DeletePlaceProduct(
+        public async Task<ActionResult<bool>> DeletePlaceProduct(
             [FromForm] string placeProductid
             )
         {
@@ -501,8 +501,7 @@ namespace CovidMassTesting.Controllers
                 if (productPlace == null) throw new Exception("Place not found");
                 if (productPlace.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define product only for your places");
 
-
-                return Ok(placeRepository.DeletePlaceProduct(placeProductid));
+                return Ok(placeRepository.DeletePlaceProduct(productPlace));
             }
             catch (Exception exc)
             {
@@ -511,6 +510,5 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
-
     }
 }

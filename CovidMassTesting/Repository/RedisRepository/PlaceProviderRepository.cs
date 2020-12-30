@@ -24,6 +24,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_REAL_INVOICES_OBJECTS = "PP_REAL_INVOICE";
         private readonly string REDIS_KEY_LAST_PRO_INVOICE = "PP_LAST_PRO_INVOICE";
         private readonly string REDIS_KEY_LAST_REAL_INVOICE = "PP_LAST_REAL_INVOICE";
+        private readonly string REDIS_KEY_CATEGORY_TO_PP = "PP_CATEGORY_TO_PP";
 
         private readonly int ProInvoiceFormat = 2010100000;
         private readonly int RealInvoiceFormat = 2010200000;
@@ -719,6 +720,8 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             pp.Products.Add(product);
             await SetPlaceProvider(pp);
+            await CombinePPWithCategory(product.Category, placeProviderId);
+
             return product;
         }
         /// <summary>
@@ -743,6 +746,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             product.LastUpdate = DateTimeOffset.Now;
             pp.Products.Add(product);
             await SetPlaceProvider(pp);
+
+            await CombinePPWithCategory(product.Category, placeProviderId);
+
             return product;
         }
 
@@ -762,6 +768,50 @@ namespace CovidMassTesting.Repository.RedisRepository
             pp.Products.Remove(old);
             await SetPlaceProvider(pp);
             return true;
+        }
+        /// <summary>
+        /// Add pp with category
+        /// </summary>
+        /// <param name="category"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public virtual Task<bool> CombinePPWithCategory(string category, string placeProviderId)
+        {
+            return redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_CATEGORY_TO_PP}_{category}", placeProviderId);
+        }
+        /// <summary>
+        /// ListPPIdsByCategory
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        public virtual Task<IEnumerable<string>> ListPPIdsByCategory(string category)
+        {
+            return redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_CATEGORY_TO_PP}_{category}");
+        }
+
+        /// <summary>
+        /// ListPlaceProductByCategory
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<PlaceProduct>> ListPlaceProductByCategory(string category)
+        {
+            var ret = new List<PlaceProduct>();
+            foreach (var ppId in await ListPPIdsByCategory(category))
+            {
+                var pp = await GetPlaceProvider(ppId);
+
+                if (pp.Products.Any(p => p.Category == category))
+                {
+                    ret.AddRange(await placeRepository.ListPlaceProductByPlaceProvider(pp));
+                }
+                var places = await placeRepository.ListAll();
+                var placesIds = places.Where(ppobj => ppobj.PlaceProviderId == pp.PlaceProviderId).Select(p => p.Id).ToArray();
+
+                ret = IPlaceProviderRepository.ExtendByAllProducts(ret, pp, placesIds);
+            }
+
+            return ret;
         }
         /// <summary>
         /// Drop all data in repository

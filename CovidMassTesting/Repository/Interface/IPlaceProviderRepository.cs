@@ -163,5 +163,42 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="placeProviderId"></param>
         /// <param name="product"></param>
         Task<bool> DeleteProduct(string placeProviderId, Product product);
+
+        /// <summary>
+        /// ListPlaceProductByCategory
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        Task<IEnumerable<PlaceProduct>> ListPlaceProductByCategory(string category);
+
+        /// <summary>
+        /// Add to export the all products
+        /// </summary>
+        /// <param name="ret"></param>
+        /// <param name="pp"></param>
+        /// <param name="placeIds"></param>
+        /// <returns></returns>
+        public static List<PlaceProduct> ExtendByAllProducts(List<PlaceProduct> ret, PlaceProvider pp, string[] placeIds)
+        {
+            foreach (var product in pp.Products.Where(t => t.All))
+            {
+                foreach (var placeId in placeIds)
+                {
+                    if (!ret.Any(ppr => ppr.ProductId == product.Id && ppr.PlaceId == placeId))
+                    {
+                        ret.Add(new PlaceProduct()
+                        {
+                            PlaceId = placeId,
+                            PlaceProviderId = pp.PlaceProviderId,
+                            CustomPrice = false,
+                            Price = product.DefaultPrice,
+                            PriceCurrency = product.DefaultPriceCurrency,
+                            ProductId = product.Id
+                        });
+                    }
+                }
+            }
+            return ret;
+        }
     }
 }

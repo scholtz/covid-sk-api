@@ -103,13 +103,31 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <summary>
         /// DeleteProductPlace
         /// </summary>
-        /// <param name="placeProductid"></param>
+        /// <param name="placeProduct"></param>
         /// <returns></returns>
-        public async override Task<bool> DeletePlaceProduct(string placeProductid)
+        public async override Task<bool> DeletePlaceProduct(PlaceProduct placeProduct)
         {
-            dataPlaceProduct.TryRemove(placeProductid, out var removed);
+            dataPlaceProduct.TryRemove(placeProduct.Id, out var removed);
             if (removed == null) return false;
             return true;
+        }
+        /// <summary>
+        /// List by place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public async override Task<List<PlaceProduct>> ListPlaceProductByPlace(string placeId)
+        {
+            return dataPlaceProduct.Values.Where(p => p.PlaceId == placeId).ToList();
+        }
+        /// <summary>
+        /// list by pp
+        /// </summary>
+        /// <param name="placeProvider"></param>
+        /// <returns></returns>
+        public async override Task<List<PlaceProduct>> ListPlaceProductByPlaceProvider(PlaceProvider placeProvider)
+        {
+            return dataPlaceProduct.Values.Where(p => p.PlaceProviderId == placeProvider.PlaceProviderId).ToList();
         }
         /// <summary>
         /// Deletes all data
