@@ -153,6 +153,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             if (string.IsNullOrEmpty(placeProduct.PlaceProviderId)) throw new Exception("Place provider is empty");
             if (string.IsNullOrEmpty(placeProduct.PlaceId)) throw new Exception("Place is empty");
+            if (string.IsNullOrEmpty(placeProduct.ProductId)) throw new Exception("Product is empty");
 
             try
             {

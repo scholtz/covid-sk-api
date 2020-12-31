@@ -193,7 +193,8 @@ namespace CovidMassTesting.Repository.Interface
                             CustomPrice = false,
                             Price = product.DefaultPrice,
                             PriceCurrency = product.DefaultPriceCurrency,
-                            ProductId = product.Id
+                            ProductId = product.Id,
+                            InsuranceOnly = product.InsuranceOnly
                         });
                     }
                 }

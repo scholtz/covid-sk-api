@@ -153,6 +153,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.ListFiltered(System.String,System.String)">
+            <summary>
+            List places
+            
+            Contains live statistics of users, registered, infected and healthy visitors
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.PlaceController.PrivateList">
             <summary>
             List places
@@ -1688,6 +1696,11 @@
         <member name="P:CovidMassTesting.Model.PlaceProduct.PlaceProviderId">
             <summary>
             Place provider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.InsuranceOnly">
+            <summary>
+            Insurance only
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.PlaceProvider">

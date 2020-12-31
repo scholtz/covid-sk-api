@@ -46,5 +46,9 @@ namespace CovidMassTesting.Model
         /// Place provider
         /// </summary>
         public string PlaceProviderId { get; set; }
+        /// <summary>
+        /// Insurance only
+        /// </summary>
+        public bool InsuranceOnly { get; set; }
     }
 }

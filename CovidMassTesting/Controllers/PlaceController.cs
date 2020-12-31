@@ -76,6 +76,61 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// List places
+        /// 
+        /// Contains live statistics of users, registered, infected and healthy visitors
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ListFiltered")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Dictionary<string, Place>>> ListFiltered([FromQuery] string category = "all", [FromQuery] string availability = "all")
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(category)) category = "all";
+                if (string.IsNullOrEmpty(availability)) availability = "all";
+
+                var places = await placeRepository.ListAll();
+
+                if (category != "all")
+                {
+                    var onlyInsured = false;
+                    if (category.EndsWith("-doctor"))
+                    {
+                        onlyInsured = true;
+                        category = category.Replace("-doctor", "");
+                    }
+                    if (category.EndsWith("-self"))
+                    {
+                        onlyInsured = false;
+                        category = category.Replace("-self", "");
+                    }
+                    var pprs = await placeProviderRepository.ListPlaceProductByCategory(category);
+
+                    if (onlyInsured) pprs = pprs.Where(ppr => ppr.InsuranceOnly == true);
+                    var ids = pprs.Select(ppr => ppr.PlaceId).Distinct().Where(id => !string.IsNullOrEmpty(id)).ToHashSet();
+                    places = places.Where(place => ids.Contains(place.Id));
+                }
+                if (availability == "all")
+                {
+                    return Ok(places.ToDictionary(p => p.Id, p => p));
+                }
+
+
+                var ret = new List<Place>();
+                ///@TODO
+                return Ok(ret.ToDictionary(p => p.Id, p => p));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// List places
         /// 
@@ -452,11 +507,16 @@ namespace CovidMassTesting.Controllers
 
                 logger.LogInformation($"InsertOrUpdatePlaceProduct : {placeProduct.PlaceId} {update}");
 
+                var products = await placeProviderRepository.ListProducts(User.GetPlaceProvider());
+                var product = products.FirstOrDefault(p => p.Id == placeProduct.ProductId);
+                if (product == null) throw new Exception("Product not found");
+
                 if (!update)
                 {
                     // new place
                     placeProduct.Id = Guid.NewGuid().ToString();
                     placeProduct.PlaceProviderId = User.GetPlaceProvider();
+                    placeProduct.InsuranceOnly = product.InsuranceOnly;
                     placeProduct = await placeRepository.SetProductPlace(placeProduct);
                     logger.LogInformation($"ProductPlace {place.Name} has been created");
                 }
@@ -467,7 +527,9 @@ namespace CovidMassTesting.Controllers
 
                     var oldPlaceProduct = await placeRepository.GetPlaceProduct(placeProduct.Id);
 
+                    placeProduct.InsuranceOnly = product.InsuranceOnly;
                     placeProduct = await placeRepository.SetProductPlace(placeProduct);
+
                     logger.LogInformation($"Place {place.Name} has been updated");
                 }
 

@@ -403,6 +403,10 @@ namespace NUnitTestCovidApi
             return client.GetAsync("PlaceProvider/ListProducts").Result;
         }
 
+        private HttpResponseMessage ListFiltered(HttpClient client, string category, string availability)
+        {
+            return client.GetAsync($"Place/ListFiltered?category={category}&availability={availability}").Result;
+        }
         private HttpResponseMessage FinalDataExport(HttpClient client, int from, int count)
         {
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/csv"));
@@ -2028,6 +2032,27 @@ namespace NUnitTestCovidApi
             var firstPlace = debugPlaces.First();
             var secondPlace = debugPlaces.Skip(1).First();
 
+            // ListFiltered
+
+            request = ListFiltered(client, "all", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(3, filteredPlaces.Count);
+
+            request = ListFiltered(client, "vac-doctor", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(3, filteredPlaces.Count);
+
+            request = ListFiltered(client, "vac-self", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(3, filteredPlaces.Count);
+
+            request = ListFiltered(client, "ant-self", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(0, filteredPlaces.Count);
 
             // test productplace
             request = ListPlaceProductByPlaceProvider(client, pp.PlaceProviderId);
