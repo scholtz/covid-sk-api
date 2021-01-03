@@ -682,7 +682,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListPlaceProductByPlace")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<IEnumerable<PlaceProduct>>> ListPlaceProductByPlace(
+        public async Task<ActionResult<IEnumerable<PlaceProductWithPlace>>> ListPlaceProductByPlace(
             [FromQuery] string placeId
             )
         {
@@ -693,8 +693,8 @@ namespace CovidMassTesting.Controllers
                 var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
                 if (pp == null) throw new Exception("Place provider not found");
                 var ret = await placeRepository.ListPlaceProductByPlace(placeId);
-
-                return Ok(IPlaceProviderRepository.ExtendByAllProducts(ret, pp, new string[] { placeId }));
+                var places2 = IPlaceProviderRepository.ExtendByAllProducts(ret, pp, new string[] { placeId });
+                return Ok(places2.Select(ppr => ppr.ToExtendedModel(placeProviderRepository).Result));
             }
             catch (Exception exc)
             {
@@ -713,7 +713,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListPlaceProductByPlaceProvider")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> ListPlaceProductByPlaceProvider(
+        public async Task<ActionResult<IEnumerable<PlaceProduct>>> ListPlaceProductByPlaceProvider(
             [FromQuery] string placeProviderId
             )
         {
@@ -743,7 +743,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListPlaceProduct")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> ListPlaceProduct()
+        public async Task<ActionResult<IEnumerable<PlaceProductWithPlace>>> ListPlaceProduct()
         {
             try
             {
@@ -751,8 +751,9 @@ namespace CovidMassTesting.Controllers
                 if (pp == null) throw new Exception("Place provider not found");
                 var ret = await placeRepository.ListPlaceProductByPlaceProvider(pp);
                 var places = await placeRepository.ListAll();
+                var places2 = IPlaceProviderRepository.ExtendByAllProducts(ret, pp, places.Where(pp => pp.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToArray());
 
-                return Ok(IPlaceProviderRepository.ExtendByAllProducts(ret, pp, places.Where(pp => pp.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToArray()));
+                return Ok(places2.Select(ppr => ppr.ToExtendedModel(placeProviderRepository).Result));
             }
             catch (Exception exc)
             {
@@ -769,7 +770,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListPlaceProductByCategory")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> ListPlaceProductByCategory(
+        public async Task<ActionResult<IEnumerable<PlaceProduct>>> ListPlaceProductByCategory(
             [FromQuery] string category
             )
         {

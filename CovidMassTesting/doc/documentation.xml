@@ -1703,6 +1703,23 @@
             Insurance only
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Model.PlaceProduct.ToExtendedModel(CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+            <summary>
+            Extend
+            </summary>
+            <param name="placeProviderRepository"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.PlaceProductWithPlace">
+            <summary>
+            Extended information about place product with product object filled in
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProductWithPlace.Product">
+            <summary>
+            Product
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProvider">
             <summary>
             Place provider is hospital or company prividing testing place. One hospital can have multiple testing places.

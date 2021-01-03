@@ -2085,8 +2085,13 @@ namespace NUnitTestCovidApi
             var placeProduct1 = JsonConvert.DeserializeObject<PlaceProduct>(request.Content.ReadAsStringAsync().Result);
             request = ListPlaceProductByPlace(client, firstPlace.Id);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(2, placeProducts.Count);
+            var placeProducts2 = JsonConvert.DeserializeObject<List<PlaceProductWithPlace>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, placeProducts2.Count);
+            foreach (var pr in placeProducts2)
+            {
+                Assert.IsNotNull(pr.Product);
+            }
+
 
             request = ListPlaceProduct(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);

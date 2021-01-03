@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CovidMassTesting.Repository.Interface;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,5 +51,28 @@ namespace CovidMassTesting.Model
         /// Insurance only
         /// </summary>
         public bool InsuranceOnly { get; set; }
+        /// <summary>
+        /// Extend
+        /// </summary>
+        /// <param name="placeProviderRepository"></param>
+        /// <returns></returns>
+        internal async Task<PlaceProductWithPlace> ToExtendedModel(IPlaceProviderRepository placeProviderRepository)
+        {
+            var pp = await placeProviderRepository.GetPlaceProvider(PlaceProviderId);
+            return new PlaceProductWithPlace()
+            {
+                Id = this.Id,
+                CustomPrice = this.CustomPrice,
+                From = From,
+                InsuranceOnly = InsuranceOnly,
+                PlaceId = PlaceId,
+                PlaceProviderId = PlaceProviderId,
+                Price = Price,
+                PriceCurrency = PriceCurrency,
+                Product = pp?.Products?.FirstOrDefault(pr => pr.Id == ProductId),
+                ProductId = ProductId,
+                Until = Until,
+            };
+        }
     }
 }
