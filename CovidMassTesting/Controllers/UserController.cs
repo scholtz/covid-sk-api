@@ -260,6 +260,28 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// Refresh token after something has been changed.. for example after new place provider registration, or after permission granting
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("RefreshToken")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<string>> RefreshToken()
+        {
+            try
+            {
+                return Ok(await userRepository.SetPlaceProvider(User.GetEmail(), User.GetPlaceProvider()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// Set place provider
         /// </summary>

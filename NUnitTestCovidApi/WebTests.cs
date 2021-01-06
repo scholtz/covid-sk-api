@@ -2106,6 +2106,87 @@ namespace NUnitTestCovidApi
             placeProducts = JsonConvert.DeserializeObject<List<PlaceProduct>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, placeProducts.Count);
 
+            // vac-doctor, specific place
+            pr2.All = false;
+            request = UpdateProduct(client, pr2);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = ListFiltered(client, "vac-doctor", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(0, filteredPlaces.Count);
+
+            request = InsertOrUpdatePlaceProduct(client, new PlaceProduct()
+            {
+                PlaceId = secondPlace.Id,
+                PlaceProviderId = pp.PlaceProviderId,
+                CustomPrice = true,
+                Price = 99M,
+                PriceCurrency = "EUR",
+                From = DateTimeOffset.Now.AddDays(1),
+                Until = DateTimeOffset.Now.AddDays(8),
+                ProductId = pr2.Id,
+            });
+
+
+            request = ListFiltered(client, "vac-doctor", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, filteredPlaces.Count);
+            var placeTmp = filteredPlaces.First().Value;
+            Assert.AreEqual(secondPlace.Id, placeTmp.Id);
+
+            request = ListPlaceProductByPlace(client, secondPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            placeProducts2 = JsonConvert.DeserializeObject<List<PlaceProductWithPlace>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, placeProducts2.Count);
+            var prod = placeProducts2.FirstOrDefault(pp => pp.Product.Category == "vac");
+            Assert.IsNotNull(prod);
+            Assert.AreEqual(99M, prod.Price);
+
+
+            request = CreateProduct(client, new Product()
+            {
+                Name = "Vakcína 3",
+                Description = "Vakcína 3",
+                DefaultPrice = 98M,
+                DefaultPriceCurrency = "EUR",
+                Category = "vac",
+                All = false,
+                InsuranceOnly = false,
+            });
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var pr3 = JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
+
+            request = InsertOrUpdatePlaceProduct(client, new PlaceProduct()
+            {
+                PlaceId = secondPlace.Id,
+                PlaceProviderId = pp.PlaceProviderId,
+                CustomPrice = false,
+                From = DateTimeOffset.Now.AddDays(1),
+                Until = DateTimeOffset.Now.AddDays(8),
+                ProductId = pr3.Id,
+            });
+            request = ListFiltered(client, "vac-doctor", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, filteredPlaces.Count);
+            placeTmp = filteredPlaces.First().Value;
+            Assert.AreEqual(secondPlace.Id, placeTmp.Id);
+
+            request = ListFiltered(client, "vac-self", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, filteredPlaces.Count);
+            placeTmp = filteredPlaces.First().Value;
+            Assert.AreEqual(secondPlace.Id, placeTmp.Id);
+
+
+            request = ListPlaceProductByPlace(client, secondPlace.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            placeProducts2 = JsonConvert.DeserializeObject<List<PlaceProductWithPlace>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, placeProducts2.Count);
+
             // invite tester
             var medicPersonEmail = "person1tester@scholtz.sk";
             request = InviteUserToPP(client, medicPersonEmail, "Person 1", "+421 907 000 000", "MyMessage");

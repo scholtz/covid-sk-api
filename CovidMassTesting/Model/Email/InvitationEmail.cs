@@ -21,7 +21,7 @@ namespace CovidMassTesting.Model.Email
         /// <summary>
         /// Template identifier
         /// </summary>
-        public override string TemplateId => "Invitation";
+        public override string TemplateId => "InvitationEmail";
         /// <summary>
         /// Name
         /// </summary>

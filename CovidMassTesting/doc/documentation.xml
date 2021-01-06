@@ -627,6 +627,12 @@
             <param name="newHash"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.RefreshToken">
+            <summary>
+            Refresh token after something has been changed.. for example after new place provider registration, or after permission granting
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.UserController.SetPlaceProvider(System.String)">
             <summary>
             Set place provider

@@ -57,7 +57,7 @@ namespace CovidMassTesting.Controllers.Email
                 var list = Newtonsoft.Json.JsonConvert.DeserializeObject<SendgridTemplates>(response);
                 if (list.Templates.Length == 0) throw new Exception("Email templates are not set up in sendgrid");
                 Name2Id = list.Templates.ToDictionary(k => k.Name, k => k.Id);
-                logger.LogInformation("SendGridController configured");
+                logger.LogInformation($"SendGridController configured {list.Templates.Length}");
             }
             catch (Exception exc)
             {
