@@ -247,14 +247,14 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override async Task<Visitor> GetResult(string id)
+        public override async Task<VerificationData> GetResult(string id)
         {
             logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
             var encoded = verification[id];
             if (string.IsNullOrEmpty(encoded)) return null;
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<VerificationData>(decoded);
         }
         /// <summary>
         /// Encode visitor data and store to database

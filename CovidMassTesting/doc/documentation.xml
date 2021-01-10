@@ -471,6 +471,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.VerifyResult(System.String)">
+            <summary>
+            This method removes test from queue
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.FinalDataExport(System.Int32,System.Int32)">
             <summary>
             This method exports data for healthy office
@@ -2019,6 +2025,11 @@
             State. Available states are listed in Model.TestResult
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Result.VerificationId">
+            <summary>
+            Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.GoSMSConfiguration">
             <summary>
             GoSMS configuration https://doc.gosms.cz/
@@ -3060,6 +3071,11 @@
             Product id
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.VerificationId">
+            <summary>
+            Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Program">
             <summary>
             App
@@ -3780,6 +3796,13 @@
             <param name="placeAddress"></param>
             <param name="product"></param>
             <param name="resultguid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetResult(System.String)">
+            <summary>
+            Decode visitor data from database
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">

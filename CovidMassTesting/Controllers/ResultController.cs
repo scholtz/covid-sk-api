@@ -327,6 +327,34 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+
+        /// <summary>
+        /// This method removes test from queue
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("VerifyResult")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<VerificationData>> VerifyResult([FromForm] string id)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    throw new ArgumentException("Please provide verification identifier");
+                }
+
+                var ret = await visitorRepository.GetResult(id);
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
         /// <summary>
         /// This method exports data for healthy office
         /// 

@@ -321,6 +321,15 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
+        private HttpResponseMessage VerifyResult(HttpClient client, string id)
+        {
+            return client.PostAsync($"Result/VerifyResult",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("id",id),
+                    })).Result;
+        }
+
+
         private HttpResponseMessage PublicRemoveTest(HttpClient client, string code, string pass)
         {
             return client.PostAsync("Result/RemoveTest",
@@ -2528,11 +2537,19 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.PositiveWaitingForCertificate, testResult.State);
+            Assert.IsNotNull(testResult.VerificationId);
 
             request = PublicGetTestResult(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeWaitingForCertificate, testResult.State);
+            Assert.IsNotNull(testResult.VerificationId);
+
+            request = VerifyResult(client, testResult.VerificationId);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var resultData = Newtonsoft.Json.JsonConvert.DeserializeObject<VerificationData>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, resultData.Result);
+
         }
         [Test]
         public void TestPDF()

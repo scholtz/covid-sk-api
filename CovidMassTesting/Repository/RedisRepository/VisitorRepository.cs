@@ -441,7 +441,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Result = visitor.Result,
                             TestingEntity = pp?.CompanyName
                         }, true);
-
+                        visitor.VerificationId = result.Id;
                         var pdf = GeneratePDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
                         attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                         {
@@ -505,7 +505,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
-            return new Result { State = visitor.Result };
+            return new Result { State = visitor.Result, VerificationId = visitor.VerificationId };
         }
         /// <summary>
         /// Deletes the test
@@ -1017,9 +1017,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.TestingAddress = placeAddress;
             data.TestingEntity = testingEntity;
             data.FrontedURL = configuration["FrontedURL"];
+            data.ResultGUID = resultguid;
             data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
             data.Product = product;
-            data.ResultGUID = resultguid;
 
             QRCoder.QRCodeGenerator qrGenerator = new QRCoder.QRCodeGenerator();
             QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.Q);
@@ -1174,14 +1174,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public virtual async Task<Visitor> GetResult(string id)
+        public virtual async Task<VerificationData> GetResult(string id)
         {
             logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_OBJECTS}", id.ToString());
             if (string.IsNullOrEmpty(encoded)) return null;
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<VerificationData>(decoded);
         }
         /// <summary>
         /// Encode visitor data and store to database

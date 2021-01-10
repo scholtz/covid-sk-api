@@ -127,5 +127,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public byte[] GeneratePDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
 
+        /// <summary>
+        /// Decode visitor data from database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Task<VerificationData> GetResult(string id);
     }
 }
