@@ -8,6 +8,7 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0-focal AS build
 WORKDIR /src
 COPY . .
+RUN apt-get update && apt-get install -y libgdiplus
 RUN dotnet restore "CovidMassTesting.sln"
 RUN dotnet build "CovidMassTesting.sln" -c Release -o /app/build
 RUN dotnet test "CovidMassTesting.sln" -c Release 
@@ -18,4 +19,5 @@ RUN dotnet publish "CovidMassTesting.sln" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN apt-get update && apt-get install -y libgdiplus
 ENTRYPOINT ["dotnet", "CovidMassTesting.dll"]
