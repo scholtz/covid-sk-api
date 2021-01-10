@@ -1017,7 +1017,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.TestingAddress = placeAddress;
             data.TestingEntity = testingEntity;
             data.FrontedURL = configuration["FrontedURL"];
-            data.VerifyURL = $"{configuration["FrontedURL"]}check/{data.ResultGUID}";
+            data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
             data.Product = product;
             data.ResultGUID = resultguid;
 
