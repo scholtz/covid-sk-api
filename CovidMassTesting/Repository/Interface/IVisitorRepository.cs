@@ -105,5 +105,27 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<int> TestStorage();
+        /// <summary>
+        /// Creates html source code for pdf generation
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="testingEntity"></param>
+        /// <param name="placeAddress"></param>
+        /// <param name="product"></param>
+        /// <param name="resultguid"></param>
+        /// <returns></returns>
+        public string GenerateHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
+
+        /// <summary>
+        /// Creates pdf from test result
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="testingEntity"></param>
+        /// <param name="placeAddress"></param>
+        /// <param name="product"></param>
+        /// <param name="resultguid"></param>
+        /// <returns></returns>
+        public byte[] GeneratePDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
+
     }
 }

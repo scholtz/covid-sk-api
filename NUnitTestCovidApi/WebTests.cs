@@ -172,6 +172,23 @@ namespace NUnitTestCovidApi
             }
             return ret.ToArray();
         }
+        private Product SetupDebugProduct(HttpClient client)
+        {
+            // Test product management
+            var request = CreateProduct(client, new Product()
+            {
+                Name = "Antigenovy test",
+                Description = "Statny antigenovy test",
+                DefaultPrice = 0,
+                DefaultPriceCurrency = "EUR",
+                Category = "ant",
+                All = true,
+                InsuranceOnly = false,
+            });
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            return JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
+        }
+
         private HttpResponseMessage ListDaySlotsByPlace(HttpClient client, string placeId)
         {
             return client.GetAsync($"Slot/ListDaySlotsByPlace?placeId={placeId}").Result;
@@ -450,7 +467,7 @@ namespace NUnitTestCovidApi
             Console.WriteLine($"cleared {dataDeleted} items");
         }
 
-        private List<Visitor> RegisterTestVisitors(HttpClient client, string placeId, long slotId)
+        private List<Visitor> RegisterTestVisitors(HttpClient client, string placeId, long slotId, string productId)
         {
             var Registered = new List<Visitor>();
             Visitor visitor1 = new Visitor()
@@ -465,6 +482,7 @@ namespace NUnitTestCovidApi
                 PersonType = "idcard",
                 Phone = "+421907000999",
                 RC = "0101010008",
+                Product = productId
 
             };
             var result = Register(client, visitor1);
@@ -482,6 +500,7 @@ namespace NUnitTestCovidApi
                 PersonType = "idcard",
                 Phone = "+421",
                 RC = "0101010019",
+                Product = productId
             };
             result = Register(client, visitor2);
             if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
@@ -980,14 +999,30 @@ namespace NUnitTestCovidApi
             using var web = new MockWebApp(AppSettings);
             var client = web.CreateClient();
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
-
             var admin = users.First(u => u.Name == "Admin");
-            var request = AuthenticateUser(client, admin.Email, admin.Password);
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = admin.Email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
+            };
+
+            var request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = AuthenticateUser(client, admin.Email, admin.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var adminToken = request.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(adminToken));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
             SetupDebugPlaces(client);
+            var pr1 = SetupDebugProduct(client);
 
             request = CheckSlotsDay1(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -1018,7 +1053,7 @@ namespace NUnitTestCovidApi
 
             var minute = minutes.Values.First();
 
-            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
             var registrationManager = users.First(u => u.Name == "RegistrationManager");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
@@ -1094,14 +1129,30 @@ namespace NUnitTestCovidApi
             using var web = new MockWebApp(AppSettings);
             var client = web.CreateClient();
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
-
             var admin = users.First(u => u.Name == "Admin");
-            var request = AuthenticateUser(client, admin.Email, admin.Password);
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = admin.Email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
+            };
+
+            var request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = AuthenticateUser(client, admin.Email, admin.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var adminToken = request.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(adminToken));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
             SetupDebugPlaces(client);
+            var pr1 = SetupDebugProduct(client);
 
             request = CheckSlotsDay1(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -1131,7 +1182,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(minutes.Count > 0);
 
             var minute = minutes.Values.First();
-            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
             var registrationManager = users.First(u => u.Name == "MedicTester");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
@@ -1194,14 +1245,30 @@ namespace NUnitTestCovidApi
             using var web = new MockWebApp(AppSettings);
             var client = web.CreateClient();
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
-
             var admin = users.First(u => u.Name == "Admin");
-            var request = AuthenticateUser(client, admin.Email, admin.Password);
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = admin.Email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
+            };
+
+            var request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            request = AuthenticateUser(client, admin.Email, admin.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var adminToken = request.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(adminToken));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
             SetupDebugPlaces(client);
+            var pr1 = SetupDebugProduct(client);
 
             request = CheckSlotsDay1(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -1231,7 +1298,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(minutes.Count > 0);
 
             var minute = minutes.Values.First();
-            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
             var registrationManager = users.First(u => u.Name == "RegistrationManager");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
@@ -1338,14 +1405,32 @@ namespace NUnitTestCovidApi
             using var web = new MockWebApp(AppSettings);
             var client = web.CreateClient();
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
-
             var admin = users.First(u => u.Name == "Admin");
-            var request = AuthenticateUser(client, admin.Email, admin.Password);
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = admin.Email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
+            };
+
+            var request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
+            request = AuthenticateUser(client, admin.Email, admin.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var adminToken = request.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(adminToken));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
             SetupDebugPlaces(client);
+            var pr1 = SetupDebugProduct(client);
+
 
             var dataexporter = users.First(u => u.Name == "DataExporter");
             request = AuthenticateUser(client, dataexporter.Email, dataexporter.Password);
@@ -1380,7 +1465,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(minutes.Count > 0);
 
             var minute = minutes.Values.First();
-            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
             var registrationManager = users.First(u => u.Name == "RegistrationManager");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
@@ -1930,7 +2015,6 @@ namespace NUnitTestCovidApi
                 MainEmail = email,
                 PrivatePhone = "+421 907 000000",
                 MainContact = "Admin Person"
-
             };
 
             request = PlaceProviderRegistration(client, obj);
@@ -2311,7 +2395,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(minutes.Count > 0);
 
             var minute = minutes.Values.First();
-            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId);
+            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
 
 
@@ -2412,11 +2496,22 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
 
 
+            noEmailSender.Data.Clear();
+
             // TEST mark as sick
             request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.PositiveWaitingForCertificate, testResult.State);
+
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+            var tuple = noEmailSender.Data.Values.First();
+            Assert.AreEqual(1, tuple.attachments.Count());
+
+#if DEBUG
+            var file = tuple.attachments.First();
+            File.WriteAllBytes($"d:/covid/{file.Filename}", Convert.FromBase64String(file.Content));
+#endif
 
             // TEST mark as wrong code
             request = SetResult(client, test1, TestResult.PositiveCertificateTaken);
@@ -2438,6 +2533,36 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeWaitingForCertificate, testResult.State);
+        }
+        [Test]
+        public void TestPDF()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+
+
+            var visitorRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
+            var visitor = new Visitor()
+            {
+                FirstName = "X",
+                LastName = "Y",
+                RC = "1234567890",
+                Language = "en-US",
+                TestingTime = DateTimeOffset.Now,
+                Result = TestResult.PositiveWaitingForCertificate,
+            };
+            var html = visitorRepository.GenerateHTML(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            Assert.IsTrue(html.Contains("X Y"));
+
+
+            var pdf = visitorRepository.GeneratePDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            Assert.IsTrue(pdf.Length > 100);
+#if DEBUG
+            File.WriteAllBytes("d:/covid/test-pdf.pdf", pdf);
+#endif
+
         }
 
         [Test]

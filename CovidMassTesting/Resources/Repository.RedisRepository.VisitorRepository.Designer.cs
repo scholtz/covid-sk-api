@@ -168,6 +168,47 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;html&gt;
+        ///&lt;head&gt;
+        ///&lt;title&gt;Test result&lt;/title&gt;
+        ///&lt;style&gt;
+        /// h1{
+        ///  color:navy;
+        ///  font-size:2em;
+        /// }
+        /// th{
+        /// text-align:left;
+        /// }
+        ///&lt;/style&gt;
+        ///&lt;/head&gt;
+        ///&lt;body&gt;
+        /// &lt;h1&gt;Výsledok testovania vírusu SARS-CoV-2&lt;/h1&gt;
+        /// &lt;table&gt;
+        ///	&lt;thead&gt;
+        ///		&lt;tr&gt;
+        ///			&lt;th&gt;Typ hodnoty&lt;/th&gt;&lt;th&gt;Hodnota&lt;/th&gt;
+        ///		&lt;/tr&gt;
+        ///	&lt;/thead&gt;
+        ///	&lt;tbody&gt;
+        ///		&lt;tr&gt;
+        ///			&lt;th&gt;Typ testu:&lt;/th&gt;&lt;td&gt;{{Product}}&lt;/td&gt;
+        ///		&lt;/tr&gt;
+        ///		&lt;tr&gt;
+        ///			&lt;th&gt;Čas testovania:&lt;/th&gt;&lt;td&gt;{{Date}}&lt;/td&gt;
+        ///		&lt;/tr&gt;
+        ///		&lt;tr&gt;
+        ///			&lt;th&gt;Výsledok:&lt;/th&gt;&lt;td&gt;{{Text}}&lt;/td&gt;
+        ///		&lt;/tr&gt;
+        ///		&lt;tr&gt;
+        ///			&lt;th&gt;Poučenie:&lt;/th&gt;&lt;t [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string TestResult {
+            get {
+                return ResourceManager.GetString("TestResult", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This 1 hour time slot has reached the capacity..
         /// </summary>
         internal static string This_1_hour_time_slot_has_reached_the_capacity_ {

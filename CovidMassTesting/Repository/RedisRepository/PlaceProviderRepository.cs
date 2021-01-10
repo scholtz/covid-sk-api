@@ -824,6 +824,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 ret++;
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", place.PlaceProviderId);
+
+
             }
             foreach (var invoice in await ListAllProInvoices())
             {
@@ -838,6 +840,9 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             await redisCacheClient.Db0.RemoveAsync(REDIS_KEY_LAST_PRO_INVOICE);
             await redisCacheClient.Db0.RemoveAsync(REDIS_KEY_LAST_REAL_INVOICE);
+
+            await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_CATEGORY_TO_PP}_ant");
+            await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_CATEGORY_TO_PP}_vac");
             return ret;
         }
 

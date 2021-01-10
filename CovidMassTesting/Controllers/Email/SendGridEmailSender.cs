@@ -71,12 +71,14 @@ namespace CovidMassTesting.Controllers.Email
         /// <param name="toEmail"></param>
         /// <param name="toName"></param>
         /// <param name="data"></param>
+        /// <param name="attachments"></param>
         /// <returns></returns>
         public async Task<bool> SendEmail(
             string subject,
             string toEmail,
             string toName,
-            IEmail data
+            IEmail data,
+            IEnumerable<Attachment> attachments
             )
         {
             if (data == null) throw new Exception("Please define data for email");
@@ -106,7 +108,7 @@ namespace CovidMassTesting.Controllers.Email
             msg.AddTo(new EmailAddress(toEmail, toName));
 
             msg.From = new EmailAddress(fromEmail, fromName);
-
+            msg.AddAttachments(attachments);
             var serialize = msg.Serialize();
             var response = await client.RequestAsync(SendGridClient.Method.POST, requestBody: serialize, urlPath: "mail/send");
             if (response.StatusCode == System.Net.HttpStatusCode.Accepted) return true;

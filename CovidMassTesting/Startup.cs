@@ -66,7 +66,13 @@ namespace CovidMassTesting
                     Version = "v1",
                     Description = "This API has been created for optimisation of time required to take sample from person for Covid-19 test.\n" +
                     "Medical personel scans the bar code on the testing set, scans the bar code of the person registration, and performs test.\n" +
-                    "After that the person is free to go home. This application aims to create mass testing possible with minimal risk of contamination from testing personel and minimising the queues in front of testing location."
+                    "After that the person is free to go home. This application aims to create mass testing possible with minimal risk of contamination from testing personel and minimising the queues in front of testing location.\n" +
+                    "\n" +
+                    "** Best practicies for strong passwords **\n" +
+                    "iv> openssl rand -base64 16\n" +
+                    "key> openssl rand -base64 32" +
+                    "MasterPDFPassword> openssl rand -base64 32\n" +
+                    "JWTTokenSecret > openssl rand - base64 32\n"
                 });
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
 

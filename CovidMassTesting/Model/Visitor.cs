@@ -71,7 +71,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Test result. Available options are in Model.TestResult
         /// </summary>
-        public string Result { get; set; } = "test-not-taken";
+        public string Result { get; set; } = TestResult.NotTaken;
         /// <summary>
         /// Testing set identifier
         /// </summary>
@@ -80,5 +80,14 @@ namespace CovidMassTesting.Model
         /// Last change
         /// </summary>
         public DateTimeOffset LastUpdate { get; set; }
+
+        /// <summary>
+        /// Real time when the test has been taken
+        /// </summary>
+        public DateTimeOffset TestingTime { get; set; }
+        /// <summary>
+        /// Product id
+        /// </summary>
+        public string Product { get; set; }
     }
 }

@@ -59,10 +59,20 @@
             Interface for email client
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.IEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+        <member name="M:CovidMassTesting.Controllers.Email.IEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail,System.Collections.Generic.IEnumerable{SendGrid.Helpers.Mail.Attachment})">
             <summary>
             Send email
             </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.IEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+            <summary>
+            Email without attachment
+            </summary>
+            <param name="subject"></param>
+            <param name="toEmail"></param>
+            <param name="toName"></param>
+            <param name="data"></param>
+            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.Email.NoEmailSender">
             <summary>
@@ -74,7 +84,7 @@
             For unit tests
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.NoEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+        <member name="M:CovidMassTesting.Controllers.Email.NoEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail,System.Collections.Generic.IEnumerable{SendGrid.Helpers.Mail.Attachment})">
             <summary>
             Act as email was sent. Log event to console
             </summary>
@@ -82,6 +92,7 @@
             <param name="toEmail"></param>
             <param name="toName"></param>
             <param name="data"></param>
+            <param name="attachments"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.Email.SendGridController">
@@ -94,7 +105,7 @@
             Constructor
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail)">
+        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail,System.Collections.Generic.IEnumerable{SendGrid.Helpers.Mail.Attachment})">
             <summary>
             Semd email
             </summary>
@@ -102,6 +113,7 @@
             <param name="toEmail"></param>
             <param name="toName"></param>
             <param name="data"></param>
+            <param name="attachments"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.Email.SendgridTemplate">
@@ -1484,6 +1496,76 @@
             Prepayment invoice
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Mustache.TestResult">
+            <summary>
+            Variables for PDF generation
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.Text">
+            <summary>
+            Result in text
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.Description">
+            <summary>
+            Result help
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.PersonalNumber">
+            <summary>
+            Personal number or insurance number
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.PassportNumber">
+            <summary>
+            Passport number for foreigners
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.Date">
+            <summary>
+            DateTime
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.FrontedURL">
+            <summary>
+            Link to testing place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.VerifyURL">
+            <summary>
+            Link for verification url
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.QRVerificationURL">
+            <summary>
+            QR code for faster check lookup
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.TestingEntity">
+            <summary>
+            Identification of testing provider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.TestingAddress">
+            <summary>
+            Address where user has been tested
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.Product">
+            <summary>
+            Product - PCR or Antigen test
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.ResultGUID">
+            <summary>
+            ResultGUID
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PersonAllocation">
             <summary>
             Allocate person to the testing place with specified role
@@ -2761,6 +2843,46 @@
             Place at which person is assigned. All person's registrations will be placed to this location
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.VerificationData">
+            <summary>
+            VerificationData
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VerificationData.Id">
+            <summary>
+            ResultGUID
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VerificationData.Name">
+            <summary>
+            Person name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VerificationData.Result">
+            <summary>
+            Result
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VerificationData.Time">
+            <summary>
+            Testing time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VerificationData.TestingEntity">
+            <summary>
+            Identification of testing provider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VerificationData.TestingAddress">
+            <summary>
+            Address where user has been tested
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VerificationData.Product">
+            <summary>
+            Product - PCR or Antigen test
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Version">
             <summary>
             API version information
@@ -2926,6 +3048,16 @@
         <member name="P:CovidMassTesting.Model.Visitor.LastUpdate">
             <summary>
             Last change
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.TestingTime">
+            <summary>
+            Real time when the test has been taken
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Product">
+            <summary>
+            Product id
             </summary>
         </member>
         <member name="T:CovidMassTesting.Program">
@@ -3628,6 +3760,28 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates html source code for pdf generation
+            </summary>
+            <param name="visitor"></param>
+            <param name="testingEntity"></param>
+            <param name="placeAddress"></param>
+            <param name="product"></param>
+            <param name="resultguid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GeneratePDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates pdf from test result
+            </summary>
+            <param name="visitor"></param>
+            <param name="testingEntity"></param>
+            <param name="placeAddress"></param>
+            <param name="product"></param>
+            <param name="resultguid"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -3971,7 +4125,7 @@
             Visitor mock repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Constructor
             </summary>
@@ -3983,6 +4137,7 @@
             <param name="smsSender"></param>
             <param name="placeRepository"></param>
             <param name="slotRepository"></param>
+            <param name="placeProviderRepository"></param>
             <param name="userRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
@@ -4087,6 +4242,21 @@
             <summary>
             Tests the storage
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetResult(System.String)">
+            <summary>
+            Decode visitor data from database
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.SetResult(CovidMassTesting.Model.VerificationData,System.Boolean)">
+            <summary>
+            Encode visitor data and store to database
+            </summary>
+            <param name="verificationData"></param>
+            <param name="mustBeNew"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository">
@@ -4867,7 +5037,7 @@
             Visitor repository holds data about visitors
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.VisitorRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.VisitorRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Constructor
             </summary>
@@ -4879,6 +5049,7 @@
             <param name="smsSender"></param>
             <param name="placeRepository"></param>
             <param name="slotRepository"></param>
+            <param name="placeProviderRepository"></param>
             <param name="userRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Add(CovidMassTesting.Model.Visitor)">
@@ -5097,6 +5268,57 @@
             <summary>
             Tests the storage
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates html source code for pdf generation
+            </summary>
+            <param name="visitor"></param>
+            <param name="testingEntity"></param>
+            <param name="placeAddress"></param>
+            <param name="product"></param>
+            <param name="resultguid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GeneratePDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+            <summary>
+            Creates pdf from test result
+            </summary>
+            <param name="visitor"></param>
+            <param name="testingEntity"></param>
+            <param name="placeAddress"></param>
+            <param name="product"></param>
+            <param name="resultguid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Sign(System.Byte[],System.Byte[],Org.BouncyCastle.X509.X509Certificate[],Org.BouncyCastle.Crypto.ICipherParameters,System.String,iText.Signatures.PdfSigner.CryptoStandard,System.String,System.String)">
+            <summary>
+            Digitaly sign pdf
+            </summary>
+            <param name="src"></param>
+            <param name="pass"></param>
+            <param name="chain"></param>
+            <param name="pk"></param>
+            <param name="digestAlgorithm"></param>
+            <param name="subfilter"></param>
+            <param name="reason"></param>
+            <param name="location"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetResult(System.String)">
+            <summary>
+            Decode visitor data from database
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetResult(CovidMassTesting.Model.VerificationData,System.Boolean)">
+            <summary>
+            Encode visitor data and store to database
+            </summary>
+            <param name="verificationData"></param>
+            <param name="mustBeNew"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Resources.Controllers_AdminController">
@@ -5480,6 +5702,43 @@
             <summary>
               Looks up a localized string similar to Test does not exists.
             </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.TestResult">
+             <summary>
+               Looks up a localized string similar to &lt;html&gt;
+            &lt;head&gt;
+            &lt;title&gt;Test result&lt;/title&gt;
+            &lt;style&gt;
+             h1{
+              color:navy;
+              font-size:2em;
+             }
+             th{
+             text-align:left;
+             }
+            &lt;/style&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+             &lt;h1&gt;Výsledok testovania vírusu SARS-CoV-2&lt;/h1&gt;
+             &lt;table&gt;
+            	&lt;thead&gt;
+            		&lt;tr&gt;
+            			&lt;th&gt;Typ hodnoty&lt;/th&gt;&lt;th&gt;Hodnota&lt;/th&gt;
+            		&lt;/tr&gt;
+            	&lt;/thead&gt;
+            	&lt;tbody&gt;
+            		&lt;tr&gt;
+            			&lt;th&gt;Typ testu:&lt;/th&gt;&lt;td&gt;{{Product}}&lt;/td&gt;
+            		&lt;/tr&gt;
+            		&lt;tr&gt;
+            			&lt;th&gt;Čas testovania:&lt;/th&gt;&lt;td&gt;{{Date}}&lt;/td&gt;
+            		&lt;/tr&gt;
+            		&lt;tr&gt;
+            			&lt;th&gt;Výsledok:&lt;/th&gt;&lt;td&gt;{{Text}}&lt;/td&gt;
+            		&lt;/tr&gt;
+            		&lt;tr&gt;
+            			&lt;th&gt;Poučenie:&lt;/th&gt;&lt;t [rest of string was truncated]&quot;;.
+             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_">
             <summary>

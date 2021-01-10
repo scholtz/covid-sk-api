@@ -21,9 +21,11 @@ namespace CovidMassTesting.Repository.MockRepository
     public class VisitorRepository : Repository.RedisRepository.VisitorRepository
     {
         private readonly ConcurrentDictionary<int, Visitor> data = new ConcurrentDictionary<int, Visitor>();
+        private readonly ConcurrentDictionary<string, string> verification = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<string, int> testing2code = new ConcurrentDictionary<string, int>();
         private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
         private readonly SortedSet<string> docqueue = new SortedSet<string>();
+        private readonly IConfiguration configuration;
         private readonly ILogger<VisitorRepository> logger;
         private int TestInt { get; set; }
         /// <summary>
@@ -37,6 +39,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="smsSender"></param>
         /// <param name="placeRepository"></param>
         /// <param name="slotRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <param name="userRepository"></param>
         public VisitorRepository(
             IStringLocalizer<Repository.RedisRepository.VisitorRepository> localizer,
@@ -47,6 +50,7 @@ namespace CovidMassTesting.Repository.MockRepository
             ISMSSender smsSender,
             IPlaceRepository placeRepository,
             ISlotRepository slotRepository,
+            IPlaceProviderRepository placeProviderRepository,
             IUserRepository userRepository
             ) : base(
                 localizer,
@@ -57,10 +61,12 @@ namespace CovidMassTesting.Repository.MockRepository
                 smsSender,
                 placeRepository,
                 slotRepository,
+                placeProviderRepository,
                 userRepository
                 )
         {
             logger = loggerFactory.CreateLogger<VisitorRepository>();
+            this.configuration = configuration;
         }
         /// <summary>
         /// Set visitor
@@ -232,6 +238,44 @@ namespace CovidMassTesting.Repository.MockRepository
             this.TestInt = toSave;
             if (toSave != TestInt) throw new Exception("Storage does not work");
             return toSave;
+        }
+
+
+
+        /// <summary>
+        /// Decode visitor data from database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public override async Task<Visitor> GetResult(string id)
+        {
+            logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
+            var encoded = verification[id];
+            if (string.IsNullOrEmpty(encoded)) return null;
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var decoded = aes.DecryptFromBase64String(encoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
+        }
+        /// <summary>
+        /// Encode visitor data and store to database
+        /// </summary>
+        /// <param name="verificationData"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        public override async Task<VerificationData> SetResult(Model.VerificationData verificationData, bool mustBeNew)
+        {
+            if (verificationData is null)
+            {
+                throw new ArgumentNullException(nameof(verificationData));
+            }
+
+            var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(verificationData);
+            logger.LogInformation($"Setting verificationData {verificationData.Id.GetHashCode()}");
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var encoded = aes.EncryptToBase64String(objectToEncode);
+            if (mustBeNew && verification.ContainsKey(verificationData.Id)) throw new Exception("Must be new");
+            verification[verificationData.Id] = encoded;
+            return verificationData;
         }
     }
 }

@@ -150,6 +150,10 @@
   <data name="Test does not exists" xml:space="preserve">
     <value>Test does not exists</value>
   </data>
+  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="TestResult" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestResult.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="This 1 hour time slot has reached the capacity." xml:space="preserve">
     <value>This 1 hour time slot has reached the capacity.</value>
   </data>

@@ -122,22 +122,7 @@
   <![endif]-->
                                     <table width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%; max-width:600px;" align="center">
                                       <tr>
-                                        <td role="modules-container" style="padding:0px 0px 0px 0px; color:#000000; text-align:left;" bgcolor="#FFFFFF" width="100%" align="left"><table class="module preheader preheader-hide" role="module" data-type="preheader" border="0" cellpadding="0" cellspacing="0" width="100%" style="display: none !important; mso-hide: all; visibility: hidden; opacity: 0; color: transparent; height: 0; width: 0;">
-    <tr>
-      <td role="module-content">
-        <p>
-        
-        {{#if isSK}}
-            Prijmite pozvanie do aplikácie hromadného testovania obyvateľov proti covidu.
-        {{else if isCS}}
-            Přijměte pozvání do aplikace hromadného testování obyvatel proti covidu.
-        {{else}}
-            Accept the invitation to apply the mass population testing application.
-        {{/if}}
-        </p>
-      </td>
-    </tr>
-  </table><table class="wrapper" role="module" data-type="image" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="7dac2bd1-e517-48a9-be14-163f81b20341">
+                                        <td role="modules-container" style="padding:0px 0px 0px 0px; color:#000000; text-align:left;" bgcolor="#FFFFFF" width="100%" align="left"><table class="wrapper" role="module" data-type="image" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed;" data-muid="7dac2bd1-e517-48a9-be14-163f81b20341">
     <tbody>
       <tr>
         <td style="font-size:6px; line-height:10px; padding:0px 20px 20px 0px;" valign="top" align="center">
@@ -150,13 +135,23 @@
       <tr>
         <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><div style="font-family: inherit; text-align: inherit"><span style="box-sizing: border-box; padding-top: 0px; padding-right: 0px; padding-bottom: 0px; padding-left: 0px; margin-top: 0px; margin-right: 0px; margin-bottom: 0px; margin-left: 0px; font-style: inherit; font-variant-ligatures: inherit; font-variant-caps: inherit; font-variant-numeric: inherit; font-variant-east-asian: inherit; font-weight: inherit; font-stretch: inherit; line-height: inherit; font-family: inherit; font-size: 14px; vertical-align: baseline; border-top-width: 0px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px; border-top-style: initial; border-right-style: initial; border-bottom-style: initial; border-left-style: initial; border-top-color: initial; border-right-color: initial; border-bottom-color: initial; border-left-color: initial; border-image-source: initial; border-image-slice: initial; border-image-width: initial; border-image-outset: initial; border-image-repeat: initial; color: #000000; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-style: initial; text-decoration-color: initial">
         
+        <p>
         
         {{#if isSK}}
-            {{Name}}, toto je pozvánka do aplikácie Rýchlejšie.sk. V aplikácii Vám boli pridelené role: {{Roles}}. Pre prihlásenie použite svoj e-mail a heslo: {{Password}}.
+            Prijmite pozvanie do aplikácie hromadného testovania obyvateľov proti covidu.
         {{else if isCS}}
-            {{Name}}, toto je pozvánka do aplikace Rýchlejšie.sk. V aplikaci Vám byly přiděleny role: {{Roles}}. Pro přihlášení použijte svůj e-mail a heslo: {{Password}}.
+            Přijměte pozvání do aplikace hromadného testování obyvatel proti covidu.
         {{else}}
-            {{Name}}, this is an invitation to the Rýchlejšie.sk application. You have been assigned roles in the application: {{Roles}}. Use your email and password to log in: {{Password}}.
+            Accept the invitation to apply the mass population testing application.
+        {{/if}}
+        </p>
+        
+        {{#if isSK}}
+            {{Name}}, toto je pozvánka do aplikácie Rýchlejšie.sk. Pre prihlásenie použite svoj e-mail a heslo: {{Password}}.
+        {{else if isCS}}
+            {{Name}}, toto je pozvánka do aplikace Rýchlejšie.sk. Pro přihlášení použijte svůj e-mail a heslo: {{Password}}.
+        {{else}}
+            {{Name}}, this is an invitation to the Rýchlejšie.sk application. Use your email and password to log in: {{Password}}.
         {{/if}}
         
         </span></div><div></div></div></td>

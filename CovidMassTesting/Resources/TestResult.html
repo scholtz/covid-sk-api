@@ -1,0 +1,88 @@
+﻿<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>Test result</title>
+    <style>
+        h1 {
+            color: navy;
+            font-size: 2em;
+        }
+
+        th {
+            text-align: left;
+        }
+
+        body {
+            font-family: sans-serif;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Výsledok testovania vírusu SARS-CoV-2</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Typ hodnoty</th>
+                <th>Hodnota</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th>Typ testu:</th>
+                <td>{{Product}}</td>
+            </tr>
+            <tr>
+                <th>Čas testovania:</th>
+                <td>{{Date}}</td>
+            </tr>
+            <tr>
+                <th>Výsledok:</th>
+                <td>{{Text}}</td>
+            </tr>
+            <tr>
+                <th>Poučenie:</th>
+                <td>{{Description}}</td>
+            </tr>
+            <tr>
+                <th>Meno testovanej osoby:</th>
+                <td>{{Name}}</td>
+            </tr>
+            {{#PersonalNumber}}
+            <tr>
+                <th>Rodné číslo alebo číslo poistenca:</th>
+                <td>{{PersonalNumber}}</td>
+            </tr>
+            {{/PersonalNumber}}
+            {{#PassportNumber}}
+            <tr>
+                <th>Číslo pasu:</th>
+                <td>{{PassportNumber}}</td>
+            </tr>
+            {{/PassportNumber}}
+            <tr>
+                <th>Test vykonal:</th>
+                <td>{{TestingEntity}}</td>
+            </tr>
+            <tr>
+                <th>Adresa výkonu testu:</th>
+                <td>{{TestingAddress}}</td>
+            </tr>
+            <tr>
+                <th>URL adresa:</th>
+                <td>{{FrontedURL}}</td>
+            </tr>
+            <tr>
+                <th>Kontrola testu:</th>
+                <td>{{FrontedURL}}check/{{ResultGUID}}</td>
+            </tr>
+            <tr>
+                <th></th>
+                <td><img style="width:150px;height:150px;" src="data:image/png;base64, {{QRVerificationURL}}" alt="QR" /></td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

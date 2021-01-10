@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -33,7 +34,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IPlaceRepository placeRepository;
         private readonly ISlotRepository slotRepository;
         private readonly IUserRepository userRepository;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
+        private readonly string REDIS_KEY_RESULTS_OBJECTS = "RESULTS";
         private readonly string REDIS_KEY_TEST2VISITOR = "TEST2VISITOR";
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
         private readonly string REDIS_KEY_DOCUMENT_QUEUE = "DOCUMENT_QUEUE";
@@ -50,6 +53,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="smsSender"></param>
         /// <param name="placeRepository"></param>
         /// <param name="slotRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <param name="userRepository"></param>
         public VisitorRepository(
             IStringLocalizer<VisitorRepository> localizer,
@@ -60,6 +64,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             ISMSSender smsSender,
             IPlaceRepository placeRepository,
             ISlotRepository slotRepository,
+            IPlaceProviderRepository placeProviderRepository,
             IUserRepository userRepository
             )
         {
@@ -72,6 +77,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.placeRepository = placeRepository;
             this.slotRepository = slotRepository;
             this.userRepository = userRepository;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// Creates new visitor registration
@@ -309,6 +315,10 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             visitor.Result = state;
             visitor.LastUpdate = DateTimeOffset.Now;
+            if (state == TestResult.TestIsBeingProcessing)
+            {
+                visitor.TestingTime = visitor.LastUpdate;
+            }
             if (state == "test-not-processed")
             {
                 visitor.TestingSet = testingSet;
@@ -413,7 +423,38 @@ namespace CovidMassTesting.Repository.RedisRepository
                     specifiedCulture = new CultureInfo(visitor.Language ?? "en");
                     CultureInfo.CurrentCulture = specifiedCulture;
                     CultureInfo.CurrentUICulture = specifiedCulture;
+                    var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
+                    try
+                    {
+                        var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                        //var product = await placeRepository.GetPlaceProduct();
+                        var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                        var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
+
+                        var result = await SetResult(new VerificationData()
+                        {
+                            Id = Guid.NewGuid().ToString(),
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                            Product = product?.Name,
+                            TestingAddress = place?.Address,
+                            Result = visitor.Result,
+                            TestingEntity = pp?.CompanyName
+                        }, true);
+
+                        var pdf = GeneratePDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
+                        attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                        {
+                            Content = Convert.ToBase64String(pdf),
+                            Filename = $"{visitor.LastName}{visitor.FirstName}-{visitor.TestingTime.ToString("MMdd")}.pdf",
+                            Type = "application/pdf",
+                            Disposition = "attachment"
+                        });
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, "Error generating file");
+                    }
                     await emailSender.SendEmail(
                         localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                         visitor.Email,
@@ -422,7 +463,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             Name = $"{visitor.FirstName} {visitor.LastName}",
 
-                        });
+                        },
+                        attachments
+                        );
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
 
@@ -924,6 +967,246 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = await redisCacheClient.Db0.GetAsync<int>("TEST");
             if (toSave != ret) throw new Exception("Storage does not work");
             return ret;
+        }
+        /// <summary>
+        /// Creates html source code for pdf generation
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="testingEntity"></param>
+        /// <param name="placeAddress"></param>
+        /// <param name="product"></param>
+        /// <param name="resultguid"></param>
+        /// <returns></returns>
+        public string GenerateHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
+        {
+            var oldCulture = CultureInfo.CurrentCulture;
+            var oldUICulture = CultureInfo.CurrentUICulture;
+            var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+            CultureInfo.CurrentCulture = specifiedCulture;
+            CultureInfo.CurrentUICulture = specifiedCulture;
+
+            var data = new Model.Mustache.TestResult();
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveWaitingForCertificate:
+                    data.Text = "Pozitívny";
+                    data.Description = "Zostaňte prosím v karanténe minimálne 14 dní. Potom si vykonajte ďalší antigénový alebo PCR test aby ste mali istotu že vírus nebudete šíriť medzi ľudí.";
+                    break;
+                case TestResult.NegativeWaitingForCertificate:
+                    data.Text = "Negatívny";
+                    data.Description = "Aj keď test u Vás nepreukázal COVID, prosím zostaňte ostražitý. V prípade príznakov ako kašeľ, zvýšená teplota, alebo bolesť hlavy choďte prosím na ďalší test.";
+                    break;
+                default:
+                    throw new Exception("Invalid state for PDF generation");
+            }
+
+            data.Name = $"{visitor.FirstName} {visitor.LastName}";
+            data.Date = visitor.TestingTime.ToString("f");
+
+            switch (visitor.PersonType)
+            {
+                case "idcard":
+                case "child":
+                    data.PersonalNumber = visitor.RC;
+                    break;
+                case "foreign":
+                    data.PassportNumber = visitor.Passport;
+                    break;
+            }
+
+            data.TestingAddress = placeAddress;
+            data.TestingEntity = testingEntity;
+            data.FrontedURL = configuration["FrontedURL"];
+            data.VerifyURL = $"{configuration["FrontedURL"]}check/{data.ResultGUID}";
+            data.Product = product;
+            data.ResultGUID = resultguid;
+
+            QRCoder.QRCodeGenerator qrGenerator = new QRCoder.QRCodeGenerator();
+            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.Q);
+            QRCoder.QRCode qrCode = new QRCoder.QRCode(qrCodeData);
+            using var outData = new MemoryStream();
+            qrCode.GetGraphic(20).Save(outData, System.Drawing.Imaging.ImageFormat.Png);
+            var pngBytes = outData.ToArray();
+            data.QRVerificationURL = Convert.ToBase64String(pngBytes).Replace("\n", "");
+
+            var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
+            var ret = stubble.Render(Resources.Repository_RedisRepository_VisitorRepository.TestResult, data);
+
+            CultureInfo.CurrentCulture = oldCulture;
+            CultureInfo.CurrentUICulture = oldUICulture;
+            return ret;
+        }
+
+        /// <summary>
+        /// Creates pdf from test result
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="testingEntity"></param>
+        /// <param name="placeAddress"></param>
+        /// <param name="product"></param>
+        /// <param name="resultguid"></param>
+        /// <returns></returns>
+        public byte[] GeneratePDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
+        {
+            var html = GenerateHTML(visitor, testingEntity, placeAddress, product, resultguid);
+            using var pdfStreamEncrypted = new MemoryStream();
+            var writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
+                            new iText.Kernel.Pdf.WriterProperties()
+                                    .SetStandardEncryption(
+                                        Encoding.ASCII.GetBytes(visitor.RC),
+                                        Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
+                                        iText.Kernel.Pdf.EncryptionConstants.ALLOW_PRINTING,
+                                        iText.Kernel.Pdf.EncryptionConstants.ENCRYPTION_AES_256
+                                    )
+
+                         //                                    .SetPdfVersion(iText.Kernel.Pdf.PdfVersion.PDF_1_4)
+                         );
+            iText.Kernel.Pdf.PdfDocument pdfDocument = new iText.Kernel.Pdf.PdfDocument(writer);
+            pdfDocument.SetDefaultPageSize(iText.Kernel.Geom.PageSize.A4);
+            var settings = new iText.Html2pdf.ConverterProperties()
+                .SetFontProvider(new iText.Html2pdf.Resolver.Font.DefaultFontProvider(false, true, false)
+            );
+            iText.Html2pdf.HtmlConverter.ConvertToPdf(html, pdfDocument, settings);
+            writer.Close();
+
+            if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
+            Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
+            string alias = null;
+            foreach (var a in pk12.Aliases)
+            {
+                alias = ((string)a);
+                if (pk12.IsKeyEntry(alias))
+                    break;
+            }
+
+            var pk = pk12.GetKey(alias).Key;
+            var ce = pk12.GetCertificateChain(alias);
+            var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
+            for (int k = 0; k < ce.Length; ++k)
+            {
+                chain[k] = ce[k].Certificate;
+            }
+
+            try
+            {
+                return Sign(
+                    pdfStreamEncrypted.ToArray(),
+                    Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
+                    chain,
+                    pk,
+                    iText.Signatures.DigestAlgorithms.SHA512,
+                    iText.Signatures.PdfSigner.CryptoStandard.CADES,
+                    "Covid test",
+                    "Pezinok"
+                    );
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, "Error while signing the pdf document");
+                return pdfStreamEncrypted.ToArray();
+            }
+        }
+        /// <summary>
+        /// Digitaly sign pdf
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="pass"></param>
+        /// <param name="chain"></param>
+        /// <param name="pk"></param>
+        /// <param name="digestAlgorithm"></param>
+        /// <param name="subfilter"></param>
+        /// <param name="reason"></param>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public byte[] Sign(
+            byte[] src,
+            byte[] pass,
+            Org.BouncyCastle.X509.X509Certificate[] chain,
+            Org.BouncyCastle.Crypto.ICipherParameters pk,
+            String digestAlgorithm,
+            iText.Signatures.PdfSigner.CryptoStandard subfilter,
+            String reason,
+            String location
+        )
+        {
+            using MemoryStream outputMemoryStream = new MemoryStream();
+            using MemoryStream memoryStream = new MemoryStream(src);
+            using MemoryStream signerMemoryStream = new MemoryStream();
+
+            var readerProperties = new iText.Kernel.Pdf.ReaderProperties();
+            readerProperties.SetPassword(pass);
+
+            using iText.Kernel.Pdf.PdfReader pdfReader = new iText.Kernel.Pdf.PdfReader(memoryStream, readerProperties);
+            iText.Signatures.PdfSigner signer =
+                new iText.Signatures.PdfSigner(
+                    pdfReader,
+                    signerMemoryStream,
+                    new iText.Kernel.Pdf.StampingProperties());
+
+            // Create the signature appearance
+            iText.Kernel.Geom.Rectangle rect = new iText.Kernel.Geom.Rectangle(350, 100, 200, 100);
+            iText.Signatures.PdfSignatureAppearance appearance = signer.GetSignatureAppearance();
+            appearance.SetReason(reason)
+                .SetLocation(location)
+                // Specify if the appearance before field is signed will be used
+                // as a background for the signed field. The "false" value is the default value.
+                .SetReuseAppearance(false)
+                .SetPageRect(rect)
+                .SetPageNumber(1);
+            signer.SetFieldName("sig");
+
+            iText.Signatures.IExternalSignature pks = new iText.Signatures.PrivateKeySignature(pk, digestAlgorithm);
+
+            // Sign the document using the detached mode, CMS or CAdES equivalent.
+            var crlList = new List<iText.Signatures.ICrlClient>();
+            signer.SignDetached(pks, chain, crlList, null, null, 0, subfilter);
+
+            pdfReader.Close();
+            memoryStream.Close();
+            src = outputMemoryStream.ToArray();
+            outputMemoryStream.Close();
+            return signerMemoryStream.ToArray();
+        }
+
+
+        /// <summary>
+        /// Decode visitor data from database
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual async Task<Visitor> GetResult(string id)
+        {
+            logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
+            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_OBJECTS}", id.ToString());
+            if (string.IsNullOrEmpty(encoded)) return null;
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var decoded = aes.DecryptFromBase64String(encoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
+        }
+        /// <summary>
+        /// Encode visitor data and store to database
+        /// </summary>
+        /// <param name="verificationData"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        public virtual async Task<VerificationData> SetResult(Model.VerificationData verificationData, bool mustBeNew)
+        {
+            if (verificationData is null)
+            {
+                throw new ArgumentNullException(nameof(verificationData));
+            }
+
+            var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(verificationData);
+            logger.LogInformation($"Setting verificationData {verificationData.Id.GetHashCode()}");
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var encoded = aes.EncryptToBase64String(objectToEncode);
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_OBJECTS}", verificationData.Id, encoded, mustBeNew);
+            if (mustBeNew && !ret)
+            {
+                throw new Exception("Error creating record in the database");
+            }
+
+            return verificationData;
         }
     }
 }
