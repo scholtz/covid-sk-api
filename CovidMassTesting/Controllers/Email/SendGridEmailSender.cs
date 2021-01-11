@@ -108,7 +108,10 @@ namespace CovidMassTesting.Controllers.Email
             msg.AddTo(new EmailAddress(toEmail, toName));
 
             msg.From = new EmailAddress(fromEmail, fromName);
-            msg.AddAttachments(attachments);
+            if (attachments.Any())
+            {
+                msg.AddAttachments(attachments);
+            }
             var serialize = msg.Serialize();
             var response = await client.RequestAsync(SendGridClient.Method.POST, requestBody: serialize, urlPath: "mail/send");
             if (response.StatusCode == System.Net.HttpStatusCode.Accepted) return true;
