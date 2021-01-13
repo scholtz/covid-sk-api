@@ -229,10 +229,11 @@
             Manages place provider companies
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceProviderController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceProviderController},CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceProviderController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceProviderController},CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="configuration"></param>
             <param name="localizer"></param>
             <param name="logger"></param>
             <param name="placeProviderRepository"></param>

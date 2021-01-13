@@ -2030,6 +2030,12 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             data = request.Content.ReadAsStringAsync().Result;
 
+            // test limit 1 place provider registration per api configuration
+            request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
+
             var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
             Assert.AreEqual(obj.VAT, pp.VAT);
             Assert.AreEqual(obj.Web, pp.Web);
@@ -2549,6 +2555,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var resultData = Newtonsoft.Json.JsonConvert.DeserializeObject<VerificationData>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeWaitingForCertificate, resultData.Result);
+            Assert.AreEqual("Drahá vakcína", resultData.Product);
 
         }
         [Test]

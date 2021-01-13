@@ -10,6 +10,7 @@ using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +23,7 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class PlaceProviderController : ControllerBase
     {
+        private readonly IConfiguration configuration;
         private readonly IStringLocalizer<PlaceProviderController> localizer;
         private readonly ILogger<PlaceProviderController> logger;
         private readonly IPlaceRepository placeRepository;
@@ -30,12 +32,14 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="configuration"></param>
         /// <param name="localizer"></param>
         /// <param name="logger"></param>
         /// <param name="placeProviderRepository"></param>
         /// <param name="placeRepository"></param>
         /// <param name="userRepository"></param>
         public PlaceProviderController(
+            IConfiguration configuration,
             IStringLocalizer<PlaceProviderController> localizer,
             ILogger<PlaceProviderController> logger,
             IPlaceProviderRepository placeProviderRepository,
@@ -43,6 +47,7 @@ namespace CovidMassTesting.Controllers
             IUserRepository userRepository
             )
         {
+            this.configuration = configuration;
             this.localizer = localizer;
             this.logger = logger;
             this.placeRepository = placeRepository;
@@ -80,7 +85,17 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Place provide valid contact phone number in form +421 907 000 000");
                 }
-
+                if (!string.IsNullOrEmpty(configuration["MaxPlaceProviders"]))
+                {
+                    if (int.TryParse(configuration["MaxPlaceProviders"], out var limit))
+                    {
+                        var list = await placeProviderRepository.ListPublic();
+                        if (limit <= list.Count())
+                        {
+                            throw new Exception("Place provider limit has been reached");
+                        }
+                    }
+                }
                 var ret = await placeProviderRepository.Register(testingPlaceProvider);
                 if (ret != null)
                 {
