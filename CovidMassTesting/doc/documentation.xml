@@ -872,6 +872,18 @@
             </summary>
             <param name="disposing"></param>
         </member>
+        <member name="T:CovidMassTesting.Helpers.Text">
+            <summary>
+            Text helper
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Text.RemoveDiacritism(System.String)">
+            <summary>
+            https://www.dotnetportal.cz/blogy/4/Tomas-Jecha/663/NET-Tip-6-Ciste-odstraneni-diakritiky
+            </summary>
+            <param name="Text"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Helpers.Validators">
             <summary>
             Validator helpers

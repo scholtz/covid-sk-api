@@ -66,6 +66,14 @@ namespace CovidMassTesting.Controllers.SMS
                 var token = await GetToken();
                 logger.LogInformation($"Sending SMS message to {toPhone}");
                 var request = new RestRequest("api/v1/messages", Method.POST, DataFormat.Json);
+
+                var text = data.GetText();
+                if (text.Length >= 70)
+                {
+                    // zrus diakritiku
+                    text = Helpers.Text.RemoveDiacritism(text);
+                }
+
                 request.AddJsonBody(new GoSMSSendMessage()
                 {
                     channel = settings.Value.Channel,

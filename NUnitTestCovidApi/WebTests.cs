@@ -2726,6 +2726,12 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(false, version.EmailConfigured);
             Assert.AreEqual(false, version.RedisConfigured);
         }
+        [Test]
+        public virtual void TestText()
+        {
+            Assert.AreEqual("Ludovit", CovidMassTesting.Helpers.Text.RemoveDiacritism("Ľudovít"));
+            Assert.AreEqual("+lsctzyaie LCZI", CovidMassTesting.Helpers.Text.RemoveDiacritism("+ľščťžýáíé ĽČŽÍ"));
+        }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;

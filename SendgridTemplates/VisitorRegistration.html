@@ -149,11 +149,13 @@
       <tr>
         <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><div style="font-family: inherit; text-align: inherit">
         {{#if isSK}}
-            {{Name}}, úspešne ste sa zaregistrovali na test pod číslom {{Code}}. Váš test sa uskutoční dňa {{Date}} na adrese: {{Place}} ({{PlaceDescription}}).
+            {{Name}}, úspešne ste sa zaregistrovali na test pod číslom {{Code}}. Váš test sa uskutoční dňa {{Date}} na adrese: {{Place}} ({{PlaceDescription}}). V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
         {{else if isCS}}
-            {{Name}}, úspěšně jste se zaregistrovali na test pod číslem {{Code}}. Váš test se uskuteční dne {{Date}} na adrese: {{Place}} ({{PlaceDescription}}).
+            {{Name}}, úspěšně jste se zaregistrovali na test pod číslem {{Code}}. Váš test se uskuteční dne {{Date}} na adrese: {{Place}} ({{PlaceDescription}}). V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
+        {{else if isEN}}
+            {{Name}}, you have successfully registered for the test under {{Code}}. Your test will take place on {{Date}} at: {{Place}} ({{PlaceDescription}}). You can find confirmation PDF file in the attachment with your personal number or passport number as the password.
         {{else}}
-            {{Name}}, you have successfully registered for the test under {{Code}}. Your test will take place on {{Date}} at: {{Place}} ({{PlaceDescription}}).
+            {{Name}}, úspešne ste sa zaregistrovali na test pod číslom {{Code}}. Váš test sa uskutoční dňa {{Date}} na adrese: {{Place}} ({{PlaceDescription}}). V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
         {{/if}}
 
         
@@ -162,10 +164,12 @@
 <div style="font-family: inherit; text-align: inherit">
         {{#if isSK}}
             Pri testovaní ukážte tento číselný kód: <strong>{{Code}}</strong>.
+        {{else if isEN}}
+            When testing, show this numeric code: <strong>{{Code}}</strong>.
         {{else if isCS}}
             Při testování ukažte tento číselný kód: <strong>{{Code}}</strong>.
         {{else}}
-            When testing, show this numeric code: <strong>{{Code}}</strong>.
+            Pri testovaní ukážte tento číselný kód: <strong>{{Code}}</strong>.
         {{/if}}
     </div><div></div></div></td>
       </tr>
@@ -190,18 +194,22 @@
         <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><div style="font-family: inherit; text-align: inherit"><span style="color: #888888">
         {{#if isSK}}
             Ďakujeme, že ste využili možnosť registrácie na test.
+        {{else if isEN}}
+            Thank you for using the test registration option.
         {{else if isCS}}
             Děkujeme, že jste využili možnost registrace na test.
         {{else}}
-            Thank you for using the test registration option.
+            Ďakujeme, že ste využili možnosť registrácie na test.
         {{/if}} 
         </span><span style="color: #888888; font-family: arial, helvetica, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline">
         {{#if isSK}}
             Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
+        {{else if isEN}}
+            Not only you save your time, but you also improve the smoothness of the testing itself and make the work of the testing team easier. We thank you.
         {{else if isCS}}
             Šetříte čas nejen sobě, ale zlepšujete plynulost samotného testování a snazší práci testovacímu týmu. Děkujeme.
         {{else}}
-            Not only you save your time, but you also improve the smoothness of the testing itself and make the work of the testing team easier. We thank you.
+            Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
         {{/if}} 
         </span></div><div></div></div></td>
       </tr>
@@ -214,23 +222,7 @@
         </td>
       </tr>
     </tbody>
-  </table><div data-role="module-unsubscribe" class="module" role="module" data-type="unsubscribe" style="color:#444444; font-size:12px; line-height:20px; padding:16px 16px 16px 16px; text-align:Center;" data-muid="4e838cf3-9892-4a6d-94d6-170e474d21e5"><div class="Unsubscribe--addressLine"></div><p style="font-size:12px; line-height:20px;"><a target="_blank" class="Unsubscribe--unsubscribeLink zzzzzzz" href="{{{unsubscribe}}}" style="">
-        {{#if isSK}}
-            Neposielať emaily
-        {{else if isCS}}
-            Neposílat emaily
-        {{else}}
-            Unsubscribe
-        {{/if}}
-  </a> - <a href="{{{unsubscribe_preferences}}}" target="_blank" class="Unsubscribe--unsubscribePreferences" style="">
-        {{#if isSK}}
-            Možnosti nastavenia emailov
-        {{else if isCS}}
-            Možnosti nastavení emailů
-        {{else}}
-            Unsubscribe Preferences
-        {{/if}}
-        </a></p></div></td>
+  </table></td>
                                       </tr>
                                     </table>
                                     <!--[if mso]>
