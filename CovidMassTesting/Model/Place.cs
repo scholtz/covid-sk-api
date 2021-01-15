@@ -68,6 +68,18 @@ namespace CovidMassTesting.Model
         /// </summary>
         public int Sick { get; set; }
         /// <summary>
+        /// Primary Picture
+        /// </summary>
+        public int Picture1 { get; set; }
+        /// <summary>
+        /// Second Picture
+        /// </summary>
+        public int Picture2 { get; set; }
+        /// <summary>
+        /// Third Picture
+        /// </summary>
+        public int Picture3 { get; set; }
+        /// <summary>
         /// Standard opening hours
         /// </summary>
         public string OpeningHoursWorkDay { get; set; }
