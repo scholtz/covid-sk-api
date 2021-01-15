@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="BarcodeLib" Version="2.2.9" />
     <PackageReference Include="ChoETL" Version="1.2.1.5" />
     <PackageReference Include="CsvHelper" Version="19.0.0" />
     <PackageReference Include="GoogleReCaptcha.V3" Version="1.3.0" />

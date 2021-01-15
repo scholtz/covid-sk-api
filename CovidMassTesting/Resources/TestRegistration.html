@@ -2,7 +2,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    <title>Test result</title>
+    <title>Test registration</title>
     <style>
         h1 {
             color: navy;
@@ -20,24 +20,20 @@
     </style>
 </head>
 <body>
-    <h1>Výsledok testovania vírusu SARS-CoV-2</h1>
+    <h1>Registrácia k odberu vzorky pre SARS-CoV-2</h1>
     <table>
         <tbody>
             <tr>
-                <th>Typ testu:</th>
-                <td>{{Product}}</td>
+                <th>Kód registrácie:</th>
+                <td>{{RegistrationCode}}</td>
             </tr>
             <tr>
                 <th>Čas testovania:</th>
                 <td>{{Date}}</td>
             </tr>
             <tr>
-                <th>Výsledok:</th>
-                <td>{{Text}}</td>
-            </tr>
-            <tr>
-                <th>Poučenie:</th>
-                <td>{{Description}}</td>
+                <th>Adresa výkonu testu:</th>
+                <td>{{TestingAddress}}</td>
             </tr>
             <tr>
                 <th>Meno testovanej osoby:</th>
@@ -56,24 +52,16 @@
             </tr>
             {{/PassportNumber}}
             <tr>
-                <th>Test vykonal:</th>
+                <th>Správca odberného miesta:</th>
                 <td>{{TestingEntity}}</td>
-            </tr>
-            <tr>
-                <th>Adresa výkonu testu:</th>
-                <td>{{TestingAddress}}</td>
             </tr>
             <tr>
                 <th>URL adresa:</th>
                 <td>{{FrontedURL}}</td>
             </tr>
             <tr>
-                <th>Kontrola testu:</th>
-                <td>{{VerifyURL}}</td>
-            </tr>
-            <tr>
                 <th></th>
-                <td><img style="width:150px;height:150px;" src="data:image/png;base64, {{QRVerificationURL}}" alt="QR" /></td>
+                <td><img style="width:150px;height:150px;" src="data:image/png;base64, {{QRCode}}" alt="QR" /> <img style="width:300px;height:150px;" src="data:image/png;base64, {{BarCode}}" alt="BarCode" /></td>
             </tr>
         </tbody>
     </table>

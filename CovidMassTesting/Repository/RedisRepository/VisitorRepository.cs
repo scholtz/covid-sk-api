@@ -13,6 +13,7 @@ using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -123,6 +124,29 @@ namespace CovidMassTesting.Repository.RedisRepository
             CultureInfo.CurrentCulture = specifiedCulture;
             CultureInfo.CurrentUICulture = specifiedCulture;
 
+
+            var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
+
+            try
+            {
+                //var product = await placeRepository.GetPlaceProduct();
+                var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+
+                var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Address, product?.Name);
+                attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                {
+                    Content = Convert.ToBase64String(pdf),
+                    Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slot.Time.ToString("MMdd")}.pdf",
+                    Type = "application/pdf",
+                    Disposition = "attachment"
+                });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, "Error generating file");
+            }
+
             await emailSender.SendEmail(
                 localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                 visitor.Email,
@@ -134,8 +158,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
                     Place = place.Name,
                     PlaceDescription = place.Description
-                    ///@TODO BAR CODE
-                });
+                }, attachments);
 
             if (!string.IsNullOrEmpty(visitor.Phone))
             {
@@ -442,7 +465,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             TestingEntity = pp?.CompanyName
                         }, true);
                         visitor.VerificationId = result.Id;
-                        var pdf = GeneratePDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
+                        var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
                         attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                         {
                             Content = Convert.ToBase64String(pdf),
@@ -826,6 +849,29 @@ namespace CovidMassTesting.Repository.RedisRepository
                 CultureInfo.CurrentCulture = specifiedCulture;
                 CultureInfo.CurrentUICulture = specifiedCulture;
 
+                var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
+
+                try
+                {
+                    //var product = await placeRepository.GetPlaceProduct();
+                    var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                    var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+
+                    var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Address, product?.Name);
+                    attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                    {
+                        Content = Convert.ToBase64String(pdf),
+                        Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slotD.Time.ToString("MMdd")}.pdf",
+                        Type = "application/pdf",
+                        Disposition = "attachment"
+                    });
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, "Error generating file");
+                }
+
+
                 await emailSender.SendEmail(
                     localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                     visitor.Email,
@@ -837,8 +883,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                         Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
                         Place = place.Name,
                         PlaceDescription = place.Description
-                        ///@TODO BAR CODE
-                    });
+
+                    }, attachments);
 
                 if (!string.IsNullOrEmpty(visitor.Phone))
                 {
@@ -977,7 +1023,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
         /// <returns></returns>
-        public string GenerateHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
+        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
         {
             var oldCulture = CultureInfo.CurrentCulture;
             var oldUICulture = CultureInfo.CurrentUICulture;
@@ -1038,6 +1084,74 @@ namespace CovidMassTesting.Repository.RedisRepository
         }
 
         /// <summary>
+        /// Creates html source code for pdf generation
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="testingEntity"></param>
+        /// <param name="placeAddress"></param>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        public string GenerateRegistrationHTML(Visitor visitor, string testingEntity, string placeAddress, string product)
+        {
+            var oldCulture = CultureInfo.CurrentCulture;
+            var oldUICulture = CultureInfo.CurrentUICulture;
+            var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+            CultureInfo.CurrentCulture = specifiedCulture;
+            CultureInfo.CurrentUICulture = specifiedCulture;
+
+            var data = new Model.Mustache.TestRegistration();
+
+            data.Name = $"{visitor.FirstName} {visitor.LastName}";
+
+            data.Date = new DateTimeOffset(visitor.ChosenSlot, TimeSpan.Zero).ToString("f");
+
+            switch (visitor.PersonType)
+            {
+                case "idcard":
+                case "child":
+                    data.PersonalNumber = visitor.RC;
+                    break;
+                case "foreign":
+                    data.PassportNumber = visitor.Passport;
+                    break;
+            }
+
+            data.TestingAddress = placeAddress;
+            data.TestingEntity = testingEntity;
+            data.FrontedURL = configuration["FrontedURL"];
+            data.Product = product;
+
+            BarcodeLib.Barcode b = new BarcodeLib.Barcode();
+            var formatted = visitor.Id.ToString();
+            if (formatted.Length == 9)
+            {
+                formatted = formatted.Substring(0, 3) + "-" + formatted.Substring(3, 3) + "-" + formatted.Substring(6, 3);
+            }
+            data.RegistrationCode = formatted;
+
+            Image img = b.Encode(BarcodeLib.TYPE.CODE39, formatted, Color.Black, Color.White, 300, 120);
+            using var outDataBar = new MemoryStream();
+            img.Save(outDataBar, System.Drawing.Imaging.ImageFormat.Png);
+            var barBytes = outDataBar.ToArray();
+            data.BarCode = Convert.ToBase64String(barBytes).Replace("\n", "");
+
+            QRCoder.QRCodeGenerator qrGenerator = new QRCoder.QRCodeGenerator();
+            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(visitor.Id.ToString(), QRCoder.QRCodeGenerator.ECCLevel.Q);
+            QRCoder.QRCode qrCode = new QRCoder.QRCode(qrCodeData);
+            using var outData = new MemoryStream();
+            qrCode.GetGraphic(20).Save(outData, System.Drawing.Imaging.ImageFormat.Png);
+            var qrBytes = outData.ToArray();
+            data.QRCode = Convert.ToBase64String(qrBytes).Replace("\n", "");
+
+            var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
+            var ret = stubble.Render(Resources.Repository_RedisRepository_VisitorRepository.TestRegistration, data);
+
+            CultureInfo.CurrentCulture = oldCulture;
+            CultureInfo.CurrentUICulture = oldUICulture;
+            return ret;
+        }
+
+        /// <summary>
         /// Creates pdf from test result
         /// </summary>
         /// <param name="visitor"></param>
@@ -1046,9 +1160,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
         /// <returns></returns>
-        public byte[] GeneratePDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
         {
-            var html = GenerateHTML(visitor, testingEntity, placeAddress, product, resultguid);
+            var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid);
             using var pdfStreamEncrypted = new MemoryStream();
             var writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
                             new iText.Kernel.Pdf.WriterProperties()
@@ -1106,6 +1220,77 @@ namespace CovidMassTesting.Repository.RedisRepository
                 return pdfStreamEncrypted.ToArray();
             }
         }
+
+
+        /// <summary>
+        /// Creates pdf from registration
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="testingEntity"></param>
+        /// <param name="placeAddress"></param>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        public byte[] GenerateRegistrationPDF(Visitor visitor, string testingEntity, string placeAddress, string product)
+        {
+            var html = GenerateRegistrationHTML(visitor, testingEntity, placeAddress, product);
+            using var pdfStreamEncrypted = new MemoryStream();
+            var writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
+                            new iText.Kernel.Pdf.WriterProperties()
+                                    .SetStandardEncryption(
+                                        Encoding.ASCII.GetBytes(visitor.RC),
+                                        Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
+                                        iText.Kernel.Pdf.EncryptionConstants.ALLOW_PRINTING,
+                                        iText.Kernel.Pdf.EncryptionConstants.ENCRYPTION_AES_256
+                                    )
+
+                         //                                    .SetPdfVersion(iText.Kernel.Pdf.PdfVersion.PDF_1_4)
+                         );
+            iText.Kernel.Pdf.PdfDocument pdfDocument = new iText.Kernel.Pdf.PdfDocument(writer);
+            pdfDocument.SetDefaultPageSize(iText.Kernel.Geom.PageSize.A4);
+            var settings = new iText.Html2pdf.ConverterProperties()
+                .SetFontProvider(new iText.Html2pdf.Resolver.Font.DefaultFontProvider(false, true, false)
+            );
+            iText.Html2pdf.HtmlConverter.ConvertToPdf(html, pdfDocument, settings);
+            writer.Close();
+
+            if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
+            Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
+            string alias = null;
+            foreach (var a in pk12.Aliases)
+            {
+                alias = ((string)a);
+                if (pk12.IsKeyEntry(alias))
+                    break;
+            }
+
+            var pk = pk12.GetKey(alias).Key;
+            var ce = pk12.GetCertificateChain(alias);
+            var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
+            for (int k = 0; k < ce.Length; ++k)
+            {
+                chain[k] = ce[k].Certificate;
+            }
+
+            try
+            {
+                return Sign(
+                    pdfStreamEncrypted.ToArray(),
+                    Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
+                    chain,
+                    pk,
+                    iText.Signatures.DigestAlgorithms.SHA512,
+                    iText.Signatures.PdfSigner.CryptoStandard.CADES,
+                    "Covid test",
+                    "Pezinok"
+                    );
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, "Error while signing the pdf document");
+                return pdfStreamEncrypted.ToArray();
+            }
+        }
+
         /// <summary>
         /// Digitaly sign pdf
         /// </summary>

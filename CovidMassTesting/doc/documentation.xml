@@ -1505,6 +1505,66 @@
             Prepayment invoice
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Mustache.TestRegistration">
+            <summary>
+            Variables for PDF generation
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.RegistrationCode">
+            <summary>
+            RegistrationCode
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.PersonalNumber">
+            <summary>
+            Personal number or insurance number
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.PassportNumber">
+            <summary>
+            Passport number for foreigners
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.Date">
+            <summary>
+            DateTime
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.FrontedURL">
+            <summary>
+            Link to testing place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.BarCode">
+            <summary>
+            Bar code
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.QRCode">
+            <summary>
+            QRCode
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.TestingEntity">
+            <summary>
+            Identification of testing provider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.TestingAddress">
+            <summary>
+            Address where user has been tested
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.Product">
+            <summary>
+            Product - PCR or Antigen test
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Mustache.TestResult">
             <summary>
             Variables for PDF generation
@@ -3784,7 +3844,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -3795,7 +3855,7 @@
             <param name="resultguid"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GeneratePDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -5301,7 +5361,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -5312,7 +5372,17 @@
             <param name="resultguid"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GeneratePDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String)">
+            <summary>
+            Creates html source code for pdf generation
+            </summary>
+            <param name="visitor"></param>
+            <param name="testingEntity"></param>
+            <param name="placeAddress"></param>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -5321,6 +5391,16 @@
             <param name="placeAddress"></param>
             <param name="product"></param>
             <param name="resultguid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String)">
+            <summary>
+            Creates pdf from registration
+            </summary>
+            <param name="visitor"></param>
+            <param name="testingEntity"></param>
+            <param name="placeAddress"></param>
+            <param name="product"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Sign(System.Byte[],System.Byte[],Org.BouncyCastle.X509.X509Certificate[],Org.BouncyCastle.Crypto.ICipherParameters,System.String,iText.Signatures.PdfSigner.CryptoStandard,System.String,System.String)">
@@ -5734,41 +5814,58 @@
               Looks up a localized string similar to Test does not exists.
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.TestRegistration">
+             <summary>
+               Looks up a localized string similar to &lt;html&gt;
+            &lt;head&gt;
+                &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+                &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1&quot;&gt;
+                &lt;title&gt;Test registration&lt;/title&gt;
+                &lt;style&gt;
+                    h1 {
+                        color: navy;
+                        font-size: 2em;
+                    }
+            
+                    th {
+                        text-align: left;
+                    }
+            
+                    body {
+                        font-family: sans-serif;
+                        font-size: 10px;
+                    }
+                &lt;/style&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+                &lt;h1&gt;Registr [rest of string was truncated]&quot;;.
+             </summary>
+        </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.TestResult">
              <summary>
                Looks up a localized string similar to &lt;html&gt;
             &lt;head&gt;
-            &lt;title&gt;Test result&lt;/title&gt;
-            &lt;style&gt;
-             h1{
-              color:navy;
-              font-size:2em;
-             }
-             th{
-             text-align:left;
-             }
-            &lt;/style&gt;
+                &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF-8&quot;&gt;
+                &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, maximum-scale=1&quot;&gt;
+                &lt;title&gt;Test result&lt;/title&gt;
+                &lt;style&gt;
+                    h1 {
+                        color: navy;
+                        font-size: 2em;
+                    }
+            
+                    th {
+                        text-align: left;
+                    }
+            
+                    body {
+                        font-family: sans-serif;
+                        font-size: 10px;
+                    }
+                &lt;/style&gt;
             &lt;/head&gt;
             &lt;body&gt;
-             &lt;h1&gt;Výsledok testovania vírusu SARS-CoV-2&lt;/h1&gt;
-             &lt;table&gt;
-            	&lt;thead&gt;
-            		&lt;tr&gt;
-            			&lt;th&gt;Typ hodnoty&lt;/th&gt;&lt;th&gt;Hodnota&lt;/th&gt;
-            		&lt;/tr&gt;
-            	&lt;/thead&gt;
-            	&lt;tbody&gt;
-            		&lt;tr&gt;
-            			&lt;th&gt;Typ testu:&lt;/th&gt;&lt;td&gt;{{Product}}&lt;/td&gt;
-            		&lt;/tr&gt;
-            		&lt;tr&gt;
-            			&lt;th&gt;Čas testovania:&lt;/th&gt;&lt;td&gt;{{Date}}&lt;/td&gt;
-            		&lt;/tr&gt;
-            		&lt;tr&gt;
-            			&lt;th&gt;Výsledok:&lt;/th&gt;&lt;td&gt;{{Text}}&lt;/td&gt;
-            		&lt;/tr&gt;
-            		&lt;tr&gt;
-            			&lt;th&gt;Poučenie:&lt;/th&gt;&lt;t [rest of string was truncated]&quot;;.
+                &lt;h1&gt;Výsledok test [rest of string was truncated]&quot;;.
              </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_">

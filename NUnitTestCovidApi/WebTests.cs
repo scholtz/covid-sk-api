@@ -639,25 +639,131 @@ namespace NUnitTestCovidApi
             var client = web.CreateClient();
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
             var admin = users.First(u => u.Name == "Admin");
+            var request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(0, result.Count);
+            var email = "place.provider@scholtz.sk";
 
-            var request = AuthenticateUser(client, admin.Email, admin.Password);
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person",
+            };
+
+            request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            data = request.Content.ReadAsStringAsync().Result;
+            var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
+            Assert.AreEqual(obj.VAT, pp.VAT);
+            Assert.AreEqual(obj.Web, pp.Web);
+            Assert.AreEqual(obj.CompanyId, pp.CompanyId);
+            Assert.AreEqual(obj.CompanyName, pp.CompanyName);
+            Assert.AreEqual(obj.Country, pp.Country);
+            Assert.AreEqual(obj.MainEmail, pp.MainEmail);
+            Assert.AreEqual("+421907000000", pp.PrivatePhone);
+            Assert.AreEqual(obj.MainContact, pp.MainContact);
+
+            request = PlaceProviderListPublic(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            data = request.Content.ReadAsStringAsync().Result;
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<List<PlaceProvider>>(data);
+            Assert.AreEqual(1, result.Count);
+
+
+            var emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
+            var noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+            var emailData = noEmailSender.Data.First().Value.data as CovidMassTesting.Model.Email.InvitationEmail;
+            noEmailSender.Data.Clear();
+            request = AuthenticateUser(client, email, emailData.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var adminToken = request.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+
+            var handler = new JwtSecurityTokenHandler();
+            var tokenS = handler.ReadToken(adminToken) as JwtSecurityToken;
+            var jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == "PPAdmin");
+            Assert.IsNotNull(jti);
+
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
 
-            SetupDebugPlaces(client);
-
-            request = CheckSlotsDay1(client);
+            request = CreateProduct(client, new Product()
+            {
+                Name = "Antigenovy test",
+                Description = "Štátny Antigenovy test",
+                DefaultPrice = 0,
+                DefaultPriceCurrency = "EUR",
+                Category = "ant",
+                All = true,
+                InsuranceOnly = false,
+            });
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            request = CheckSlotsDay2(client);
+            var pr1 = JsonConvert.DeserializeObject<Product>(request.Content.ReadAsStringAsync().Result);
+
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+            var places = SetupDebugPlaces(client);
+            var firstPlace = places[0];
+            var secondPlace = places[1];
+
+
+            // open testing for public
+
+            var actions = new TimeUpdate[]
+            {
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now,
+                    OpeningHoursTemplateId= 1,
+                    PlaceId = firstPlace.Id,
+                    Type = "set"
+                },
+
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now,
+                    OpeningHoursTemplateId= 2,
+                    PlaceId = secondPlace.Id,
+                    Type = "set"
+                },
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now.AddDays(1),
+                    OpeningHoursTemplateId= 1,
+                    PlaceId = secondPlace.Id,
+                    Type = "set"
+                },
+
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now.AddDays(1),
+                    OpeningHoursTemplateId= 2,
+                    PlaceId = firstPlace.Id,
+                    Type = "set"
+                },
+            };
+
+            request = ListScheduledDays(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var daysData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DayTimeManagement>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(0, daysData.Count);
+
+            request = ScheduleOpenningHours(client, actions);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             client.DefaultRequestHeaders.Clear();
 
             request = ListPlaces(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            var places = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result).Values.ToArray();
             Assert.IsTrue(places.Length > 1);
             var place1 = places[0];
             var place2 = places[1];
@@ -709,6 +815,12 @@ namespace NUnitTestCovidApi
                 RC = "0101010008",
 
             };
+
+            emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
+            noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
+            noEmailSender.Data.Clear();
+
+
             request = Register(client, visitor);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var responsedVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
@@ -722,6 +834,16 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(visitor.RC, responsedVisitor.RC);
             Assert.AreEqual("", responsedVisitor.Phone);
             Assert.AreEqual(TestResult.NotTaken, responsedVisitor.Result);
+
+            Assert.AreEqual(1, noEmailSender.Data.Count);
+
+            var tuple = noEmailSender.Data.Values.First();
+            Assert.AreEqual(1, tuple.attachments.Count());
+
+#if DEBUG
+            var file = tuple.attachments.First();
+            File.WriteAllBytes($"d:/covid/{file.Filename}", Convert.FromBase64String(file.Content));
+#endif
 
             request = ListDaySlotsByPlace(client, place2.Id);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -2577,11 +2699,11 @@ namespace NUnitTestCovidApi
                 TestingTime = DateTimeOffset.Now,
                 Result = TestResult.PositiveWaitingForCertificate,
             };
-            var html = visitorRepository.GenerateHTML(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            var html = visitorRepository.GenerateResultHTML(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
             Assert.IsTrue(html.Contains("X Y"));
 
 
-            var pdf = visitorRepository.GeneratePDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
             Assert.IsTrue(pdf.Length > 100);
 #if DEBUG
             File.WriteAllBytes("d:/covid/test-pdf.pdf", pdf);

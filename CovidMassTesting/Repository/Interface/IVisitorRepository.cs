@@ -114,7 +114,7 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
         /// <returns></returns>
-        public string GenerateHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
+        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
 
         /// <summary>
         /// Creates pdf from test result
@@ -125,7 +125,7 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
         /// <returns></returns>
-        public byte[] GeneratePDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
 
         /// <summary>
         /// Decode visitor data from database

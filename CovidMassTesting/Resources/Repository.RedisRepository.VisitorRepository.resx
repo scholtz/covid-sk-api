@@ -151,6 +151,9 @@
     <value>Test does not exists</value>
   </data>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="TestRegistration" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>TestRegistration.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
+  </data>
   <data name="TestResult" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>TestResult.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
