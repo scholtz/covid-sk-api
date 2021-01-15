@@ -684,12 +684,14 @@
             This controller manages public registrations
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.VisitorController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.VisitorController},CovidMassTesting.Repository.Interface.IVisitorRepository)">
+        <member name="M:CovidMassTesting.Controllers.VisitorController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.VisitorController},CovidMassTesting.Repository.Interface.IVisitorRepository,Microsoft.Extensions.Configuration.IConfiguration,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
             <summary>
             constructor
             </summary>
             <param name="logger"></param>
             <param name="visitorRepository"></param>
+            <param name="configuration"></param>
+            <param name="captchaValidator"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Register(CovidMassTesting.Model.Visitor)">
             <summary>
@@ -3075,6 +3077,11 @@
         <member name="P:CovidMassTesting.Model.Visitor.VerificationId">
             <summary>
             Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Token">
+            <summary>
+            Captcha token. After it is used it is removed
             </summary>
         </member>
         <member name="T:CovidMassTesting.Program">

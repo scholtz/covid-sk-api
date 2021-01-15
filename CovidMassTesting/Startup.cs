@@ -162,6 +162,7 @@ namespace CovidMassTesting
                 services.AddSingleton<IVisitorRepository, Repository.RedisRepository.VisitorRepository>();
             }
 
+            services.AddHttpClient<GoogleReCaptcha.V3.Interface.ICaptchaValidator, GoogleReCaptcha.V3.GoogleReCaptchaValidator>();
 
 
 

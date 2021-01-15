@@ -9,6 +9,7 @@ using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace CovidMassTesting.Controllers
@@ -22,18 +23,26 @@ namespace CovidMassTesting.Controllers
     {
         private readonly ILogger<VisitorController> logger;
         private readonly IVisitorRepository visitorRepository;
+        private readonly GoogleReCaptcha.V3.Interface.ICaptchaValidator captchaValidator;
+        private readonly IConfiguration configuration;
         /// <summary>
         /// constructor
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="visitorRepository"></param>
+        /// <param name="configuration"></param>
+        /// <param name="captchaValidator"></param>
         public VisitorController(
             ILogger<VisitorController> logger,
-            IVisitorRepository visitorRepository
+            IVisitorRepository visitorRepository,
+            IConfiguration configuration,
+            GoogleReCaptcha.V3.Interface.ICaptchaValidator captchaValidator
             )
         {
             this.logger = logger;
             this.visitorRepository = visitorRepository;
+            this.configuration = configuration;
+            this.captchaValidator = captchaValidator;
         }
         /// <summary>
         /// Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
@@ -53,6 +62,19 @@ namespace CovidMassTesting.Controllers
                 if (visitor is null)
                 {
                     throw new ArgumentNullException(nameof(visitor));
+                }
+                if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
+                {
+                    if (string.IsNullOrEmpty(visitor.Token))
+                    {
+                        throw new Exception("Please provide captcha");
+                    }
+
+                    var validation = await captchaValidator.IsCaptchaPassedAsync(visitor.Token);
+                    if (!validation)
+                    {
+                        throw new Exception("Please provide valid captcha");
+                    }
                 }
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
