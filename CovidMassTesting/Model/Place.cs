@@ -70,15 +70,15 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Primary Picture
         /// </summary>
-        public int Picture1 { get; set; }
+        public string Picture1 { get; set; }
         /// <summary>
         /// Second Picture
         /// </summary>
-        public int Picture2 { get; set; }
+        public string Picture2 { get; set; }
         /// <summary>
         /// Third Picture
         /// </summary>
-        public int Picture3 { get; set; }
+        public string Picture3 { get; set; }
         /// <summary>
         /// Standard opening hours
         /// </summary>
