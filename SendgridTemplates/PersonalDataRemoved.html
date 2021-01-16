@@ -131,8 +131,10 @@
             Vaše osobné dáta boli odstránené.
         {{else if isCS}}
             Vaše osobní data byly odstraněny.
-        {{else}}
+        {{else if isEN}}
             Your personal data has been deleted.
+        {{else}}
+            Vaše osobné dáta boli odstránené.
         {{/if}}
         </p>
       </td>
@@ -151,11 +153,13 @@
         <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><div style="font-family: inherit; text-align: inherit"><span style="color: #000000; font-family: arial, helvetica, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline">
         
         {{#if isSK}}
-            {{Name}}, Vaše osobné dáta boli po odoslaní tohoto e-mailu zmazané zo systému Rýchlejšie.sk.
+            {{Name}}, Vaše osobné dáta boli po odoslaní tohoto e-mailu zmazané zo systému.
         {{else if isCS}}
-            {{Name}}, Vaše osobní data byla po odeslání tohoto e-mailu smazány ze systému Rýchlejšie.sk.
+            {{Name}}, Vaše osobní data byla po odeslání tohoto e-mailu smazány ze systému.
+        {{else if isEN}}
+            {{Name}}, your personal data has been deleted.
         {{else}}
-            {{Name}}, your personal data has been deleted from the Rýchlejšie.sk.
+            {{Name}}, Vaše osobné dáta boli po odoslaní tohoto e-mailu zmazané zo systému.
         {{/if}}
         </span></div><div></div></div></td>
       </tr>
@@ -182,16 +186,20 @@
             Ďakujeme, že ste využili možnosť registrácie na test.
         {{else if isCS}}
             Děkujeme, že jste využili možnost registrace na test.
-        {{else}}
+        {{else if isEN}}
             Thank you for using the test registration option.
+        {{else}}
+            Ďakujeme, že ste využili možnosť registrácie na test.
         {{/if}} 
         </span><span style="color: #888888; font-family: arial, helvetica, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline">
         {{#if isSK}}
             Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
         {{else if isCS}}
             Šetříte čas nejen sobě, ale zlepšujete plynulost samotného testování a snazší práci testovacímu týmu. Děkujeme.
-        {{else}}
+        {{else if isEN}}
             Not only you save your time, but you also improve the smoothness of the testing itself and make the work of the testing team easier. We thank you.
+        {{else}}
+            Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
         {{/if}} 
         </span></div><div></div></div></td>
       </tr>
@@ -209,16 +217,20 @@
             Neposielať emaily
         {{else if isCS}}
             Neposílat emaily
-        {{else}}
+        {{else if isEN}}
             Unsubscribe
+        {{else}}
+            Neposielať emaily
         {{/if}}
   </a> - <a href="{{{unsubscribe_preferences}}}" target="_blank" class="Unsubscribe--unsubscribePreferences" style="">
         {{#if isSK}}
             Možnosti nastavenia emailov
         {{else if isCS}}
-            Možnosti nastavení emailů
-        {{else}}
+            Možnosti nastavenia emailov
+        {{else if isEN}}
             Unsubscribe Preferences
+        {{else}}
+            Možnosti nastavenia emailov
         {{/if}}
         </a></p></div></td>
                                       </tr>
