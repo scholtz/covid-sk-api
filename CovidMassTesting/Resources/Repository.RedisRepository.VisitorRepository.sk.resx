@@ -130,7 +130,7 @@
     <value>{0}, váš test sa spracováva. Počkajte na ďalšie inštrukcie ktoré dostanete v ďalšej SMS správe.</value>
   </data>
   <data name="Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate." xml:space="preserve">
-    <value>{0}, váš test bol dokončený. Online si môžete skontrolovať výsledok. Príďte si prosím pre certifikát.</value>
+    <value>{0}, váš test bol dokončený. Online si môžete skontrolovať výsledok.</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
     <value>{0}, {1} je váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>

@@ -74,6 +74,11 @@ namespace CovidMassTesting.Controllers.SMS
                     text = Helpers.Text.RemoveDiacritism(text);
                 }
 
+                if (text.Length > 160)
+                {
+                    text = text.Substring(0, 158) + "..";
+                }
+
                 request.AddJsonBody(new GoSMSSendMessage()
                 {
                     channel = settings.Value.Channel,

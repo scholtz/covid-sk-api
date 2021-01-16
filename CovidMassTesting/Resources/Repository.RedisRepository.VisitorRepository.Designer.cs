@@ -110,7 +110,7 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate..
+        ///   Looks up a localized string similar to Dear {0}, your test result has been processed. You can check the result online..
         /// </summary>
         internal static string Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_ {
             get {
