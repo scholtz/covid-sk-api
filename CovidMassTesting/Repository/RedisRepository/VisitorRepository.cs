@@ -1577,17 +1577,27 @@ namespace CovidMassTesting.Repository.RedisRepository
                         await SetResult(result, false);
                         logger.LogInformation("Result fixed");
                     }
-                }
-
-                foreach (var visitor in dict[result.Name])
-                {
-                    if (string.IsNullOrEmpty(visitor.VerificationId))
+                    else
                     {
-                        visitor.VerificationId = result.Id;
-                        await SetVisitor(visitor, false);
-                        logger.LogInformation("Visitor fixed");
+                        logger.LogInformation($"Item ok");
+                    }
+
+                    logger.LogInformation($"Count visitors: {dict[result.Name].Count}");
+                    foreach (var visitor in dict[result.Name])
+                    {
+                        if (string.IsNullOrEmpty(visitor.VerificationId))
+                        {
+                            visitor.VerificationId = result.Id;
+                            await SetVisitor(visitor, false);
+                            logger.LogInformation("Visitor fixed");
+                        }
                     }
                 }
+                else
+                {
+                    logger.LogInformation($"Does not contain name {result.Name}");
+                }
+
 
             }
 
