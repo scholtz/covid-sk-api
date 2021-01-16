@@ -1540,7 +1540,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeCertificateTaken, result.State);
-
+            /*
             // remove my private information from system
             request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -1550,7 +1550,7 @@ namespace NUnitTestCovidApi
             // unable to delete removed test
             request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-
+            /**/
         }
         [Test]
         public void RoleDataExporterTest()
@@ -1726,6 +1726,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(TestResult.NegativeCertificateTaken, result.State);
 
             // remove my private information from system
+            /*
             request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             bool resultBool = Newtonsoft.Json.JsonConvert.DeserializeObject<bool>(request.Content.ReadAsStringAsync().Result);
@@ -1734,7 +1735,7 @@ namespace NUnitTestCovidApi
             // unable to delete removed test
             request = PublicRemoveTest(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-
+            /**/
             // unauthorized request
             request = FinalDataExport(client, 0, 100);
             Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);

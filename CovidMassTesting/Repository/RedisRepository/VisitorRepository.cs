@@ -591,6 +591,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<bool> RemoveTest(int code, string pass)
         {
+            throw new Exception("Test removal has been suspended");
             if (string.IsNullOrEmpty(pass))
             {
                 throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
