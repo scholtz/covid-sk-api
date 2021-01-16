@@ -989,6 +989,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<IEnumerable<Visitor>> ListSickVisitors(int from = 0, int count = 9999999)
         {
+            logger.LogInformation($"ListSickVisitors {from} {count}");
             var ret = new List<Visitor>();
             foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
             {
@@ -1003,6 +1004,34 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                 }
             }
+            logger.LogInformation($"ListSickVisitors {from} {count} END - {ret.Count}");
+            return ret;
+        }
+        /// <summary>
+        /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Visitor>> ListVisitorsInProcess(int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ListVisitorsInProcess {from} {count}");
+
+            var ret = new List<Visitor>();
+            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    if (visitor.Result == TestResult.TestIsBeingProcessing)
+                    {
+                        ret.Add(visitor);
+                    }
+                }
+            }
+            logger.LogInformation($"ListVisitorsInProcess {from} {count} END - {ret.Count}");
+
             return ret;
         }
         /// <summary>

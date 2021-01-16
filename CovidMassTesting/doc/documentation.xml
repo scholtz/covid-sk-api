@@ -488,6 +488,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ListVisitorsInProcess(System.Int32,System.Int32)">
+            <summary>
+            This method exports all visitors who are in state in processing
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.SlotController">
             <summary>
             Slot controller manages time slots at the sampling places
@@ -1755,6 +1761,21 @@
         <member name="P:CovidMassTesting.Model.Place.Sick">
             <summary>
             Results of covid positive results
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Picture1">
+            <summary>
+            Primary Picture
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Picture2">
+            <summary>
+            Second Picture
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.Picture3">
+            <summary>
+            Third Picture
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Place.OpeningHoursWorkDay">
@@ -3850,6 +3871,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListVisitorsInProcess(System.Int32,System.Int32)">
+            <summary>
+            This method exports all visitors who are in state in processing
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.TestStorage">
             <summary>
             Test storage
@@ -5367,6 +5394,14 @@
             <param name="count"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListVisitorsInProcess(System.Int32,System.Int32)">
+            <summary>
+            List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.TestStorage">
             <summary>
             Tests the storage
@@ -5798,7 +5833,7 @@
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_">
             <summary>
-              Looks up a localized string similar to Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate..
+              Looks up a localized string similar to Dear {0}, your test result has been processed. You can check the result online..
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0__We_have_removed_your_personal_data_from_the_database__Thank_you_for_taking_the_covid_test">
