@@ -465,6 +465,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             TestingEntity = pp?.CompanyName
                         }, true);
                         visitor.VerificationId = result.Id;
+                        await SetVisitor(visitor, false);
                         var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
                         attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                         {
