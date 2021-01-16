@@ -520,6 +520,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
             var visitor = await GetVisitor(code);
+            if (visitor == null)
+            {
+                throw new Exception("Skontrolujte prosím správne zadanie kódu registrácie.");
+            }
             if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
