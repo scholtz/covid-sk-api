@@ -77,7 +77,7 @@ namespace CovidMassTesting.Controllers.SMS
                 request.AddJsonBody(new GoSMSSendMessage()
                 {
                     channel = settings.Value.Channel,
-                    message = data.GetText(),
+                    message = text,
                     recipients = toPhone
                 });
                 request.AddHeader("Authorization", $"Bearer {token}");
