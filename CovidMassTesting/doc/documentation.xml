@@ -496,6 +496,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ProofOfWorkExport(System.Int32,System.Int32)">
+            <summary>
+            Proof of work.. Export for army or other institution with names of visitors
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.ListVisitorsInProcess(System.Int32,System.Int32)">
             <summary>
             This method exports all visitors who are in state in processing
@@ -3185,6 +3191,65 @@
             Captcha token. After it is used it is removed
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Id">
+            <summary>
+            Registration code. 9-digit, formatted 000-000-000 for visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.TestingTime">
+            <summary>
+            Real time when the test has been taken
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.FirstName">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.LastName">
+            <summary>
+            Last name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Language">
+            <summary>
+            Language in which we will communicate to the visitor
+            
+            sk | en
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.TestingSet">
+            <summary>
+            Testing set identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Product">
+            <summary>
+            Product id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.VerificationId">
+            <summary>
+            Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.PersonType">
+            <summary>
+            Type of person
+            
+            idcard|child|foreign
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Passport">
+            <summary>
+            Passport number if person type is foreigner
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.RC">
+            <summary>
+            Personal number if person type is idcard or child
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Program">
             <summary>
             App
@@ -3883,6 +3948,14 @@
             <summary>
             This method exports all visitors who are in state in processing
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProofOfWorkExport(System.Int32,System.Int32)">
+            <summary>
+            ProofOfWorkExport
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.TestStorage">
@@ -5425,6 +5498,14 @@
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListSickVisitors(System.Int32,System.Int32)">
             <summary>
             List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ProofOfWorkExport(System.Int32,System.Int32)">
+            <summary>
+            Export for institution that pays for the tests
             </summary>
             <param name="from"></param>
             <param name="count"></param>

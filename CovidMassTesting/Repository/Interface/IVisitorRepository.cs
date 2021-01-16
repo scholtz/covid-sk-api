@@ -106,6 +106,13 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<IEnumerable<Visitor>> ListVisitorsInProcess(int from = 0, int count = 9999999);
         /// <summary>
+        /// ProofOfWorkExport
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(int from = 0, int count = 9999999);
+        /// <summary>
         /// Test storage
         /// </summary>
         /// <returns></returns>

@@ -433,6 +433,40 @@ namespace CovidMassTesting.Controllers
             }
         }
 
+        /// <summary>
+        /// Proof of work.. Export for army or other institution with names of visitors
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ProofOfWorkExport")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> ProofOfWorkExport([FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        {
+            try
+            {
+                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                logger.LogInformation($"User {User.GetEmail()} is exporting sick visitors");
+
+                using var stream = new MemoryStream();
+                using var writer = new StreamWriter(stream);
+                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                writer.Write("Test");
+                var data = await visitorRepository.ProofOfWorkExport(from, count);
+
+                csv.WriteRecords(data);
+                writer.Flush();
+                var ret = stream.ToArray();
+                logger.LogInformation($"Export size: {ret.Length}");
+                return File(ret, "text/csv", $"final-data-export-{from}-{count}.csv");
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
 
         /// <summary>
         /// This method exports all visitors who are in state in processing

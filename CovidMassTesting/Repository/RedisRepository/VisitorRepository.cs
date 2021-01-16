@@ -1070,6 +1070,46 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"ListSickVisitors {from} {count} END - {ret.Count}");
             return ret;
         }
+
+        /// <summary>
+        /// Export for institution that pays for the tests
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ProofOfWorkExport {from} {count}");
+            var ret = new List<VisitorSimplified>();
+            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    if (visitor.Result == TestResult.PositiveCertificateTaken ||
+                        visitor.Result == TestResult.PositiveWaitingForCertificate)
+                    {
+                        ret.Add(new VisitorSimplified()
+                        {
+                            Id = visitor.Id,
+                            FirstName = visitor.FirstName,
+                            Language = visitor.Language,
+                            LastName = visitor.LastName,
+                            TestingSet = visitor.TestingSet,
+                            TestingTime = visitor.TestingTime,
+                            Passport = visitor.Passport,
+                            PersonType = visitor.PersonType,
+                            Product = visitor.Product,
+                            RC = visitor.RC,
+                            VerificationId = visitor.VerificationId
+                        });
+                    }
+                }
+            }
+            logger.LogInformation($"ProofOfWorkExport {from} {count} END - {ret.Count}");
+            return ret;
+        }
         /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
