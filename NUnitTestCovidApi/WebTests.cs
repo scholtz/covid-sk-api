@@ -321,6 +321,15 @@ namespace NUnitTestCovidApi
                     })
                 ).Result;
         }
+        private HttpResponseMessage DownloadPDF(HttpClient client, string code, string pass)
+        {
+            return client.PostAsync("Result/DownloadPDF",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("code",code),
+                        new KeyValuePair<string, string>("pass",pass),
+                    })
+                ).Result;
+        }
         private HttpResponseMessage VerifyResult(HttpClient client, string id)
         {
             return client.PostAsync($"Result/VerifyResult",
@@ -1361,10 +1370,25 @@ namespace NUnitTestCovidApi
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
 
+
+            request = DownloadPDF(client, registered[0].Id.ToString(), registered[0].RC.Substring(6, 4));
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var file = request.Content.ReadAsByteArrayAsync().Result;
+#if DEBUG
+            File.WriteAllBytes("d:/covid/test-111-111-111.pdf", file);
+#endif
+
+
+
+
             request = PublicGetTestResult(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeWaitingForCertificate, result.State);
+
+
+
+
         }
 
 

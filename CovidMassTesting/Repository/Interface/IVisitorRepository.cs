@@ -138,5 +138,12 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="id"></param>
         /// <returns></returns>
         public Task<VerificationData> GetResult(string id);
+        /// <summary>
+        /// Generate and sign PDF with test result
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        public Task<byte[]> GetPublicPDF(int code, string pass);
     }
 }

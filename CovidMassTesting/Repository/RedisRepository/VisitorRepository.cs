@@ -535,6 +535,55 @@ namespace CovidMassTesting.Repository.RedisRepository
             return new Result { State = visitor.Result, VerificationId = visitor.VerificationId };
         }
         /// <summary>
+        /// Generate PDF file with test result
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        public async Task<byte[]> GetPublicPDF(int code, string pass)
+        {
+            if (string.IsNullOrEmpty(pass))
+            {
+                throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
+            }
+            if (pass.Length < 4)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            var visitor = await GetVisitor(code);
+            if (visitor == null)
+            {
+                throw new Exception("Skontrolujte prosím správne zadanie kódu registrácie.");
+            }
+            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveWaitingForCertificate:
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTaken:
+                    // process
+                    break;
+                default:
+                    throw new Exception("Môžeme Vám vygenerovať certifikát iba po absolvovaní testu");
+            }
+
+            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            //var product = await placeRepository.GetPlaceProduct();
+            var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+            var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
+        }
+
+        /// <summary>
         /// Deletes the test
         /// </summary>
         /// <param name="code"></param>

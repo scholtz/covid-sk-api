@@ -434,9 +434,17 @@
             <param name="testCode"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.ResultController.Get(System.String,System.String)">
+        <member name="M:CovidMassTesting.Controllers.ResultController.Get(System.String,System.String,System.String)">
             <summary>
             Public method to show test results to user
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.DownloadPDF(System.String,System.String,System.String)">
+            <summary>
+            Public method to show test results to user .. returns pdf file
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
@@ -3912,6 +3920,14 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetPublicPDF(System.Int32,System.String)">
+            <summary>
+            Generate and sign PDF with test result
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -5283,6 +5299,14 @@
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetTest(System.Int32,System.String)">
             <summary>
             Returns test by code and password
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetPublicPDF(System.Int32,System.String)">
+            <summary>
+            Generate PDF file with test result
             </summary>
             <param name="code"></param>
             <param name="pass"></param>

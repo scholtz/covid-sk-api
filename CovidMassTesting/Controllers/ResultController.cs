@@ -168,9 +168,8 @@ namespace CovidMassTesting.Controllers
         [HttpPost("Get")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Result>> Get([FromForm] string code, [FromForm] string pass)
+        public async Task<ActionResult<Result>> Get([FromForm] string code, [FromForm] string pass, [FromForm] string captcha = "")
         {
-
             try
             {
                 if (string.IsNullOrEmpty(code))
@@ -186,6 +185,47 @@ namespace CovidMassTesting.Controllers
                 if (int.TryParse(codeClear, out var codeInt))
                 {
                     return Ok(await visitorRepository.GetTest(codeInt, pass));
+                }
+                throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Public method to show test results to user .. returns pdf file
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        [HttpPost("DownloadPDF")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Result>> DownloadPDF([FromForm] string code, [FromForm] string pass, [FromForm] string captcha)
+        {
+
+            try
+            {
+                ///@TODO validate captcha after fe deployed
+
+                if (string.IsNullOrEmpty(code))
+                {
+                    throw new ArgumentException(localizer[Controllers_ResultController.Visitor_code_must_not_be_empty].Value);
+                }
+
+                if (string.IsNullOrEmpty(pass))
+                {
+                    throw new ArgumentException(localizer[Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
+                }
+                var codeClear = FormatBarCode(code);
+                if (int.TryParse(codeClear, out var codeInt))
+                {
+                    var data = await visitorRepository.GetPublicPDF(codeInt, pass);
+
+                    return File(data, "application/pdf", "result.pdf");
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
