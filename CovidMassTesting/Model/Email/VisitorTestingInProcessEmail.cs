@@ -21,7 +21,7 @@ namespace CovidMassTesting.Model.Email
         /// <summary>
         /// Template identifier
         /// </summary>
-        public override string TemplateId => "TestingResult";
+        public override string TemplateId => "TestingInProcess";
         /// <summary>
         /// Visitor name
         /// </summary>
