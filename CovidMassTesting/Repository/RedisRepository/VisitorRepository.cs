@@ -462,7 +462,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Product = product?.Name,
                             TestingAddress = place?.Address,
                             Result = visitor.Result,
-                            TestingEntity = pp?.CompanyName
+                            TestingEntity = pp?.CompanyName,
+                            Time = visitor.TestingTime
                         }, true);
                         visitor.VerificationId = result.Id;
                         await SetVisitor(visitor, false);
