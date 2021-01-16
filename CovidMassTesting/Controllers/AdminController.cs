@@ -185,5 +185,23 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        [HttpPost("Fix01")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> Fix01()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                return Ok(visitorRepository.Fix01());
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }

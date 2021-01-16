@@ -145,5 +145,10 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="pass"></param>
         /// <returns></returns>
         public Task<byte[]> GetPublicPDF(int code, string pass);
+        /// <summary>
+        /// Temp fix
+        /// </summary>
+        /// <returns></returns>
+        public Task<bool> Fix01();
     }
 }

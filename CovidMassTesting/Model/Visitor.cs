@@ -84,7 +84,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Real time when the test has been taken
         /// </summary>
-        public DateTimeOffset TestingTime { get; set; }
+        public DateTimeOffset? TestingTime { get; set; }
         /// <summary>
         /// Product id
         /// </summary>

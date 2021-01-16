@@ -463,7 +463,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             TestingAddress = place?.Address,
                             Result = visitor.Result,
                             TestingEntity = pp?.CompanyName,
-                            Time = visitor.TestingTime
+                            Time = visitor.TestingTime ?? DateTimeOffset.Now
                         }, true);
                         visitor.VerificationId = result.Id;
                         await SetVisitor(visitor, false);
@@ -471,7 +471,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                         {
                             Content = Convert.ToBase64String(pdf),
-                            Filename = $"{visitor.LastName}{visitor.FirstName}-{visitor.TestingTime.ToString("MMdd")}.pdf",
+                            Filename = $"{visitor.LastName}{visitor.FirstName}-{visitor.TestingTime?.ToString("MMdd")}.pdf",
                             Type = "application/pdf",
                             Disposition = "attachment"
                         });
@@ -689,6 +689,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         public virtual Task<IEnumerable<string>> ListAllKeys()
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
+        }
+        /// <summary>
+        /// Lists all result keys
+        /// </summary>
+        /// <returns></returns>
+        public virtual Task<IEnumerable<string>> ListAllResultKeys()
+        {
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_OBJECTS}");
         }
         /// <summary>
         /// Returns visitor by personal number
@@ -1031,6 +1039,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}", item);
             }
             ret += (int)await redisCacheClient.Db0.SetRemoveAllAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}");
+
+            // REDIS_KEY_RESULTS_OBJECTS are intended to stay even if all data has been removed
+
             return ret;
         }
         /// <summary>
@@ -1132,7 +1143,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             data.Name = $"{visitor.FirstName} {visitor.LastName}";
-            data.Date = visitor.TestingTime.ToString("f");
+            data.Date = visitor.TestingTime.Value.ToString("f");
 
             switch (visitor.PersonType)
             {
@@ -1478,5 +1489,73 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return verificationData;
         }
+        /// <summary>
+        /// Fix. Set to visitor the test result and time of the test
+        /// 
+        /// tries to match visitors by name with the test results list 
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<bool> Fix01()
+        {
+            logger.LogInformation($"Fix01");
+
+            var ret = new List<Visitor>();
+            var dict = new Dictionary<string, List<Visitor>>();
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    if (!visitor.TestingTime.HasValue || visitor.TestingTime == DateTimeOffset.MinValue)
+                    {
+                        continue;
+                    }
+                    var name = $"{visitor.FirstName} {visitor.LastName}";
+                    if (!dict.ContainsKey(name))
+                    {
+                        dict[name] = new List<Visitor>();
+                    }
+                    foreach (var v in dict[name])
+                    {
+                        if (v.RC != visitor.RC) throw new Exception($"Multiple people {name}");// aspon jeden zaznam je taky ze meno je zhodne pri dvoch roznych navstevnikoch
+                    }
+                }
+            }
+            logger.LogInformation("Visitors cache built");
+
+            foreach (var id in await ListAllResultKeys())
+            {
+                var result = await GetResult(id);
+                if (dict.ContainsKey(result.Name))
+                {
+                    var t = dict[result.Name].FirstOrDefault(x => x.TestingTime.HasValue && x.TestingTime > DateTimeOffset.MinValue)?.TestingTime;
+                    if (t.HasValue && result.Time != t)
+                    {
+                        result.Time = t.Value;
+                        await SetResult(result, false);
+                        logger.LogInformation("Result fixed");
+                    }
+                }
+
+                foreach (var visitor in dict[result.Name])
+                {
+                    if (string.IsNullOrEmpty(visitor.VerificationId))
+                    {
+                        visitor.VerificationId = result.Id;
+                        await SetVisitor(visitor, false);
+                        logger.LogInformation("Visitor fixed");
+                    }
+                }
+
+            }
+
+            logger.LogInformation($"Fix01 Done");
+
+            return true;
+        }
+
     }
 }

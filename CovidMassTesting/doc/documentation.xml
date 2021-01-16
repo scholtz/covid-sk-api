@@ -3928,6 +3928,12 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Fix01">
+            <summary>
+            Temp fix
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -5332,6 +5338,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAllResultKeys">
+            <summary>
+            Lists all result keys
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitorByPersonalNumber(System.String)">
             <summary>
             Returns visitor by personal number
@@ -5501,6 +5513,16 @@
             </summary>
             <param name="verificationData"></param>
             <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Fix01">
+            <summary>
+            Fix. Set to visitor the test result and time of the test
+            
+            tries to match visitors by name with the test results list 
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Resources.Controllers_AdminController">
