@@ -1557,6 +1557,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         dict[name] = new List<Visitor>();
                     }
+                    dict[name].Add(visitor);
                     foreach (var v in dict[name])
                     {
                         if (v.RC != visitor.RC) throw new Exception($"Multiple people {name}");// aspon jeden zaznam je taky ze meno je zhodne pri dvoch roznych navstevnikoch
