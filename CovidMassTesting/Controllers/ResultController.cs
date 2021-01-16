@@ -382,8 +382,9 @@ namespace CovidMassTesting.Controllers
 
                 csv.WriteRecords(data);
                 writer.Flush();
+                var ret = stream.ToArray();
                 logger.LogInformation($"Export size: {ret.Length}");
-                return File(stream.ToArray(), "text/csv", $"final-data-export-{from}-{count}.csv");
+                return File(ret, "text/csv", $"final-data-export-{from}-{count}.csv");
             }
             catch (Exception exc)
             {
