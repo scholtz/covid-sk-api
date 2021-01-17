@@ -1314,9 +1314,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case "idcard":
                 case "child":
                 default:
-                    password = visitor.RC;
+                    password = visitor.RC?.Replace("/", "").Trim();
                     break;
             }
+
             var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid);
             using var pdfStreamEncrypted = new MemoryStream();
             var writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
@@ -1397,7 +1398,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case "idcard":
                 case "child":
                 default:
-                    password = visitor.RC;
+                    password = visitor.RC?.Replace("/", "").Trim();
                     break;
             }
             var html = GenerateRegistrationHTML(visitor, testingEntity, placeAddress, product);
