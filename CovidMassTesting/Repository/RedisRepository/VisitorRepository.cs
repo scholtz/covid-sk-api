@@ -1187,8 +1187,12 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             data.Name = $"{visitor.FirstName} {visitor.LastName}";
-            data.Date = visitor.TestingTime.Value.ToString("f");
 
+
+            if (visitor.TestingTime.HasValue)
+            {
+                data.Date = visitor.TestingTime.Value.ToOffset(new TimeSpan(1, 0, 0)).ToString("f");
+            }
             switch (visitor.PersonType)
             {
                 case "foreign":

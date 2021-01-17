@@ -99,8 +99,8 @@ namespace NUnitTestCovidApi
             return client.PostAsync("Admin/CheckSlots",
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
                         new KeyValuePair<string, string>("testingDay",$"{DateTimeOffset.Now.ToString("yyyy-MM-dd")}T00:00:00+00:00"),
-                        new KeyValuePair<string, string>("from","10"),
-                        new KeyValuePair<string, string>("until","12"),
+                        new KeyValuePair<string, string>("from","22"),
+                        new KeyValuePair<string, string>("until","23"),
                     })
                 ).Result;
         }
@@ -1195,13 +1195,13 @@ namespace NUnitTestCovidApi
             var hours = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(hours.Count > 0);
 
-            var hour = hours.First().Value;
+            var hour = hours.Last().Value;
             request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(minutes.Count > 0);
 
-            var minute = minutes.Values.First();
+            var minute = minutes.Values.Last();
 
             var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
@@ -2725,18 +2725,34 @@ namespace NUnitTestCovidApi
 
 
             var visitorRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
+
+            var t = new DateTimeOffset(2021, 1, 17, 13, 14, 20, TimeSpan.Zero);
+
             var visitor = new Visitor()
             {
                 FirstName = "X",
                 LastName = "Y",
                 RC = "1234567890",
                 Language = "en-US",
-                TestingTime = DateTimeOffset.Now,
+                TestingTime = t,
                 Result = TestResult.PositiveWaitingForCertificate,
             };
             var html = visitorRepository.GenerateResultHTML(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
             Assert.IsTrue(html.Contains("X Y"));
+            Assert.IsTrue(html.Contains("Sunday, January 17, 2021 2:14 PM"));
 
+            var visitor2 = new Visitor()
+            {
+                FirstName = "X",
+                LastName = "Y",
+                RC = "1234567890",
+                Language = "sk-SK",
+                TestingTime = t,
+                Result = TestResult.PositiveWaitingForCertificate,
+            };
+            var html2 = visitorRepository.GenerateResultHTML(visitor2, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            Assert.IsTrue(html2.Contains("X Y"));
+            Assert.IsTrue(html2.Contains("nedeľa 17. janu&#225;ra 2021 14:14"));
 
             var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
             Assert.IsTrue(pdf.Length > 100);
