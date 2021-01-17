@@ -141,19 +141,36 @@
             Prijmite pozvanie do aplikácie hromadného testovania obyvateľov proti covidu.
         {{else if isCS}}
             Přijměte pozvání do aplikace hromadného testování obyvatel proti covidu.
-        {{else}}
+        {{else if isEN}}
             Accept the invitation to apply the mass population testing application.
+        {{else}}
+            Prijmite pozvanie do aplikácie hromadného testovania obyvateľov proti covidu.
         {{/if}}
         </p>
         
         {{#if isSK}}
-            {{Name}}, toto je pozvánka do aplikácie Rýchlejšie.sk. Pre prihlásenie použite svoj e-mail a heslo: {{Password}}.
+            {{Name}}, toto je pozvánka do aplikácie Rýchlejšie.sk. 
         {{else if isCS}}
-            {{Name}}, toto je pozvánka do aplikace Rýchlejšie.sk. Pro přihlášení použijte svůj e-mail a heslo: {{Password}}.
+            {{Name}}, toto je pozvánka do aplikace Rýchlejšie.sk.
+        {{else if isEN}}
+            {{Name}}, this is an invitation to the Rýchlejšie.sk application. 
         {{else}}
-            {{Name}}, this is an invitation to the Rýchlejšie.sk application. Use your email and password to log in: {{Password}}.
+            {{Name}}, toto je pozvánka do aplikácie Rýchlejšie.sk. 
         {{/if}}
         
+        {{#if Password}}
+			
+			{{#if isSK}}
+				Pre prihlásenie použite svoj e-mail a heslo: <b>{{Password}}</b>
+			{{else if isCS}}
+				Pro přihlášení použijte svůj e-mail a heslo: <b>{{Password}}</b>
+			{{else if isEN}}
+				Use your email and password to log in: <b>{{Password}}</b>
+			{{else}}
+				Pre prihlásenie použite svoj e-mail a heslo: <b>{{Password}}</b>
+			{{/if}}
+			
+		{{/if}}
         </span></div><div></div></div></td>
       </tr>
     </tbody>
@@ -179,8 +196,10 @@
             Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
         {{else if isCS}}
             Šetříte čas nejen sobě, ale zlepšujete plynulost samotného testování a snazší práci testovacímu týmu. Děkujeme.
-        {{else}}
+        {{else if isEN}}
             Not only you save your time, but you also improve the smoothness of the testing itself and make the work of the testing team easier. We thank you.
+        {{else}}
+            Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
         {{/if}} 
         </span></div><div></div></div></td>
       </tr>
@@ -198,16 +217,20 @@
             Neposielať emaily
         {{else if isCS}}
             Neposílat emaily
-        {{else}}
+        {{else if isEN}}
             Unsubscribe
+        {{else}}
+            Neposielať emaily
         {{/if}}
   </a> - <a href="{{{unsubscribe_preferences}}}" target="_blank" class="Unsubscribe--unsubscribePreferences" style="">
         {{#if isSK}}
             Možnosti nastavenia emailov
         {{else if isCS}}
-            Možnosti nastavení emailů
-        {{else}}
+            Možnosti nastavenia emailov
+        {{else if isEN}}
             Unsubscribe Preferences
+        {{else}}
+            Možnosti nastavenia emailov
         {{/if}}
         </a></p></div></td>
                                       </tr>

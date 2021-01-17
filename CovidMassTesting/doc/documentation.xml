@@ -707,7 +707,7 @@
             This controller manages public registrations
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.VisitorController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.VisitorController},CovidMassTesting.Repository.Interface.IVisitorRepository,Microsoft.Extensions.Configuration.IConfiguration,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
+        <member name="M:CovidMassTesting.Controllers.VisitorController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.VisitorController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,Microsoft.Extensions.Configuration.IConfiguration,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
             <summary>
             constructor
             </summary>

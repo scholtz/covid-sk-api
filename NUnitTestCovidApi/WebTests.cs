@@ -94,11 +94,21 @@ namespace NUnitTestCovidApi
                     })
                     ).Result;
         }
+        private HttpResponseMessage CheckSlotsDayToday(HttpClient client)
+        {
+            return client.PostAsync("Admin/CheckSlots",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("testingDay",$"{DateTimeOffset.Now.ToString("yyyy-MM-dd")}T00:00:00+00:00"),
+                        new KeyValuePair<string, string>("from","10"),
+                        new KeyValuePair<string, string>("until","12"),
+                    })
+                ).Result;
+        }
         private HttpResponseMessage CheckSlotsDay1(HttpClient client)
         {
             return client.PostAsync("Admin/CheckSlots",
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
-                        new KeyValuePair<string, string>("testingDay","2020-10-31T00:00:00+00:00"),
+                        new KeyValuePair<string, string>("testingDay",$"{DateTimeOffset.Now.AddDays(1).ToString("yyyy-MM-dd")}T00:00:00+00:00"),
                         new KeyValuePair<string, string>("from","10"),
                         new KeyValuePair<string, string>("until","12"),
                     })
@@ -108,7 +118,7 @@ namespace NUnitTestCovidApi
         {
             return client.PostAsync("Admin/CheckSlots",
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
-                        new KeyValuePair<string, string>("testingDay","2020-11-29T00:00:00+00:00"),
+                        new KeyValuePair<string, string>("testingDay",$"{DateTimeOffset.Now.AddDays(2).ToString("yyyy-MM-dd")}T00:00:00+00:00"),
                         new KeyValuePair<string, string>("from","10"),
                         new KeyValuePair<string, string>("until","12"),
                     })
@@ -1164,7 +1174,7 @@ namespace NUnitTestCovidApi
             SetupDebugPlaces(client);
             var pr1 = SetupDebugProduct(client);
 
-            request = CheckSlotsDay1(client);
+            request = CheckSlotsDayToday(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             client.DefaultRequestHeaders.Clear();

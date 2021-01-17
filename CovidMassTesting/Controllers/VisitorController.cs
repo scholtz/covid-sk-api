@@ -23,6 +23,8 @@ namespace CovidMassTesting.Controllers
     {
         private readonly ILogger<VisitorController> logger;
         private readonly IVisitorRepository visitorRepository;
+        private readonly IUserRepository userRepository;
+        private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly GoogleReCaptcha.V3.Interface.ICaptchaValidator captchaValidator;
         private readonly IConfiguration configuration;
         /// <summary>
@@ -35,6 +37,8 @@ namespace CovidMassTesting.Controllers
         public VisitorController(
             ILogger<VisitorController> logger,
             IVisitorRepository visitorRepository,
+            IUserRepository userRepository,
+            IPlaceProviderRepository placeProviderRepository,
             IConfiguration configuration,
             GoogleReCaptcha.V3.Interface.ICaptchaValidator captchaValidator
             )
@@ -43,6 +47,8 @@ namespace CovidMassTesting.Controllers
             this.visitorRepository = visitorRepository;
             this.configuration = configuration;
             this.captchaValidator = captchaValidator;
+            this.userRepository = userRepository;
+            this.placeProviderRepository = placeProviderRepository;
         }
         /// <summary>
         /// Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
@@ -77,6 +83,12 @@ namespace CovidMassTesting.Controllers
                     }
                     visitor.Token = "";
                 }
+                var time = new DateTimeOffset(visitor.ChosenSlot, TimeSpan.Zero);
+                if (time.AddMinutes(10) < DateTimeOffset.Now)
+                {
+                    throw new Exception("Na tento termín sa nedá zaregistrovať pretože časový úsek je už ukončený");
+                }
+
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
             catch (Exception exc)
@@ -104,6 +116,10 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentNullException(nameof(visitor));
                 }
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
+                    && !User.IsMedicTester(userRepository, placeProviderRepository))
+                    throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
+
                 return Ok(await visitorRepository.Register(visitor, User.GetEmail()));
             }
             catch (Exception exc)

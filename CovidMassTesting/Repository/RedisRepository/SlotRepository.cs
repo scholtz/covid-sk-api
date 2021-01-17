@@ -566,10 +566,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             var days = await ListDaySlotsByPlace(place);
             var currentDay = days.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            if (currentDay == null) throw new Exception("Toto miesto dnes nie je otvorené");
             var hours = await ListHourSlotsByPlaceAndDaySlotId(place, currentDay.SlotId);
+            if (hours == null) throw new Exception("Toto miesto dnes nie je otvorené");
             var currentHour = hours.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            if (currentHour == null) currentHour = hours.Last();
             var minutes = await ListMinuteSlotsByPlaceAndHourSlotId(place, currentHour.SlotId);
-            return minutes.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var ret = minutes.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            if (ret == null) return minutes.Last();
+            return ret;
         }
         /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
