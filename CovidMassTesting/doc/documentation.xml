@@ -40,6 +40,12 @@
             <param name="roles"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixStats(System.String,System.Int32,System.String)">
+            <summary>
+            Fix corrupted stats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.RemoveUser(System.String)">
             <summary>
             Administrator is allowed to invite other users and set their groups
