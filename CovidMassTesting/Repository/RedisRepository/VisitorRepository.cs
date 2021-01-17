@@ -1297,12 +1297,24 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
         {
+            var password = "";
+
+            switch (visitor.PersonType)
+            {
+                case "idcard":
+                case "child":
+                    password = visitor.RC;
+                    break;
+                case "foreign":
+                    password = visitor.Passport;
+                    break;
+            }
             var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid);
             using var pdfStreamEncrypted = new MemoryStream();
             var writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
                             new iText.Kernel.Pdf.WriterProperties()
                                     .SetStandardEncryption(
-                                        Encoding.ASCII.GetBytes(visitor.RC),
+                                        Encoding.ASCII.GetBytes(password),
                                         Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
                                         iText.Kernel.Pdf.EncryptionConstants.ALLOW_PRINTING,
                                         iText.Kernel.Pdf.EncryptionConstants.ENCRYPTION_AES_256
@@ -1367,12 +1379,24 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public byte[] GenerateRegistrationPDF(Visitor visitor, string testingEntity, string placeAddress, string product)
         {
+            var password = "";
+
+            switch (visitor.PersonType)
+            {
+                case "idcard":
+                case "child":
+                    password = visitor.RC;
+                    break;
+                case "foreign":
+                    password = visitor.Passport;
+                    break;
+            }
             var html = GenerateRegistrationHTML(visitor, testingEntity, placeAddress, product);
             using var pdfStreamEncrypted = new MemoryStream();
             var writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
                             new iText.Kernel.Pdf.WriterProperties()
                                     .SetStandardEncryption(
-                                        Encoding.ASCII.GetBytes(visitor.RC),
+                                        Encoding.ASCII.GetBytes(password),
                                         Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
                                         iText.Kernel.Pdf.EncryptionConstants.ALLOW_PRINTING,
                                         iText.Kernel.Pdf.EncryptionConstants.ENCRYPTION_AES_256
