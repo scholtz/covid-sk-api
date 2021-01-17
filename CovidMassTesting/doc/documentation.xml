@@ -1358,6 +1358,33 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Model.HotBreak">
+            <summary>
+            We should not cancel the slots because of statistics reasons and existing registrations
+            
+            This object is intended to cancel all new visitors for specific time slots
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.HotBreak.Id">
+            <summary>
+            Break id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.HotBreak.PlaceId">
+            <summary>
+            Place id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.HotBreak.From">
+            <summary>
+            From
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.HotBreak.Until">
+            <summary>
+            Until
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Invitation">
             <summary>
             Admin can invite person to the place provider (company which manages the testing places)

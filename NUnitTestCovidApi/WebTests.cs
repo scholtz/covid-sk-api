@@ -142,8 +142,8 @@ namespace NUnitTestCovidApi
                     IsDriveIn = true,
                     IsWalkIn = false,
                     Registrations = 0,
-                    OpeningHoursWorkDay = "10:00-12:00",
-                    OpeningHoursOther1 = "11:45-11:50",
+                    OpeningHoursWorkDay = "20:00-23:55",
+                    OpeningHoursOther1 = "23:45-23:55",
                },new Place()
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -154,8 +154,8 @@ namespace NUnitTestCovidApi
                     IsDriveIn = false,
                     IsWalkIn = true,
                     Registrations = 0,
-                    OpeningHoursWorkDay = "08:30-22:00",
-                    OpeningHoursOther1 = "11:00-13:00",
+                    OpeningHoursWorkDay = "21:00-23:55",
+                    OpeningHoursOther1 = "23:25-23:55",
                 },new Place()
                 {
                     Id = Guid.NewGuid().ToString(),
@@ -166,8 +166,8 @@ namespace NUnitTestCovidApi
                     IsDriveIn = true,
                     IsWalkIn = true,
                     Registrations = 0,
-                    OpeningHoursWorkDay = "08:00-09:00",
-                    OpeningHoursOther1 = "09:00-10:00",
+                    OpeningHoursWorkDay = "23:00-23:55",
+                    OpeningHoursOther1 = "23:05-23:55",
                 }
             };
             var ret = new List<Place>();
@@ -1959,7 +1959,7 @@ namespace NUnitTestCovidApi
             var daysDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, daysDictionary.Count);
             var daySlot = daysDictionary.Values.First();
-            Assert.AreEqual("11:45-11:50", daySlot.OpeningHours);
+            Assert.AreEqual("23:45-23:55", daySlot.OpeningHours);
             Assert.AreEqual(2, daySlot.OpeningHoursTemplate);
             request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, daySlot.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -1972,7 +1972,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             var minutesDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(1, minutesDictionary.Count);
+            Assert.AreEqual(2, minutesDictionary.Count);
 
 
 
@@ -1982,20 +1982,20 @@ namespace NUnitTestCovidApi
             daysDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, daysDictionary.Count);
             daySlot = daysDictionary.Values.First();
-            Assert.AreEqual("08:30-22:00", daySlot.OpeningHours);
+            Assert.AreEqual("21:00-23:55", daySlot.OpeningHours);
             Assert.AreEqual(1, daySlot.OpeningHoursTemplate);
             request = ListHourSlotsByPlaceAndDaySlotId(client, second.Id, daySlot.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             hoursDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(14, hoursDictionary.Count);
+            Assert.AreEqual(3, hoursDictionary.Count);
             hourSlot = hoursDictionary.Values.First();
 
             request = ListMinuteSlotsByPlaceAndHourSlotId(client, second.Id, hourSlot.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             minutesDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(6, minutesDictionary.Count);
+            Assert.AreEqual(12, minutesDictionary.Count);
 
             request = ListScheduledDays(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -2004,11 +2004,11 @@ namespace NUnitTestCovidApi
 
             var keys = daysData.Select(d => d.SlotId).OrderBy(d => d).ToArray();
             var day1 = daysData.First(d => d.SlotId == keys[0]);
-            Assert.IsTrue(day1.OpeningHours.Contains("08:30-22:00"));
-            Assert.IsTrue(day1.OpeningHours.Contains("08:00-09:00"));
+            Assert.IsTrue(day1.OpeningHours.Contains("23:00-23:55"));
+            Assert.IsTrue(day1.OpeningHours.Contains("21:00-23:55"));
             Assert.IsTrue(day1.OpeningHoursTemplates.Contains(1));
             var day2 = daysData.First(d => d.SlotId == keys[1]);
-            Assert.IsTrue(day2.OpeningHours.Contains("11:45-11:50"));
+            Assert.IsTrue(day2.OpeningHours.Contains("23:45-23:55"));
             Assert.IsTrue(day2.OpeningHoursTemplates.Contains(2));
         }
 
