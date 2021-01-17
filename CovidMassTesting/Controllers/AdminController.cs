@@ -124,7 +124,54 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Fix corrupted stats
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FixStats")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> FixStats([FromForm] string placeId, [FromForm] int stats, [FromForm] string type)
+        {
+            try
+            {
+                if (placeId is null)
+                {
+                    throw new ArgumentNullException(nameof(placeId));
+                }
 
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+
+
+                var place = await placeRepository.GetPlace(placeId);
+                switch (type)
+                {
+                    case "Registrations":
+                        logger.LogInformation($"FIX STATS: {placeId} {type} {place.Registrations} -> {stats}");
+                        place.Registrations = stats;
+                        await placeRepository.SetPlace(place);
+                        break;
+                    case "Sick":
+                        logger.LogInformation($"FIX STATS: {placeId} {type} {place.Sick} -> {stats}");
+                        place.Sick = stats;
+                        await placeRepository.SetPlace(place);
+                        break;
+                    case "Healthy":
+                        logger.LogInformation($"FIX STATS: {placeId} {type} {place.Healthy} -> {stats}"); place.Sick = stats;
+                        place.Healthy = stats;
+                        await placeRepository.SetPlace(place);
+                        break;
+                    default: throw new Exception("Wrong type");
+                }
+                return Ok(true);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 
         /// <summary>
         /// Administrator is allowed to invite other users and set their groups
