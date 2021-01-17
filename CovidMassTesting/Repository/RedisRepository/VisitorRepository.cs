@@ -1592,14 +1592,17 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             logger.LogInformation("Visitors cache built");
 
-            foreach (var item in dict.ToArray())
+            foreach (var item in dict.Keys.ToArray())
             {
-                foreach (var v in item)
+                var visitor = dict[item].First();
+                var firstRC = visitor.RC;
+                var name = $"{visitor.FirstName} {visitor.LastName}";
+                foreach (var v in dict[item])
                 {
-                    if (v.RC != visitor.RC)
+                    if (v.RC != firstRC)
                     {
                         logger.LogError($"Multiple people {name}");
-                        dict.Remove(item.Key);
+                        dict.Remove(item);
                     }
                 }
             }
