@@ -844,14 +844,17 @@ namespace CovidMassTesting.Repository.RedisRepository
             var slotH = await slotRepository.GetHourSlot(visitor.ChosenPlaceId, slotM.HourSlotId);
             if (slotH == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_hour_slot].Value); }
             var slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
-
-            if (slotM.Registrations >= place.LimitPer5MinSlot)
+            if (string.IsNullOrEmpty(managerEmail))
             {
-                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value);
-            }
-            if (slotH.Registrations >= place.LimitPer1HourSlot)
-            {
-                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value);
+                // manager is not affected by limits
+                if (slotM.Registrations >= place.LimitPer5MinSlot)
+                {
+                    throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value);
+                }
+                if (slotH.Registrations >= place.LimitPer1HourSlot)
+                {
+                    throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value);
+                }
             }
             Visitor previous = null;
             try
