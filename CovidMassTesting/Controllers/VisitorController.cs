@@ -75,6 +75,7 @@ namespace CovidMassTesting.Controllers
                     {
                         throw new Exception("Please provide valid captcha");
                     }
+                    visitor.Token = "";
                 }
                 return Ok(await visitorRepository.Register(visitor, ""));
             }

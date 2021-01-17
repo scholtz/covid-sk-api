@@ -9,8 +9,10 @@ using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using CsvHelper;
+using GoogleReCaptcha.V3.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -23,31 +25,40 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class ResultController : ControllerBase
     {
+        private readonly IConfiguration configuration;
         private readonly IStringLocalizer<ResultController> localizer;
         private readonly ILogger<ResultController> logger;
         private readonly IVisitorRepository visitorRepository;
         private readonly IUserRepository userRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
+        private readonly ICaptchaValidator captchaValidator;
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="configuration"></param>
         /// <param name="localizer"></param>
         /// <param name="logger"></param>
         /// <param name="visitorRepository"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
+        /// <param name="captchaValidator"></param>
         public ResultController(
+            IConfiguration configuration,
             IStringLocalizer<ResultController> localizer,
             ILogger<ResultController> logger,
             IVisitorRepository visitorRepository,
             IUserRepository userRepository,
-            IPlaceProviderRepository placeProviderRepository
+            IPlaceProviderRepository placeProviderRepository,
+            ICaptchaValidator captchaValidator
             )
         {
+            this.configuration = configuration;
             this.localizer = localizer;
             this.logger = logger;
             this.visitorRepository = visitorRepository;
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
+            this.captchaValidator = captchaValidator;
         }
         /// <summary>
         /// Testing personell can load data by the code, so that they can verify that the code is the specific user
@@ -181,6 +192,21 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentException(localizer[Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
                 }
+
+                if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
+                {
+                    if (string.IsNullOrEmpty(captcha))
+                    {
+                        throw new Exception("Please provide captcha");
+                    }
+
+                    var validation = await captchaValidator.IsCaptchaPassedAsync(captcha);
+                    if (!validation)
+                    {
+                        throw new Exception("Please provide valid captcha");
+                    }
+                }
+
                 var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
@@ -209,8 +235,6 @@ namespace CovidMassTesting.Controllers
 
             try
             {
-                ///@TODO validate captcha after fe deployed
-
                 if (string.IsNullOrEmpty(code))
                 {
                     throw new ArgumentException(localizer[Controllers_ResultController.Visitor_code_must_not_be_empty].Value);
@@ -220,6 +244,21 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentException(localizer[Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
                 }
+                if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
+                {
+                    if (string.IsNullOrEmpty(captcha))
+                    {
+                        throw new Exception("Please provide captcha");
+                    }
+
+                    var validation = await captchaValidator.IsCaptchaPassedAsync(captcha);
+                    if (!validation)
+                    {
+                        throw new Exception("Please provide valid captcha");
+                    }
+                }
+
+
                 var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {

@@ -403,14 +403,17 @@
             This controller manages test results
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.ResultController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.ResultController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
             <summary>
             Constructor
             </summary>
+            <param name="configuration"></param>
             <param name="localizer"></param>
             <param name="logger"></param>
             <param name="visitorRepository"></param>
             <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
+            <param name="captchaValidator"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.GetVisitor(System.String)">
             <summary>
