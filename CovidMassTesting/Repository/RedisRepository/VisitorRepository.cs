@@ -100,17 +100,18 @@ namespace CovidMassTesting.Repository.RedisRepository
             var code = visitor.Id.ToString();
             switch (visitor.PersonType)
             {
-                case "idcard":
-                case "child":
-                    if (!string.IsNullOrEmpty(visitor.RC))
-                    {
-                        await MapPersonalNumberToVisitorCode(visitor.RC, visitor.Id);
-                    }
-                    break;
                 case "foreign":
                     if (!string.IsNullOrEmpty(visitor.Passport))
                     {
                         await MapPersonalNumberToVisitorCode(visitor.Passport, visitor.Id);
+                    }
+                    break;
+                case "idcard":
+                case "child":
+                default:
+                    if (!string.IsNullOrEmpty(visitor.RC))
+                    {
+                        await MapPersonalNumberToVisitorCode(visitor.RC, visitor.Id);
                     }
                     break;
             }
@@ -625,17 +626,18 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             switch (visitor.PersonType)
             {
-                case "idcard":
-                case "child":
-                    if (!string.IsNullOrEmpty(visitor.RC))
-                    {
-                        await UnMapPersonalNumber(visitor.RC);
-                    }
-                    break;
                 case "foreign":
                     if (!string.IsNullOrEmpty(visitor.Passport))
                     {
                         await UnMapPersonalNumber(visitor.Passport);
+                    }
+                    break;
+                case "idcard":
+                case "child":
+                default:
+                    if (!string.IsNullOrEmpty(visitor.RC))
+                    {
+                        await UnMapPersonalNumber(visitor.RC);
                     }
                     break;
             }
@@ -1186,12 +1188,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             switch (visitor.PersonType)
             {
-                case "idcard":
-                case "child":
-                    data.PersonalNumber = visitor.RC;
-                    break;
                 case "foreign":
                     data.PassportNumber = visitor.Passport;
+                    break;
+                case "idcard":
+                case "child":
+                default:
+                    data.PersonalNumber = visitor.RC;
                     break;
             }
 
@@ -1242,12 +1245,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             switch (visitor.PersonType)
             {
-                case "idcard":
-                case "child":
-                    data.PersonalNumber = visitor.RC;
-                    break;
                 case "foreign":
                     data.PassportNumber = visitor.Passport;
+                    break;
+                case "idcard":
+                case "child":
+                default:
+                    data.PersonalNumber = visitor.RC;
                     break;
             }
 
@@ -1301,12 +1305,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             switch (visitor.PersonType)
             {
-                case "idcard":
-                case "child":
-                    password = visitor.RC;
-                    break;
                 case "foreign":
                     password = visitor.Passport;
+                    break;
+                case "idcard":
+                case "child":
+                default:
+                    password = visitor.RC;
                     break;
             }
             var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid);
@@ -1383,12 +1388,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             switch (visitor.PersonType)
             {
-                case "idcard":
-                case "child":
-                    password = visitor.RC;
-                    break;
                 case "foreign":
                     password = visitor.Passport;
+                    break;
+                case "idcard":
+                case "child":
+                default:
+                    password = visitor.RC;
                     break;
             }
             var html = GenerateRegistrationHTML(visitor, testingEntity, placeAddress, product);
