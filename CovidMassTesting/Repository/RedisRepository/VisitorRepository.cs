@@ -1665,8 +1665,6 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"Fix02");
 
-            var ret = new List<Visitor>();
-            var dict = new Dictionary<string, List<Visitor>>();
             foreach (var visitorId in (await ListAllKeys()))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
@@ -1679,11 +1677,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         if (visitor.Language == "en")
                         {
-                            smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, we are sorry, but your registration {visitorId} was performed in demo application. Please consider it as canceled. Your personal data removed."));
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, we are sorry, but your registration {visitorId} was performed in demo application. Please consider it as canceled. Your personal data removed."));
                         }
                         else
                         {
-                            smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, ospravedlnujeme sa, vasa registracia {visitorId} bola vykonana do demo aplikacie. Povazujte ju za zrusenu. osobne udaje boli vymazane."));
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, ospravedlnujeme sa, vasa registracia {visitorId} bola vykonana do demo aplikacie. Povazujte ju za zrusenu. osobne udaje boli vymazane."));
                         }
                     }
                 }
