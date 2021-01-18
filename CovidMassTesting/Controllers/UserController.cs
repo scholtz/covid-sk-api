@@ -268,7 +268,7 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize]
-        [HttpPost("RefreshToken")]
+        [HttpGet("RefreshToken")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<string>> RefreshToken()
