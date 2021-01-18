@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define UseFixes
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -232,7 +233,7 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
-
+#if UseFixes
         [HttpPost("Fix01")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -293,5 +294,6 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+#endif
     }
 }

@@ -1701,8 +1701,6 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"Fix03");
 
-            var ret = new List<Visitor>();
-            var dict = new Dictionary<string, List<Visitor>>();
             foreach (var visitorId in (await ListAllKeys()))
             {
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitorId);
