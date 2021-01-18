@@ -157,5 +157,15 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<bool> Fix01();
+        /// <summary>
+        /// Temp fix
+        /// </summary>
+        /// <returns></returns>
+        public Task<bool> Fix02();
+        /// <summary>
+        /// Temp fix
+        /// </summary>
+        /// <returns></returns>
+        public Task<bool> Fix03();
     }
 }

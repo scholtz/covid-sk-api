@@ -60,6 +60,18 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.Fix02">
+            <summary>
+            Send your registration is not valid to all registered visitors. Some real people were registered to demo backend.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.Fix03">
+            <summary>
+            Send your registration is not valid to all registered visitors. Some real people were registered to demo backend.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -4043,6 +4055,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Fix02">
+            <summary>
+            Temp fix
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Fix03">
+            <summary>
+            Temp fix
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -5640,6 +5664,22 @@
             </summary>
             <param name="from"></param>
             <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Fix02">
+            <summary>
+            Fix. Set to visitor the test result and time of the test
+            
+            tries to match visitors by name with the test results list 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Fix03">
+            <summary>
+            Fix. Set to visitor the test result and time of the test
+            
+            tries to match visitors by name with the test results list 
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Resources.Controllers_AdminController">

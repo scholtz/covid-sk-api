@@ -1655,6 +1655,63 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return true;
         }
+        /// <summary>
+        /// Fix. Set to visitor the test result and time of the test
+        /// 
+        /// tries to match visitors by name with the test results list 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> Fix02()
+        {
+            logger.LogInformation($"Fix02");
 
+            var ret = new List<Visitor>();
+            var dict = new Dictionary<string, List<Visitor>>();
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    var name = $"{visitor.FirstName} {visitor.LastName}";
+
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+                        if (visitor.Language == "en")
+                        {
+                            smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, we are sorry, but your registration {visitorId} was performed in demo application. Please consider it as canceled. Your personal data removed."));
+                        }
+                        else
+                        {
+                            smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, ospravedlnujeme sa, vasa registracia {visitorId} bola vykonana do demo aplikacie. Povazujte ju za zrusenu. osobne udaje boli vymazane."));
+                        }
+                    }
+                }
+                //await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitorId);
+            }
+            logger.LogInformation($"Fix02 Done");
+
+            return true;
+        }
+        /// <summary>
+        /// Fix. Set to visitor the test result and time of the test
+        /// 
+        /// tries to match visitors by name with the test results list 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<bool> Fix03()
+        {
+            logger.LogInformation($"Fix03");
+
+            var ret = new List<Visitor>();
+            var dict = new Dictionary<string, List<Visitor>>();
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitorId);
+            }
+            logger.LogInformation($"Fix03 Done");
+
+            return true;
+        }
     }
 }

@@ -250,5 +250,48 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// Send your registration is not valid to all registered visitors. Some real people were registered to demo backend.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("Fix02")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> Fix02()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                return Ok(visitorRepository.Fix02());
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Send your registration is not valid to all registered visitors. Some real people were registered to demo backend.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("Fix03")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> Fix03()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                return Ok(visitorRepository.Fix03());
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }
