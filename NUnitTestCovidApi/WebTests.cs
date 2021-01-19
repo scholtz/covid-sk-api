@@ -2783,6 +2783,37 @@ namespace NUnitTestCovidApi
             Assert.AreEqual("Ludovit", CovidMassTesting.Helpers.Text.RemoveDiacritism("Ľudovít"));
             Assert.AreEqual("+lsctzyaie LCZI", CovidMassTesting.Helpers.Text.RemoveDiacritism("+ľščťžýáíé ĽČŽÍ"));
         }
+
+
+        [Test]
+        public void SendEmailTest()
+        {
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+
+            var emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
+            var noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
+            noEmailSender?.Data.Clear();
+            var attachment = new SendGrid.Helpers.Mail.Attachment();
+            attachment.Content = Convert.ToBase64String(Encoding.UTF8.GetBytes("Hello"));
+            attachment.Filename = "test.pdf";
+            attachment.Type = "application/pdf";
+
+            emailSender.SendEmail(
+                $"Test {DateTimeOffset.Now.ToString("f")}",
+                "ludko2@gmail.com",
+                "CovidL",
+                new CovidMassTesting.Model.Email.InvitationEmail("sk")
+                {
+                    IsSK = true,
+                    CompanyName = "company",
+                    Password = "test"
+                },
+                new List<SendGrid.Helpers.Mail.Attachment>() { attachment }
+            );
+            Task.Delay(100).Wait();
+            Assert.AreEqual(1, noEmailSender?.Data.Count);
+        }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;

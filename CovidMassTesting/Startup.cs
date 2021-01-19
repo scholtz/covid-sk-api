@@ -187,13 +187,19 @@ namespace CovidMassTesting
 
 
             var sendGridConfiguration = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
-            if (string.IsNullOrEmpty(sendGridConfiguration?.MailerApiKey))
+            var mailGunConfiguration = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
+
+            if (!string.IsNullOrEmpty(sendGridConfiguration?.MailerApiKey))
             {
-                services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
+                services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
+            }
+            else if (!string.IsNullOrEmpty(mailGunConfiguration?.ApiKey))
+            {
+                services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
             }
             else
             {
-                services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
+                services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
             }
 
         }

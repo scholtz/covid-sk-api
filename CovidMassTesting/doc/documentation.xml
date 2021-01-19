@@ -60,18 +60,6 @@
             <param name="hash"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.Fix02">
-            <summary>
-            Send your registration is not valid to all registered visitors. Some real people were registered to demo backend.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.Fix03">
-            <summary>
-            Send your registration is not valid to all registered visitors. Some real people were registered to demo backend.
-            </summary>
-            <returns></returns>
-        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -90,6 +78,27 @@
             <param name="toEmail"></param>
             <param name="toName"></param>
             <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Controllers.Email.MailGunSender">
+            <summary>
+            Sendgrid email sender
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.MailGunSender.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.Email.MailGunSender},Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.MailGunSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail,System.Collections.Generic.IEnumerable{SendGrid.Helpers.Mail.Attachment})">
+            <summary>
+            Semd email
+            </summary>
+            <param name="subject"></param>
+            <param name="toEmail"></param>
+            <param name="toName"></param>
+            <param name="data"></param>
+            <param name="attachments"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.Email.NoEmailSender">
@@ -2211,6 +2220,36 @@
         <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.Channel">
             <summary>
             Channel
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Settings.MailGunConfiguration">
+            <summary>
+            Mailgun configuration
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.Endpoint">
+            <summary>
+            Endpoint
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.Domain">
+            <summary>
+            Sendgrid domain
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.ApiKey">
+            <summary>
+            Api key
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.MailerFromName">
+            <summary>
+            From name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.MailerFromEmail">
+            <summary>
+            From email
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Settings.SendGridConfiguration">
