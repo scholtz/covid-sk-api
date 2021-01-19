@@ -425,6 +425,37 @@
             <param name="category"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.QRController">
+            <summary>
+            Manages places
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.QRController.GeneratePDF(CovidMassTesting.Model.Settings.PDFQRConfiguration)">
+             <summary>
+             Generates PDF File
+             
+             Default variables: <br/>
+             Prefix  = "BA01-"; <br/>
+             offsetBranch  = 100000; <br/>
+             OffsetIter  = 1; <br/>
+             Columns  = 3; <br/>
+             Count  = 100; <br/>
+             Height  = 50f; <br/>
+             Width  = 200f; <br/>
+             CellPaddingTop  = 10f; <br/>
+             CellPaddingRight  = 10f; <br/>
+             CellPaddingLeft  = 30f; <br/>
+             CellPaddingBottom  = 10f; <br/>
+             PageMarginTop  = 45f; <br/>
+             PageMarginRight  = 45f; <br/>
+             PageMarginLeft  = 45f; <br/>
+             PageMarginBottom  = 45f; <br/>
+             Type  = QRCode|BarCode; <br/>
+             Scale  = 2.5f; <br/>
+            
+             </summary>
+             <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.ResultController">
             <summary>
             This controller manages test results
@@ -2250,6 +2281,11 @@
         <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.MailerFromEmail">
             <summary>
             From email
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Settings.PDFQRConfiguration">
+            <summary>
+            Settings for pdf generation
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Settings.SendGridConfiguration">
