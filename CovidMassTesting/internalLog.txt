@@ -4,3 +4,69 @@
 2021-01-17 03:14:14.2767 Info Adding target FileTarget(Name=otherFile-web)
 2021-01-17 03:14:14.2892 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
 2021-01-17 03:14:14.3499 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:12:52.4615 Info Message Template Auto Format enabled
+2021-01-19 20:12:52.5323 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:12:52.5801 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:12:52.5801 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:12:52.6021 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:12:52.7347 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:14:10.8245 Info Message Template Auto Format enabled
+2021-01-19 20:14:10.9244 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:14:11.0296 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:14:11.0807 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:14:11.0807 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:14:11.1407 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:15:28.4560 Info Message Template Auto Format enabled
+2021-01-19 20:15:28.4967 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:15:28.5790 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:15:28.6756 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:15:28.6756 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:15:28.8081 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:16:05.4826 Info Message Template Auto Format enabled
+2021-01-19 20:16:05.5149 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:16:05.5948 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:16:05.6381 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:16:05.6474 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:16:05.7239 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:16:47.5034 Info Message Template Auto Format enabled
+2021-01-19 20:16:47.5714 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:16:47.6180 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:16:47.6352 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:16:47.6446 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:16:47.6861 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:17:48.4099 Info Message Template Auto Format enabled
+2021-01-19 20:17:48.4517 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:17:48.5069 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:17:48.5069 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:17:48.5235 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:17:48.5562 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:20:09.2099 Info Message Template Auto Format enabled
+2021-01-19 20:20:09.2342 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:20:09.2818 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:20:09.2917 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:20:09.3006 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:20:09.3551 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:20:52.0892 Info Message Template Auto Format enabled
+2021-01-19 20:20:52.1315 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:20:52.2452 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:20:52.3480 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:20:52.3480 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:20:52.3960 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:22:32.7890 Info Message Template Auto Format enabled
+2021-01-19 20:22:32.8090 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:22:32.8545 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:22:32.8725 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:22:32.8819 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:22:32.9300 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:23:43.5981 Info Message Template Auto Format enabled
+2021-01-19 20:23:43.6963 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:23:43.7994 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:23:43.8783 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:23:43.8870 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:23:43.9207 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
+2021-01-19 20:24:18.8787 Info Message Template Auto Format enabled
+2021-01-19 20:24:19.0052 Info Loading assembly: NLog.Web.AspNetCore
+2021-01-19 20:24:19.1656 Info Adding target FileTarget(Name=alldata)
+2021-01-19 20:24:19.1924 Info Adding target FileTarget(Name=otherFile-web)
+2021-01-19 20:24:19.2014 Info Adding target ColoredConsoleTarget(Name=coloredConsole)
+2021-01-19 20:24:19.2354 Info Validating config: TargetNames=coloredConsole, alldata, otherFile-web, ConfigItems=81, FilePath=C:\Users\ludovit.scholtz\source\repos\covid-sk-api\CovidMassTesting\bin\Debug\net5.0\nlog.config
