@@ -488,7 +488,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         new Model.Email.VisitorTestingResultEmail(visitor.Language)
                         {
                             Name = $"{visitor.FirstName} {visitor.LastName}",
-
+                            IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
                         },
                         attachments
                         );

@@ -26,5 +26,9 @@ namespace CovidMassTesting.Model.Email
         /// Visitor name
         /// </summary>
         public string Name { get; set; }
+        /// <summary>
+        /// Is sick
+        /// </summary>
+        public bool IsSick { get; set; }
     }
 }

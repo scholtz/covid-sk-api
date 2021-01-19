@@ -89,7 +89,74 @@ namespace CovidMassTesting.Controllers.Email
                 request.AddParameter("from", $"{config.MailerFromName} <{config.MailerFromEmail}>");
                 request.AddParameter("to", $"{toName} <{toEmail}>");
                 request.AddParameter("subject", subject);
-                request.AddParameter("text", "Test");
+                request.AddParameter("template", data.TemplateId);
+
+                request.AddParameter("v:IsCS", data.IsCS);
+                request.AddParameter("v:IsSK", data.IsSK);
+                request.AddParameter("v:IsDE", data.IsDE);
+                request.AddParameter("v:IsEN", data.IsEN);
+                request.AddParameter("v:IsHU", data.IsHU);
+
+                if (data is InvitationEmail)
+                {
+                    var emailData = data as InvitationEmail;
+                    request.AddParameter("v:Password", emailData.Password);
+                    request.AddParameter("v:CompanyName", emailData.CompanyName);
+                    request.AddParameter("v:InviterName", emailData.InviterName);
+                    request.AddParameter("v:Name", emailData.Name);
+                    request.AddParameter("v:Roles", emailData.Roles);
+                }
+
+                if (data is PersonalDataRemovedEmail)
+                {
+                    var emailData = data as PersonalDataRemovedEmail;
+                    request.AddParameter("v:Name", emailData.Name);
+                }
+
+                if (data is RolesUpdatedEmail)
+                {
+                    var emailData = data as RolesUpdatedEmail;
+                    request.AddParameter("v:Name", emailData.Name);
+                    request.AddParameter("v:Password", emailData.Password);
+                    request.AddParameter("v:Roles", emailData.Roles);
+                }
+                if (data is VisitorChangeRegistrationEmail)
+                {
+                    var emailData = data as VisitorChangeRegistrationEmail;
+                    request.AddParameter("v:BarCode", emailData.BarCode);
+                    request.AddParameter("v:Code", emailData.Code);
+                    request.AddParameter("v:Date", emailData.Date);
+                    request.AddParameter("v:Name", emailData.Name);
+                    request.AddParameter("v:Place", emailData.Place);
+                    request.AddParameter("v:PlaceDescription", emailData.PlaceDescription);
+                }
+                if (data is VisitorRegistrationEmail)
+                {
+                    var emailData = data as VisitorRegistrationEmail;
+                    request.AddParameter("v:BarCode", emailData.BarCode);
+                    request.AddParameter("v:Code", emailData.Code);
+                    request.AddParameter("v:Date", emailData.Date);
+                    request.AddParameter("v:Name", emailData.Name);
+                    request.AddParameter("v:Place", emailData.Place);
+                    request.AddParameter("v:PlaceDescription", emailData.PlaceDescription);
+                }
+                if (data is VisitorTestingInProcessEmail)
+                {
+                    var emailData = data as VisitorTestingInProcessEmail;
+                    request.AddParameter("v:Name", emailData.Name);
+                }
+                if (data is VisitorTestingResultEmail)
+                {
+                    var emailData = data as VisitorTestingResultEmail;
+                    request.AddParameter("v:Name", emailData.Name);
+                    request.AddParameter("v:IsSick", emailData.IsSick);
+                }
+                if (data is VisitorTestingToBeRepeatedEmail)
+                {
+                    var emailData = data as VisitorTestingToBeRepeatedEmail;
+                    request.AddParameter("v:Name", emailData.Name);
+                }
+
                 foreach (var attachment in attachments)
                 {
                     request.AddFile("attachment", Convert.FromBase64String(attachment.Content), attachment.Filename, attachment.Type);

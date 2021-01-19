@@ -2801,17 +2801,20 @@ namespace NUnitTestCovidApi
 
             emailSender.SendEmail(
                 $"Test {DateTimeOffset.Now.ToString("f")}",
-                "ludko2@gmail.com",
+                "ludkosk@gmail.com",
                 "CovidL",
                 new CovidMassTesting.Model.Email.InvitationEmail("sk")
                 {
+                    Name = "Ludo",
                     IsSK = true,
                     CompanyName = "company",
-                    Password = "test"
+                    Password = "test",
+                    InviterName = "Inviter name",
+                    Roles = new string[] { "Test", "test2" }
                 },
                 new List<SendGrid.Helpers.Mail.Attachment>() { attachment }
-            );
-            Task.Delay(100).Wait();
+            ).Wait();
+            Task.Delay(1000).Wait();
             Assert.AreEqual(1, noEmailSender?.Data.Count);
         }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>

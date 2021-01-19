@@ -1333,6 +1333,11 @@
             Visitor name
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Email.VisitorTestingResultEmail.IsSick">
+            <summary>
+            Is sick
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail">
             <summary>
             Email sent when test was not positive not negative, and needs to be repeated
