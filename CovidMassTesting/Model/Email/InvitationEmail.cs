@@ -44,5 +44,9 @@ namespace CovidMassTesting.Model.Email
         /// Company name
         /// </summary>
         public string CompanyName { get; set; }
+        /// <summary>
+        /// Company name
+        /// </summary>
+        public string WebPath { get; set; }
     }
 }

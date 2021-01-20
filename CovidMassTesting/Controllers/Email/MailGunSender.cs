@@ -105,6 +105,7 @@ namespace CovidMassTesting.Controllers.Email
                     request.AddParameter("v:InviterName", emailData.InviterName);
                     request.AddParameter("v:Name", emailData.Name);
                     request.AddParameter("v:Roles", emailData.Roles);
+                    request.AddParameter("v:WebPath", emailData.WebPath);
                 }
 
                 if (data is PersonalDataRemovedEmail)

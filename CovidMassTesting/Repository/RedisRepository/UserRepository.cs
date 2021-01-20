@@ -107,6 +107,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     Roles = user.Roles?.ToArray(),
                     InviterName = inviterName,
                     CompanyName = companyName,
+                    WebPath = configuration["FrontedURL"]
                 });
             if (!string.IsNullOrEmpty(user.Phone))
             {
@@ -683,7 +684,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                         Name = user.Name,
                         Roles = user.Roles?.ToArray(),
                         InviterName = invitation.InviterName,
-                        CompanyName = pp.CompanyName
+                        CompanyName = pp.CompanyName,
+                        WebPath = configuration["FrontedURL"]
                     });
             }
 

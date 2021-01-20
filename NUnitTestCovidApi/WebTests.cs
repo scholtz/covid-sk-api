@@ -2810,7 +2810,8 @@ namespace NUnitTestCovidApi
                     CompanyName = "company",
                     Password = "test",
                     InviterName = "Inviter name",
-                    Roles = new string[] { "Test", "test2" }
+                    Roles = new string[] { "Test", "test2" },
+                    WebPath = configuration["FrontedURL"]
                 },
                 new List<SendGrid.Helpers.Mail.Attachment>() { attachment }
             ).Wait();
