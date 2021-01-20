@@ -175,7 +175,23 @@ namespace CovidMassTesting
             {
                 Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
             }
-            if (!string.IsNullOrEmpty(goSMSConfiguration.ClientId))
+
+            var goSMSQueueConfiguration = new Model.Settings.GoSMSQueueConfiguration();
+            try
+            {
+                Configuration.GetSection("GoSMSQueue")?.Bind(goSMSQueueConfiguration);
+            }
+            catch (Exception exc)
+            {
+                Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
+            }
+
+            if (!string.IsNullOrEmpty(goSMSQueueConfiguration.QueueURL))
+            {
+                services.Configure<Model.Settings.GoSMSQueueConfiguration>(Configuration.GetSection("GoSMSQueue"));
+                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSQueueSender>();
+            }
+            else if (!string.IsNullOrEmpty(goSMSConfiguration.ClientId))
             {
                 services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
                 services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();

@@ -2818,6 +2818,22 @@ namespace NUnitTestCovidApi
             Task.Delay(1000).Wait();
             Assert.AreEqual(1, noEmailSender?.Data.Count);
         }
+        [Test]
+        public void SendSMSTest()
+        {
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+
+            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
+            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
+            noSMSSender?.Data.Clear();
+
+            smsSender.SendSMS(
+                $"+420776082012",
+                new CovidMassTesting.Model.SMS.Message($"SMS Test {DateTimeOffset.Now.ToString("f")}")
+            ).Wait();
+            Assert.AreEqual(1, noSMSSender?.Data.Count);
+        }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;

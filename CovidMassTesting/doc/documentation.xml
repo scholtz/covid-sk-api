@@ -173,10 +173,11 @@
             Manages places
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.ISlotRepository)">
+        <member name="M:CovidMassTesting.Controllers.PlaceController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.ISlotRepository)">
             <summary>
             Constructor
             </summary>
+            <param name="configuration"></param>
             <param name="localizer"></param>
             <param name="logger"></param>
             <param name="placeRepository"></param>
@@ -604,6 +605,27 @@
             <param name="hourSlotId"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.SMS.GoSMSQueueSender">
+            <summary>
+            https://doc.gosms.cz/#dokumentace-gosms-api
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.GoSMSQueueSender.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.SMS.GoSMSQueueSender},Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.GoSMSQueueConfiguration},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.SMS.GoSMSQueueSender})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="settings"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.GoSMSQueueSender.SendSMS(System.String,CovidMassTesting.Model.SMS.ISMS)">
+            <summary>
+            Act as sms was sent. Log event to console
+            </summary>
+            <param name="toPhone"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.SMS.GoSMSSender">
             <summary>
             https://doc.gosms.cz/#dokumentace-gosms-api
@@ -638,6 +660,11 @@
         <member name="T:CovidMassTesting.Controllers.SMS.MockSMSSender">
             <summary>
             If no email sender is defined
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Controllers.SMS.MockSMSSender.Data">
+            <summary>
+            For unit tests
             </summary>
         </member>
         <member name="M:CovidMassTesting.Controllers.SMS.MockSMSSender.SendSMS(System.String,CovidMassTesting.Model.SMS.ISMS)">
@@ -1143,6 +1170,11 @@
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Email.InvitationEmail.CompanyName">
+            <summary>
+            Company name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.InvitationEmail.WebPath">
             <summary>
             Company name
             </summary>
@@ -1945,6 +1977,16 @@
             Place does the covid vaccine paid by insurance or government
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.HasReservationSystem">
+            <summary>
+            If set to false, the icon on the map should be differnt with the icon where reservation is possible
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.ExternalReservationSystem">
+            <summary>
+            Link to external reservation system
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProduct">
             <summary>
             Product specified for specific place
@@ -2254,6 +2296,36 @@
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.Channel">
+            <summary>
+            Channel
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration">
+            <summary>
+            GoSMS Queue support
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration.Region">
+            <summary>
+            Region
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration.QueueURL">
+            <summary>
+            SQS Endpoint
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration.SecretAccessKey">
+            <summary>
+            Client Secret
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration.AccessKeyID">
+            <summary>
+            Client identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration.Channel">
             <summary>
             Channel
             </summary>
@@ -3322,16 +3394,6 @@
         <member name="P:CovidMassTesting.Model.Visitor.Token">
             <summary>
             Captcha token. After it is used it is removed
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Visitor.HasReservationSystem">
-            <summary>
-            If set to false, the icon on the map should be differnt with the icon where reservation is possible
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Visitor.ExternalReservationSystem">
-            <summary>
-            Link to external reservation system
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.VisitorSimplified.Id">

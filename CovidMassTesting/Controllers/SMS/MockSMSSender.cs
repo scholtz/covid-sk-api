@@ -1,4 +1,6 @@
 ﻿using CovidMassTesting.Model.SMS;
+using System;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers.SMS
@@ -8,6 +10,10 @@ namespace CovidMassTesting.Controllers.SMS
     /// </summary>
     public class MockSMSSender : ISMSSender
     {
+        /// <summary>
+        /// For unit tests
+        /// </summary>
+        public ConcurrentDictionary<long, (string toPhone, ISMS data)> Data { get; private set; } = new ConcurrentDictionary<long, (string toPhone, ISMS data)>();
 
         /// <summary>
         /// Act as sms was sent. Log event to console
@@ -28,7 +34,10 @@ namespace CovidMassTesting.Controllers.SMS
             }
 
             var msg = data.GetText();
-            System.Console.WriteLine($"SMS: {msg}");
+            System.Console.WriteLine($"SMS: {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
+
+            await Task.Delay(1);
+            Data[DateTimeOffset.Now.Ticks] = (toPhone, data);
             await Task.Delay(1);
             return true;
         }
