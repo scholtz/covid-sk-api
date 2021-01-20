@@ -495,7 +495,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<string> Authenticate(string email, string hash)
         {
-            var places = await placeProviderRepository.ListPrivate(email);
+            var isGlobalAdmin = InAnyGroup(email, new string[] { Groups.Admin }, null).Result;
+
+            var places = await placeProviderRepository.ListPrivate(email, isGlobalAdmin);
             var placeProviderId = places?.FirstOrDefault()?.PlaceProviderId;
             var usr = await GetUser(email, placeProviderId);
             if (usr == null)
@@ -535,7 +537,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             user.CoHash = user.CoData;
             if (await SetUser(user, false))
             {
-                var places = await placeProviderRepository.ListPrivate(user.Email);
+                var isGlobalAdmin = InAnyGroup(email, new string[] { Groups.Admin }, null).Result;
+                var places = await placeProviderRepository.ListPrivate(user.Email, isGlobalAdmin);
                 return Token.CreateToken(user, configuration, places?.FirstOrDefault()?.PlaceProviderId);
             }
             return "";

@@ -38,7 +38,7 @@ namespace CovidMassTesting.Repository.Interface
         /// Returns list of test providers with full information
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<PlaceProvider>> ListPrivate(string email);
+        public Task<IEnumerable<PlaceProvider>> ListPrivate(string email, bool isGlobalAdmin);
         /// <summary>
         /// Get price
         /// </summary>

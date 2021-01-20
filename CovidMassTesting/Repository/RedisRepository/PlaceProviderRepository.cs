@@ -306,9 +306,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Admin can list private info
         /// </summary>
         /// <param name="email"></param>
+        /// <param name="isAdmin"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<PlaceProvider>> ListPrivate(string email)
+        public async Task<IEnumerable<PlaceProvider>> ListPrivate(string email, bool isAdmin)
         {
+            if (isAdmin)
+            {
+                return await ListAll();
+            }
             return (await ListAll()).Where(
                 p => p.MainEmail == email
                     || (p.Group2Emails.ContainsKey(Groups.Admin) && p.Group2Emails[Groups.Admin].Contains(email))

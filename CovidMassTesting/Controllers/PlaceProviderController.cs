@@ -319,7 +319,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                return Ok(await placeProviderRepository.ListPrivate(User.GetEmail()));
+                return Ok(await placeProviderRepository.ListPrivate(User.GetEmail(), User.IsAdmin(userRepository)));
             }
             catch (Exception exc)
             {

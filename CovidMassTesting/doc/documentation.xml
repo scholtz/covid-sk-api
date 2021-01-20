@@ -3427,7 +3427,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListPrivate(System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListPrivate(System.String,System.Boolean)">
             <summary>
             Returns list of test providers with full information
             </summary>
@@ -4744,11 +4744,12 @@
             <param name="currency"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListPrivate(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListPrivate(System.String,System.Boolean)">
             <summary>
             Admin can list private info
             </summary>
             <param name="email"></param>
+            <param name="isAdmin"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.ListPublic">
