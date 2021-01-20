@@ -101,14 +101,5 @@ namespace CovidMassTesting.Model
         /// Captcha token. After it is used it is removed
         /// </summary>
         public string Token { get; set; }
-        /// <summary>
-        /// If set to false, the icon on the map should be differnt with the icon where reservation is possible
-        /// </summary>
-        public bool HasReservationSystem { get; set; } = false;
-
-        /// <summary>
-        /// Link to external reservation system
-        /// </summary>
-        public string ExternalReservationSystem { get; set; }
     }
 }

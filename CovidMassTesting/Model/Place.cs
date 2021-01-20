@@ -128,6 +128,15 @@ namespace CovidMassTesting.Model
         /// Place does the covid vaccine paid by insurance or government
         /// </summary>
         public bool HasVaccineFree { get; set; }
+        /// <summary>
+        /// If set to false, the icon on the map should be differnt with the icon where reservation is possible
+        /// </summary>
+        public bool HasReservationSystem { get; set; } = false;
+
+        /// <summary>
+        /// Link to external reservation system
+        /// </summary>
+        public string ExternalReservationSystem { get; set; }
 
     }
 }
