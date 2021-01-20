@@ -3304,6 +3304,11 @@
             Real time when the test has been taken
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Enqueued">
+            <summary>
+            Time, when visitor has clicked that he is in the queue
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.Product">
             <summary>
             Product id
@@ -3317,6 +3322,16 @@
         <member name="P:CovidMassTesting.Model.Visitor.Token">
             <summary>
             Captcha token. After it is used it is removed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.HasReservationSystem">
+            <summary>
+            If set to false, the icon on the map should be differnt with the icon where reservation is possible
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.ExternalReservationSystem">
+            <summary>
+            Link to external reservation system
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.VisitorSimplified.Id">
