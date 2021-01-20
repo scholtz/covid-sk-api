@@ -91,43 +91,7 @@ namespace CovidMassTesting.Model
         /// non Standard opening hours - holidays
         /// </summary>
         public string OpeningHoursOther2 { get; set; }
-        /// <summary>
-        /// Place does the PCR tests paid by insurance
-        /// </summary>
-        public bool HasPCRTestFree { get; set; }
-        /// <summary>
-        /// Self paying pcr test
-        /// </summary>
-        public bool HasPCRTestSelf { get; set; }
 
-        /// <summary>
-        /// Self paying pcr test price
-        /// </summary>
-        public decimal HasPCRTestSelfPrice { get; set; }
-        /// <summary>
-        /// Self paying pcr test currency
-        /// </summary>
-        public string HasPCRTestSelfPriceCurrency { get; set; }
-        /// <summary>
-        /// Place does the antigen tests paid by insurance or government
-        /// </summary>
-        public bool HasAntTestFree { get; set; }
-        /// <summary>
-        /// Place does the antigen tests paid by visitors
-        /// </summary>
-        public bool HasAntTestSelf { get; set; }
-        /// <summary>
-        /// Self paying antigen test price
-        /// </summary>
-        public decimal HasAntTestSelfPrice { get; set; }
-        /// <summary>
-        /// Self paying antigen test currency
-        /// </summary>
-        public string HasAntTestSelfPriceCurrency { get; set; }
-        /// <summary>
-        /// Place does the covid vaccine paid by insurance or government
-        /// </summary>
-        public bool HasVaccineFree { get; set; }
         /// <summary>
         /// If set to false, the icon on the map should be differnt with the icon where reservation is possible
         /// </summary>
