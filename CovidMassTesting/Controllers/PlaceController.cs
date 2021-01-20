@@ -10,6 +10,7 @@ using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 
@@ -22,6 +23,7 @@ namespace CovidMassTesting.Controllers
     [Route("[controller]")]
     public class PlaceController : ControllerBase
     {
+        private readonly IConfiguration configuration;
         private readonly IStringLocalizer<PlaceController> localizer;
         private readonly ILogger<PlaceController> logger;
         private readonly IPlaceRepository placeRepository;
@@ -32,6 +34,7 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Constructor
         /// </summary>
+        /// <param name="configuration"></param>
         /// <param name="localizer"></param>
         /// <param name="logger"></param>
         /// <param name="placeRepository"></param>
@@ -39,6 +42,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="placeProviderRepository"></param>
         /// <param name="slotRepository"></param>
         public PlaceController(
+            IConfiguration configuration,
             IStringLocalizer<PlaceController> localizer,
             ILogger<PlaceController> logger,
             IPlaceRepository placeRepository,
@@ -47,6 +51,7 @@ namespace CovidMassTesting.Controllers
             ISlotRepository slotRepository
             )
         {
+            this.configuration = configuration;
             this.localizer = localizer;
             this.logger = logger;
             this.placeRepository = placeRepository;
@@ -67,7 +72,34 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                return Ok((await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p));
+                var ret = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                if (string.IsNullOrEmpty(configuration["LimitPer5MinSlot"])
+                    && string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
+                {
+                    return Ok(ret);
+                }
+
+                if (!string.IsNullOrEmpty(configuration["LimitPer5MinSlot"]))
+                {
+                    if (int.TryParse(configuration["LimitPer5MinSlot"], out var confLimit))
+                    {
+                        foreach (var key in ret.Keys)
+                        {
+                            if (ret[key].LimitPer1HourSlot > confLimit) ret[key].LimitPer1HourSlot = confLimit;
+                        }
+                    }
+                }
+                if (!string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
+                {
+                    if (int.TryParse(configuration["LimitPer1HourSlot"], out var confLimit))
+                    {
+                        foreach (var key in ret.Keys)
+                        {
+                            if (ret[key].LimitPer1HourSlot > confLimit) ret[key].LimitPer1HourSlot = confLimit;
+                        }
+                    }
+                }
+                return Ok(ret);
             }
             catch (Exception exc)
             {

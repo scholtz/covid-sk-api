@@ -847,9 +847,33 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (string.IsNullOrEmpty(managerEmail))
             {
                 // manager is not affected by limits
-                if (slotM.Registrations >= place.LimitPer5MinSlot)
+
+                var LimitPer5MinSlot = place.LimitPer5MinSlot;
+                if (!string.IsNullOrEmpty(configuration["LimitPer5MinSlot"]))
+                {
+                    if (int.TryParse(configuration["LimitPer5MinSlot"], out var confLimit))
+                    {
+                        if (LimitPer5MinSlot > confLimit)
+                        {
+                            LimitPer5MinSlot = confLimit;
+                        }
+                    }
+                }
+
+                if (slotM.Registrations >= LimitPer5MinSlot)
                 {
                     throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value);
+                }
+                var LimitPer1HourSlot = place.LimitPer5MinSlot;
+                if (!string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
+                {
+                    if (int.TryParse(configuration["LimitPer1HourSlot"], out var confLimit))
+                    {
+                        if (LimitPer1HourSlot > confLimit)
+                        {
+                            LimitPer1HourSlot = confLimit;
+                        }
+                    }
                 }
                 if (slotH.Registrations >= place.LimitPer1HourSlot)
                 {
