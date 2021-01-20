@@ -91,11 +91,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(inviterName));
             }
 
-            if (string.IsNullOrEmpty(companyName))
-            {
-                throw new ArgumentNullException(nameof(companyName));
-            }
-
             (string pass, string hash, string cohash) = GeneratePassword();
             user.PswHash = hash;
             user.CoHash = cohash;
