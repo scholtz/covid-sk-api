@@ -45,7 +45,23 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string LastName { get; set; }
         /// <summary>
-        /// Address
+        /// ZIP - Pernament address
+        /// </summary>
+        public string ZIP { get; set; }
+        /// <summary>
+        /// City - Pernament address
+        /// </summary>
+        public string City { get; set; }
+        /// <summary>
+        /// Street - Pernament address
+        /// </summary>
+        public string Street { get; set; }
+        /// <summary>
+        /// StreetNo - Pernament address
+        /// </summary>
+        public string StreetNo { get; set; }
+        /// <summary>
+        /// Address - Pernament address
         /// </summary>
         public string Address { get; set; }
         /// <summary>
