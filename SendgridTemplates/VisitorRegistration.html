@@ -149,13 +149,13 @@
       <tr>
         <td style="padding:18px 0px 18px 0px; line-height:22px; text-align:inherit;" height="100%" valign="top" bgcolor="" role="module-content"><div><div style="font-family: inherit; text-align: inherit">
         {{#if isSK}}
-            {{Name}}, úspešne ste sa zaregistrovali na test pod číslom {{Code}}. Váš test sa uskutoční dňa {{Date}} na adrese: {{Place}} ({{PlaceDescription}}). V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
+            {{Name}}, úspešne ste sa zaregistrovali na test pod číslom {{Code}}. Váš test sa uskutoční dňa {{Date}} na adrese: {{Place}}{{#if PlaceDescription}}({{PlaceDescription}}){{/if}}. V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
         {{else if isCS}}
-            {{Name}}, úspěšně jste se zaregistrovali na test pod číslem {{Code}}. Váš test se uskuteční dne {{Date}} na adrese: {{Place}} ({{PlaceDescription}}). V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
+            {{Name}}, úspěšně jste se zaregistrovali na test pod číslem {{Code}}. Váš test se uskuteční dne {{Date}} na adrese: {{Place}}{{#if PlaceDescription}}({{PlaceDescription}}){{/if}}. V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
         {{else if isEN}}
-            {{Name}}, you have successfully registered for the test under {{Code}}. Your test will take place on {{Date}} at: {{Place}} ({{PlaceDescription}}). You can find confirmation PDF file in the attachment with your personal number or passport number as the password.
+            {{Name}}, you have successfully registered for the test under {{Code}}. Your test will take place on {{Date}} at: {{Place}}{{#if PlaceDescription}}({{PlaceDescription}}){{/if}}. You can find confirmation PDF file in the attachment with your personal number or passport number as the password.
         {{else}}
-            {{Name}}, úspešne ste sa zaregistrovali na test pod číslom {{Code}}. Váš test sa uskutoční dňa {{Date}} na adrese: {{Place}} ({{PlaceDescription}}). V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
+            {{Name}}, úspešne ste sa zaregistrovali na test pod číslom {{Code}}. Váš test sa uskutoční dňa {{Date}} na adrese: {{Place}}{{#if PlaceDescription}}({{PlaceDescription}}){{/if}}. V prílohe tohto emailu nájdete PDF súbor s potvrdením registrácie. Heslo do PDF súboru je Vaše rodné číslo.
         {{/if}}
 
         
