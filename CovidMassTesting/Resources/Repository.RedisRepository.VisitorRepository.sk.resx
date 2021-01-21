@@ -127,13 +127,13 @@
     <value>{0}, aktualizovali sme vašu registráciu {1}. Čas: {2}, Miesto: {3}</value>
   </data>
   <data name="Dear {0}, your test is in processing. Please wait for further instructions in next sms message." xml:space="preserve">
-    <value>{0}, váš test sa spracováva. Počkajte na ďalšie inštrukcie ktoré dostanete v ďalšej SMS správe.</value>
+    <value>{0}, Váš test sa spracováva. Počkajte na ďalšie inštrukcie ktoré dostanete v ďalšej SMS správe.</value>
   </data>
   <data name="Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate." xml:space="preserve">
-    <value>{0}, váš test bol dokončený. Online si môžete skontrolovať výsledok.</value>
+    <value>{0}, Váš test bol dokončený. Online si môžete skontrolovať výsledok.</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
-    <value>{0}, {1} je váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>
+    <value>{0}, {1} je Váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>
   </data>
   <data name="Dear {0},We have removed your personal data from the database. Thank you for taking the covid test" xml:space="preserve">
     <value>{0}, vymazali sme Vaše osobné údaje z databázy. Ďakujeme že ste sa nechali otestovať</value>
