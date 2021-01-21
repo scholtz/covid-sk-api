@@ -575,7 +575,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentException($"'{nameof(placeProviderId)}' cannot be null or empty", nameof(placeProviderId));
             }
 
-            if (role is null)
+            if (role == null)
             {
                 throw new ArgumentNullException(nameof(role));
             }
@@ -607,9 +607,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             foreach (var group in role)
             {
-                if (place.Group2Emails.ContainsKey(group))
+                if (place.Group2Emails != null)
                 {
-                    if (place.Group2Emails[group].Contains(email)) return true;
+                    if (place.Group2Emails.ContainsKey(group))
+                    {
+                        if (place.Group2Emails[group].Contains(email)) return true;
+                    }
                 }
             }
 
