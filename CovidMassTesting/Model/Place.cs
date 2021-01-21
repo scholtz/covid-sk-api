@@ -95,7 +95,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// If set to false, the icon on the map should be differnt with the icon where reservation is possible
         /// </summary>
-        public bool HasReservationSystem { get; set; } = true;
+        public bool? HasReservationSystem { get; set; } = true;
 
         /// <summary>
         /// Link to external reservation system
@@ -107,7 +107,7 @@ namespace CovidMassTesting.Model
         /// 
         /// If true, place requires preregistration
         /// </summary>
-        public bool RequiresRegistration { get; set; } = false;
+        public bool? RequiresRegistration { get; set; } = false;
 
     }
 }

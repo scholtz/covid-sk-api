@@ -1932,51 +1932,6 @@
             non Standard opening hours - holidays
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.Place.HasPCRTestFree">
-            <summary>
-            Place does the PCR tests paid by insurance
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasPCRTestSelf">
-            <summary>
-            Self paying pcr test
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasPCRTestSelfPrice">
-            <summary>
-            Self paying pcr test price
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasPCRTestSelfPriceCurrency">
-            <summary>
-            Self paying pcr test currency
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasAntTestFree">
-            <summary>
-            Place does the antigen tests paid by insurance or government
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasAntTestSelf">
-            <summary>
-            Place does the antigen tests paid by visitors
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasAntTestSelfPrice">
-            <summary>
-            Self paying antigen test price
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasAntTestSelfPriceCurrency">
-            <summary>
-            Self paying antigen test currency
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.Place.HasVaccineFree">
-            <summary>
-            Place does the covid vaccine paid by insurance or government
-            </summary>
-        </member>
         <member name="P:CovidMassTesting.Model.Place.HasReservationSystem">
             <summary>
             If set to false, the icon on the map should be differnt with the icon where reservation is possible
@@ -1985,6 +1940,13 @@
         <member name="P:CovidMassTesting.Model.Place.ExternalReservationSystem">
             <summary>
             Link to external reservation system
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.RequiresRegistration">
+            <summary>
+            Is it possible to register on site or does it require preregistration?
+            
+            If true, place requires preregistration
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.PlaceProduct">
