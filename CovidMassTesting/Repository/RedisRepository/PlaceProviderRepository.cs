@@ -582,21 +582,24 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (role.Length == 0) return true;
             var place = await GetPlaceProvider(placeProviderId);
-            if (role.Contains(Groups.PPAdmin))
+            if (place != null)
             {
-                if (place.MainEmail == email) return true;
-            }
-
-            if (place.Allocations != null)
-            {
-                foreach (var allocation in place.Allocations)
+                if (role.Contains(Groups.PPAdmin))
                 {
-                    if (allocation.User != email) continue;
-                    foreach (var group in role)
+                    if (place.MainEmail == email) return true;
+                }
+
+                if (place.Allocations != null)
+                {
+                    foreach (var allocation in place.Allocations)
                     {
-                        if (allocation.Role == group)
+                        if (allocation.User != email) continue;
+                        foreach (var group in role)
                         {
-                            return true;
+                            if (allocation.Role == group)
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
