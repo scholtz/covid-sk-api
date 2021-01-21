@@ -100,7 +100,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Link to external reservation system
         /// </summary>
-        public string ExternalReservationSystem { get; set; } = false;
+        public string ExternalReservationSystem { get; set; }
 
         /// <summary>
         /// Is it possible to register on site or does it require preregistration?
