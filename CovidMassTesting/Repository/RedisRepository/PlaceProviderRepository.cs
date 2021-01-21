@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -320,13 +321,23 @@ namespace CovidMassTesting.Repository.RedisRepository
                     || ((p.Users?.Any(u => u.Email == email) == true)
             ));
         }
+        private static ConcurrentBag<PlaceProviderPublic> Cache = new ConcurrentBag<PlaceProviderPublic>();
+        private static DateTimeOffset? CacheTime;
         /// <summary>
         /// Public info of all place providers
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<PlaceProviderPublic>> ListPublic()
         {
-            return (await ListAll()).Select(p => p.ToPublic());
+            var rand = new Random();
+            var limit = rand.Next(1, 5);
+            if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
+            {
+                return Cache;
+            }
+            Cache = new ConcurrentBag<PlaceProviderPublic>((await ListAll()).Select(p => p.ToPublic()));
+            CacheTime = DateTimeOffset.Now;
+            return Cache;
         }
         /// <summary>
         /// Registers as place provider

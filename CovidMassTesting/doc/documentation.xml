@@ -1949,6 +1949,11 @@
             If true, place requires preregistration
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.IsVisible">
+            <summary>
+            Old testing places will not be visible
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProduct">
             <summary>
             Product specified for specific place
@@ -3278,6 +3283,21 @@
             Personal number if person type is idcard or child
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.BirthDayDay">
+            <summary>
+            BirthDay - day
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.BirthDayMonth">
+            <summary>
+            BirthDay - month
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.BirthDayYear">
+            <summary>
+            BirthDay - year
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.FirstName">
             <summary>
             Name
@@ -3288,9 +3308,29 @@
             Last name
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.ZIP">
+            <summary>
+            ZIP - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.City">
+            <summary>
+            City - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Street">
+            <summary>
+            Street - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.StreetNo">
+            <summary>
+            StreetNo - Pernament address
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.Address">
             <summary>
-            Address
+            Address - Pernament address
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Visitor.Email">
@@ -6136,7 +6176,7 @@
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_">
             <summary>
-              Looks up a localized string similar to Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}.
+              Looks up a localized string similar to Dear {1}, {0} is your registration code. Show this code at the covid sampling place {3} on {2}.
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_">
