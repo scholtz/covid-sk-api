@@ -109,5 +109,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? RequiresRegistration { get; set; } = false;
 
+        /// <summary>
+        /// Old testing places will not be visible
+        /// </summary>
+        public bool? IsVisible { get; set; } = true;
+
     }
 }
