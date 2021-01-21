@@ -433,7 +433,11 @@ namespace CovidMassTesting.Controllers
                 if (!update)
                 {
                     // new place
-                    place.Id = Guid.NewGuid().ToString();
+                    if (string.IsNullOrEmpty(place.Id))
+                    {
+                        //setup place id only if we do not wish to setup one
+                        place.Id = Guid.NewGuid().ToString();
+                    }
                     place.PlaceProviderId = User.GetPlaceProvider();
                     place = await placeRepository.SetPlace(place);
                     logger.LogInformation($"Place {place.Name} has been created");
