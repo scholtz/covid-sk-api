@@ -88,9 +88,10 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Na tento termín sa nedá zaregistrovať pretože časový úsek je už ukončený");
                 }
-
-                visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
-
+                if (string.IsNullOrEmpty(visitor.Address))
+                {
+                    visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
+                }
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
             catch (Exception exc)

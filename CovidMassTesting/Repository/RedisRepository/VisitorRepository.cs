@@ -213,7 +213,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new ArgumentNullException(nameof(visitor));
             }
-
+            if (string.IsNullOrEmpty(visitor.Address))
+            {
+                visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
+            }
             visitor.LastUpdate = DateTimeOffset.Now;
 
             var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(visitor);
