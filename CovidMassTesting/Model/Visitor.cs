@@ -37,6 +37,18 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string RC { get; set; }
         /// <summary>
+        /// BirthDay - day
+        /// </summary>
+        public int? BirthDayDay { get; set; }
+        /// <summary>
+        /// BirthDay - month
+        /// </summary>
+        public int? BirthDayMonth { get; set; }
+        /// <summary>
+        /// BirthDay - year
+        /// </summary>
+        public int? BirthDayYear { get; set; }
+        /// <summary>
         /// Name
         /// </summary>
         public string FirstName { get; set; }
