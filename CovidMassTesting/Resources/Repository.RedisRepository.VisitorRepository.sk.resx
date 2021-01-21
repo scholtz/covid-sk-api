@@ -133,7 +133,7 @@
     <value>{0}, Váš test bol dokončený. Online si môžete skontrolovať výsledok.</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
-    <value>{0}, {1} je Váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>
+    <value>{1}, {0} je Váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>
   </data>
   <data name="Dear {0},We have removed your personal data from the database. Thank you for taking the covid test" xml:space="preserve">
     <value>{0}, vymazali sme Vaše osobné údaje z databázy. Ďakujeme že ste sa nechali otestovať</value>
