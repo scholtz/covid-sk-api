@@ -1091,63 +1091,68 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var code = visitor.Id.ToString();
                 var codeFormatted = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}";
 
-                var oldCulture = CultureInfo.CurrentCulture;
-                var oldUICulture = CultureInfo.CurrentUICulture;
-                var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                CultureInfo.CurrentCulture = specifiedCulture;
-                CultureInfo.CurrentUICulture = specifiedCulture;
 
-                var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
-
-                try
+                if (string.IsNullOrEmpty(managerEmail))
                 {
-                    //var product = await placeRepository.GetPlaceProduct();
-                    var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
-                    var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+                    var oldCulture = CultureInfo.CurrentCulture;
+                    var oldUICulture = CultureInfo.CurrentUICulture;
+                    var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                    CultureInfo.CurrentCulture = specifiedCulture;
+                    CultureInfo.CurrentUICulture = specifiedCulture;
+                    // send EMAIL/SMS notifications only if user registers himself
 
-                    var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Address, product?.Name);
-                    attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                    var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
+
+                    try
                     {
-                        Content = Convert.ToBase64String(pdf),
-                        Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slotD.Time.ToString("MMdd")}.pdf",
-                        Type = "application/pdf",
-                        Disposition = "attachment"
-                    });
-                }
-                catch (Exception exc)
-                {
-                    logger.LogError(exc, "Error generating file");
-                }
+                        //var product = await placeRepository.GetPlaceProduct();
+                        var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                        var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
-
-                await emailSender.SendEmail(
-                    localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                    visitor.Email,
-                    $"{visitor.FirstName} {visitor.LastName}",
-                    new Model.Email.VisitorChangeRegistrationEmail(visitor.Language)
+                        var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Address, product?.Name);
+                        attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                        {
+                            Content = Convert.ToBase64String(pdf),
+                            Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slotD.Time.ToString("MMdd")}.pdf",
+                            Type = "application/pdf",
+                            Disposition = "attachment"
+                        });
+                    }
+                    catch (Exception exc)
                     {
-                        Code = codeFormatted,
-                        Name = $"{visitor.FirstName} {visitor.LastName}",
-                        Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
-                        Place = place.Name,
-                        PlaceDescription = place.Description
+                        logger.LogError(exc, "Error generating file");
+                    }
 
-                    }, attachments);
 
-                if (!string.IsNullOrEmpty(visitor.Phone))
-                {
-
-                    await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
-                        string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0___we_have_updated_your_registration__1___Time___2___Place___3_].Value,
+                    await emailSender.SendEmail(
+                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                        visitor.Email,
                         $"{visitor.FirstName} {visitor.LastName}",
-                        codeFormatted,
-                        slot.Time.ToString("dd.MM.yyyy H:mm"),
-                        place.Name
-                    )));
+                        new Model.Email.VisitorChangeRegistrationEmail(visitor.Language)
+                        {
+                            Code = codeFormatted,
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                            Date = slot.Time.ToString("dd.MM.yyyy H:mm"),
+                            Place = place.Name,
+                            PlaceDescription = place.Description
 
+                        }, attachments);
+
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                            string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0___we_have_updated_your_registration__1___Time___2___Place___3_].Value,
+                            $"{visitor.FirstName} {visitor.LastName}",
+                            codeFormatted,
+                            slot.Time.ToString("dd.MM.yyyy H:mm"),
+                            place.Name
+                        )));
+
+                    }
+                    CultureInfo.CurrentCulture = oldCulture;
+                    CultureInfo.CurrentUICulture = oldUICulture;
                 }
-                CultureInfo.CurrentCulture = oldCulture;
-                CultureInfo.CurrentUICulture = oldUICulture;
 
                 if (previous.ChosenSlot != visitor.ChosenSlot || previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {
