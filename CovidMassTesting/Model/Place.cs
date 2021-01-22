@@ -117,5 +117,9 @@ namespace CovidMassTesting.Model
         /// Queue in minutes
         /// </summary>
         public TimeSpan? Queue { get; set; }
+        /// <summary>
+        /// Queue last update time
+        /// </summary>
+        public DateTimeOffset? QueueLastUpdate { get; set; }
     }
 }
