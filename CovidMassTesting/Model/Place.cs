@@ -113,6 +113,9 @@ namespace CovidMassTesting.Model
         /// Old testing places will not be visible
         /// </summary>
         public bool? IsVisible { get; set; } = true;
-
+        /// <summary>
+        /// Queue in minutes
+        /// </summary>
+        public TimeSpan? Queue { get; set; }
     }
 }
