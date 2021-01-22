@@ -80,6 +80,8 @@ namespace CovidMassTesting.Repository.MockRepository
             {
                 throw new ArgumentNullException(nameof(visitor));
             }
+            visitor = await FixVisitor(visitor, false);
+
             if (mustBeNew && data.ContainsKey(visitor.Id)) throw new Exception("Item already exists");
             data[visitor.Id] = visitor;
             logger.LogInformation($"Visitor.Set {visitor.Id}");
@@ -126,7 +128,7 @@ namespace CovidMassTesting.Repository.MockRepository
             if (!data.ContainsKey(codeInt)) return null;
 
             logger.LogInformation($"Visitor.Get {codeInt}");
-            return await FixVisitor(data[codeInt]);
+            return await FixVisitor(data[codeInt], true);
         }
         /// <summary>
         /// List all keys

@@ -5584,11 +5584,12 @@
             <param name="codeInt"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixVisitor(CovidMassTesting.Model.Visitor)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>
             Fills in missing data if possible
             </summary>
             <param name="visitor"></param>
+            <param name="save">If true, it saves it</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">

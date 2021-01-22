@@ -1333,6 +1333,9 @@ namespace NUnitTestCovidApi
 
             var minute = minutes.Values.First();
             var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
+
+
+
             Assert.IsTrue(registered.Count >= 2);
             var registrationManager = users.First(u => u.Name == "MedicTester");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
@@ -1399,10 +1402,19 @@ namespace NUnitTestCovidApi
             var file = request.Content.ReadAsByteArrayAsync().Result;
 #if DEBUG
             File.WriteAllBytes("d:/covid/test-111-111-111.pdf", file);
+
+            var emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
+            var noEmailSender = emailSender as CovidMassTesting.Controllers.Email.NoEmailSender;
+
+            foreach (var email in noEmailSender.Data.Values)
+            {
+                foreach (var att in email.attachments)
+                {
+                    File.WriteAllBytes($"d:/covid/{att.Filename}", Convert.FromBase64String(att.Content));
+                }
+            }
+
 #endif
-
-
-
 
             request = PublicGetTestResult(client, registered[1].Id.ToString(), registered[1].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);

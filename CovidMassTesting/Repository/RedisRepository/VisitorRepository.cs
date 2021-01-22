@@ -200,14 +200,15 @@ namespace CovidMassTesting.Repository.RedisRepository
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             var ret = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
-            return await FixVisitor(ret);
+            return await FixVisitor(ret, true);
         }
         /// <summary>
         /// Fills in missing data if possible
         /// </summary>
         /// <param name="visitor"></param>
+        /// <param name="save">If true, it saves it</param>
         /// <returns></returns>
-        protected async Task<Visitor> FixVisitor(Visitor visitor)
+        protected async Task<Visitor> FixVisitor(Visitor visitor, bool save)
         {
             var updated = false;
             if (string.IsNullOrEmpty(visitor.Address))
@@ -259,7 +260,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
 
-            if (updated)
+            if (updated && save)
             {
                 logger.LogInformation("Post fix visitor");
                 await SetVisitor(visitor, false);
@@ -283,6 +284,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
             }
+            visitor = await FixVisitor(visitor, false);
             visitor.LastUpdate = DateTimeOffset.Now;
 
             var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(visitor);
@@ -975,7 +977,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (currentSlot == null) throw new Exception("Unable to select testing slot.");
                 visitor.ChosenSlot = currentSlot.SlotId;
             }
-
+            visitor = await FixVisitor(visitor, false);
             try
             {
                 var addr = new System.Net.Mail.MailAddress(visitor.Email);
