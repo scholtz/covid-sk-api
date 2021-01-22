@@ -11,6 +11,11 @@
 
         th {
             text-align: left;
+            vertical-align: top;
+        }
+
+        td {
+            vertical-align: top;
         }
 
         body {
@@ -23,6 +28,10 @@
     <h1>Registrácia k odberu vzorky pre SARS-CoV-2</h1>
     <table>
         <tbody>
+            <tr>
+                <th>Typ testu:</th>
+                <td>Antigénový test</td>
+            </tr>
             <tr>
                 <th>Kód registrácie:</th>
                 <td>{{RegistrationCode}}</td>
@@ -51,6 +60,10 @@
                 <td>{{PassportNumber}}</td>
             </tr>
             {{/PassportNumber}}
+            <tr>
+                <th>Dátum narodenia:</th>
+                <td>{{BirthDayDay}}.{{BirthDayMonth}}.{{BirthDayYear}}</td>
+            </tr>
             <tr>
                 <th>Správca odberného miesta:</th>
                 <td>{{TestingEntity}}</td>

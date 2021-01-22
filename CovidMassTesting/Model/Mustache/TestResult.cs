@@ -11,6 +11,22 @@ namespace CovidMassTesting.Model.Mustache
     public class TestResult
     {
         /// <summary>
+        /// BirthDay - day
+        /// </summary>
+        public int? BirthDayDay { get; set; }
+        /// <summary>
+        /// BirthDay - month
+        /// </summary>
+        public int? BirthDayMonth { get; set; }
+        /// <summary>
+        /// BirthDay - year
+        /// </summary>
+        public int? BirthDayYear { get; set; }
+        /// <summary>
+        /// Base64 encoded signature picture in png
+        /// </summary>
+        public string Signature { get; set; }
+        /// <summary>
         /// Result in text
         /// </summary>
         public string Text { get; set; }

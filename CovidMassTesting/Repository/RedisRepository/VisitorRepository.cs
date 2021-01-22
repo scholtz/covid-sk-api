@@ -1367,6 +1367,16 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             data.Name = $"{visitor.FirstName} {visitor.LastName}";
 
+            data.BirthDayDay = visitor.BirthDayDay;
+            data.BirthDayMonth = visitor.BirthDayMonth;
+            data.BirthDayYear = visitor.BirthDayYear;
+            if (!string.IsNullOrEmpty(configuration["SignaturePicture"]))
+            {
+                if (File.Exists(configuration["SignaturePicture"]))
+                {
+                    data.Signature = Convert.ToBase64String(File.ReadAllBytes(configuration["SignaturePicture"])).Replace("\n", "");
+                }
+            }
 
             if (visitor.TestingTime.HasValue)
             {
@@ -1526,25 +1536,26 @@ namespace CovidMassTesting.Repository.RedisRepository
             writer.Close();
 
             if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
-            Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
-            string alias = null;
-            foreach (var a in pk12.Aliases)
-            {
-                alias = ((string)a);
-                if (pk12.IsKeyEntry(alias))
-                    break;
-            }
-
-            var pk = pk12.GetKey(alias).Key;
-            var ce = pk12.GetCertificateChain(alias);
-            var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
-            for (int k = 0; k < ce.Length; ++k)
-            {
-                chain[k] = ce[k].Certificate;
-            }
 
             try
             {
+                Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
+                string alias = null;
+                foreach (var a in pk12.Aliases)
+                {
+                    alias = ((string)a);
+                    if (pk12.IsKeyEntry(alias))
+                        break;
+                }
+
+                var pk = pk12.GetKey(alias).Key;
+                var ce = pk12.GetCertificateChain(alias);
+                var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
+                for (int k = 0; k < ce.Length; ++k)
+                {
+                    chain[k] = ce[k].Certificate;
+                }
+
                 return Sign(
                     pdfStreamEncrypted.ToArray(),
                     Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
@@ -1553,7 +1564,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.DigestAlgorithms.SHA512,
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
-                    "Pezinok"
+                    ""
                     );
             }
             catch (Exception exc)

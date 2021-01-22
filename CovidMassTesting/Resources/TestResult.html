@@ -45,7 +45,7 @@
                 <td>{{Description}}</td>
             </tr>
             <tr>
-                <th>Meno testovanej osoby:</th>
+                <th>Meno:</th>
                 <td>{{Name}}</td>
             </tr>
             {{#PersonalNumber}}
@@ -84,6 +84,12 @@
                 <th></th>
                 <td><img style="width:150px;height:150px;" src="data:image/png;base64, {{QRVerificationURL}}" alt="QR" /></td>
             </tr>
+            {{#Signature}}
+            <tr>
+                <th>Podpis</th>
+                <td><img style="width:226px;height:90px;" src="data:image/png;base64, {{Signature}}" alt="Signature" /></td>
+            </tr>
+            {{/Signature}}
         </tbody>
     </table>
     <h4>ČO MÁM ROBIŤ AK SOM COVID-19 POZITÍVNY?</h4>

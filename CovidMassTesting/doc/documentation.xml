@@ -1764,6 +1764,26 @@
             Variables for PDF generation
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.BirthDayDay">
+            <summary>
+            BirthDay - day
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.BirthDayMonth">
+            <summary>
+            BirthDay - month
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.BirthDayYear">
+            <summary>
+            BirthDay - year
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.Signature">
+            <summary>
+            Base64 encoded signature picture in png
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Text">
             <summary>
             Result in text
