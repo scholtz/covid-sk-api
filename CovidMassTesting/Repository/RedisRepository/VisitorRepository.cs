@@ -1564,7 +1564,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.DigestAlgorithms.SHA512,
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
-                    ""
+                    configuration["SignaturePlace"]
                     );
             }
             catch (Exception exc)
@@ -1647,7 +1647,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.DigestAlgorithms.SHA512,
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
-                    ""
+                    configuration["SignaturePlace"]
                     );
             }
             catch (Exception exc)
