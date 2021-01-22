@@ -329,11 +329,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<IEnumerable<PlaceProviderPublic>> ListPublic()
         {
-            var rand = new Random();
-            var limit = rand.Next(1, 5);
-            if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
+            if (string.IsNullOrEmpty(configuration["DoNotUseObjCache"]))
             {
-                return Cache;
+                var rand = new Random();
+                var limit = rand.Next(1, 5);
+                if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
+                {
+                    return Cache;
+                }
             }
             Cache = new ConcurrentBag<PlaceProviderPublic>((await ListAll()).Select(p => p.ToPublic()));
             CacheTime = DateTimeOffset.Now;
