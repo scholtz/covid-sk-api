@@ -5871,7 +5871,7 @@
             <param name="product"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Sign(System.Byte[],System.Byte[],Org.BouncyCastle.X509.X509Certificate[],Org.BouncyCastle.Crypto.ICipherParameters,System.String,iText.Signatures.PdfSigner.CryptoStandard,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Sign(System.Byte[],System.Byte[],Org.BouncyCastle.X509.X509Certificate[],Org.BouncyCastle.Crypto.ICipherParameters,System.String,iText.Signatures.PdfSigner.CryptoStandard,System.String,System.String,System.Int32)">
             <summary>
             Digitaly sign pdf
             </summary>

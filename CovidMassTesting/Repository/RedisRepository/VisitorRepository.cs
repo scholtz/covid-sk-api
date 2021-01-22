@@ -1536,7 +1536,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             writer.Close();
 
             if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
-
+            var pages = pdfDocument.GetNumberOfPages();
             try
             {
                 Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
@@ -1564,7 +1564,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.DigestAlgorithms.SHA512,
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
-                    configuration["SignaturePlace"]
+                    configuration["SignaturePlace"],
+                    pages
                     );
             }
             catch (Exception exc)
@@ -1620,25 +1621,26 @@ namespace CovidMassTesting.Repository.RedisRepository
             writer.Close();
 
             if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
-            Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
-            string alias = null;
-            foreach (var a in pk12.Aliases)
-            {
-                alias = ((string)a);
-                if (pk12.IsKeyEntry(alias))
-                    break;
-            }
-
-            var pk = pk12.GetKey(alias).Key;
-            var ce = pk12.GetCertificateChain(alias);
-            var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
-            for (int k = 0; k < ce.Length; ++k)
-            {
-                chain[k] = ce[k].Certificate;
-            }
-
             try
             {
+                var pages = pdfDocument.GetNumberOfPages();
+                Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
+                string alias = null;
+                foreach (var a in pk12.Aliases)
+                {
+                    alias = ((string)a);
+                    if (pk12.IsKeyEntry(alias))
+                        break;
+                }
+
+                var pk = pk12.GetKey(alias).Key;
+                var ce = pk12.GetCertificateChain(alias);
+                var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
+                for (int k = 0; k < ce.Length; ++k)
+                {
+                    chain[k] = ce[k].Certificate;
+                }
+
                 return Sign(
                     pdfStreamEncrypted.ToArray(),
                     Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
@@ -1647,7 +1649,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.DigestAlgorithms.SHA512,
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
-                    configuration["SignaturePlace"]
+                    configuration["SignaturePlace"],
+                    pages
                     );
             }
             catch (Exception exc)
@@ -1677,7 +1680,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             String digestAlgorithm,
             iText.Signatures.PdfSigner.CryptoStandard subfilter,
             String reason,
-            String location
+            String location,
+            int pages
         )
         {
             using MemoryStream outputMemoryStream = new MemoryStream();
@@ -1703,7 +1707,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 // as a background for the signed field. The "false" value is the default value.
                 .SetReuseAppearance(false)
                 .SetPageRect(rect)
-                .SetPageNumber(1);
+                .SetPageNumber(pages);
             signer.SetFieldName("sig");
 
             iText.Signatures.IExternalSignature pks = new iText.Signatures.PrivateKeySignature(pk, digestAlgorithm);
