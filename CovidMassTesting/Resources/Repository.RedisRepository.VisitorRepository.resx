@@ -130,7 +130,7 @@
     <value>Dear {0}, your test is in processing. Please wait for further instructions in next sms message.</value>
   </data>
   <data name="Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate." xml:space="preserve">
-    <value>Dear {0}, your test result has been processed. You can check the result online.</value>
+    <value>{0}, {1}, AG test from {2} is {3}. Download PDF certificate from: {4}</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
     <value>Dear {1}, {0} is your registration code. Show this code at the covid sampling place {3} on {2}</value>
@@ -144,8 +144,14 @@
   <data name="Last 4 digits of personal number or declared passport for foreigner at registration must not be empty" xml:space="preserve">
     <value>Last 4 digits of personal number or declared passport for foreigner at registration must not be empty</value>
   </data>
+  <data name="NEGATIVE" xml:space="preserve">
+    <value>NEGATIVE</value>
+  </data>
   <data name="Personal data may be deleted only after the test has proven negative result and person receives the certificate." xml:space="preserve">
     <value>Personal data may be deleted only after the test has proven negative result and person receives the certificate.</value>
+  </data>
+  <data name="POSITIVE" xml:space="preserve">
+    <value>POSITIVE</value>
   </data>
   <data name="Test does not exists" xml:space="preserve">
     <value>Test does not exists</value>

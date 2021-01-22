@@ -110,7 +110,7 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dear {0}, your test result has been processed. You can check the result online..
+        ///   Looks up a localized string similar to {0}, {1}, AG test from {2} is {3}. Download PDF certificate from: {4}.
         /// </summary>
         internal static string Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_ {
             get {
@@ -149,12 +149,30 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to NEGATIVE.
+        /// </summary>
+        internal static string NEGATIVE {
+            get {
+                return ResourceManager.GetString("NEGATIVE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Personal data may be deleted only after the test has proven negative result and person receives the certificate..
         /// </summary>
         internal static string Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_ {
             get {
                 return ResourceManager.GetString("Personal data may be deleted only after the test has proven negative result and p" +
                         "erson receives the certificate.", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to POSITIVE.
+        /// </summary>
+        internal static string POSITIVE {
+            get {
+                return ResourceManager.GetString("POSITIVE", resourceCulture);
             }
         }
         

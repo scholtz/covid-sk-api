@@ -130,7 +130,7 @@
     <value>{0}, Váš test sa spracováva. Počkajte na ďalšie inštrukcie ktoré dostanete v ďalšej SMS správe.</value>
   </data>
   <data name="Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate." xml:space="preserve">
-    <value>{0}, Váš test bol dokončený. Online si môžete skontrolovať výsledok.</value>
+    <value>{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
     <value>{1}, {0} je Váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>
@@ -144,8 +144,14 @@
   <data name="Last 4 digits of personal number or declared passport for foreigner at registration must not be empty" xml:space="preserve">
     <value>Posledné 4 číslice rodného čísla alebo pre cudzincov posledné 4 znaky zadaného cestovného dokladu musia byť zadané</value>
   </data>
+  <data name="NEGATIVE" xml:space="preserve">
+    <value>NEGATIVNY</value>
+  </data>
   <data name="Personal data may be deleted only after the test has proven negative result and person receives the certificate." xml:space="preserve">
     <value>Osobné údaje môžu byť vymazané iba ak Vám nebol detekovaný covid a prevzali ste si certifikát.</value>
+  </data>
+  <data name="POSITIVE" xml:space="preserve">
+    <value>POZITIVNY</value>
   </data>
   <data name="Test does not exists" xml:space="preserve">
     <value>Test neexistuje</value>

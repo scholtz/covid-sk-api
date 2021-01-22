@@ -1289,7 +1289,7 @@ namespace NUnitTestCovidApi
                 CompanyName = "123, s.r.o.",
                 Country = "SK",
                 MainEmail = admin.Email,
-                PrivatePhone = "+421 907 000000",
+                PrivatePhone = "+421907000000",
                 MainContact = "Admin Person"
             };
 
@@ -1358,11 +1358,24 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabToken}");
 
+            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
+            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
+            noSMSSender?.Data.Clear();
+
+
             // TEST mark as sick
             request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
+
+            Assert.AreEqual(1, noSMSSender?.Data.Count);
+            var sms = noSMSSender.Data.Values.First();
+            Assert.AreEqual(registered[0].Phone, sms.toPhone);
+            Assert.IsTrue(sms.data.GetText().Contains("POSITIVE"));
+            Assert.IsTrue(sms.data.GetText().Contains(DateTime.Now.ToString("dd.MM.yyyy")));
+            Assert.IsTrue(sms.data.GetText().Contains("F1 L1"));
+            Assert.IsTrue(sms.data.GetText().Contains("2001"));
 
             // TEST mark as wrong code
             request = SetResult(client, test1, TestResult.PositiveCertificateTaken);

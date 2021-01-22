@@ -202,8 +202,12 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
             return await FixVisitor(ret);
         }
-
-        private async Task<Visitor> FixVisitor(Visitor visitor)
+        /// <summary>
+        /// Fills in missing data if possible
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        protected async Task<Visitor> FixVisitor(Visitor visitor)
         {
             var updated = false;
             if (string.IsNullOrEmpty(visitor.Address))
@@ -495,12 +499,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-
+                        /*
+                         * send only by email..
                         await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(
                             Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_,
                             $"{visitor.FirstName} {visitor.LastName}"
                             )));
-
+                        */
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
@@ -560,7 +565,27 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
 
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_, $"{visitor.FirstName} {visitor.LastName}")));
+                        var resultLocalized = "";
+                        switch (visitor.Result)
+                        {
+                            case TestResult.PositiveWaitingForCertificate:
+                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.POSITIVE];
+                                break;
+                            case TestResult.NegativeWaitingForCertificate:
+                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.NEGATIVE];
+                                break;
+                        }
+
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                            string.Format(
+                                //{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}
+                                Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_,
+                                $"{visitor.FirstName} {visitor.LastName}",
+                                visitor.BirthDayYear,
+                                visitor.TestingTime?.ToString("dd.MM.yyyy"),
+                                resultLocalized,
+                                configuration["FrontedURL"]
+                                )));
 
                     }
                     CultureInfo.CurrentCulture = oldCulture;
@@ -1420,6 +1445,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.TestingEntity = testingEntity;
             data.FrontedURL = configuration["FrontedURL"];
             data.Product = product;
+            data.BirthDayDay = visitor.BirthDayDay;
+            data.BirthDayMonth = visitor.BirthDayMonth;
+            data.BirthDayYear = visitor.BirthDayYear;
 
             BarcodeLib.Barcode b = new BarcodeLib.Barcode();
             var formatted = visitor.Id.ToString();
@@ -1725,8 +1753,6 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// 
         /// tries to match visitors by name with the test results list 
         /// </summary>
-        /// <param name="from"></param>
-        /// <param name="count"></param>
         /// <returns></returns>
         public async Task<bool> Fix01()
         {

@@ -126,7 +126,7 @@ namespace CovidMassTesting.Repository.MockRepository
             if (!data.ContainsKey(codeInt)) return null;
 
             logger.LogInformation($"Visitor.Get {codeInt}");
-            return data[codeInt];
+            return await FixVisitor(data[codeInt]);
         }
         /// <summary>
         /// List all keys

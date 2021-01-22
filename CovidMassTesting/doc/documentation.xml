@@ -1744,6 +1744,21 @@
             Product - PCR or Antigen test
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.BirthDayDay">
+            <summary>
+            BirthDay - day
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.BirthDayMonth">
+            <summary>
+            BirthDay - month
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.BirthDayYear">
+            <summary>
+            BirthDay - year
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Mustache.TestResult">
             <summary>
             Variables for PDF generation
@@ -5549,6 +5564,13 @@
             <param name="codeInt"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixVisitor(CovidMassTesting.Model.Visitor)">
+            <summary>
+            Fills in missing data if possible
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>
             Encode visitor data and store to database
@@ -5864,8 +5886,6 @@
             
             tries to match visitors by name with the test results list 
             </summary>
-            <param name="from"></param>
-            <param name="count"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Fix02">
@@ -6238,7 +6258,7 @@
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_">
             <summary>
-              Looks up a localized string similar to Dear {0}, your test result has been processed. You can check the result online..
+              Looks up a localized string similar to {0}, {1}, AG test from {2} is {3}. Download PDF certificate from: {4}.
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Dear__0__We_have_removed_your_personal_data_from_the_database__Thank_you_for_taking_the_covid_test">
@@ -6256,9 +6276,19 @@
               Looks up a localized string similar to Last 4 digits of personal number or declared passport for foreigner at registration must not be empty.
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.NEGATIVE">
+            <summary>
+              Looks up a localized string similar to NEGATIVE.
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_">
             <summary>
               Looks up a localized string similar to Personal data may be deleted only after the test has proven negative result and person receives the certificate..
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.POSITIVE">
+            <summary>
+              Looks up a localized string similar to POSITIVE.
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Test_does_not_exists">
