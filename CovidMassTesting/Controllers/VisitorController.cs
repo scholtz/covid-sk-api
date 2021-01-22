@@ -32,6 +32,8 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="logger"></param>
         /// <param name="visitorRepository"></param>
+        /// <param name="userRepository"></param>
+        /// <param name="placeProviderRepository"></param>
         /// <param name="configuration"></param>
         /// <param name="captchaValidator"></param>
         public VisitorController(
@@ -93,6 +95,61 @@ namespace CovidMassTesting.Controllers
                     visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
                 }
                 return Ok(await visitorRepository.Register(visitor, ""));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+        /// <summary>
+        /// When person comes to the queue he can mark him as in the queue
+        /// 
+        /// It can help other people to check the queue time
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <param name="captcha"></param>
+        /// <returns></returns>
+        [HttpPost("Enqueued")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> Enqueued([FromForm] string code, [FromForm] string pass, [FromForm] string captcha = "")
+        {
+
+            try
+            {
+                if (string.IsNullOrEmpty(code))
+                {
+                    throw new ArgumentException("Zadajte svoj 9 miestny kód registrácie");
+                }
+
+                if (string.IsNullOrEmpty(pass))
+                {
+                    throw new ArgumentException("Zadajte posledné štvorčíslie svojho rodného čísla");
+                }
+
+                if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
+                {
+                    if (string.IsNullOrEmpty(captcha))
+                    {
+                        throw new Exception("Please provide captcha");
+                    }
+
+                    var validation = await captchaValidator.IsCaptchaPassedAsync(captcha);
+                    if (!validation)
+                    {
+                        throw new Exception("Please provide valid captcha");
+                    }
+                }
+                var codeClear = ResultController.FormatBarCode(code);
+                if (int.TryParse(codeClear, out var codeInt))
+                {
+                    return Ok(await visitorRepository.Enqueued(codeInt, pass));
+                }
+                throw new Exception("Registračný kód vyzerá byť neplatný");
             }
             catch (Exception exc)
             {

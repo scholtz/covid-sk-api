@@ -175,6 +175,7 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="code"></param>
         /// <param name="pass"></param>
+        /// <param name="captcha"></param>
         /// <returns></returns>
         [HttpPost("Get")]
         [ProducesResponseType(200)]
@@ -282,11 +283,12 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="code"></param>
         /// <param name="pass"></param>
+        /// <param name="captcha"></param>
         /// <returns></returns>
         [HttpPost("RemoveTest")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> RemoveTest([FromForm] string code, [FromForm] string pass)
+        public async Task<ActionResult<bool>> RemoveTest([FromForm] string code, [FromForm] string pass, [FromForm] string captcha = "")
         {
 
             try
@@ -300,10 +302,23 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentException(localizer[Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
                 }
+                if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
+                {
+                    if (string.IsNullOrEmpty(captcha))
+                    {
+                        throw new Exception("Please provide captcha");
+                    }
+
+                    var validation = await captchaValidator.IsCaptchaPassedAsync(captcha);
+                    if (!validation)
+                    {
+                        throw new Exception("Please provide valid captcha");
+                    }
+                }
                 var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
-                    return Ok(await visitorRepository.RemoveTest(codeInt, pass));
+                    return Ok(await visitorRepository.RemoveTest(codeInt, pass, true));
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code].Value);
             }
@@ -537,7 +552,12 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
-        private static string FormatBarCode(string code)
+        /// <summary>
+        /// Format the visitor code
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
+        public static string FormatBarCode(string code)
         {
             return code
                 .Replace("-", "")

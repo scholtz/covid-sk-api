@@ -588,16 +588,16 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
         }
-
         /// <summary>
-        /// Deletes the test
+        /// When person comes to the queue he can mark him as in the queue
+        /// 
+        /// It can help other people to check the queue time
         /// </summary>
         /// <param name="code"></param>
         /// <param name="pass"></param>
         /// <returns></returns>
-        public async Task<bool> RemoveTest(int code, string pass)
+        public async Task<bool> Enqueued(int code, string pass)
         {
-            throw new Exception("Test removal has been suspended");
             if (string.IsNullOrEmpty(pass))
             {
                 throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
@@ -619,8 +619,57 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
-            if (visitor.Result != TestResult.NegativeCertificateTaken) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
+            if (visitor.Result != TestResult.NotTaken)
+            {
+                return true; // quietly do not accept
+            }
+            visitor.Enqueued = DateTimeOffset.UtcNow;
+            await SetVisitor(visitor, false);
+            return true;
+        }
 
+        /// <summary>
+        /// Deletes the test
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <param name="beforeTest"></param>
+        /// <returns></returns>
+        public async Task<bool> RemoveTest(int code, string pass, bool beforeTest)
+        {
+            if (!beforeTest)
+            {
+                throw new Exception("Test removal after test has been taken has been suspended");
+            }
+            if (string.IsNullOrEmpty(pass))
+            {
+                throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
+            }
+            if (pass.Length < 4)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            var visitor = await GetVisitor(code);
+            if (visitor == null)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Test_does_not_exists].Value);
+            }
+            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            if (beforeTest)
+            {
+                if (visitor.Result != TestResult.NotTaken) throw new Exception("Test is not in the state NotTaken");
+            }
+            else
+            {
+                if (visitor.Result != TestResult.NegativeCertificateTaken) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
+            }
             await Remove(visitor.Id);
             if (!string.IsNullOrEmpty(visitor.TestingSet))
             {
@@ -670,6 +719,22 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             CultureInfo.CurrentCulture = oldCulture;
             CultureInfo.CurrentUICulture = oldUICulture;
+            if (beforeTest)
+            {
+                var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                if (place == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_testing_place].Value); }
+                var slotM = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
+                if (slotM == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_5_min__slot].Value); }
+                var slotH = await slotRepository.GetHourSlot(visitor.ChosenPlaceId, slotM.HourSlotId);
+                if (slotH == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_hour_slot].Value); }
+                var slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
+
+                await slotRepository.DecrementRegistration5MinSlot(slotM);
+                await slotRepository.DecrementRegistrationHourSlot(slotH);
+                await slotRepository.DecrementRegistrationDaySlot(slotD);
+                await placeRepository.DecrementPlaceRegistrations(visitor.ChosenPlaceId);
+            }
+
             return true;
         }
         /// <summary>

@@ -36,8 +36,9 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="code"></param>
         /// <param name="pass"></param>
+        /// <param name="beforeTest"></param>
         /// <returns></returns>
-        public Task<bool> RemoveTest(int code, string pass);
+        public Task<bool> RemoveTest(int code, string pass, bool beforeTest);
         /// <summary>
         /// Update test state of visitor
         /// </summary>
@@ -127,6 +128,13 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="resultguid"></param>
         /// <returns></returns>
         public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
+        /// <summary>
+        /// Enqueue visitor
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        public Task<bool> Enqueued(int code, string pass);
 
         /// <summary>
         /// Creates pdf from test result

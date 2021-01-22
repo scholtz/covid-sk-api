@@ -502,6 +502,7 @@
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
+            <param name="captcha"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.DownloadPDF(System.String,System.String,System.String)">
@@ -512,7 +513,7 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.ResultController.RemoveTest(System.String,System.String)">
+        <member name="M:CovidMassTesting.Controllers.ResultController.RemoveTest(System.String,System.String,System.String)">
             <summary>
             Public method to remove user test from database and all his private information
             
@@ -520,6 +521,7 @@
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
+            <param name="captcha"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.SetResult(System.String,System.String)">
@@ -568,6 +570,13 @@
             <summary>
             This method exports all visitors who are in state in processing
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.FormatBarCode(System.String)">
+            <summary>
+            Format the visitor code
+            </summary>
+            <param name="code"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.SlotController">
@@ -798,6 +807,8 @@
             </summary>
             <param name="logger"></param>
             <param name="visitorRepository"></param>
+            <param name="userRepository"></param>
+            <param name="placeProviderRepository"></param>
             <param name="configuration"></param>
             <param name="captchaValidator"></param>
         </member>
@@ -808,6 +819,17 @@
             Request size is limitted.
             </summary>
             <param name="visitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.Enqueued(System.String,System.String,System.String)">
+            <summary>
+            When person comes to the queue he can mark him as in the queue
+            
+            It can help other people to check the queue time
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <param name="captcha"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.RegisterByManager(CovidMassTesting.Model.Visitor)">
@@ -4072,12 +4094,13 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveTest(System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveTest(System.Int32,System.String,System.Boolean)">
             <summary>
             Removes test on wish of user when visitor was tested negative
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
+            <param name="beforeTest"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.UpdateTestingState(System.Int32,System.String)">
@@ -4180,6 +4203,14 @@
             <param name="placeAddress"></param>
             <param name="product"></param>
             <param name="resultguid"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Enqueued(System.Int32,System.String)">
+            <summary>
+            Enqueue visitor
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
@@ -5611,12 +5642,23 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveTest(System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Enqueued(System.Int32,System.String)">
+            <summary>
+            When person comes to the queue he can mark him as in the queue
+            
+            It can help other people to check the queue time
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveTest(System.Int32,System.String,System.Boolean)">
             <summary>
             Deletes the test
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
+            <param name="beforeTest"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.CreateNewVisitorId">
