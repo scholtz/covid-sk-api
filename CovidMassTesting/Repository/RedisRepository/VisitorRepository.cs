@@ -1541,7 +1541,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             writer.Close();
 
             if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
-            var pages = pdfDocument.GetNumberOfPages();
+            //var pages = pdfDocument.GetNumberOfPages();
             try
             {
                 Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
@@ -1570,7 +1570,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
                     configuration["SignaturePlace"],
-                    pages
+                    2
                     );
             }
             catch (Exception exc)
@@ -1628,7 +1628,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
             try
             {
-                var pages = pdfDocument.GetNumberOfPages();
+                //var pages = pdfDocument.GetNumberOfPages();
                 Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
                 string alias = null;
                 foreach (var a in pk12.Aliases)
@@ -1655,7 +1655,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
                     configuration["SignaturePlace"],
-                    pages
+                    //pages
+                    1
                     );
             }
             catch (Exception exc)
