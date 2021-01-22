@@ -2011,6 +2011,21 @@
             Old testing places will not be visible
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.Queue">
+            <summary>
+            Queue in minutes
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.QueueLastUpdate">
+            <summary>
+            Queue last update time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.ManualQueueEntry">
+            <summary>
+            Queue in minutes
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProduct">
             <summary>
             Product specified for specific place
