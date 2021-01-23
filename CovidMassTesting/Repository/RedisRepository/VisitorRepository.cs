@@ -241,6 +241,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 else
                 {
                     visitor.BirthDayYear += 1900;
+                    updated = true;
                 }
             }
             if (!visitor.BirthDayMonth.HasValue)
