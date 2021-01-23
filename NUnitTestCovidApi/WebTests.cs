@@ -2909,7 +2909,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(1, iVisitor.FixBirthYear().Result);
             Task.Delay(100).Wait();
 
-            Assert.AreEqual("L S, 1984, AG test from 23.01.2021 is NEGATIVE. Download PDF certificate from: https://www.rychlejsie.sk/", noSMSSender.Data.Values.First().data.GetText());
+            Assert.AreEqual("L S, 1984, AG test from 24.01.2021 is NEGATIVE. Download PDF certificate from: https://www.rychlejsie.sk/", noSMSSender.Data.Values.First().data.GetText());
             Assert.AreEqual(1, noSMSSender?.Data.Count);
             var sms = noSMSSender.Data.Values.First();
             Assert.IsTrue(sms.data.GetText().Contains("NEGATIVE"));
