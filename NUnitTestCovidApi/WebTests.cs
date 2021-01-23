@@ -1270,7 +1270,6 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(visitor.Phone, responsedVisitor.Phone);
             Assert.AreEqual(TestResult.NotTaken, responsedVisitor.Result);
         }
-#endif
 
         [Test]
         public void RoleMedicTesterTest()
@@ -2918,6 +2917,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(sms.data.GetText().Contains("L S"));
             Assert.IsTrue(sms.data.GetText().Contains("1984"));
         }
+#endif
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;
