@@ -1291,8 +1291,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     var visitor = await GetVisitor(visitorIdInt);
                     if (visitor == null) continue;
-                    if (visitor.Result == TestResult.PositiveCertificateTaken ||
-                        visitor.Result == TestResult.PositiveWaitingForCertificate)
+                    if (!string.IsNullOrEmpty(visitor.TestingSet))
                     {
                         ret.Add(visitor);
                     }
