@@ -220,7 +220,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (visitor.RC?.Length == 9 || visitor.RC?.Length == 10)
                 {
-                    var year = visitor.RC.Substring(2, 2);
+                    var year = visitor.RC.Substring(0, 2);
                     if (int.TryParse(year, out var yearInt))
                     {
                         if (yearInt > 21)
@@ -279,7 +279,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 }
                             }
                         }
-                        var year = visitor.RC.Substring(2, 2);
+                        var year = visitor.RC.Substring(0, 2);
                         if (int.TryParse(year, out var yearInt))
                         {
                             if (yearInt > 21)
@@ -1965,6 +1965,42 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<bool> Fix02()
         {
             logger.LogInformation($"Fix02");
+
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    var name = $"{visitor.FirstName} {visitor.LastName}";
+
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+                        if (visitor.Language == "en")
+                        {
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, we are sorry, but your registration {visitorId} was performed in demo application. Please consider it as canceled. Your personal data removed."));
+                        }
+                        else
+                        {
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, ospravedlnujeme sa, vasa registracia {visitorId} bola vykonana do demo aplikacie. Povazujte ju za zrusenu. osobne udaje boli vymazane."));
+                        }
+                    }
+                }
+                //await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitorId);
+            }
+            logger.LogInformation($"Fix02 Done");
+
+            return true;
+        }
+        /// <summary>
+        /// Fix. Set to visitor the test result and time of the test
+        /// 
+        /// tries to match visitors by name with the test results list 
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> FixBirthYear()
+        {
+            logger.LogInformation($"FixBirthYear");
 
             foreach (var visitorId in (await ListAllKeys()))
             {
