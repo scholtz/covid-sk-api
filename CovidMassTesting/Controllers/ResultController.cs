@@ -592,6 +592,7 @@ namespace CovidMassTesting.Controllers
         public static string FormatBarCode(string code)
         {
             return code
+                .ToUpper()
                 .Replace("-", "")
                 .Replace(" ", "")
                 .Trim();
