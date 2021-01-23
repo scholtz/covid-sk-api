@@ -1705,8 +1705,8 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(resultExport.Contains(registered[0].Id.ToString()));
             Assert.IsTrue(resultExport.Contains(registered[0].Phone));
             Assert.IsTrue(resultExport.Contains(registered[0].RC));
-            Assert.IsFalse(resultExport.Contains(registered[1].Id.ToString()));
-            Assert.IsFalse(resultExport.Contains(registered[1].RC));
+            Assert.IsTrue(resultExport.Contains(registered[1].Id.ToString()));
+            Assert.IsTrue(resultExport.Contains(registered[1].RC));
 
             client.DefaultRequestHeaders.Clear();
 
@@ -1787,8 +1787,8 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(resultExport.Contains(registered[0].Id.ToString()));
             Assert.IsTrue(resultExport.Contains(registered[0].Phone));
             Assert.IsTrue(resultExport.Contains(registered[0].RC));
-            Assert.IsFalse(resultExport.Contains(registered[1].Id.ToString()));
-            Assert.IsFalse(resultExport.Contains(registered[1].RC));
+            Assert.IsTrue(resultExport.Contains(registered[1].Id.ToString()));
+            Assert.IsTrue(resultExport.Contains(registered[1].RC));
             //Assert.AreEqual(1, resultExport.Count);
         }
 
