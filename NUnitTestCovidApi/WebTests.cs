@@ -2887,7 +2887,7 @@ namespace NUnitTestCovidApi
                 Language = "en",
                 ChosenPlaceId = "123",
                 ChosenSlot = tick.Ticks,
-                RC = "8451230007",
+                RC = " 845123/0007",
                 BirthDayDay = 23,
                 BirthDayMonth = 01,
                 BirthDayYear = 1985,

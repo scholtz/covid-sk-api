@@ -223,6 +223,18 @@ namespace CovidMassTesting.Repository.RedisRepository
                 visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
                 updated = true;
             }
+
+            if (!string.IsNullOrEmpty(visitor.RC))
+            {
+                var rc = visitor.RC;
+                rc = rc.Replace(" ", "").Replace("/", "");
+                if (rc != visitor.RC)
+                {
+                    visitor.RC = rc;
+                    updated = true;
+                }
+            }
+
             // Fix years where person put 80 instead of 1980
             if (visitor.BirthDayYear < 1900)
             {
