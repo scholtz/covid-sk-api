@@ -2110,6 +2110,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     logger.LogInformation($"Fixing stats for {p.Name} Regs: {p.Registrations}");
                     p.Registrations = stats[p.Id].Reg;
                     fix = true;
+                    ret++;
                 }
 
                 if (p.Registrations != stats[p.Id].Sick)
@@ -2117,6 +2118,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     logger.LogInformation($"Fixing stats for {p.Name} Sick: {p.Sick}");
                     p.Registrations = stats[p.Id].Sick;
                     fix = true;
+                    ret++;
                 }
 
                 if (p.Registrations != stats[p.Id].Healthy)
@@ -2124,6 +2126,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     logger.LogInformation($"Fixing stats for {p.Name} Healthy: {p.Healthy}");
                     p.Registrations = stats[p.Id].Healthy;
                     fix = true;
+                    ret++;
                 }
                 if (fix)
                 {
