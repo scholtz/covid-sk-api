@@ -2000,6 +2000,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<int> FixBirthYear()
         {
+            int ret = 0;
             logger.LogInformation($"FixBirthYear");
 
             foreach (var visitorId in (await ListAllKeys()))
@@ -2010,23 +2011,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (visitor == null) continue;
                     var name = $"{visitor.FirstName} {visitor.LastName}";
 
-                    if (!string.IsNullOrEmpty(visitor.Phone))
-                    {
-                        if (visitor.Language == "en")
-                        {
-                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, we are sorry, but your registration {visitorId} was performed in demo application. Please consider it as canceled. Your personal data removed."));
-                        }
-                        else
-                        {
-                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message($"{name}, ospravedlnujeme sa, vasa registracia {visitorId} bola vykonana do demo aplikacie. Povazujte ju za zrusenu. osobne udaje boli vymazane."));
-                        }
-                    }
                 }
                 //await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitorId);
             }
             logger.LogInformation($"Fix02 Done");
 
-            return true;
+            return ret++;
         }
         /// <summary>
         /// Fix. Set to visitor the test result and time of the test
