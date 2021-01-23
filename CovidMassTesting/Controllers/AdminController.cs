@@ -251,7 +251,10 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
-
+        /// <summary>
+        /// Fix stats
+        /// </summary>
+        /// <returns></returns>
         [HttpPost("FixStatsAuto")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
