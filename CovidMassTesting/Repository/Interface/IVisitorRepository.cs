@@ -190,6 +190,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<bool> Fix03();
         /// <summary>
+        /// FixStats
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> FixStats();
+        /// <summary>
         /// Fix year
         /// </summary>
         /// <returns></returns>

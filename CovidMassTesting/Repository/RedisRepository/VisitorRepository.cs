@@ -2071,6 +2071,76 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// tries to match visitors by name with the test results list 
         /// </summary>
         /// <returns></returns>
+        public async Task<int> FixStats()
+        {
+            int ret = 0;
+            logger.LogInformation($"FixStats");
+            var stats = new Dictionary<string, Stat>();
+
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt, false);
+                    if (visitor == null) continue;
+
+                    if (!stats.ContainsKey(visitor.ChosenPlaceId))
+                    {
+                        stats[visitor.ChosenPlaceId] = new Stat();
+                    }
+                    stats[visitor.ChosenPlaceId].Reg++;
+                    if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
+                    {
+                        stats[visitor.ChosenPlaceId].Sick++;
+                    }
+                    if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
+                    {
+                        stats[visitor.ChosenPlaceId].Healthy++;
+                    }
+                }
+            }
+
+            var places = await placeRepository.ListAll();
+            foreach (var p in places)
+            {
+                if (!stats.ContainsKey(p.Id)) continue;
+                var fix = false;
+                if (p.Registrations != stats[p.Id].Reg)
+                {
+                    logger.LogInformation($"Fixing stats for {p.Name} Regs: {p.Registrations}");
+                    p.Registrations = stats[p.Id].Reg;
+                    fix = true;
+                }
+
+                if (p.Registrations != stats[p.Id].Sick)
+                {
+                    logger.LogInformation($"Fixing stats for {p.Name} Sick: {p.Sick}");
+                    p.Registrations = stats[p.Id].Sick;
+                    fix = true;
+                }
+
+                if (p.Registrations != stats[p.Id].Healthy)
+                {
+                    logger.LogInformation($"Fixing stats for {p.Name} Healthy: {p.Healthy}");
+                    p.Registrations = stats[p.Id].Healthy;
+                    fix = true;
+                }
+                if (fix)
+                {
+                    await placeRepository.SetPlace(p);
+                }
+            }
+
+            logger.LogInformation($"FixStats Done");
+
+            return ret;
+        }
+        /// <summary>
+        /// Fix. Set to visitor the test result and time of the test
+        /// 
+        /// tries to match visitors by name with the test results list 
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> Fix03()
         {
             logger.LogInformation($"Fix03");

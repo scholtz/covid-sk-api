@@ -4319,6 +4319,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixStats">
+            <summary>
+            FixStats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixBirthYear">
             <summary>
             Fix year
@@ -5959,6 +5965,14 @@
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixBirthYear">
+            <summary>
+            Fix. Set to visitor the test result and time of the test
+            
+            tries to match visitors by name with the test results list 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixStats">
             <summary>
             Fix. Set to visitor the test result and time of the test
             
