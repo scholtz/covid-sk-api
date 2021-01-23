@@ -2859,6 +2859,64 @@ namespace NUnitTestCovidApi
             ).Wait();
             Assert.AreEqual(1, noSMSSender?.Data.Count);
         }
+        [Test]
+        public void TestFixYear()
+        {
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var iVisitor = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
+            var iPlace = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IPlaceRepository>();
+            var iSlot = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.ISlotRepository>();
+            iPlace.SetPlace(new Place()
+            {
+                Id = "123",
+            });
+
+            var tick = DateTimeOffset.Parse("2020-01-01");
+            iSlot.Add(new Slot1Day() { PlaceId = "123", Time = tick });
+            iSlot.Add(new Slot1Hour() { PlaceId = "123", Time = tick });
+            iSlot.Add(new Slot5Min() { PlaceId = "123", Time = tick });
+
+            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
+            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
+            Visitor visitor;
+            var vis = iVisitor.Add(visitor = new Visitor()
+            {
+                FirstName = "L",
+                LastName = "S",
+                Language = "en",
+                ChosenPlaceId = "123",
+                ChosenSlot = tick.Ticks,
+                RC = "8451230007",
+                BirthDayDay = 23,
+                BirthDayMonth = 01,
+                BirthDayYear = 1985,
+                PersonType = "child",
+                Result = TestResult.NegativeWaitingForCertificate,
+                Email = "test@test.com",
+                Phone = "+421907723428"
+            }).Result;
+
+            iVisitor.ConnectVisitorToTest(vis.Id, "12345");
+            iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate);
+
+            Assert.AreEqual(1984, visitor.BirthDayYear);// check if fix with insert is done
+
+            visitor.BirthDayYear = 1985;//corrupt
+            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, visitor.Result);
+            Task.Delay(100).Wait();
+            noSMSSender?.Data.Clear();
+            Assert.AreEqual(1, iVisitor.FixBirthYear().Result);
+            Task.Delay(100).Wait();
+
+            Assert.AreEqual("L S, 1984, AG test from 23.01.2021 is NEGATIVE. Download PDF certificate from: https://www.rychlejsie.sk/", noSMSSender.Data.Values.First().data.GetText());
+            Assert.AreEqual(1, noSMSSender?.Data.Count);
+            var sms = noSMSSender.Data.Values.First();
+            Assert.IsTrue(sms.data.GetText().Contains("NEGATIVE"));
+            Assert.IsTrue(sms.data.GetText().Contains(DateTime.Now.ToString("dd.MM.yyyy")));
+            Assert.IsTrue(sms.data.GetText().Contains("L S"));
+            Assert.IsTrue(sms.data.GetText().Contains("1984"));
+        }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;

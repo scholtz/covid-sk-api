@@ -58,7 +58,7 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="codeInt"></param>
         /// <returns></returns>
-        public Task<Visitor> GetVisitor(int codeInt);
+        public Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true);
         /// <summary>
         /// Public registration
         /// </summary>
@@ -189,5 +189,10 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<bool> Fix03();
+        /// <summary>
+        /// Fix year
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> FixBirthYear();
     }
 }

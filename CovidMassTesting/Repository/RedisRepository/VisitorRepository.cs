@@ -192,7 +192,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="codeInt"></param>
         /// <returns></returns>
-        public virtual async Task<Visitor> GetVisitor(int codeInt)
+        public virtual async Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true)
         {
             logger.LogInformation($"Visitor loaded from database: {codeInt.GetHashCode()}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", codeInt.ToString());
@@ -200,7 +200,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             var ret = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
-            return await FixVisitor(ret, true);
+            if (fixOnLoad)
+            {
+                return await FixVisitor(ret, true);
+            }
+            else
+            {
+                return ret;
+            }
         }
         /// <summary>
         /// Fills in missing data if possible
@@ -216,69 +223,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                 visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
                 updated = true;
             }
-            if (visitor.BirthDayYear.HasValue && visitor.BirthDayYear < 1900)
+            // Fix years where person put 80 instead of 1980
+            if (visitor.BirthDayYear < 1900)
             {
-                if (visitor.RC?.Length == 9 || visitor.RC?.Length == 10)
-                {
-                    var year = visitor.RC.Substring(0, 2);
-                    if (int.TryParse(year, out var yearInt))
-                    {
-                        if (yearInt > 21)
-                        {
-                            yearInt += 1900;
-                        }
-                        else
-                        {
-                            yearInt += 2000;
-                        }
-                        if (visitor.BirthDayYear != yearInt)
-                        {
-                            visitor.BirthDayYear = yearInt;
-                            updated = true;
-                        }
-                    }
-                }
-                else
-                {
-                    visitor.BirthDayYear += 1900;
-                    updated = true;
-                }
-            }
-            if (!visitor.BirthDayMonth.HasValue)
-            {
-                if (visitor.PersonType == "idcard" || visitor.PersonType == "child")
+                if ((visitor.PersonType == "idcard" || visitor.PersonType == "child"))
                 {
                     if (visitor.RC?.Length == 9 || visitor.RC?.Length == 10)
                     {
-                        var day = visitor.RC.Substring(4, 2);
-                        if (int.TryParse(day, out var dayInt))
-                        {
-                            if (dayInt > 50) dayInt -= 50;
-                            if (dayInt >= 1 && dayInt <= 31)
-                            {
-                                if (visitor.BirthDayDay != dayInt)
-                                {
-                                    visitor.BirthDayDay = dayInt;
-                                    updated = true;
-                                }
-                            }
-                        }
-                        var month = visitor.RC.Substring(2, 2);
-                        if (int.TryParse(month, out var monthInt))
-                        {
-                            if (monthInt > 50)
-                            {
-                                monthInt -= 50;
-                            }
-                            if (monthInt >= 1 && monthInt <= 12)
-                            {
-                                if (visitor.BirthDayMonth != monthInt)
-                                {
-                                    visitor.BirthDayMonth = monthInt;
-                                    updated = true;
-                                }
-                            }
-                        }
                         var year = visitor.RC.Substring(0, 2);
                         if (int.TryParse(year, out var yearInt))
                         {
@@ -296,6 +247,73 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 updated = true;
                             }
                         }
+                    }
+                    else
+                    {
+                        visitor.BirthDayYear += 1900;
+                        updated = true;
+                    }
+                }
+            }
+
+            if ((visitor.PersonType == "idcard" || visitor.PersonType == "child")
+                && !string.IsNullOrEmpty(visitor.RC)
+                && (visitor.RC?.Length == 9 || visitor.RC?.Length == 10)
+                )
+            {
+
+                // fix day
+                if (!visitor.BirthDayDay.HasValue)
+                {
+                    var day = visitor.RC.Substring(4, 2);
+                    if (int.TryParse(day, out var dayInt))
+                    {
+                        if (dayInt >= 1 && dayInt <= 31)
+                        {
+                            if (visitor.BirthDayDay != dayInt)
+                            {
+                                visitor.BirthDayDay = dayInt;
+                                updated = true;
+                            }
+                        }
+                    }
+                }
+                // fix month
+                if (!visitor.BirthDayMonth.HasValue)
+                {
+                    var month = visitor.RC.Substring(2, 2);
+                    if (int.TryParse(month, out var monthInt))
+                    {
+                        if (monthInt > 50)
+                        {
+                            monthInt -= 50;
+                        }
+                        if (monthInt >= 1 && monthInt <= 12)
+                        {
+                            if (visitor.BirthDayMonth != monthInt)
+                            {
+                                visitor.BirthDayMonth = monthInt;
+                                updated = true;
+                            }
+                        }
+                    }
+                }
+                // fix year
+                var year = visitor.RC.Substring(0, 2);
+                if (int.TryParse(year, out var yearInt))
+                {
+                    if (yearInt > 21)
+                    {
+                        yearInt += 1900;
+                    }
+                    else
+                    {
+                        yearInt += 2000;
+                    }
+                    if (visitor.BirthDayYear != yearInt)
+                    {
+                        visitor.BirthDayYear = yearInt;
+                        updated = true;
                     }
                 }
             }
@@ -428,7 +446,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public Task<bool> UpdateTestingState(int code, string state)
         {
-            return UpdateTestingState(code, state, "");
+            return UpdateTestingState(code, state, "", true);
         }
         /// <summary>
         /// Updates testing state
@@ -437,7 +455,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="state"></param>
         /// <param name="testingSet"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateTestingState(int code, string state, string testingSet = "")
+        public async Task<bool> UpdateTestingState(int code, string state, string testingSet = "", bool updateStats = true)
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await GetVisitor(code);
@@ -463,14 +481,17 @@ namespace CovidMassTesting.Repository.RedisRepository
             try
             {
                 // update slots stats
-                switch (state)
+                if (updateStats)
                 {
-                    case TestResult.PositiveWaitingForCertificate:
-                        await placeRepository.IncrementPlaceSick(visitor.ChosenPlaceId);
-                        break;
-                    case TestResult.NegativeWaitingForCertificate:
-                        await placeRepository.IncrementPlaceHealthy(visitor.ChosenPlaceId);
-                        break;
+                    switch (state)
+                    {
+                        case TestResult.PositiveWaitingForCertificate:
+                            await placeRepository.IncrementPlaceSick(visitor.ChosenPlaceId);
+                            break;
+                        case TestResult.NegativeWaitingForCertificate:
+                            await placeRepository.IncrementPlaceHealthy(visitor.ChosenPlaceId);
+                            break;
+                    }
                 }
             }
             catch (Exception exc)
@@ -2007,16 +2028,30 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false);
                     if (visitor == null) continue;
-                    var name = $"{visitor.FirstName} {visitor.LastName}";
-
+                    var year = visitor.BirthDayYear;
+                    var newVisitor = await FixVisitor(visitor, true);
+                    if (
+                        year != newVisitor.BirthDayYear &&
+                        (
+                        visitor.Result == TestResult.PositiveWaitingForCertificate ||
+                        visitor.Result == TestResult.NegativeWaitingForCertificate
+                        )
+                        )
+                    {
+                        var state = visitor.Result;
+                        visitor.Result = TestResult.TestMustBeRepeated;
+                        await SetVisitor(visitor, false);// save visitor state
+                        await UpdateTestingState(visitor.Id, state, "", false);
+                        ret++;
+                    }
                 }
                 //await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", visitorId);
             }
-            logger.LogInformation($"Fix02 Done");
+            logger.LogInformation($"FixBirthYear Done");
 
-            return ret++;
+            return ret;
         }
         /// <summary>
         /// Fix. Set to visitor the test result and time of the test

@@ -4175,7 +4175,7 @@
             <param name="testCodeClear"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitor(System.Int32)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitor(System.Int32,System.Boolean)">
             <summary>
             Load visitor
             </summary>
@@ -4316,6 +4316,12 @@
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Fix03">
             <summary>
             Temp fix
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixBirthYear">
+            <summary>
+            Fix year
             </summary>
             <returns></returns>
         </member>
@@ -4705,7 +4711,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetVisitor(System.Int32)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetVisitor(System.Int32,System.Boolean)">
             <summary>
             loads visitor by code
             </summary>
@@ -5604,7 +5610,7 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitor(System.Int32)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitor(System.Int32,System.Boolean)">
             <summary>
             Decode visitor data from database
             </summary>
@@ -5687,7 +5693,7 @@
             <param name="state"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.String,System.Boolean)">
             <summary>
             Updates testing state
             </summary>
@@ -5945,6 +5951,14 @@
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Fix02">
+            <summary>
+            Fix. Set to visitor the test result and time of the test
+            
+            tries to match visitors by name with the test results list 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixBirthYear">
             <summary>
             Fix. Set to visitor the test result and time of the test
             
