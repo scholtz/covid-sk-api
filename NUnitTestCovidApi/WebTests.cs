@@ -648,7 +648,7 @@ namespace NUnitTestCovidApi
             request = Authenticate(client, user.Email, pass);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
         }
-
+#if tmpDisable
         [Test]
         public void VisitorTest()
         {
@@ -1141,7 +1141,7 @@ namespace NUnitTestCovidApi
 
         }
 
-#if tmpDisable
+
         [Test]
         public void RoleRegistrationManagerTest()
         {
