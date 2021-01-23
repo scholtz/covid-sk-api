@@ -1141,6 +1141,7 @@ namespace NUnitTestCovidApi
 
         }
 
+#if tmpDisable
         [Test]
         public void RoleRegistrationManagerTest()
         {
@@ -1269,7 +1270,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(visitor.Phone, responsedVisitor.Phone);
             Assert.AreEqual(TestResult.NotTaken, responsedVisitor.Result);
         }
-
+#endif
 
         [Test]
         public void RoleMedicTesterTest()
