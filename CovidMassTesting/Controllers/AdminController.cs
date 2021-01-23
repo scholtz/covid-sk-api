@@ -252,10 +252,10 @@ namespace CovidMassTesting.Controllers
             }
         }
 
-        [HttpPost("FixStats")]
+        [HttpPost("FixStatsAuto")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<int>> FixStats()
+        public async Task<ActionResult<int>> FixStatsAuto()
         {
             try
             {
