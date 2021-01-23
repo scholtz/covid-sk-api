@@ -231,7 +231,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             yearInt += 2000;
                         }
-                        if (visitor.BirthDayYear == yearInt)
+                        if (visitor.BirthDayYear != yearInt)
                         {
                             visitor.BirthDayYear = yearInt;
                             updated = true;
@@ -272,7 +272,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             }
                             if (monthInt >= 1 && monthInt <= 12)
                             {
-                                if (visitor.BirthDayMonth == monthInt)
+                                if (visitor.BirthDayMonth != monthInt)
                                 {
                                     visitor.BirthDayMonth = monthInt;
                                     updated = true;
@@ -290,7 +290,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             {
                                 yearInt += 2000;
                             }
-                            if (visitor.BirthDayYear == yearInt)
+                            if (visitor.BirthDayYear != yearInt)
                             {
                                 visitor.BirthDayYear = yearInt;
                                 updated = true;
