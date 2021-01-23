@@ -216,8 +216,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
                 updated = true;
             }
-
-            if (!visitor.BirthDayDay.HasValue)
+            if (!visitor.BirthDayMonth.HasValue)
             {
                 if (visitor.PersonType == "idcard" || visitor.PersonType == "child")
                 {
@@ -229,17 +228,27 @@ namespace CovidMassTesting.Repository.RedisRepository
                             if (dayInt > 50) dayInt -= 50;
                             if (dayInt >= 1 && dayInt <= 31)
                             {
-                                visitor.BirthDayDay = dayInt;
-                                updated = true;
+                                if (visitor.BirthDayDay != dayInt)
+                                {
+                                    visitor.BirthDayDay = dayInt;
+                                    updated = true;
+                                }
                             }
                         }
                         var month = visitor.RC.Substring(2, 2);
                         if (int.TryParse(month, out var monthInt))
                         {
+                            if (monthInt > 50)
+                            {
+                                monthInt -= 50;
+                            }
                             if (monthInt >= 1 && monthInt <= 12)
                             {
-                                visitor.BirthDayMonth = monthInt;
-                                updated = true;
+                                if (visitor.BirthDayMonth == monthInt)
+                                {
+                                    visitor.BirthDayMonth = monthInt;
+                                    updated = true;
+                                }
                             }
                         }
                         var year = visitor.RC.Substring(2, 2);
@@ -253,8 +262,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                             {
                                 yearInt += 2000;
                             }
-                            visitor.BirthDayYear = yearInt;
-                            updated = true;
+                            if (visitor.BirthDayYear == yearInt)
+                            {
+                                visitor.BirthDayYear = yearInt;
+                                updated = true;
+                            }
                         }
                     }
                 }
