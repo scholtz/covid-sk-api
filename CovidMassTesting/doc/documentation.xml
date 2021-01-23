@@ -572,6 +572,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ListAllVisitorsWhoDidNotCome(System.Int32,System.Int32)">
+            <summary>
+            This method exports all visitors who did not come for the test
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.FormatBarCode(System.String)">
             <summary>
             Format the visitor code
@@ -4230,6 +4236,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListAllVisitorsWhoDidNotCome(System.Int32,System.Int32)">
+            <summary>
+            This method exports all visitors who are in state in processing
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProofOfWorkExport(System.Int32,System.Int32)">
             <summary>
             ProofOfWorkExport
@@ -5832,6 +5844,14 @@
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListVisitorsInProcess(System.Int32,System.Int32)">
+            <summary>
+            List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAllVisitorsWhoDidNotCome(System.Int32,System.Int32)">
             <summary>
             List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
             </summary>

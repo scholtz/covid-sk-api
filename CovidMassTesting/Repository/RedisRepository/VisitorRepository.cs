@@ -1368,6 +1368,65 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
         /// <summary>
+        /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ListAllVisitorsWhoDidNotCome {from} {count}");
+
+            var ret = new List<Visitor>();
+            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    if (string.IsNullOrEmpty(visitor.TestingSet)
+                        && visitor.ChosenSlot < DateTimeOffset.UtcNow.Ticks
+                        )
+                    {
+                        ret.Add(visitor);
+                    }
+                }
+            }
+            logger.LogInformation($"ListAllVisitorsWhoDidNotCome {from} {count} END - {ret.Count}");
+
+            return ret;
+        }
+        public async Task<IEnumerable<Visitor>> ListAllVisitorsAtPlace(
+            string placeId,
+            DateTimeOffset fromRegTime,
+            DateTimeOffset untilRegTime,
+            int from = 0,
+            int count = 9999999
+            )
+        {
+            logger.LogInformation($"ListAllVisitorsAtPlace {from} {count} {placeId} {fromRegTime.ToString("R")} {untilRegTime.ToString("R")}");
+
+            var ret = new List<Visitor>();
+            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    if (visitor.ChosenPlaceId == placeId
+                        && visitor.ChosenSlot >= fromRegTime.ToUniversalTime().Ticks
+                        && visitor.ChosenSlot < untilRegTime.ToUniversalTime().Ticks
+                        )
+                    {
+                        ret.Add(visitor);
+                    }
+                }
+            }
+            logger.LogInformation($"ListAllVisitorsAtPlace {from} {count} END - {ret.Count}");
+
+            return ret;
+        }
+        /// <summary>
         /// Tests the storage
         /// </summary>
         /// <returns></returns>

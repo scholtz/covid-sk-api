@@ -107,6 +107,20 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<IEnumerable<Visitor>> ListVisitorsInProcess(int from = 0, int count = 9999999);
         /// <summary>
+        /// This method exports all visitors who are in state in processing
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(int from = 0, int count = 9999999);
+
+        public Task<IEnumerable<Visitor>> ListAllVisitorsAtPlace(
+            string placeId,
+            DateTimeOffset fromRegTime,
+            DateTimeOffset untilRegTime,
+            int from = 0,
+            int count = 9999999
+            );
+
+        /// <summary>
         /// ProofOfWorkExport
         /// </summary>
         /// <param name="from"></param>
