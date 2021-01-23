@@ -216,6 +216,33 @@ namespace CovidMassTesting.Repository.RedisRepository
                 visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
                 updated = true;
             }
+            if (visitor.BirthDayYear.HasValue && visitor.BirthDayYear < 1900)
+            {
+                if (visitor.RC?.Length == 9 || visitor.RC?.Length == 10)
+                {
+                    var year = visitor.RC.Substring(2, 2);
+                    if (int.TryParse(year, out var yearInt))
+                    {
+                        if (yearInt > 21)
+                        {
+                            yearInt += 1900;
+                        }
+                        else
+                        {
+                            yearInt += 2000;
+                        }
+                        if (visitor.BirthDayYear == yearInt)
+                        {
+                            visitor.BirthDayYear = yearInt;
+                            updated = true;
+                        }
+                    }
+                }
+                else
+                {
+                    visitor.BirthDayYear += 1900;
+                }
+            }
             if (!visitor.BirthDayMonth.HasValue)
             {
                 if (visitor.PersonType == "idcard" || visitor.PersonType == "child")
