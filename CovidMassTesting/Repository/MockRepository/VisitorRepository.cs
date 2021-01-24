@@ -153,6 +153,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
         {
+            if (!pname2code.ContainsKey(personalNumber)) personalNumber = FormatDocument(personalNumber);
             if (!pname2code.ContainsKey(personalNumber)) return null;
             logger.LogInformation($"Visitor.GETVisitorCodeFromPersonalNumber {personalNumber}");
             return pname2code[personalNumber];
@@ -176,6 +177,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task MapPersonalNumberToVisitorCode(string personalNumber, int visitorCode)
         {
+            personalNumber = FormatDocument(personalNumber);
             logger.LogInformation($"Visitor.MapPersonalNumberToVisitorCode {personalNumber} {visitorCode}");
             pname2code[personalNumber] = visitorCode;
         }
@@ -197,6 +199,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task UnMapPersonalNumber(string personalNumber)
         {
+            personalNumber = FormatDocument(personalNumber);
             logger.LogInformation($"Visitor.UnMapPersonalNumber {personalNumber}");
             if (pname2code.ContainsKey(personalNumber)) pname2code.TryRemove(personalNumber, out var _);
         }

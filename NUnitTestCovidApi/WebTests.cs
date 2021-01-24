@@ -509,7 +509,7 @@ namespace NUnitTestCovidApi
                 Insurance = "25",
                 PersonType = "idcard",
                 Phone = "+421907000999",
-                RC = "0101010008",
+                RC = " 010101 /0008 ",
                 Product = productId
 
             };
@@ -1232,13 +1232,19 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(user1.Address, responseVisitor.Address);
 
 
-            request = GetVisitorByRC(client, user1.RC);
+            request = GetVisitorByRC(client, "0101010008");
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             responseVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(user1.RC, responseVisitor.RC);
+            Assert.AreEqual("0101010008", responseVisitor.RC);
             Assert.AreEqual(user1.FirstName, responseVisitor.FirstName);
             Assert.AreEqual(user1.LastName, responseVisitor.LastName);
             Assert.AreEqual(user1.Address, responseVisitor.Address);
+
+            request = GetVisitorByRC(client, "  010101/0008 ");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            responseVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual("0101010008", responseVisitor.RC);
+
 
             request = ConnectVisitorToTest(client, user1.Id.ToString(), "111-111-111");
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);

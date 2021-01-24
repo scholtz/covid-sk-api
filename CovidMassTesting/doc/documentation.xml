@@ -66,6 +66,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixVisitorRC">
+            <summary>
+            Fix stats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -4328,6 +4334,12 @@
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixStats">
             <summary>
             FixStats
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixVisitorRC">
+            <summary>
+            Fix rc map
             </summary>
             <returns></returns>
         </member>

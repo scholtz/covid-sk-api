@@ -337,7 +337,15 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return visitor;
         }
-
+        protected string FormatDocument(string input)
+        {
+            return input?
+                .ToUpper()
+                .Replace("-", "")
+                .Replace(" ", "")
+                .Replace("/", "")
+                .Trim();
+        }
         /// <summary>
         /// Encode visitor data and store to database
         /// </summary>
@@ -411,6 +419,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual async Task MapPersonalNumberToVisitorCode(string personalNumber, int visitorCode)
         {
+            personalNumber = FormatDocument(personalNumber);
             await redisCacheClient.Db0.HashSetAsync(
                 $"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}",
                 Encoding.ASCII.GetBytes($"{personalNumber}{configuration["key"]}").GetSHA256Hash(),
@@ -424,6 +433,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual async Task UnMapPersonalNumber(string personalNumber)
         {
+            personalNumber = FormatDocument(personalNumber);
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}", Encoding.ASCII.GetBytes($"{personalNumber}{configuration["key"]}").GetSHA256Hash());
         }
         /// <summary>
@@ -431,12 +441,23 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="personalNumber"></param>
         /// <returns></returns>
-        public virtual Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
+        public async virtual Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
         {
-            return redisCacheClient.Db0.HashGetAsync<int?>(
+
+            var ret = await redisCacheClient.Db0.HashGetAsync<int?>(
                 $"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}",
                 Encoding.ASCII.GetBytes($"{personalNumber}{configuration["key"]}").GetSHA256Hash()
             );
+            if (ret != null)
+            {
+                return ret;
+            }
+            var pn = FormatDocument(personalNumber);
+            ret = await redisCacheClient.Db0.HashGetAsync<int?>(
+                $"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}",
+                Encoding.ASCII.GetBytes($"{pn}{configuration["key"]}").GetSHA256Hash()
+            );
+            return ret;
         }
         /// <summary>
         /// Map visitor code to testing code
@@ -2138,6 +2159,36 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+
+
+        public async Task<int> FixVisitorRC()
+        {
+            int ret = 0;
+            logger.LogInformation($"FixVisitorRC");
+            var stats = new Dictionary<string, Stat>();
+
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt, false);
+                    if (visitor == null) continue;
+                    try
+                    {
+                        await MapPersonalNumberToVisitorCode(visitor.RC, visitor.Id);
+                    }
+                    catch
+                    {
+                        logger.LogError("Unable to map");
+                    }
+                }
+            }
+
+            logger.LogInformation($"FixVisitorRC Done");
+
+            return ret;
+        }
+
         /// <summary>
         /// Fix. Set to visitor the test result and time of the test
         /// 
