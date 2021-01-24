@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -59,6 +60,10 @@ namespace CovidMassTesting.Controllers
             this.placeProviderRepository = placeProviderRepository;
             this.slotRepository = slotRepository;
         }
+
+
+        private static ConcurrentBag<Place> Cache = new ConcurrentBag<Place>();
+        private static DateTimeOffset? CacheTime;
         /// <summary>
         /// List places
         /// 
@@ -72,7 +77,34 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                var ret = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                IEnumerable<Place> list;
+
+                if (string.IsNullOrEmpty(configuration["DoNotUseObjCache"]))
+                {
+                    var rand = new Random();
+                    var limit = rand.Next(1, 5);
+                    if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
+                    {
+                        list = Cache;
+                    }
+                    else
+                    {
+                        list = await placeRepository.ListAll();
+                        Cache = new ConcurrentBag<Place>(list);
+                        CacheTime = DateTimeOffset.Now;
+                    }
+                }
+                else
+                {
+                    list = await placeRepository.ListAll();
+                    Cache = new ConcurrentBag<Place>(list);
+                    CacheTime = DateTimeOffset.Now;
+                }
+
+                list = await EnrichWithEmptySlots(list);
+                var ret = list.ToDictionary(p => p.Id, p => p);
+
+
                 if (string.IsNullOrEmpty(configuration["LimitPer5MinSlot"])
                     && string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
                 {
@@ -107,6 +139,40 @@ namespace CovidMassTesting.Controllers
 
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
+        }
+
+        private async Task<IEnumerable<Place>> EnrichWithEmptySlots(IEnumerable<Place> list)
+        {
+            foreach (var item in list)
+            {
+                var total = 0;
+                //var day = await slotRepository.GetDaySlot(item.Id, DateTimeOffset.UtcNow.Ticks);
+                var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(item.Id, DateTimeOffset.UtcNow.Ticks);
+                foreach (var hour in hours)
+                {
+                    if (hour.Time < DateTimeOffset.Now.AddHours(-1)) continue;
+                    var count = hour.Registrations - item.LimitPer1HourSlot;
+                    var countMAggregated = 0;
+                    if (count > 0)
+                    {
+                        var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId);
+                        foreach (var minute in minutes)
+                        {
+                            if (minute.Time < DateTimeOffset.Now.AddMinutes(-5)) continue;
+                            var countm = minute.Registrations - item.LimitPer5MinSlot;
+                            if (countm > 0)
+                            {
+                                countMAggregated += countm;
+                            }
+                        }
+                    }
+                    total += Math.Min(countMAggregated, count);
+                }
+                item.AvailableSlotsTodayUpdate = DateTimeOffset.UtcNow;
+                item.AvailableSlotsToday = total;
+            }
+
+            return list;
         }
 
         /// <summary>

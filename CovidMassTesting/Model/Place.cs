@@ -125,5 +125,13 @@ namespace CovidMassTesting.Model
         /// Queue in minutes
         /// </summary>
         public bool? ManualQueueEntry { get; set; } = true;
+        /// <summary>
+        /// AvailableSlotsToday
+        /// </summary>
+        public int? AvailableSlotsToday { get; set; }
+        /// <summary>
+        /// AvailableSlotsToday
+        /// </summary>
+        public DateTimeOffset? AvailableSlotsTodayUpdate { get; set; }
     }
 }
