@@ -2176,6 +2176,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     try
                     {
                         await MapPersonalNumberToVisitorCode(visitor.RC, visitor.Id);
+                        ret++;
                     }
                     catch
                     {
