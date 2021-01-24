@@ -648,7 +648,7 @@ namespace NUnitTestCovidApi
             request = Authenticate(client, user.Email, pass);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
         }
-#if tmpDisable
+
         [Test]
         public void VisitorTest()
         {
@@ -2917,7 +2917,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(sms.data.GetText().Contains("L S"));
             Assert.IsTrue(sms.data.GetText().Contains("1984"));
         }
-#endif
+
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;
