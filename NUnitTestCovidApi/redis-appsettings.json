@@ -62,6 +62,8 @@
     "ClientSecret": "",
     "Channel": 123
   },
+  "DoNotUseObjCache": true,
+
   "AllowedHosts": "*",
   "db-prefix": "DB1-",
   "key": "6YfJAAoimCKsBpe70UveZgQNralsNkYIR+65wYa0jEE=",

@@ -2923,7 +2923,74 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(sms.data.GetText().Contains("L S"));
             Assert.IsTrue(sms.data.GetText().Contains("1984"));
         }
+        [Test]
+        public void TestDoubleTestInput()
+        {
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var iVisitor = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
+            var iPlace = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IPlaceRepository>();
+            var iSlot = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.ISlotRepository>();
+            iPlace.SetPlace(new Place()
+            {
+                Id = "123",
+            });
 
+            var tick = DateTimeOffset.Parse("2020-01-01");
+            iSlot.Add(new Slot1Day() { PlaceId = "123", Time = tick });
+            iSlot.Add(new Slot1Hour() { PlaceId = "123", Time = tick });
+            iSlot.Add(new Slot5Min() { PlaceId = "123", Time = tick });
+
+            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
+            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
+            Visitor visitor;
+            var vis1 = iVisitor.Add(visitor = new Visitor()
+            {
+                FirstName = "L",
+                LastName = "S",
+                Language = "en",
+                ChosenPlaceId = "123",
+                ChosenSlot = tick.Ticks,
+                RC = " 845123/0007",
+                BirthDayDay = 23,
+                BirthDayMonth = 01,
+                BirthDayYear = 1985,
+                PersonType = "child",
+                Result = TestResult.NegativeWaitingForCertificate,
+                Email = "test@test.com",
+                Phone = "+421907723428"
+            }).Result;
+
+            iVisitor.ConnectVisitorToTest(vis1.Id, "12345");
+            iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate);
+
+            var vis2 = iVisitor.Add(visitor = new Visitor()
+            {
+                FirstName = "L",
+                LastName = "S",
+                Language = "en",
+                ChosenPlaceId = "123",
+                ChosenSlot = tick.Ticks,
+                RC = " 845123/0018",
+                BirthDayDay = 23,
+                BirthDayMonth = 01,
+                BirthDayYear = 1985,
+                PersonType = "child",
+                Result = TestResult.NegativeWaitingForCertificate,
+                Email = "test@test.com",
+                Phone = "+421907723428"
+            }).Result;
+            try
+            {
+                var result = iVisitor.ConnectVisitorToTest(vis2.Id, "12345").Result;
+                Assert.Fail("ConnectVisitorToTest with duplicit testset id should throw exception");
+            }
+            catch(Exception  exc)
+            {
+                Console.WriteLine(exc.Message);
+            }
+
+        }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;

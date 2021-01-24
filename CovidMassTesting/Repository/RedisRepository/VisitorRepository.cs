@@ -467,6 +467,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear)
         {
+            var visitorCode = await this.GETVisitorCodeFromTesting(testCodeClear);
+            if (visitorCode.HasValue)
+            {
+                if (codeInt != visitorCode)
+                {
+                    throw new Exception("Tento kód testovacej sady je použitý pre iného návštevníka. Zadajte iný prosím.");
+                }
+            }
             await MapTestingSetToVisitorCode(codeInt, testCodeClear);
             await UpdateTestingState(codeInt, "test-not-processed", testCodeClear);
             return testCodeClear;
