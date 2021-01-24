@@ -64,6 +64,36 @@ namespace CovidMassTesting.Controllers
 
         private static ConcurrentBag<Place> Cache = new ConcurrentBag<Place>();
         private static DateTimeOffset? CacheTime;
+        private async Task<IEnumerable<Place>> ListAllPlaces()
+        {
+            IEnumerable<Place> list;
+
+            if (string.IsNullOrEmpty(configuration["DoNotUseObjCache"]))
+            {
+                var rand = new Random();
+                var limit = rand.Next(1, 5);
+                if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
+                {
+                    list = Cache;
+                }
+                else
+                {
+                    list = await placeRepository.ListAll();
+                    list = await EnrichWithEmptySlots(list);
+                    Cache = new ConcurrentBag<Place>(list);
+                    CacheTime = DateTimeOffset.Now;
+                }
+            }
+            else
+            {
+                list = await placeRepository.ListAll();
+                list = await EnrichWithEmptySlots(list);
+                Cache = new ConcurrentBag<Place>(list);
+                CacheTime = DateTimeOffset.Now;
+            }
+            return list;
+        }
+
         /// <summary>
         /// List places
         /// 
@@ -77,31 +107,8 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                IEnumerable<Place> list;
 
-                if (string.IsNullOrEmpty(configuration["DoNotUseObjCache"]))
-                {
-                    var rand = new Random();
-                    var limit = rand.Next(1, 5);
-                    if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
-                    {
-                        list = Cache;
-                    }
-                    else
-                    {
-                        list = await placeRepository.ListAll();
-                        Cache = new ConcurrentBag<Place>(list);
-                        CacheTime = DateTimeOffset.Now;
-                    }
-                }
-                else
-                {
-                    list = await placeRepository.ListAll();
-                    Cache = new ConcurrentBag<Place>(list);
-                    CacheTime = DateTimeOffset.Now;
-                }
-
-                list = await EnrichWithEmptySlots(list);
+                var list = await ListAllPlaces();
                 var ret = list.ToDictionary(p => p.Id, p => p);
 
 
@@ -188,10 +195,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                var places = await ListAllPlaces();
+
+
                 if (string.IsNullOrEmpty(category)) category = "all";
                 if (string.IsNullOrEmpty(availability)) availability = "all";
-
-                var places = await placeRepository.ListAll();
 
                 if (category != "all")
                 {
