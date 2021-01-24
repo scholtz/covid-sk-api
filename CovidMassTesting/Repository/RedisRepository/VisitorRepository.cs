@@ -2113,18 +2113,18 @@ namespace CovidMassTesting.Repository.RedisRepository
                     ret++;
                 }
 
-                if (p.Registrations != stats[p.Id].Sick)
+                if (p.Sick != stats[p.Id].Sick)
                 {
                     logger.LogInformation($"Fixing stats for {p.Name} Sick: {p.Sick}");
-                    p.Registrations = stats[p.Id].Sick;
+                    p.Sick = stats[p.Id].Sick;
                     fix = true;
                     ret++;
                 }
 
-                if (p.Registrations != stats[p.Id].Healthy)
+                if (p.Healthy != stats[p.Id].Healthy)
                 {
                     logger.LogInformation($"Fixing stats for {p.Name} Healthy: {p.Healthy}");
-                    p.Registrations = stats[p.Id].Healthy;
+                    p.Healthy = stats[p.Id].Healthy;
                     fix = true;
                     ret++;
                 }
