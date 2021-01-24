@@ -593,6 +593,7 @@ namespace CovidMassTesting.Controllers
         {
             return code
                 .ToUpper()
+                .Replace("‐", "")//utf slash?
                 .Replace("-", "")
                 .Replace(" ", "")
                 .Trim();

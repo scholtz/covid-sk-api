@@ -5,55 +5,58 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model
 {
+    /// <summary>
+    /// NCZI - Datova veta pre registracny system Ag testov
+    /// </summary>
     public class VisitorSimplified
     {
         /// <summary>
-        /// Registration code. 9-digit, formatted 000-000-000 for visitors
-        /// </summary>
-        public int Id { get; set; }
-        /// <summary>
-        /// Real time when the test has been taken
-        /// </summary>
-        public DateTimeOffset? TestingTime { get; set; }
-        /// <summary>
         /// Name
         /// </summary>
-        public string FirstName { get; set; }
+        public string Meno { get; set; }
         /// <summary>
         /// Last name
         /// </summary>
-        public string LastName { get; set; }
+        public string Priezvisko { get; set; }
         /// <summary>
-        /// Language in which we will communicate to the visitor
-        /// 
-        /// sk | en
+        /// Last name
         /// </summary>
-        public string Language { get; set; } = "sk";
+        public string RodneCislo { get; set; }
         /// <summary>
-        /// Testing set identifier
+        /// Telefon
         /// </summary>
-        public string TestingSet { get; set; }
+        public string Telefon { get; set; }
         /// <summary>
-        /// Product id
+        /// Mail
         /// </summary>
-        public string Product { get; set; }
+        public string Mail { get; set; }
         /// <summary>
-        /// Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+        /// PSC
         /// </summary>
-        public string VerificationId { get; set; }
+        public string PSC { get; set; }
         /// <summary>
-        /// Type of person
-        /// 
-        /// idcard|child|foreign
+        /// Mesto
         /// </summary>
-        public string PersonType { get; set; }
+        public string Mesto { get; set; }
         /// <summary>
-        /// Passport number if person type is foreigner
+        /// Ulica
         /// </summary>
-        public string Passport { get; set; }
+        public string Ulica { get; set; }
         /// <summary>
-        /// Personal number if person type is idcard or child
+        /// Cislo
         /// </summary>
-        public string RC { get; set; }
+        public string Cislo { get; set; }
+        /// <summary>
+        /// DatumVysetrenia
+        /// </summary>
+        public string DatumVysetrenia { get; set; }
+        /// <summary>
+        /// DatumVysetrenia
+        /// </summary>
+        public string TypVysetrenia { get; set; }
+        /// <summary>
+        /// DatumVysetrenia
+        /// </summary>
+        public string VysledokVysetrenia { get; set; }
     }
 }

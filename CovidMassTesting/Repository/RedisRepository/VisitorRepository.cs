@@ -341,6 +341,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return input?
                 .ToUpper()
+                .Replace("‐", "")//utf slash?
                 .Replace("-", "")
                 .Replace(" ", "")
                 .Replace("/", "")
@@ -1381,19 +1382,42 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (visitor == null) continue;
                     if (visitor.TestingTime.HasValue && visitor.TestingTime.Value > DateTimeOffset.MinValue)
                     {
+                        var rc = visitor.RC;
+                        if (visitor.PersonType == "foreign") rc = visitor.Passport;
+
+                        var result = "";
+                        if (visitor.Result == TestResult.NegativeCertificateTaken ||
+                            visitor.Result == TestResult.NegativeWaitingForCertificate
+                            )
+                        {
+                            result = "negatívny";
+                        }
+
+                        if (visitor.Result == TestResult.PositiveWaitingForCertificate ||
+                            visitor.Result == TestResult.PositiveCertificateTaken
+                            )
+                        {
+                            result = "pozitívny";
+                        }
+                        if (visitor.Result == TestResult.TestMustBeRepeated
+                            )
+                        {
+                            result = "zneplatnený";
+                        }
+
                         ret.Add(new VisitorSimplified()
                         {
-                            Id = visitor.Id,
-                            FirstName = visitor.FirstName,
-                            Language = visitor.Language,
-                            LastName = visitor.LastName,
-                            TestingSet = visitor.TestingSet,
-                            TestingTime = visitor.TestingTime,
-                            Passport = visitor.Passport,
-                            PersonType = visitor.PersonType,
-                            Product = visitor.Product,
-                            RC = visitor.RC,
-                            VerificationId = visitor.VerificationId
+                            Meno = visitor.FirstName,
+                            Priezvisko = visitor.LastName,
+                            RodneCislo = rc,
+                            Telefon = visitor.Phone,
+                            Mail = visitor.Email,
+                            PSC = visitor.ZIP,
+                            Mesto = visitor.City,
+                            Ulica = visitor.Street,
+                            Cislo = visitor.StreetNo,
+                            DatumVysetrenia = visitor.TestingTime?.ToString("yyyy-MM-dd"),
+                            VysledokVysetrenia = result
                         });
                     }
                 }
