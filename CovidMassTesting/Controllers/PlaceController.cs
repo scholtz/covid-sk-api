@@ -79,6 +79,7 @@ namespace CovidMassTesting.Controllers
                 else
                 {
                     list = await placeRepository.ListAll();
+                    list = list.Where(p => p.IsVisible == true);
                     list = await EnrichWithEmptySlots(list);
                     Cache = new ConcurrentBag<Place>(list);
                     CacheTime = DateTimeOffset.Now;
@@ -87,9 +88,8 @@ namespace CovidMassTesting.Controllers
             else
             {
                 list = await placeRepository.ListAll();
+                list = list.Where(p => p.IsVisible == true);
                 list = await EnrichWithEmptySlots(list);
-                Cache = new ConcurrentBag<Place>(list);
-                CacheTime = DateTimeOffset.Now;
             }
             return list;
         }
@@ -148,35 +148,42 @@ namespace CovidMassTesting.Controllers
             }
         }
 
-        private async Task<IEnumerable<Place>> EnrichWithEmptySlots(IEnumerable<Place> list)
+        private async Task<IEnumerable<Place>> EnrichWithEmptySlots(IEnumerable<Place> list, int daysCount = 1)
         {
             foreach (var item in list)
             {
                 var total = 0;
-                //var day = await slotRepository.GetDaySlot(item.Id, DateTimeOffset.UtcNow.Ticks);
-                var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(item.Id, DateTimeOffset.UtcNow.Ticks);
-                foreach (var hour in hours)
+                var days = await slotRepository.ListDaySlotsByPlace(item.Id);
+                foreach (var day in
+                    days.Where(d =>
+                        d.Time >= DateTimeOffset.UtcNow.AddDays(-1)
+                        && d.Time < DateTimeOffset.UtcNow.AddDays(daysCount - 1)
+                ))
                 {
-                    if (hour.Time < DateTimeOffset.Now.AddHours(-1)) continue;
-                    var count = hour.Registrations - item.LimitPer1HourSlot;
-                    var countMAggregated = 0;
-                    if (count > 0)
+                    var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(item.Id, day.SlotId);
+                    foreach (var hour in hours)
                     {
-                        var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId);
-                        foreach (var minute in minutes)
+                        if (hour.Time < DateTimeOffset.Now.AddHours(-1)) continue;
+                        var count = item.LimitPer1HourSlot - hour.Registrations;
+                        var countMAggregated = 0;
+                        if (count > 0)
                         {
-                            if (minute.Time < DateTimeOffset.Now.AddMinutes(-5)) continue;
-                            var countm = minute.Registrations - item.LimitPer5MinSlot;
-                            if (countm > 0)
+                            var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId);
+                            foreach (var minute in minutes)
                             {
-                                countMAggregated += countm;
+                                if (minute.Time < DateTimeOffset.Now.AddMinutes(-5)) continue;
+                                var countm = item.LimitPer5MinSlot - minute.Registrations;
+                                if (countm > 0)
+                                {
+                                    countMAggregated += countm;
+                                }
                             }
                         }
+                        total += Math.Min(countMAggregated, count);
                     }
-                    total += Math.Min(countMAggregated, count);
+                    item.AvailableSlotsTodayUpdate = DateTimeOffset.UtcNow;
+                    item.AvailableSlotsToday = total;
                 }
-                item.AvailableSlotsTodayUpdate = DateTimeOffset.UtcNow;
-                item.AvailableSlotsToday = total;
             }
 
             return list;
