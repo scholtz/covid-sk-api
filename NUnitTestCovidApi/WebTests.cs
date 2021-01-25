@@ -2097,6 +2097,9 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
 
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
             var places = SetupDebugPlaces(client);
             var firstPlace = places.First();
             var secondPlace = places.Skip(1).First();
@@ -2138,6 +2141,9 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
 
             var allocations = new PersonAllocation[]
             {
@@ -2257,6 +2263,9 @@ namespace NUnitTestCovidApi
             Assert.IsNotNull(jti);
 
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
 
             // Test product management
             request = CreateProduct(client, new Product()
@@ -2554,6 +2563,9 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
 
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
             request = ListUserInvites(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             invites = JsonConvert.DeserializeObject<List<Invitation>>(request.Content.ReadAsStringAsync().Result);
@@ -2564,6 +2576,9 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
 
             request = ListUserInvites(client);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -2585,25 +2600,43 @@ namespace NUnitTestCovidApi
             var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(days.Count > 0);
 
-            var day = days.First().Value;
+            var day = days.Last().Value;
             request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var hours = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(hours.Count > 0);
 
-            var hour = hours.First().Value;
+            var hour = hours.Last().Value;
             request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(minutes.Count > 0);
 
-            var minute = minutes.Values.First();
+            // test free places
+
+            request = ListFiltered(client, "vac-doctor", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, filteredPlaces.Count);
+            Assert.AreEqual(120, filteredPlaces.Values.First().AvailableSlotsToday);
+
+            var minute = minutes.Values.Last();
             var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
-
+            Task.Delay(3000).Wait();
+            request = ListFiltered(client, "vac-doctor", "all");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, filteredPlaces.Count);
+            Assert.AreEqual(2, filteredPlaces.Values.First().Registrations);
+            Assert.AreEqual(118, filteredPlaces.Values.First().AvailableSlotsToday);
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
             // test authentication when user has not yet been assigned to the place
             var user1 = registered[0];
             request = GetVisitor(client, user1.Id.ToString());
@@ -2613,6 +2646,9 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
 
             // assign person to pp
 
@@ -2631,6 +2667,13 @@ namespace NUnitTestCovidApi
                     End = DateTimeOffset.Now.AddDays(1),
                     Role = Groups.MedicLab,
                     User = medicLabPersonEmail
+                },
+                new PersonAllocation()
+                {
+                    Start = DateTimeOffset.Now,
+                    End = DateTimeOffset.Now.AddDays(1),
+                    Role = Groups.DataExporter,
+                    User = medicLabPersonEmail
                 }
             };
             request = AllocatePersonsToPlace(client, allocations, firstPlace.Id);
@@ -2640,6 +2683,10 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
             request = SetPlaceProvider(client, pp.PlaceProviderId);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             medicPersonToken = request.Content.ReadAsStringAsync().Result;
@@ -2654,14 +2701,25 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
             request = SetPlaceProvider(client, pp.PlaceProviderId);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             medicLabPersonToken = request.Content.ReadAsStringAsync().Result;
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
 
             handler = new JwtSecurityTokenHandler();
             tokenS = handler.ReadToken(medicLabPersonToken) as JwtSecurityToken;
             jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == Groups.MedicLab);
             Assert.IsNotNull(jti);
+            jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == "Role" && claim.Value == Groups.DataExporter);
+            Assert.IsNotNull(jti);
+            var jtis = tokenS.Claims.Where(claim => claim.Type == "Role").ToArray();
+            Assert.AreEqual(2, jtis.Length);
             jti = tokenS.Claims.FirstOrDefault(claim => claim.Type == Token.Claims.PlaceProvider);
             Assert.IsNotNull(jti);
             Assert.AreEqual(pp.PlaceProviderId, jti.Value);
@@ -2670,6 +2728,10 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
+
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
             request = GetVisitor(client, user1.Id.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var responseVisitor = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
@@ -2698,7 +2760,8 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
 
-
+            request = FinalDataExport(client, 0, 100);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
             noEmailSender.Data.Clear();
 
             // TEST mark as sick
@@ -2726,8 +2789,9 @@ namespace NUnitTestCovidApi
             testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeWaitingForCertificate, testResult.State);
             client.DefaultRequestHeaders.Clear();
+            var idWithSlashes = registered[0].Id.ToString();
 
-            request = PublicGetTestResult(client, registered[0].Id.ToString(), registered[0].RC.Substring(6, 4));
+            request = PublicGetTestResult(client, idWithSlashes.Substring(0, 3) + "‐" + idWithSlashes.Substring(3, 3) + " " + idWithSlashes.Substring(6), registered[0].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.PositiveWaitingForCertificate, testResult.State);
@@ -2744,6 +2808,8 @@ namespace NUnitTestCovidApi
             var resultData = Newtonsoft.Json.JsonConvert.DeserializeObject<VerificationData>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeWaitingForCertificate, resultData.Result);
             Assert.AreEqual("Drahá vakcína", resultData.Product);
+
+
 
         }
         [Test]
@@ -2985,7 +3051,7 @@ namespace NUnitTestCovidApi
                 var result = iVisitor.ConnectVisitorToTest(vis2.Id, "12345").Result;
                 Assert.Fail("ConnectVisitorToTest with duplicit testset id should throw exception");
             }
-            catch(Exception  exc)
+            catch (Exception exc)
             {
                 Console.WriteLine(exc.Message);
             }

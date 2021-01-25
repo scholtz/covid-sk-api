@@ -2044,6 +2044,16 @@
             Queue in minutes
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.AvailableSlotsToday">
+            <summary>
+            AvailableSlotsToday
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.AvailableSlotsTodayUpdate">
+            <summary>
+            AvailableSlotsToday
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.PlaceProduct">
             <summary>
             Product specified for specific place
@@ -3488,63 +3498,69 @@
             Captcha token. After it is used it is removed
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.Id">
+        <member name="T:CovidMassTesting.Model.VisitorSimplified">
             <summary>
-            Registration code. 9-digit, formatted 000-000-000 for visitors
+            NCZI - Datova veta pre registracny system Ag testov
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.TestingTime">
-            <summary>
-            Real time when the test has been taken
-            </summary>
-        </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.FirstName">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Meno">
             <summary>
             Name
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.LastName">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Priezvisko">
             <summary>
             Last name
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.Language">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.RodneCislo">
             <summary>
-            Language in which we will communicate to the visitor
-            
-            sk | en
+            Last name
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.TestingSet">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Telefon">
             <summary>
-            Testing set identifier
+            Telefon
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.Product">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Mail">
             <summary>
-            Product id
+            Mail
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.VerificationId">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.PSC">
             <summary>
-            Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            PSC
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.PersonType">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Mesto">
             <summary>
-            Type of person
-            
-            idcard|child|foreign
+            Mesto
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.Passport">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Ulica">
             <summary>
-            Passport number if person type is foreigner
+            Ulica
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.VisitorSimplified.RC">
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Cislo">
             <summary>
-            Personal number if person type is idcard or child
+            Cislo
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.DatumVysetrenia">
+            <summary>
+            DatumVysetrenia
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.TypVysetrenia">
+            <summary>
+            DatumVysetrenia
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.VysledokVysetrenia">
+            <summary>
+            DatumVysetrenia
             </summary>
         </member>
         <member name="T:CovidMassTesting.Program">

@@ -645,7 +645,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             var ret = new HashSet<string>();
             if (pp == null) return ret;
             if (pp.MainEmail == email) ret.Add(Groups.PPAdmin);
-            foreach (var group in pp.Allocations?.Select(a => a.Role).Distinct())
+            foreach (var group in pp.Allocations
+                ?.Where(a => a.User == email)
+                ?.Select(a => a.Role)
+                .Distinct())
             {
                 if (!ret.Contains(group)) ret.Add(group);
             }
