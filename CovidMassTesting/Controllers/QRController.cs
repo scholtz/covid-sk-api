@@ -11,6 +11,7 @@ using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using iText.Barcodes;
+using iText.Barcodes.Qrcode;
 using iText.Kernel.Pdf;
 using iText.Kernel.Pdf.Xobject;
 using iText.Layout;
@@ -33,24 +34,7 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Generates PDF File
         /// 
-        /// Default variables: <br/>
-        /// Prefix  = "BA01-"; <br/>
-        /// offsetBranch  = 100000; <br/>
-        /// OffsetIter  = 1; <br/>
-        /// Columns  = 3; <br/>
-        /// Count  = 100; <br/>
-        /// Height  = 50f; <br/>
-        /// Width  = 200f; <br/>
-        /// CellPaddingTop  = 10f; <br/>
-        /// CellPaddingRight  = 10f; <br/>
-        /// CellPaddingLeft  = 30f; <br/>
-        /// CellPaddingBottom  = 10f; <br/>
-        /// PageMarginTop  = 45f; <br/>
-        /// PageMarginRight  = 45f; <br/>
-        /// PageMarginLeft  = 45f; <br/>
-        /// PageMarginBottom  = 45f; <br/>
-        /// Type  = QRCode|BarCode; <br/>
-        /// Scale  = 2.5f; <br/>
+        /// Default variables: https://github.com/scholtz/covid-sk-api/blob/main/CovidMassTesting/Model/Settings/PDFQRConfiguration.cs
         ///
         /// </summary>
         /// <returns></returns>
@@ -152,6 +136,9 @@ namespace CovidMassTesting.Controllers
             table.AddCell(MakeCell(code, pdfDoc, settings));
             ret.Add(table);
             ret.SetBorder(new iText.Layout.Borders.DottedBorder(iText.Kernel.Colors.ColorConstants.LIGHT_GRAY, 1));
+
+            ret.SetMargin(0);
+            ret.SetPadding(0);
             return ret;
         }
         private Cell MakeCell(string code, PdfDocument pdfDoc, PDFQRConfiguration settings)
@@ -168,7 +155,11 @@ namespace CovidMassTesting.Controllers
             p.SetMargin(0);
             p.SetPadding(0);
             cell.Add(p);
-            BarcodeQRCode barcode = new BarcodeQRCode($"{settings.Prefix}{code}");
+
+            var qrParam = new Dictionary<EncodeHintType, Object>();
+            qrParam[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.H;
+            qrParam[EncodeHintType.CHARACTER_SET] = "ASCII";
+            BarcodeQRCode barcode = new BarcodeQRCode($"{settings.Prefix}{code}", qrParam);
             PdfFormXObject barcodeObject = barcode.CreateFormXObject(pdfDoc);
 
             // Create barcode object to put it to the cell as image

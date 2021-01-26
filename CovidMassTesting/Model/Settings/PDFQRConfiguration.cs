@@ -18,15 +18,15 @@ namespace CovidMassTesting.Model.Settings
         public int Count { get; set; } = 8 * 3 * 3;
         public float Height { get; set; } = 50f;
         public float Width { get; set; } = 180f;
-        public float CellPaddingTop { get; set; } = 0;
+        public float CellPaddingTop { get; set; } = 1f;
         public float CellPaddingRight { get; set; } = 10F;
         public float CellPaddingLeft { get; set; } = 20F;
-        public float CellPaddingBottom { get; set; } = 0;
+        public float CellPaddingBottom { get; set; } = 1f;
         public float PageMarginTop { get; set; } = 15f;
         public float PageMarginRight { get; set; } = 10f;
         public float PageMarginLeft { get; set; } = 10f;
         public float PageMarginBottom { get; set; } = 10f;
         public string Type { get; set; } = "QRCode";
-        public float Scale { get; set; } = 2.1f;
+        public float Scale { get; set; } = 1.9f;
     }
 }

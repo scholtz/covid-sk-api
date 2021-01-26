@@ -2332,6 +2332,46 @@
             This object hold the public information for the visitor result
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Result.Values">
+            <summary>
+            Available values in State
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Result.Values.NotFound">
+            <summary>
+            Not found
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Result.Values.Positive">
+            <summary>
+            Positive
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Result.Values.Negative">
+            <summary>
+            Negative
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Result.Values.ToRepeat">
+            <summary>
+            ToRepeat
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Result.Values.ResultTooSoon">
+            <summary>
+            If technical delay eg 15 minutes is not met from the testing time, the result should not be processed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Result.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Result.TestingSetId">
+            <summary>
+            Id of testing set
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Result.State">
             <summary>
             State. Available states are listed in Model.TestResult
@@ -2340,6 +2380,11 @@
         <member name="P:CovidMassTesting.Model.Result.VerificationId">
             <summary>
             Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Result.Time">
+            <summary>
+            Time when result has been inserted
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Settings.GoSMSConfiguration">
@@ -3473,6 +3518,11 @@
             Last change
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.ResultNotifiedCount">
+            <summary>
+            Last change
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.TestingTime">
             <summary>
             Real time when the test has been taken
@@ -3496,6 +3546,11 @@
         <member name="P:CovidMassTesting.Model.Visitor.Token">
             <summary>
             Captcha token. After it is used it is removed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.TestResultTime">
+            <summary>
+            Time when test has been confirmed by lab
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.VisitorSimplified">
@@ -5728,6 +5783,14 @@
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String)">
             <summary>
             Updates testing state
+            </summary>
+            <param name="code"></param>
+            <param name="state"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestWithoutNotification(System.Int32,System.String)">
+            <summary>
+            Updates the visitor test result
             </summary>
             <param name="code"></param>
             <param name="state"></param>
