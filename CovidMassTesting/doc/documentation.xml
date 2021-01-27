@@ -253,7 +253,6 @@
             <summary>
             Creates product at specified place with special price valid from until as specified in PlaceProduct object 
             </summary>
-            <param name="placeId"></param>
             <param name="placeProduct"></param>
             <returns></returns>
         </member>
@@ -447,24 +446,7 @@
              <summary>
              Generates PDF File
              
-             Default variables: <br/>
-             Prefix  = "BA01-"; <br/>
-             offsetBranch  = 100000; <br/>
-             OffsetIter  = 1; <br/>
-             Columns  = 3; <br/>
-             Count  = 100; <br/>
-             Height  = 50f; <br/>
-             Width  = 200f; <br/>
-             CellPaddingTop  = 10f; <br/>
-             CellPaddingRight  = 10f; <br/>
-             CellPaddingLeft  = 30f; <br/>
-             CellPaddingBottom  = 10f; <br/>
-             PageMarginTop  = 45f; <br/>
-             PageMarginRight  = 45f; <br/>
-             PageMarginLeft  = 45f; <br/>
-             PageMarginBottom  = 45f; <br/>
-             Type  = QRCode|BarCode; <br/>
-             Scale  = 2.5f; <br/>
+             Default variables: https://github.com/scholtz/covid-sk-api/blob/main/CovidMassTesting/Model/Settings/PDFQRConfiguration.cs
             
              </summary>
              <returns></returns>
@@ -4369,7 +4351,7 @@
             <param name="resultguid"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetResult(System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetResultVerification(System.String)">
             <summary>
             Decode visitor data from database
             </summary>
@@ -4882,7 +4864,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetResult(System.String)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetResultVerification(System.String)">
             <summary>
             Decode visitor data from database
             </summary>
@@ -6028,9 +6010,10 @@
             <param name="subfilter"></param>
             <param name="reason"></param>
             <param name="location"></param>
+            <param name="pages"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetResult(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetResultVerification(System.String)">
             <summary>
             Decode visitor data from database
             </summary>

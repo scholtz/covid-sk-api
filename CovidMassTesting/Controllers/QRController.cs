@@ -148,14 +148,15 @@ namespace CovidMassTesting.Controllers
             cell.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
             cell.SetHorizontalAlignment(HorizontalAlignment.CENTER);
             cell.SetVerticalAlignment(VerticalAlignment.MIDDLE);
-
-            Paragraph p = new Paragraph(settings.Prefix);
-            p.SetTextAlignment(TextAlignment.CENTER);
-            p.SetVerticalAlignment(VerticalAlignment.BOTTOM);
-            p.SetMargin(0);
-            p.SetPadding(0);
-            cell.Add(p);
-
+            if (settings.PrefixAboveQR)
+            {
+                Paragraph p = new Paragraph(settings.Prefix);
+                p.SetTextAlignment(TextAlignment.CENTER);
+                p.SetVerticalAlignment(VerticalAlignment.BOTTOM);
+                p.SetMargin(0);
+                p.SetPadding(0);
+                cell.Add(p);
+            }
             var qrParam = new Dictionary<EncodeHintType, Object>();
             qrParam[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.H;
             qrParam[EncodeHintType.CHARACTER_SET] = "ASCII";
@@ -174,13 +175,24 @@ namespace CovidMassTesting.Controllers
             cell.SetPaddingLeft(settings.CellPaddingLeft);
             cell.SetBorder(iText.Layout.Borders.Border.NO_BORDER);
 
-
-            p = new Paragraph(code);
-            p.SetTextAlignment(TextAlignment.CENTER);
-            p.SetVerticalAlignment(VerticalAlignment.TOP);
-            p.SetMargin(0);
-            p.SetPadding(0);
-            cell.Add(p);
+            if (settings.PrefixAboveQR)
+            {
+                var p = new Paragraph(code);
+                p.SetTextAlignment(TextAlignment.CENTER);
+                p.SetVerticalAlignment(VerticalAlignment.TOP);
+                p.SetMargin(0);
+                p.SetPadding(0);
+                cell.Add(p);
+            }
+            else
+            {
+                var p = new Paragraph($"{settings.Prefix}{code}");
+                p.SetTextAlignment(TextAlignment.CENTER);
+                p.SetVerticalAlignment(VerticalAlignment.TOP);
+                p.SetMargin(0);
+                p.SetPadding(0);
+                cell.Add(p);
+            }
             return cell;
         }
     }
