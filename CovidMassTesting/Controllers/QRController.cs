@@ -65,7 +65,7 @@ namespace CovidMassTesting.Controllers
                 if (configuration.Width == default) configuration.Width = baseConfig.Width;
                 if (configuration.Increment == default) configuration.Increment = baseConfig.Increment;
 
-                if (configuration.Count > 10000) throw new Exception("Limit has been reached");
+                if (configuration.Count > 100000) throw new Exception("Limit has been reached");
 
                 return File(ManipulatePdf(configuration), "application/pdf", $"qr-{configuration.Prefix}-{configuration.OffsetIter}-{configuration.Count}.pdf");
             }
