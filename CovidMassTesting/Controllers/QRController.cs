@@ -64,6 +64,8 @@ namespace CovidMassTesting.Controllers
                 if (configuration.Type == default) configuration.Type = baseConfig.Type;
                 if (configuration.Width == default) configuration.Width = baseConfig.Width;
                 if (configuration.Increment == default) configuration.Increment = baseConfig.Increment;
+                if (configuration.TopTextSize == default) configuration.TopTextSize = baseConfig.Increment;
+                if (configuration.BottomTextSize == default) configuration.BottomTextSize = baseConfig.Increment;
 
                 if (configuration.Count > 100000) throw new Exception("Limit has been reached");
 
@@ -151,6 +153,7 @@ namespace CovidMassTesting.Controllers
             if (settings.PrefixAboveQR)
             {
                 Paragraph p = new Paragraph(settings.Prefix);
+                p.SetFontSize(settings.TopTextSize);
                 p.SetTextAlignment(TextAlignment.CENTER);
                 p.SetVerticalAlignment(VerticalAlignment.BOTTOM);
                 p.SetMargin(0);
@@ -160,7 +163,18 @@ namespace CovidMassTesting.Controllers
             var qrParam = new Dictionary<EncodeHintType, Object>();
             qrParam[EncodeHintType.ERROR_CORRECTION] = ErrorCorrectionLevel.H;
             qrParam[EncodeHintType.CHARACTER_SET] = "ASCII";
-            BarcodeQRCode barcode = new BarcodeQRCode($"{settings.Prefix}{code}", qrParam);
+
+            var codeInQR = "";
+            if (settings.IncludePrefixInQR)
+            {
+                codeInQR = $"{settings.Prefix}{code}";
+            }
+            else
+            {
+                codeInQR = $"{code}";
+            }
+
+            BarcodeQRCode barcode = new BarcodeQRCode(codeInQR, qrParam);
             PdfFormXObject barcodeObject = barcode.CreateFormXObject(pdfDoc);
 
             // Create barcode object to put it to the cell as image
@@ -178,6 +192,7 @@ namespace CovidMassTesting.Controllers
             if (settings.PrefixAboveQR)
             {
                 var p = new Paragraph(code);
+                p.SetFontSize(settings.BottomTextSize);
                 p.SetTextAlignment(TextAlignment.CENTER);
                 p.SetVerticalAlignment(VerticalAlignment.TOP);
                 p.SetMargin(0);
@@ -187,6 +202,7 @@ namespace CovidMassTesting.Controllers
             else
             {
                 var p = new Paragraph($"{settings.Prefix}{code}");
+                p.SetFontSize(settings.BottomTextSize);
                 p.SetTextAlignment(TextAlignment.CENTER);
                 p.SetVerticalAlignment(VerticalAlignment.TOP);
                 p.SetMargin(0);

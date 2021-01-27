@@ -29,5 +29,8 @@ namespace CovidMassTesting.Model.Settings
         public string Type { get; set; } = "QRCode";
         public float Scale { get; set; } = 1.9f;
         public bool PrefixAboveQR { get; set; } = true;
+        public float TopTextSize { get; set; } = 5;
+        public float BottomTextSize { get; set; } = 10;
+        public bool IncludePrefixInQR { get; set; } = true;
     }
 }
