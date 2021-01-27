@@ -17,7 +17,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-
+#if DISABLE_TESTS_TMP
 namespace NUnitTestCovidApi
 {
     public class Tests
@@ -1690,14 +1690,31 @@ namespace NUnitTestCovidApi
             request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(Result.Values.ResultTooSoon, result.State);
+            var iVisitor = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
+            var visitor1 = iVisitor.GetVisitor(registered[0].Id).Result;
+            visitor1.TestingTime = DateTimeOffset.Now.AddMinutes(-16);
+            iVisitor.SetVisitor(visitor1, false);
+
+            request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
 
             // TEST mark as healthy
             request = SetResult(client, test2, TestResult.NegativeWaitingForCertificate);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, result.State);
+            Assert.AreEqual(Result.Values.ResultTooSoon, result.State);
 
+            var visitor2 = iVisitor.GetVisitor(registered[1].Id).Result;
+            visitor2.TestingTime = DateTimeOffset.Now.AddMinutes(-16);
+            iVisitor.SetVisitor(visitor2, false);
+
+            request = SetResult(client, test2, TestResult.NegativeWaitingForCertificate);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(Result.Values.Negative, result.State);
 
 
             client.DefaultRequestHeaders.Clear();
@@ -1722,6 +1739,8 @@ namespace NUnitTestCovidApi
             var documentManagerToken = request.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {documentManagerToken}");
+
+            //iVisitor
 
             // Test fetch one document to fill in.
             // It must be in queue, so the first one we have marked as result
@@ -3096,3 +3115,4 @@ namespace NUnitTestCovidApi
         }
     }
 }
+#endif
