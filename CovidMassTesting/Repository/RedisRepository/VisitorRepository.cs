@@ -565,10 +565,18 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
+                case TestResult.TestMustBeRepeated:
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
                     break;
                 case TestResult.TestIsBeingProcessing:
                     visitor.TestingTime = visitor.LastUpdate;
+                    break;
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.NegativeCertificateTaken:
+                    if (!visitor.ResultNotifiedAt.HasValue)
+                    {
+                        visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
+                    }
                     break;
             }
             visitor.LastUpdate = DateTimeOffset.Now;
