@@ -5879,6 +5879,12 @@
             <param name="testId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ProcessSingle">
+            <summary>
+            Process pdf and sms sending after the test
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(System.String)">
             <summary>
             Removes document from queue and sets the test as taken
@@ -6595,14 +6601,15 @@
             This method gets called by the runtime. Use this method to add services to the container.
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CovidMassTesting.Repository.Interface.IUserRepository,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Startup})">
+        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CovidMassTesting.Repository.Interface.IUserRepository,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Startup},CovidMassTesting.Repository.Interface.IVisitorRepository)">
             <summary>
             This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             </summary>
             <param name="app"></param>
             <param name="env"></param>
             <param name="userRepository"></param>
-            <param name="logger"></param>        
+            <param name="logger"></param>
+            <param name="visitorRepository"></param>        
         </member>
     </members>
 </doc>

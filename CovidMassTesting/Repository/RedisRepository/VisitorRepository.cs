@@ -1107,7 +1107,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             return item;
             /**/
         }
-
+        /// <summary>
+        /// Process pdf and sms sending after the test
+        /// </summary>
+        /// <returns></returns>
         public async Task<bool> ProcessSingle()
         {
             var msg = await PopFromResultQueue();
