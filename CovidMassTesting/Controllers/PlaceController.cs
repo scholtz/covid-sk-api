@@ -138,7 +138,7 @@ namespace CovidMassTesting.Controllers
                         }
                     }
                 }
-                return Ok(ret);
+                return Ok(ret.OrderBy(p => p.Value.Name));
             }
             catch (Exception exc)
             {
@@ -231,7 +231,7 @@ namespace CovidMassTesting.Controllers
                 }
                 if (availability == "all")
                 {
-                    return Ok(places.ToDictionary(p => p.Id, p => p));
+                    return Ok(places.OrderBy(p => p.Name).ToDictionary(p => p.Id, p => p));
                 }
 
 
@@ -264,7 +264,7 @@ namespace CovidMassTesting.Controllers
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) return Ok(null);
                 var list = (await placeRepository.ListAll());
                 if (isGlobalAdmin) return Ok(list.ToDictionary(p => p.Id, p => p));
-                return Ok(list.Where(p => p.PlaceProviderId == User.GetPlaceProvider()).ToDictionary(p => p.Id, p => p));
+                return Ok(list.Where(p => p.PlaceProviderId == User.GetPlaceProvider()).OrderBy(p => p.Name).ToDictionary(p => p.Id, p => p));
             }
             catch (Exception exc)
             {
