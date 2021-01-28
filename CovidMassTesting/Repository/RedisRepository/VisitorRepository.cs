@@ -1142,9 +1142,12 @@ namespace CovidMassTesting.Repository.RedisRepository
             var waitInt = int.Parse(confWait);
             if (obj.Time.AddMinutes(waitInt) > DateTimeOffset.Now)
             {
+                await AddToResultQueue(msg); // put at the end of the queue .. in case we close this app we cannot loose the data
+
                 var delay = DateTimeOffset.Now - obj.Time.AddMinutes(waitInt);
                 if (delay > TimeSpan.Zero)
                 {
+                    logger.LogInformation($"Waiting {delay} for next task");
                     await Task.Delay(delay);
                 }
             }
