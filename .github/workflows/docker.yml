@@ -1,6 +1,6 @@
 name: Create docker image
 
-on: [push, pull_request]
+on: [ push ]
 
 jobs:
   multi:
