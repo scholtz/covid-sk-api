@@ -771,6 +771,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
             }
+
+            pass = FormatDocument(pass); // normalize
+
             if (pass.Length < 4)
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
@@ -780,13 +783,25 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new Exception("Skontrolujte prosím správne zadanie kódu registrácie.");
             }
-            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            if (visitor.PersonType == "foreign")
             {
-                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+                var passport = FormatDocument(visitor.Passport);
+
+                if (passport.Length < 4) { throw new Exception("Your passport length is smaller then 4 chars. It is probably error. Contact support please."); }
+
+                if (!visitor.Passport.EndsWith(pass, true, CultureInfo.InvariantCulture))
+                {
+                    throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+                }
             }
-            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            else
             {
-                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+                if (visitor.RC == null || visitor.RC.Length < 4) { throw new Exception("Vaše rodné číslo je kratšie ako 4 znaky. Je to pravdepodobne chyba. Prosím kontaktujte podporu."); }
+
+                if (!visitor.RC.EndsWith(pass, true, CultureInfo.InvariantCulture))
+                {
+                    throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+                }
             }
 
 
