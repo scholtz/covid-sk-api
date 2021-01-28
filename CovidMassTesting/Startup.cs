@@ -33,6 +33,8 @@ namespace CovidMassTesting
         /// Identifies specific run of the application
         /// </summary>
         public static readonly DateTimeOffset Started = DateTimeOffset.Now;
+
+        private static Task watcher = null;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -289,7 +291,7 @@ namespace CovidMassTesting
             if (Configuration["SendResults"] == "1")
             {
 
-                Task.Run(() =>
+                watcher = Task.Factory.StartNew(() =>
                 {
                     logger.LogInformation("SendResults acivated");
                     while (true)
@@ -307,7 +309,7 @@ namespace CovidMassTesting
                             logger.LogError(exc, "Error in main sending loop");
                         }
                     }
-                });
+                }, TaskCreationOptions.LongRunning);
             }
 
             logger.LogInformation($"App started with db prefix {Configuration["db-prefix"]}");
