@@ -1778,7 +1778,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.Product = product;
 
             QRCoder.QRCodeGenerator qrGenerator = new QRCoder.QRCodeGenerator();
-            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.Q);
+            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.H);
             QRCoder.QRCode qrCode = new QRCoder.QRCode(qrCodeData);
             using var outData = new MemoryStream();
             qrCode.GetGraphic(20).Save(outData, System.Drawing.Imaging.ImageFormat.Png);
@@ -1850,7 +1850,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.BarCode = Convert.ToBase64String(barBytes).Replace("\n", "");
 
             QRCoder.QRCodeGenerator qrGenerator = new QRCoder.QRCodeGenerator();
-            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(visitor.Id.ToString(), QRCoder.QRCodeGenerator.ECCLevel.Q);
+            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(visitor.Id.ToString(), QRCoder.QRCodeGenerator.ECCLevel.H);
             QRCoder.QRCode qrCode = new QRCoder.QRCode(qrCodeData);
             using var outData = new MemoryStream();
             qrCode.GetGraphic(20).Save(outData, System.Drawing.Imaging.ImageFormat.Png);
