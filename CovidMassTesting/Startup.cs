@@ -290,6 +290,7 @@ namespace CovidMassTesting
 
             if (Configuration["SendResults"] == "1")
             {
+                logger.LogInformation("SendResults starting..");
 
                 watcher = Task.Factory.StartNew(() =>
                 {
