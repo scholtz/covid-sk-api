@@ -439,7 +439,7 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException("Please provide verification identifier");
                 }
 
-                var ret = await visitorRepository.GetResult(id);
+                var ret = await visitorRepository.GetResultVerification(id);
                 return Ok(ret);
             }
             catch (Exception exc)

@@ -89,7 +89,7 @@ namespace CovidMassTesting.Controllers
             {
                 list = await placeRepository.ListAll();
                 list = list.Where(p => p.IsVisible == true);
-                list = await EnrichWithEmptySlots(list);
+                list = await EnrichWithEmptySlots(list.ToArray());
             }
             return list;
         }
@@ -150,6 +150,7 @@ namespace CovidMassTesting.Controllers
 
         private async Task<IEnumerable<Place>> EnrichWithEmptySlots(IEnumerable<Place> list, int daysCount = 1)
         {
+            var ret = new List<Place>();
             foreach (var item in list)
             {
                 var total = 0;
@@ -184,9 +185,10 @@ namespace CovidMassTesting.Controllers
                     item.AvailableSlotsTodayUpdate = DateTimeOffset.UtcNow;
                     item.AvailableSlotsToday = total;
                 }
+                ret.Add(item);
             }
 
-            return list;
+            return ret;
         }
 
         /// <summary>
@@ -597,7 +599,6 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Creates product at specified place with special price valid from until as specified in PlaceProduct object 
         /// </summary>
-        /// <param name="placeId"></param>
         /// <param name="placeProduct"></param>
         /// <returns></returns>
         [Authorize]

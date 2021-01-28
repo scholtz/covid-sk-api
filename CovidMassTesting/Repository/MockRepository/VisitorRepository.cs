@@ -21,10 +21,12 @@ namespace CovidMassTesting.Repository.MockRepository
     public class VisitorRepository : Repository.RedisRepository.VisitorRepository
     {
         private readonly ConcurrentDictionary<int, Visitor> data = new ConcurrentDictionary<int, Visitor>();
+        private readonly ConcurrentDictionary<string, Result> dataResults = new ConcurrentDictionary<string, Result>();
         private readonly ConcurrentDictionary<string, string> verification = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<string, int> testing2code = new ConcurrentDictionary<string, int>();
         private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
         private readonly SortedSet<string> docqueue = new SortedSet<string>();
+        private readonly Queue<string> resultqueue = new Queue<string>();
         private readonly IConfiguration configuration;
         private readonly ILogger<VisitorRepository> logger;
         private int TestInt { get; set; }
@@ -259,7 +261,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override async Task<VerificationData> GetResult(string id)
+        public override async Task<VerificationData> GetResultVerification(string id)
         {
             logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
             var encoded = verification[id];
@@ -288,6 +290,49 @@ namespace CovidMassTesting.Repository.MockRepository
             if (mustBeNew && verification.ContainsKey(verificationData.Id)) throw new Exception("Must be new");
             verification[verificationData.Id] = encoded;
             return verificationData;
+        }
+
+        public async override Task<bool> AddToResultQueue(string resultId)
+        {
+            resultqueue.Enqueue(resultId);
+            return true;
+        }
+        public async override Task<string> GetFirstItemFromResultQueue()
+        {
+            logger.LogInformation($"Visitor.GetFirstItemFromResultQueue");
+            return resultqueue.FirstOrDefault();
+        }
+        public async override Task<Result> GetResultObject(string id)
+        {
+            return dataResults[id];
+        }
+        public async override Task<IEnumerable<string>> ListAllKeysResults()
+        {
+            return dataResults.Keys;
+        }
+        public async override Task<IEnumerable<string>> ListAllResultKeys()
+        {
+            return verification.Keys;
+        }
+        public async override Task<string> PopFromResultQueue()
+        {
+            resultqueue.TryDequeue(out var ret);
+            logger.LogInformation($"Visitor.RemoveFromDocQueue {ret}");
+            return ret;
+        }
+        public async override Task<bool> RemoveResult(string id)
+        {
+            dataResults.TryRemove(id, out var removed);
+            return removed != null;
+        }
+        public async override Task<Result> SetResultObject(Result result, bool mustBeNew)
+        {
+            if (mustBeNew)
+            {
+                if (dataResults.ContainsKey(result.Id)) throw new Exception("Result must be new");
+            }
+            dataResults[result.Id] = result;
+            return result;
         }
     }
 }

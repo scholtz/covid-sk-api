@@ -21,23 +21,23 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Core" Version="3.5.2" />
-    <PackageReference Include="AWSSDK.SQS" Version="3.5.1.10" />
-    <PackageReference Include="BarcodeLib" Version="2.2.9" />
+    <PackageReference Include="AWSSDK.Core" Version="3.5.2.1" />
+    <PackageReference Include="AWSSDK.SQS" Version="3.5.1.11" />
+    <PackageReference Include="BarcodeLib" Version="2.2.10" />
     <PackageReference Include="ChoETL" Version="1.2.1.5" />
-    <PackageReference Include="CsvHelper" Version="19.0.0" />
+    <PackageReference Include="CsvHelper" Version="21.2.1" />
     <PackageReference Include="GoogleReCaptcha.V3" Version="1.3.0" />
     <PackageReference Include="GoPay.NetStandard" Version="1.1.14" />
-    <PackageReference Include="itext7.pdfhtml" Version="3.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.1" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.1" />
+    <PackageReference Include="itext7.pdfhtml" Version="3.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="5.0.2" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NLog" Version="4.7.6" />
+    <PackageReference Include="NLog" Version="4.7.7" />
     <PackageReference Include="NLog.Web.AspNetCore" Version="4.10.0" />
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.5" />
+    <PackageReference Include="Portable.BouncyCastle" Version="1.8.9" />
     <PackageReference Include="QRCoder" Version="1.4.1" />
     <PackageReference Include="RestSharp" Version="106.11.7" />
     <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="106.11.7" />

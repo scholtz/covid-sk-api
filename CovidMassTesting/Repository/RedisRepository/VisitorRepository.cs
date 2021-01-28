@@ -37,10 +37,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IUserRepository userRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
-        private readonly string REDIS_KEY_RESULTS_OBJECTS = "RESULTS";
+        private readonly string REDIS_KEY_RESULTVERIFICATION_OBJECTS = "RESULTS";
+        private readonly string REDIS_KEY_RESULTS_NEW_OBJECTS = "RESULTSLIST";
         private readonly string REDIS_KEY_TEST2VISITOR = "TEST2VISITOR";
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
         private readonly string REDIS_KEY_DOCUMENT_QUEUE = "DOCUMENT_QUEUE";
+        private readonly string REDIS_KEY_RESULT_QUEUE = "RESULT_QUEUE";
         private readonly IEmailSender emailSender;
         private readonly ISMSSender smsSender;
         /// <summary>
@@ -79,6 +81,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.slotRepository = slotRepository;
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
+
         }
         /// <summary>
         /// Creates new visitor registration
@@ -186,7 +189,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", id.ToString(CultureInfo.InvariantCulture));
             return true;
         }
-
+        public virtual async Task<bool> RemoveResult(string id)
+        {
+            await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", id);
+            return true;
+        }
         /// <summary>
         /// Decode visitor data from database
         /// </summary>
@@ -208,6 +215,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 return ret;
             }
+        }
+        public virtual Task<Result> GetResultObject(string id)
+        {
+            return redisCacheClient.Db0.HashGetAsync<Result>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", id);
         }
         /// <summary>
         /// Fills in missing data if possible
@@ -381,6 +392,21 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return visitor;
         }
+
+        public virtual async Task<Result> SetResultObject(Result result, bool mustBeNew)
+        {
+            if (result is null)
+            {
+                throw new ArgumentNullException(nameof(result));
+            }
+
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", result.Id, result, mustBeNew);
+            if (mustBeNew && !ret)
+            {
+                throw new Exception("Error creating record in the database");
+            }
+            return result;
+        }
         /// <summary>
         /// Maps testing code to visitor code
         /// </summary>
@@ -491,6 +517,32 @@ namespace CovidMassTesting.Repository.RedisRepository
             return UpdateTestingState(code, state, "", true);
         }
         /// <summary>
+        /// Updates the visitor test result
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public async Task<bool> UpdateTestWithoutNotification(int code, string state)
+        {
+            var visitor = await GetVisitor(code);
+            if (visitor.TestingTime.HasValue)
+            {
+                var confWait = configuration["minWaitTimeForResultMinutes"] ?? "15";
+
+                if (visitor.TestingTime.Value.AddMinutes(int.Parse(confWait)) > DateTimeOffset.Now)
+                {
+                    return false;
+                }
+            }
+#if SaveASAP
+            visitor.Result = state;
+            visitor.LastUpdate = DateTimeOffset.Now;
+            visitor.TestResultTime = visitor.LastUpdate;
+            await SetVisitor(visitor, false);
+#endif
+            return true;
+        }
+        /// <summary>
         /// Updates testing state
         /// </summary>
         /// <param name="code"></param>
@@ -502,18 +554,24 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await GetVisitor(code);
             if (visitor == null) throw new Exception(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found].Value, code));
-            if (visitor.Result == state)
+            if (visitor.Result == state && visitor.ResultNotifiedAt.HasValue)
             {
                 // repeated requests should not send emails
                 return true;
             }
 
             visitor.Result = state;
-            visitor.LastUpdate = DateTimeOffset.Now;
-            if (state == TestResult.TestIsBeingProcessing)
+            switch (state)
             {
-                visitor.TestingTime = visitor.LastUpdate;
+                case TestResult.PositiveWaitingForCertificate:
+                case TestResult.NegativeWaitingForCertificate:
+                    visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
+                    break;
+                case TestResult.TestIsBeingProcessing:
+                    visitor.TestingTime = visitor.LastUpdate;
+                    break;
             }
+            visitor.LastUpdate = DateTimeOffset.Now;
             if (state == "test-not-processed")
             {
                 visitor.TestingSet = testingSet;
@@ -730,6 +788,19 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
+
+
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveWaitingForCertificate:
+                    visitor.Result = TestResult.PositiveCertificateTaken;
+                    break;
+                case TestResult.NegativeWaitingForCertificate:
+                    visitor.Result = TestResult.NegativeCertificateTaken;
+                    break;
+            }
+            visitor.LastStatusCheck = DateTimeOffset.UtcNow;
+            await SetVisitor(visitor, false);
             return new Result { State = visitor.Result, VerificationId = visitor.VerificationId };
         }
         /// <summary>
@@ -952,13 +1023,17 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
         }
+        public virtual Task<IEnumerable<string>> ListAllKeysResults()
+        {
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}");
+        }
         /// <summary>
         /// Lists all result keys
         /// </summary>
         /// <returns></returns>
         public virtual Task<IEnumerable<string>> ListAllResultKeys()
         {
-            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_OBJECTS}");
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTVERIFICATION_OBJECTS}");
         }
         /// <summary>
         /// Returns visitor by personal number
@@ -980,13 +1055,23 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Result> SetTestResult(string testCode, string result)
         {
             var visitorCode = await GETVisitorCodeFromTesting(testCode);
-            if (!visitorCode.HasValue) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Unable_to_find_visitor_code_from_test_code__Are_you_sure_test_code_is_correct_].Value);
-
-            await UpdateTestingState(visitorCode.Value, result);
-            return new Result()
+            var ret = new Result()
             {
-                State = result
+                State = result,
+                TestingSetId = testCode
             };
+            if (!visitorCode.HasValue)
+            {
+                ret.Matched = false;
+            }
+            if (visitorCode.HasValue)
+            {
+                ret.Matched = true;
+                ret.TimeIsValid = await UpdateTestWithoutNotification(visitorCode.Value, result);
+            }
+            await SetResultObject(ret, false);
+            if (ret.TimeIsValid) await AddToResultQueue(ret.Id);
+            return ret;
         }
         /// <summary>
         /// Add test to document queue
@@ -997,6 +1082,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId, DateTimeOffset.UtcNow.Ticks);
         }
+
+        public async virtual Task<bool> AddToResultQueue(string resultId)
+        {
+            return await redisCacheClient.Db0.ListAddToLeftAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", resultId) > 0;
+            //return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", resultId, DateTimeOffset.UtcNow.Ticks);
+        }
         /// <summary>
         /// Removes test from document queue
         /// </summary>
@@ -1005,6 +1096,66 @@ namespace CovidMassTesting.Repository.RedisRepository
         public virtual Task<bool> RemoveFromDocQueue(string testId)
         {
             return redisCacheClient.Db0.SortedSetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId);
+        }
+        public async virtual Task<string> PopFromResultQueue()
+        {
+            return await redisCacheClient.Db0.ListGetFromRightAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}");
+
+            /*
+            var item = await GetFirstItemFromResultQueue();
+            await redisCacheClient.Db0.SortedSetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", item);
+            return item;
+            /**/
+        }
+
+        public async Task<bool> ProcessSingle()
+        {
+            var msg = await PopFromResultQueue();
+            if (string.IsNullOrEmpty(msg)) return false;
+            var obj = await GetResultObject(msg);
+            if (obj == null)
+            {
+                logger.LogError("Result with id {msg} not found");
+                return false;
+            }
+            // if time is less then 5 minutes from the click allow to change result without notification
+
+            var confWait = configuration["minWaitTimeForFinalResultsMinutes"] ?? "5";
+            var waitInt = int.Parse(confWait);
+            if (obj.Time.AddMinutes(waitInt) > DateTimeOffset.Now)
+            {
+                var delay = DateTimeOffset.Now - obj.Time.AddMinutes(waitInt);
+                if (delay > TimeSpan.Zero)
+                {
+                    await Task.Delay(delay);
+                }
+            }
+            var random = new Random();
+            var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 1000));
+            await Task.Delay(randDelay);
+            obj = await GetResultObject(msg);
+
+            var visitorCode = await GETVisitorCodeFromTesting(obj.TestingSetId);
+
+            if (obj.State == Result.Values.NotFound)
+            {
+                // check again
+                if (!visitorCode.HasValue)
+                {
+                    return true; // put the message to the trash
+                }
+            }
+
+            if (visitorCode.HasValue)
+            {
+                logger.LogInformation($"SendResults: processing {obj.State}");
+                await UpdateTestingState(visitorCode.Value, obj.State);
+            }
+            else
+            {
+                // put the message to the trash
+            }
+            return true;
         }
         /// <summary>
         /// Removes document from queue and sets the test as taken
@@ -1036,6 +1187,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         public virtual async Task<string> GetFirstItemFromQueue()
         {
             return (await redisCacheClient.Db0.SortedSetRangeByScoreAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", take: 1, skip: 0)).FirstOrDefault();
+        }
+        public virtual async Task<string> GetFirstItemFromResultQueue()
+        {
+            return (await redisCacheClient.Db0.SortedSetRangeByScoreAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", take: 1, skip: 0)).FirstOrDefault();
         }
         /// <summary>
         /// Fetch next test
@@ -1324,16 +1479,23 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", item);
             }
+            foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}"))
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", item);
+            }
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}"))
             {
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", item);
             }
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}"))
             {
+
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}", item);
             }
             ret += (int)await redisCacheClient.Db0.SetRemoveAllAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}");
-
+            ret += (int)await redisCacheClient.Db0.SetRemoveAllAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}");
+            var bool1 = await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}");
+            var bool2 = await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}");
             // REDIS_KEY_RESULTS_OBJECTS are intended to stay even if all data has been removed
 
             return ret;
@@ -1544,10 +1706,12 @@ namespace CovidMassTesting.Repository.RedisRepository
             var data = new Model.Mustache.TestResult();
             switch (visitor.Result)
             {
+                case TestResult.PositiveCertificateTaken:
                 case TestResult.PositiveWaitingForCertificate:
                     data.Text = "Pozitívny";
                     data.Description = "Zostaňte prosím v karanténe minimálne 14 dní. Potom si vykonajte ďalší antigénový alebo PCR test aby ste mali istotu že vírus nebudete šíriť medzi ľudí.";
                     break;
+                case TestResult.NegativeCertificateTaken:
                 case TestResult.NegativeWaitingForCertificate:
                     data.Text = "Negatívny";
                     data.Description = "Aj keď test u Vás nepreukázal COVID, prosím zostaňte ostražitý. V prípade príznakov ako kašeľ, zvýšená teplota, alebo bolesť hlavy choďte prosím na ďalší test.";
@@ -1863,6 +2027,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="subfilter"></param>
         /// <param name="reason"></param>
         /// <param name="location"></param>
+        /// <param name="pages"></param>
         /// <returns></returns>
         public byte[] Sign(
             byte[] src,
@@ -1921,10 +2086,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public virtual async Task<VerificationData> GetResult(string id)
+        public virtual async Task<VerificationData> GetResultVerification(string id)
         {
             logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
-            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_OBJECTS}", id.ToString());
+            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTVERIFICATION_OBJECTS}", id.ToString());
             if (string.IsNullOrEmpty(encoded)) return null;
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
@@ -1947,7 +2112,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"Setting verificationData {verificationData.Id.GetHashCode()}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var encoded = aes.EncryptToBase64String(objectToEncode);
-            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_OBJECTS}", verificationData.Id, encoded, mustBeNew);
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTVERIFICATION_OBJECTS}", verificationData.Id, encoded, mustBeNew);
             if (mustBeNew && !ret)
             {
                 throw new Exception("Error creating record in the database");
@@ -2004,7 +2169,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             foreach (var id in await ListAllResultKeys())
             {
-                var result = await GetResult(id);
+                var result = await GetResultVerification(id);
                 if (dict.ContainsKey(result.Name))
                 {
                     var t = dict[result.Name].FirstOrDefault(x => x.TestingTime.HasValue && x.TestingTime > DateTimeOffset.MinValue)?.TestingTime;

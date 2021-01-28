@@ -16,6 +16,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting
 {
@@ -226,8 +227,15 @@ namespace CovidMassTesting
         /// <param name="app"></param>
         /// <param name="env"></param>
         /// <param name="userRepository"></param>
-        /// <param name="logger"></param>        
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IUserRepository userRepository, ILogger<Startup> logger)
+        /// <param name="logger"></param>
+        /// <param name="visitorRepository"></param>        
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+            IUserRepository userRepository,
+            ILogger<Startup> logger,
+            IVisitorRepository visitorRepository
+            )
         {
             if (app is null)
             {
@@ -277,6 +285,31 @@ namespace CovidMassTesting
             });
 
             userRepository.CreateAdminUsersFromConfiguration().Wait();
+
+            if (Configuration["SendResults"] == "1")
+            {
+
+                Task.Run(() =>
+                {
+                    logger.LogInformation("SendResults acivated");
+                    while (true)
+                    {
+                        try
+                        {
+                            visitorRepository.ProcessSingle().Wait();
+
+                            var random = new Random();
+                            var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 2000));
+                            Task.Delay(randDelay).Wait();
+                        }
+                        catch (Exception exc)
+                        {
+                            logger.LogError(exc, "Error in main sending loop");
+                        }
+                    }
+                });
+            }
+
             logger.LogInformation($"App started with db prefix {Configuration["db-prefix"]}");
             GC.Collect();
             try

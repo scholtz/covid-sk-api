@@ -100,6 +100,7 @@ namespace CovidMassTesting.Model
         /// Test result. Available options are in Model.TestResult
         /// </summary>
         public string Result { get; set; } = TestResult.NotTaken;
+        public DateTimeOffset? ResultNotifiedAt { get; set; } = null;
         /// <summary>
         /// Testing set identifier
         /// </summary>
@@ -108,6 +109,10 @@ namespace CovidMassTesting.Model
         /// Last change
         /// </summary>
         public DateTimeOffset LastUpdate { get; set; }
+        /// <summary>
+        /// Last change
+        /// </summary>
+        public int? ResultNotifiedCount { get; set; }
 
         /// <summary>
         /// Real time when the test has been taken
@@ -129,5 +134,10 @@ namespace CovidMassTesting.Model
         /// Captcha token. After it is used it is removed
         /// </summary>
         public string Token { get; set; }
+        /// <summary>
+        /// Time when test has been confirmed by lab
+        /// </summary>
+        public DateTimeOffset? TestResultTime { get; set; }
+        public DateTimeOffset? LastStatusCheck { get; set; }
     }
 }

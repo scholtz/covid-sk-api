@@ -166,7 +166,7 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public Task<VerificationData> GetResult(string id);
+        public Task<VerificationData> GetResultVerification(string id);
         /// <summary>
         /// Generate and sign PDF with test result
         /// </summary>
@@ -204,5 +204,9 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<int> FixBirthYear();
+
+        public Task<bool> ProcessSingle();
+
+        public Task<Result> SetResultObject(Result result, bool mustBeNew);
     }
 }

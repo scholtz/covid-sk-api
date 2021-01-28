@@ -2369,6 +2369,16 @@
             Time when result has been inserted
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Result.Matched">
+            <summary>
+            Matched with visitor
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Result.TimeIsValid">
+            <summary>
+            Returns true if time is valid
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.GoSMSConfiguration">
             <summary>
             GoSMS configuration https://doc.gosms.cz/
