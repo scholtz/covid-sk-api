@@ -1,3 +1,6 @@
+//#define DoTests
+
+#if DoTests
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using Microsoft.AspNetCore.Hosting;
@@ -3201,3 +3204,5 @@ namespace NUnitTestCovidApi
         }
     }
 }
+
+#endif
