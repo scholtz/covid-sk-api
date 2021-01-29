@@ -1327,7 +1327,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             )
                         );
                 }
-                var LimitPer1HourSlot = place.LimitPer5MinSlot;
+                var LimitPer1HourSlot = place.LimitPer1HourSlot;
                 if (!string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
                 {
                     if (int.TryParse(configuration["LimitPer1HourSlot"], out var confLimit))
