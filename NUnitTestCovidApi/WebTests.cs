@@ -542,11 +542,18 @@ namespace NUnitTestCovidApi
             DropDatabase();
             using var web = new MockWebApp(AppSettings);
             var client = web.CreateClient();
+
+            var request = Preauthenticate(client, "@");
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            request = Authenticate(client, "@", "1");
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();//.GetValue<List<CovidMassTesting.Model.Settings.User>>("AdminUsers");
 
             var user = users.First(u => u.Name == "Admin");
             /// Preauthenticate
-            var request = Preauthenticate(client, user.Email);
+            request = Preauthenticate(client, user.Email);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var authData = JsonConvert.DeserializeObject<AuthData>(request.Content.ReadAsStringAsync().Result);
             var cohash = authData.CoHash;

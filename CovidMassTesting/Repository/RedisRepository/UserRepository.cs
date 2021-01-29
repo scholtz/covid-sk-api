@@ -580,7 +580,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
 
             var usr = await GetUser(email, placeProviderId);
-            if (usr.Roles != null)
+            if (usr != null && usr.Roles != null)
             {
                 foreach (var dbrole in usr.Roles?.ToArray())
                 {
