@@ -133,5 +133,9 @@ namespace CovidMassTesting.Model
         /// AvailableSlotsToday
         /// </summary>
         public DateTimeOffset? AvailableSlotsTodayUpdate { get; set; }
+        /// <summary>
+        /// Limitations
+        /// </summary>
+        public List<PlaceLimitation> OtherLimitations { get; set; } = new List<PlaceLimitation>();
     }
 }

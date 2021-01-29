@@ -10,7 +10,7 @@ namespace CovidMassTesting.Model
     /// 
     /// This object is intended to cancel all new visitors for specific time slots
     /// </summary>
-    public class HotBreak
+    public class PlaceLimitation
     {
         /// <summary>
         /// Break id
@@ -28,5 +28,9 @@ namespace CovidMassTesting.Model
         /// Until
         /// </summary>
         public DateTimeOffset Until { get; set; }
+        /// <summary>
+        /// Limit
+        /// </summary>
+        public int HourLimit { get; set; }
     }
 }
