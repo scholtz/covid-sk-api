@@ -789,7 +789,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var visitor = await GetVisitor(code);
             if (visitor == null)
             {
-                throw new Exception("Skontrolujte prosím správne zadanie kódu registrácie.");
+                throw new Exception("Neznámy kód registrácie");
             }
             if (visitor.PersonType == "foreign")
             {
