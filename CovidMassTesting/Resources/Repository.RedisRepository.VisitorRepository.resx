@@ -164,10 +164,10 @@
     <value>TestResult.html;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
   <data name="This 1 hour time slot has reached the capacity." xml:space="preserve">
-    <value>This 1 hour time slot has reached the capacity.</value>
+    <value>This 1 hour time slot has reached the capacity ({0}).</value>
   </data>
   <data name="This 5 minute time slot has reached the capacity." xml:space="preserve">
-    <value>This 5 minute time slot has reached the capacity.</value>
+    <value>This 5 minute time slot has reached the capacity ({0}).</value>
   </data>
   <data name="Unable to find visitor code from test code. Are you sure test code is correct?" xml:space="preserve">
     <value>Unable to find visitor code from test code. Are you sure test code is correct?</value>

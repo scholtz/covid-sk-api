@@ -246,7 +246,7 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This 1 hour time slot has reached the capacity..
+        ///   Looks up a localized string similar to This 1 hour time slot has reached the capacity ({0})..
         /// </summary>
         internal static string This_1_hour_time_slot_has_reached_the_capacity_ {
             get {
@@ -255,7 +255,7 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to This 5 minute time slot has reached the capacity..
+        ///   Looks up a localized string similar to This 5 minute time slot has reached the capacity ({0})..
         /// </summary>
         internal static string This_5_minute_time_slot_has_reached_the_capacity_ {
             get {

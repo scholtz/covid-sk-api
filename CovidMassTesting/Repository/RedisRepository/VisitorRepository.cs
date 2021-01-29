@@ -1095,7 +1095,18 @@ namespace CovidMassTesting.Repository.RedisRepository
                 ret.TimeIsValid = await UpdateTestWithoutNotification(visitorCode.Value, result);
             }
             await SetResultObject(ret, false);
-            if (ret.TimeIsValid) await AddToResultQueue(ret.Id);
+            if (ret.TimeIsValid)
+            {
+                if (configuration["SendResultsThroughQueue"] == "1")
+                {
+                    await AddToResultQueue(ret.Id);
+                }
+                else
+                {
+                    logger.LogInformation($"SendResultsThroughQueue 0: processing {result}");
+                    await UpdateTestingState(visitorCode.Value, result);
+                }
+            }
             return ret;
         }
         /// <summary>
@@ -1309,7 +1320,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                 if (slotM.Registrations >= LimitPer5MinSlot)
                 {
-                    throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value);
+                    throw new Exception(
+                        string.Format(
+                                localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value,
+                                LimitPer5MinSlot
+                            )
+                        );
                 }
                 var LimitPer1HourSlot = place.LimitPer5MinSlot;
                 if (!string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
@@ -1331,7 +1347,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
                 if (slotH.Registrations >= LimitPer1HourSlot)
                 {
-                    throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value);
+                    throw new Exception(
+                        string.Format(
+                            localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value,
+                            LimitPer1HourSlot
+                        ));
                 }
             }
             Visitor previous = null;

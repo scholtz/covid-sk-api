@@ -157,10 +157,10 @@
     <value>Test neexistuje</value>
   </data>
   <data name="This 1 hour time slot has reached the capacity." xml:space="preserve">
-    <value>Tento hodinový časový úsek má už bohužiaľ kapacitu zaplnenú.</value>
+    <value>Tento hodinový časový úsek má už bohužiaľ kapacitu zaplnenú ({0}).</value>
   </data>
   <data name="This 5 minute time slot has reached the capacity." xml:space="preserve">
-    <value>Tento 5-minútový časový úsek má už bohužiaľ kapacitu zaplnenú.</value>
+    <value>Tento 5-minútový časový úsek má už bohužiaľ kapacitu zaplnenú ({0}).</value>
   </data>
   <data name="Unable to find visitor code from test code. Are you sure test code is correct?" xml:space="preserve">
     <value>Nepodarilo sa nájsť návštevníka podľa testovacej sady. Ste si istý, že kód testu je správny?</value>
