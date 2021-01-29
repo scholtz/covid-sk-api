@@ -1369,6 +1369,23 @@ namespace CovidMassTesting.Repository.RedisRepository
                 logger.LogInformation($"Update registration");
                 // update registration
                 visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
+
+                if (previous.TestingTime.HasValue)
+                {
+                    // visitor which was previously tested
+                    if (previous.Result == TestResult.PositiveCertificateTaken ||
+                        previous.Result == TestResult.PositiveWaitingForCertificate
+                        )
+                    {
+                        throw new Exception("Prosím, zostaňte doma. Váš predchádzajúci test preukázal prítomnosť covidu.");
+                    }
+
+                    if (previous.TestingTime.Value.AddDays(2) > DateTimeOffset.Now)
+                    {
+                        throw new Exception("Test si môžete vykonať najskôr za 2 dni");
+                    }
+                }
+
                 var slot = slotM;
                 visitor.Language = CultureInfo.CurrentCulture.Name;
                 var ret = await SetVisitor(visitor, false);
