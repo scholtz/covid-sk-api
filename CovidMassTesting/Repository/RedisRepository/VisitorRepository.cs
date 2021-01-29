@@ -985,19 +985,20 @@ namespace CovidMassTesting.Repository.RedisRepository
             var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
             CultureInfo.CurrentCulture = specifiedCulture;
             CultureInfo.CurrentUICulture = specifiedCulture;
-
-            await emailSender.SendEmail(
-                localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                visitor.Email,
-                $"{visitor.FirstName} {visitor.LastName}",
-                new Model.Email.PersonalDataRemovedEmail(visitor.Language)
-                {
-                    Name = $"{visitor.FirstName} {visitor.LastName}",
-                });
-
-            if (!string.IsNullOrEmpty(visitor.Phone))
+            if (!string.IsNullOrEmpty(visitor.Email))
             {
-
+                await emailSender.SendEmail(
+                    localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                    visitor.Email,
+                    $"{visitor.FirstName} {visitor.LastName}",
+                    new Model.Email.PersonalDataRemovedEmail(visitor.Language)
+                    {
+                        Name = $"{visitor.FirstName} {visitor.LastName}",
+                    });
+            }
+            if (!string.IsNullOrEmpty(visitor.Phone) && string.IsNullOrEmpty(visitor.Email))
+            {
+                // send sms only if email is not available
                 await smsSender.SendSMS(visitor.Phone,
                     new Model.SMS.Message(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0__We_have_removed_your_personal_data_from_the_database__Thank_you_for_taking_the_covid_test].Value, $"{visitor.FirstName} {visitor.LastName}"))
                 );
