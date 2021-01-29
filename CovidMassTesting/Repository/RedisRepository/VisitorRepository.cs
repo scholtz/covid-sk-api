@@ -1306,6 +1306,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                 }
 
+
                 if (slotM.Registrations >= LimitPer5MinSlot)
                 {
                     throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value);
@@ -1321,7 +1322,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                         }
                     }
                 }
-                if (slotH.Registrations >= place.LimitPer1HourSlot)
+                if (place.OtherLimitations != null)
+                {
+                    foreach (var limit in place.OtherLimitations.Where(l => l.From <= slotH.Time && l.Until > slotH.Time))
+                    {
+                        if (limit.HourLimit < LimitPer1HourSlot) LimitPer1HourSlot = limit.HourLimit;
+                    }
+                }
+                if (slotH.Registrations >= LimitPer1HourSlot)
                 {
                     throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value);
                 }

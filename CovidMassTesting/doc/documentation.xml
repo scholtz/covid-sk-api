@@ -242,6 +242,24 @@
             <param name="place"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.SetPlaceLimitation(System.String,System.DateTimeOffset,System.DateTimeOffset,System.Int32)">
+            <summary>
+            Limit specific place
+            </summary>
+            <param name="placeId"></param>
+            <param name="from"></param>
+            <param name="until"></param>
+            <param name="limit"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceController.DeletePlaceLimitation(System.String,System.String)">
+            <summary>
+            Delete place limitation
+            </summary>
+            <param name="placeId"></param>
+            <param name="limitId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.PlaceController.Delete(CovidMassTesting.Model.Place)">
             <summary>
             Admin can delete testing location

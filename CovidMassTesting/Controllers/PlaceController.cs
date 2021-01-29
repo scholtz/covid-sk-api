@@ -537,6 +537,7 @@ namespace CovidMassTesting.Controllers
                         place.PlaceProviderId = User.GetPlaceProvider();
                     }
                     place.Registrations = oldPlace.Registrations;
+                    place.OtherLimitations = oldPlace.OtherLimitations;
                     place = await placeRepository.SetPlace(place);
                     logger.LogInformation($"Place {place.Name} has been updated");
                 }
@@ -550,6 +551,105 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Limit specific place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <param name="from"></param>
+        /// <param name="until"></param>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("SetPlaceLimitation")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<PlaceLimitation>> SetPlaceLimitation(
+            [FromForm] string placeId,
+            [FromForm] DateTimeOffset from,
+            [FromForm] DateTimeOffset until,
+            [FromForm] int limit
+            )
+        {
+
+            try
+            {
+                var isGlobalAdmin = User.IsAdmin(userRepository);
+                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                var place = await placeRepository.GetPlace(placeId);
+
+                if (place is null)
+                {
+                    throw new ArgumentNullException(nameof(placeId));
+                }
+
+                var limitation = new PlaceLimitation()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    From = from,
+                    Until = until,
+                    HourLimit = limit,
+                    PlaceId = placeId
+                };
+
+                place.OtherLimitations.Add(limitation);
+                await placeRepository.SetPlace(place);
+
+                return Ok(place);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Delete place limitation
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <param name="limitId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("DeletePlaceLimitation")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<PlaceLimitation>> DeletePlaceLimitation(
+            [FromForm] string placeId,
+            [FromForm] string limitId
+            )
+        {
+
+            try
+            {
+                var isGlobalAdmin = User.IsAdmin(userRepository);
+                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                var place = await placeRepository.GetPlace(placeId);
+
+                if (place is null)
+                {
+                    throw new ArgumentNullException(nameof(placeId));
+                }
+
+                var item = place.OtherLimitations.FirstOrDefault(l => l.Id == limitId);
+                if (item == null)
+                {
+                    throw new ArgumentNullException(nameof(limitId));
+                }
+                place.OtherLimitations.Remove(item);
+
+                await placeRepository.SetPlace(place);
+
+                return Ok(item);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+
         /// <summary>
         /// Admin can delete testing location
         /// </summary>
