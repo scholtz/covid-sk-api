@@ -1387,7 +1387,14 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.PositiveWaitingForCertificate, result.State);
-            Assert.AreEqual(0, noSMSSender?.Data.Count);
+            if (configuration["SendResultsThroughQueue"] == "1")
+            {
+                Assert.AreEqual(0, noSMSSender?.Data.Count);
+            }
+            else
+            {
+                Assert.AreEqual(1, noSMSSender?.Data.Count);
+            }
             iVisitor.ProcessSingle().Wait();
             Assert.AreEqual(1, noSMSSender?.Data.Count);
             var sms = noSMSSender.Data.Values.First();

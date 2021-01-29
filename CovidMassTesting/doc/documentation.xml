@@ -6556,12 +6556,12 @@
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_">
             <summary>
-              Looks up a localized string similar to This 1 hour time slot has reached the capacity..
+              Looks up a localized string similar to This 1 hour time slot has reached the capacity ({0})..
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_">
             <summary>
-              Looks up a localized string similar to This 5 minute time slot has reached the capacity..
+              Looks up a localized string similar to This 5 minute time slot has reached the capacity ({0})..
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Unable_to_find_visitor_code_from_test_code__Are_you_sure_test_code_is_correct_">
