@@ -582,16 +582,23 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentNullException(nameof(placeId));
                 }
 
-                var limitation = new PlaceLimitation()
+                var existing = place.OtherLimitations?.FirstOrDefault(l => l.From == from && l.Until == until);
+                if (existing != null)
                 {
-                    Id = Guid.NewGuid().ToString(),
-                    From = from,
-                    Until = until,
-                    HourLimit = limit,
-                    PlaceId = placeId
-                };
-
-                place.OtherLimitations.Add(limitation);
+                    existing.HourLimit = limit;
+                }
+                else
+                {
+                    var limitation = new PlaceLimitation()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        From = from,
+                        Until = until,
+                        HourLimit = limit,
+                        PlaceId = placeId
+                    };
+                    place.OtherLimitations.Add(limitation);
+                }
                 await placeRepository.SetPlace(place);
 
                 return Ok(place);
