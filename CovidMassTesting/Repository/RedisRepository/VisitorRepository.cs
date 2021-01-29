@@ -919,14 +919,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="code"></param>
         /// <param name="pass"></param>
-        /// <param name="beforeTest"></param>
         /// <returns></returns>
-        public async Task<bool> RemoveTest(int code, string pass, bool beforeTest)
+        public async Task<bool> RemoveTest(int code, string pass)
         {
-            if (!beforeTest)
-            {
-                throw new Exception("Test removal after test has been taken has been suspended");
-            }
             if (string.IsNullOrEmpty(pass))
             {
                 throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
@@ -936,6 +931,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
             var visitor = await GetVisitor(code);
+            var beforeTest = visitor.TestingTime.HasValue;
             if (visitor == null)
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Test_does_not_exists].Value);
@@ -950,11 +946,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             if (beforeTest)
             {
-                if (visitor.Result != TestResult.NotTaken) throw new Exception("Test is not in the state NotTaken");
+                if (visitor.Result != TestResult.NotTaken) throw new Exception("Test môže byť zmazaný iba ak ste ešte neprišli na test");
             }
             else
             {
-                if (visitor.Result != TestResult.NegativeCertificateTaken) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
+                if (visitor.Result != TestResult.NegativeCertificateTaken || visitor.Result != TestResult.NegativeWaitingForCertificate) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
+                if (!visitor.TestingTime.HasValue) throw new Exception("S Vašim testom sa vyskytla technická chyba, kontaktujte podporu prosím");
+                if (visitor.TestingTime.Value.AddDays(5) > DateTimeOffset.Now)
+                {
+                    throw new Exception("Test ešte nemôžeme vymazať pretože údaje ešte neboli finálne spracované pre hygienu. Test sa môže zmazať 5 dní od vykonania testu.");
+                }
             }
             await Remove(visitor.Id);
             if (!string.IsNullOrEmpty(visitor.TestingSet))

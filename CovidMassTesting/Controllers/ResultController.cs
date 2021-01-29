@@ -318,7 +318,7 @@ namespace CovidMassTesting.Controllers
                 var codeClear = FormatBarCode(code);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
-                    return Ok(await visitorRepository.RemoveTest(codeInt, pass, true));
+                    return Ok(await visitorRepository.RemoveTest(codeInt, pass));
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code].Value);
             }

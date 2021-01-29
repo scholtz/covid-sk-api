@@ -36,9 +36,8 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="code"></param>
         /// <param name="pass"></param>
-        /// <param name="beforeTest"></param>
         /// <returns></returns>
-        public Task<bool> RemoveTest(int code, string pass, bool beforeTest);
+        public Task<bool> RemoveTest(int code, string pass);
         /// <summary>
         /// Update test state of visitor
         /// </summary>

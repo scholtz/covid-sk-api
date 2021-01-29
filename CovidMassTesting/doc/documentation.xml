@@ -4235,13 +4235,12 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveTest(System.Int32,System.String,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveTest(System.Int32,System.String)">
             <summary>
             Removes test on wish of user when visitor was tested negative
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
-            <param name="beforeTest"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.UpdateTestingState(System.Int32,System.String)">
@@ -5833,13 +5832,12 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveTest(System.Int32,System.String,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveTest(System.Int32,System.String)">
             <summary>
             Deletes the test
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
-            <param name="beforeTest"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.CreateNewVisitorId">
