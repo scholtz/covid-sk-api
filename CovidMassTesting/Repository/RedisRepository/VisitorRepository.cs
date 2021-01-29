@@ -931,7 +931,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
             var visitor = await GetVisitor(code);
-            var beforeTest = visitor.TestingTime.HasValue;
+            var beforeTest = !visitor.TestingTime.HasValue;
             if (visitor == null)
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Test_does_not_exists].Value);
