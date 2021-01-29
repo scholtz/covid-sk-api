@@ -136,7 +136,7 @@
     <value>{1}, {0} je Váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>
   </data>
   <data name="Dear {0},We have removed your personal data from the database. Thank you for taking the covid test" xml:space="preserve">
-    <value>{0}, vymazali sme Vaše osobné údaje z databázy. Ďakujeme že ste sa nechali otestovať</value>
+    <value>{0}, vymazali sme Vašu registráciu aj Vaše osobné údaje zo systému.</value>
   </data>
   <data name="Invalid code" xml:space="preserve">
     <value>Neplatný kód</value>

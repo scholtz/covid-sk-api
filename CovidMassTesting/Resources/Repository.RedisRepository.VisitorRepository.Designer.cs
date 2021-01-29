@@ -120,7 +120,7 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Dear {0},We have removed your personal data from the database. Thank you for taking the covid test.
+        ///   Looks up a localized string similar to Dear {0},We have removed your registration as well your personal data. Thank you.
         /// </summary>
         internal static string Dear__0__We_have_removed_your_personal_data_from_the_database__Thank_you_for_taking_the_covid_test {
             get {
@@ -199,16 +199,15 @@ namespace CovidMassTesting.Resources {
         ///
         ///        th {
         ///            text-align: left;
+        ///            vertical-align: top;
+        ///        }
+        ///
+        ///        td {
+        ///            vertical-align: top;
         ///        }
         ///
         ///        body {
-        ///            font-family: sans-serif;
-        ///            font-size: 10px;
-        ///        }
-        ///    &lt;/style&gt;
-        ///&lt;/head&gt;
-        ///&lt;body&gt;
-        ///    &lt;h1&gt;Registr [rest of string was truncated]&quot;;.
+        ///            font-family: sans- [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TestRegistration {
             get {
@@ -230,16 +229,15 @@ namespace CovidMassTesting.Resources {
         ///
         ///        th {
         ///            text-align: left;
+        ///            vertical-align: top;
+        ///        }
+        ///
+        ///        td {
+        ///            vertical-align: top;
         ///        }
         ///
         ///        body {
-        ///            font-family: sans-serif;
-        ///            font-size: 10px;
-        ///        }
-        ///    &lt;/style&gt;
-        ///&lt;/head&gt;
-        ///&lt;body&gt;
-        ///    &lt;h1&gt;Výsledok test [rest of string was truncated]&quot;;.
+        ///            font-family: sans-serif; [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string TestResult {
             get {
