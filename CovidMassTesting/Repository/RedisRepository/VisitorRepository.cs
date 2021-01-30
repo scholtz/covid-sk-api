@@ -842,7 +842,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             await SendResults(visitor);
 
-            if (visitor.ResultNotifiedCount.HasValue)
+            if (!visitor.ResultNotifiedCount.HasValue)
             {
                 visitor.ResultNotifiedCount = 1;
                 await SetVisitor(visitor, false);
