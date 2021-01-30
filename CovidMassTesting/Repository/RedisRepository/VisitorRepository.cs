@@ -2463,7 +2463,54 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+        public async Task<int> FixTestingTime()
+        {
+            int ret = 0;
+            logger.LogInformation($"FixTestingTime");
+            var limit = DateTimeOffset.Parse("2021-01-30T08:00:00+01:00");
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt, false);
+                    if (visitor == null) continue;
+                    if (visitor.TestingTime.HasValue)
+                    {
+                        if (
+                            visitor.TestingTime.Value < limit &&
+                            visitor.TestingTime.Value.AddDays(3) > DateTimeOffset.Now)
+                        {
+                            if (visitor.Result == TestResult.NegativeCertificateTaken ||
+                                visitor.Result == TestResult.NegativeWaitingForCertificate ||
+                                visitor.Result == TestResult.PositiveWaitingForCertificate ||
+                                visitor.Result == TestResult.PositiveCertificateTaken)
+                            {
 
+                                logger.LogInformation("FixTestingTime.Fixing with result resend");
+                                var result = visitor.Result;
+                                visitor.TestingTime = DateTimeOffset.Parse("2021-01-30T08:30:00+01:00");
+                                visitor.Result = TestResult.TestMustBeRepeated;
+                                visitor.ResultNotifiedAt = null;
+                                await SetVisitor(visitor, false);
+                                await SetTestResult(visitor.TestingSet, result);
+                            }
+                            else
+                            {
+                                logger.LogInformation("FixTestingTime.Fixing without resend");
+                                visitor.TestingTime = DateTimeOffset.Parse("2021-01-30T08:31:00+01:00");
+                                await SetVisitor(visitor, false);
+                            }
+                            ret++;
+
+                        }
+                    }
+                }
+            }
+
+            logger.LogInformation($"FixTestingTime Done");
+
+            return ret;
+        }
         /// <summary>
         /// Fix. Set to visitor the test result and time of the test
         /// 

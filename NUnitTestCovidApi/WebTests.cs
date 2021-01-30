@@ -3097,6 +3097,66 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(sms.data.GetText().Contains("L S"));
             Assert.IsTrue(sms.data.GetText().Contains("1984"));
         }/**/
+
+
+        [Test]
+        public void TestFixTestingTime()
+        {
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var iVisitor = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
+            var iPlace = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IPlaceRepository>();
+            var iSlot = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.ISlotRepository>();
+            iPlace.SetPlace(new Place()
+            {
+                Id = "123",
+            });
+
+            var tick = DateTimeOffset.Parse("2020-01-01");
+            iSlot.Add(new Slot1Day() { PlaceId = "123", Time = tick });
+            iSlot.Add(new Slot1Hour() { PlaceId = "123", Time = tick });
+            iSlot.Add(new Slot5Min() { PlaceId = "123", Time = tick });
+
+            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
+            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
+            Visitor visitor;
+            var vis = iVisitor.Add(visitor = new Visitor()
+            {
+                FirstName = "L",
+                LastName = "S",
+                Language = "en",
+                ChosenPlaceId = "123",
+                ChosenSlot = tick.Ticks,
+                RC = " 845123/0007",
+                BirthDayDay = 23,
+                BirthDayMonth = 01,
+                BirthDayYear = 1984,
+                PersonType = "child",
+                Result = TestResult.NegativeWaitingForCertificate,
+                Email = "test@test.com",
+                Phone = "+421907723428"
+            }).Result;
+
+            iVisitor.ConnectVisitorToTest(vis.Id, "12345");
+            var vis1 = iVisitor.GetVisitor(vis.Id).Result;
+            vis1.TestingTime = DateTimeOffset.UtcNow.AddDays(-1);
+            var new1 = iVisitor.SetVisitor(vis1, false).Result;
+            iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate);
+
+            Assert.AreEqual(TestResult.NegativeWaitingForCertificate, visitor.Result);
+            Task.Delay(100).Wait();
+            noSMSSender?.Data.Clear();
+            Assert.AreEqual(1, iVisitor.FixTestingTime().Result);
+            Task.Delay(100).Wait();
+
+            //Assert.AreEqual("L S, 1984, AG test from 24.01.2021 is NEGATIVE. Download PDF certificate from: https://www.rychlejsie.sk/", noSMSSender.Data.Values.First().data.GetText());
+            Assert.AreEqual(1, noSMSSender?.Data.Count);
+            var sms = noSMSSender.Data.Values.First();
+            Assert.IsTrue(sms.data.GetText().Contains("NEGATIVE"));
+            Assert.IsTrue(sms.data.GetText().Contains(DateTime.Now.ToString("dd.MM.yyyy")));
+            Assert.IsTrue(sms.data.GetText().Contains("L S"));
+            Assert.IsTrue(sms.data.GetText().Contains("1984"));
+        }/**/
         [Test]
         public void TestDoubleTestInput()
         {

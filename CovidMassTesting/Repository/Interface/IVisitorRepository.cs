@@ -199,6 +199,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<int> FixVisitorRC();
         /// <summary>
+        /// Fix rc map
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> FixTestingTime();
+        /// <summary>
         /// Fix year
         /// </summary>
         /// <returns></returns>
