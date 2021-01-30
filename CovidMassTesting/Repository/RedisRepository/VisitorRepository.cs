@@ -563,20 +563,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             visitor.Result = state;
             switch (state)
             {
-                case TestResult.PositiveWaitingForCertificate:
-                case TestResult.NegativeWaitingForCertificate:
                 case TestResult.TestMustBeRepeated:
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
                     break;
                 case TestResult.TestIsBeingProcessing:
                     visitor.TestingTime = DateTimeOffset.UtcNow;
-                    break;
-                case TestResult.PositiveCertificateTaken:
-                case TestResult.NegativeCertificateTaken:
-                    if (!visitor.ResultNotifiedAt.HasValue)
-                    {
-                        visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-                    }
                     break;
             }
             visitor.LastUpdate = DateTimeOffset.Now;
@@ -631,6 +622,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                     CultureInfo.CurrentCulture = specifiedCulture;
                     CultureInfo.CurrentUICulture = specifiedCulture;
 
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                            string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_,
+                            $"{visitor.FirstName} {visitor.LastName}")));
+
+                    }
                     await emailSender.SendEmail(
                         localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                         visitor.Email,
@@ -640,13 +638,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Name = $"{visitor.FirstName} {visitor.LastName}",
                         });
 
-                    if (!string.IsNullOrEmpty(visitor.Phone))
-                    {
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
-                            string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_,
-                            $"{visitor.FirstName} {visitor.LastName}")));
-
-                    }
 
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
@@ -683,84 +674,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
-                    oldCulture = CultureInfo.CurrentCulture;
-                    oldUICulture = CultureInfo.CurrentUICulture;
-                    specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                    CultureInfo.CurrentCulture = specifiedCulture;
-                    CultureInfo.CurrentUICulture = specifiedCulture;
-                    var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
-                    try
+                    if (!visitor.ResultNotifiedAt.HasValue)
                     {
-                        var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
-                        //var product = await placeRepository.GetPlaceProduct();
-                        var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
-                        var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
-
-
-                        var result = await SetResult(new VerificationData()
-                        {
-                            Id = Guid.NewGuid().ToString(),
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                            Product = product?.Name,
-                            TestingAddress = place?.Address,
-                            Result = visitor.Result,
-                            TestingEntity = pp?.CompanyName,
-                            Time = visitor.TestingTime ?? DateTimeOffset.Now
-                        }, true);
-                        visitor.VerificationId = result.Id;
-                        await SetVisitor(visitor, false);
-                        var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
-                        attachments.Add(new SendGrid.Helpers.Mail.Attachment()
-                        {
-                            Content = Convert.ToBase64String(pdf),
-                            Filename = $"{visitor.LastName}{visitor.FirstName}-{visitor.TestingTime?.ToString("MMdd")}.pdf",
-                            Type = "application/pdf",
-                            Disposition = "attachment"
-                        });
+                        await SendResults(visitor);
                     }
-                    catch (Exception exc)
-                    {
-                        logger.LogError(exc, "Error generating file");
-                    }
-                    await emailSender.SendEmail(
-                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                        visitor.Email,
-                        $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorTestingResultEmail(visitor.Language)
-                        {
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                            IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
-                        },
-                        attachments
-                        );
-                    if (!string.IsNullOrEmpty(visitor.Phone))
-                    {
-
-                        var resultLocalized = "";
-                        switch (visitor.Result)
-                        {
-                            case TestResult.PositiveWaitingForCertificate:
-                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.POSITIVE];
-                                break;
-                            case TestResult.NegativeWaitingForCertificate:
-                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.NEGATIVE];
-                                break;
-                        }
-
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
-                            string.Format(
-                                //{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}
-                                Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_,
-                                $"{visitor.FirstName} {visitor.LastName}",
-                                visitor.BirthDayYear,
-                                visitor.TestingTime?.ToString("dd.MM.yyyy"),
-                                resultLocalized,
-                                configuration["FrontedURL"]
-                                )));
-
-                    }
-                    CultureInfo.CurrentCulture = oldCulture;
-                    CultureInfo.CurrentUICulture = oldUICulture;
+                    break;
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.NegativeCertificateTaken:
+                    await SendResults(visitor);
                     break;
                 default:
                     break;
@@ -873,6 +794,177 @@ namespace CovidMassTesting.Repository.RedisRepository
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
             return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
+        }
+
+
+        public async Task<bool> ResendResults(int code, string pass)
+        {
+            if (string.IsNullOrEmpty(pass))
+            {
+                throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
+            }
+            if (pass.Length < 4)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            var visitor = await GetVisitor(code);
+            if (visitor == null)
+            {
+                throw new Exception("Skontrolujte prosím správne zadanie kódu registrácie.");
+            }
+            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveWaitingForCertificate:
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTaken:
+                    // process
+                    break;
+                default:
+                    throw new Exception("Môžeme Vám vygenerovať certifikát iba po absolvovaní testu");
+            }
+
+            var maxResends = configuration["maxResends"] ?? "1";
+            var max = int.Parse(maxResends);
+
+            if (visitor.ResultNotifiedCount.HasValue && visitor.ResultNotifiedCount >= max)
+            {
+                throw new Exception("Bol dosiahnutý limit znovu odoslania certifikátu. Stiahnite si prosím PDF certifikát z webstránky.");
+            }
+
+            await SendResults(visitor);
+
+            if (visitor.ResultNotifiedCount.HasValue)
+            {
+                visitor.ResultNotifiedCount = 1;
+                await SetVisitor(visitor, false);
+            }
+            else
+            {
+                visitor.ResultNotifiedCount++;
+                await SetVisitor(visitor, false);
+            }
+            return true;
+        }
+        private async Task SendResults(Visitor visitor)
+        {
+
+            visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
+            await SetVisitor(visitor, false);
+
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.NegativeCertificateTaken:
+                case TestResult.PositiveWaitingForCertificate:
+                case TestResult.NegativeWaitingForCertificate:
+                    var oldCulture = CultureInfo.CurrentCulture;
+                    var oldUICulture = CultureInfo.CurrentUICulture;
+                    var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                    CultureInfo.CurrentCulture = specifiedCulture;
+                    CultureInfo.CurrentUICulture = specifiedCulture;
+                    var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
+                    try
+                    {
+                        var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                        //var product = await placeRepository.GetPlaceProduct();
+                        var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                        var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+
+                        if (!string.IsNullOrEmpty(visitor.VerificationId))
+                        {
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
+                            attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                            {
+                                Content = Convert.ToBase64String(pdf),
+                                Filename = $"{visitor.LastName}{visitor.FirstName}-{visitor.TestingTime?.ToString("MMdd")}.pdf",
+                                Type = "application/pdf",
+                                Disposition = "attachment"
+                            });
+                        }
+                        else
+                        {
+                            var verificationData = GetResultVerification(visitor.VerificationId);
+
+                            var result = await SetResult(new VerificationData()
+                            {
+                                Id = Guid.NewGuid().ToString(),
+                                Name = $"{visitor.FirstName} {visitor.LastName}",
+                                Product = product?.Name,
+                                TestingAddress = place?.Address,
+                                Result = visitor.Result,
+                                TestingEntity = pp?.CompanyName,
+                                Time = visitor.TestingTime ?? DateTimeOffset.Now
+                            }, true);
+                            visitor.VerificationId = result.Id;
+                            await SetVisitor(visitor, false);
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
+                            attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                            {
+                                Content = Convert.ToBase64String(pdf),
+                                Filename = $"{visitor.LastName}{visitor.FirstName}-{visitor.TestingTime?.ToString("MMdd")}.pdf",
+                                Type = "application/pdf",
+                                Disposition = "attachment"
+                            });
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, "Error generating file");
+                    }
+
+                    await emailSender.SendEmail(
+                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                        visitor.Email,
+                        $"{visitor.FirstName} {visitor.LastName}",
+                        new Model.Email.VisitorTestingResultEmail(visitor.Language)
+                        {
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                            IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
+                        },
+                        attachments
+                        );
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+
+                        var resultLocalized = "";
+                        switch (visitor.Result)
+                        {
+                            case TestResult.PositiveWaitingForCertificate:
+                            case TestResult.PositiveCertificateTaken:
+                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.POSITIVE];
+                                break;
+                            case TestResult.NegativeWaitingForCertificate:
+                            case TestResult.NegativeCertificateTaken:
+                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.NEGATIVE];
+                                break;
+                        }
+                        if (!string.IsNullOrEmpty(resultLocalized))
+                        {
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                                string.Format(
+                                    //{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}
+                                    Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_,
+                                    $"{visitor.FirstName} {visitor.LastName}",
+                                    visitor.BirthDayYear,
+                                    visitor.TestingTime?.ToString("dd.MM.yyyy"),
+                                    resultLocalized,
+                                    configuration["FrontedURL"]
+                                    )));
+                        }
+                    }
+                    CultureInfo.CurrentCulture = oldCulture;
+                    CultureInfo.CurrentUICulture = oldUICulture;
+                    break;
+            }
         }
         /// <summary>
         /// When person comes to the queue he can mark him as in the queue

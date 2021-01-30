@@ -3139,7 +3139,7 @@ namespace NUnitTestCovidApi
 
             iVisitor.ConnectVisitorToTest(vis.Id, "12345");
             var vis1 = iVisitor.GetVisitor(vis.Id).Result;
-            vis1.TestingTime = DateTimeOffset.UtcNow.AddDays(-1);
+            vis1.TestingTime = DateTimeOffset.Parse("2021-01-28");
             var new1 = iVisitor.SetVisitor(vis1, false).Result;
             iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate);
 

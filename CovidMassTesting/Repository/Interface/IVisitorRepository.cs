@@ -174,6 +174,13 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<byte[]> GetPublicPDF(int code, string pass);
         /// <summary>
+        /// Allow person to request one resend for free
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        public Task<bool> ResendResults(int code, string pass);
+        /// <summary>
         /// Temp fix
         /// </summary>
         /// <returns></returns>

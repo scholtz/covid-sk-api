@@ -531,6 +531,15 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ResendResult(System.String,System.String,System.String)">
+            <summary>
+            Person can resend his results one more time on request
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <param name="captcha"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.RemoveTest(System.String,System.String,System.String)">
             <summary>
             Public method to remove user test from database and all his private information
@@ -4404,6 +4413,14 @@
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetPublicPDF(System.Int32,System.String)">
             <summary>
             Generate and sign PDF with test result
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ResendResults(System.Int32,System.String)">
+            <summary>
+            Allow person to request one resend for free
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
