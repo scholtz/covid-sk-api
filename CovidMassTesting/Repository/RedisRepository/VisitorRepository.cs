@@ -559,6 +559,26 @@ namespace CovidMassTesting.Repository.RedisRepository
                 // repeated requests should not send emails
                 return true;
             }
+            bool forceSend = false;
+
+            if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
+            {
+                if (state == TestResult.TestMustBeRepeated || state == TestResult.NegativeCertificateTaken || state == TestResult.NegativeWaitingForCertificate)
+                {
+                    forceSend = true;
+                }
+            }
+            if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
+            {
+                if (state == TestResult.TestMustBeRepeated || state == TestResult.PositiveWaitingForCertificate || state == TestResult.PositiveCertificateTaken)
+                {
+                    forceSend = true;
+                }
+            }
+            if (state == TestResult.TestMustBeRepeated)
+            {
+                forceSend = true;
+            }
 
             visitor.Result = state;
             switch (state)
@@ -674,7 +694,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
-                    if (!visitor.ResultNotifiedAt.HasValue)
+                    if (forceSend || !visitor.ResultNotifiedAt.HasValue)
                     {
                         await SendResults(visitor);
                     }
@@ -1747,6 +1767,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Mesto = visitor.City,
                             Ulica = visitor.Street,
                             Cislo = visitor.StreetNo,
+                            Miesto = visitor.ChosenPlaceId,
                             DatumVysetrenia = visitor.TestingTime?.ToString("yyyy-MM-dd"),
                             VysledokVysetrenia = result
                         });

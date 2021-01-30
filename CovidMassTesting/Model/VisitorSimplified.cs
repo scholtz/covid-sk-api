@@ -58,5 +58,9 @@ namespace CovidMassTesting.Model
         /// DatumVysetrenia
         /// </summary>
         public string VysledokVysetrenia { get; set; }
+        /// <summary>
+        /// Miesto vysetrenia
+        /// </summary>
+        public string Miesto { get; set; }
     }
 }
