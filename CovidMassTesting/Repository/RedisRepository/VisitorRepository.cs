@@ -569,7 +569,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
                     break;
                 case TestResult.TestIsBeingProcessing:
-                    visitor.TestingTime = visitor.LastUpdate;
+                    visitor.TestingTime = DateTimeOffset.UtcNow;
                     break;
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.NegativeCertificateTaken:
