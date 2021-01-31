@@ -50,7 +50,7 @@ namespace CovidMassTesting.Controllers
                 var slots = (await slotRepository.ListDaySlotsByPlace(placeId)).Where(s => s != null);
                 if (showAll != "1")
                 {
-                    slots = slots.Where(s => s.Time >= DateTimeOffset.Now.AddDays(-1));
+                    slots = slots.Where(s => s.Time >= DateTimeOffset.UtcNow.AddDays(-1));
                 }
                 return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
@@ -82,7 +82,7 @@ namespace CovidMassTesting.Controllers
                 var slots = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(placeId, daySlotId);
                 if (showAll != "1")
                 {
-                    slots = slots.Where(s => s.Time >= DateTimeOffset.Now.AddHours(-1));
+                    slots = slots.Where(s => s.Time >= DateTimeOffset.UtcNow.AddHours(-1));
                 }
                 return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
@@ -113,7 +113,7 @@ namespace CovidMassTesting.Controllers
                 var slots = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(placeId, hourSlotId);
                 if (showAll != "1")
                 {
-                    slots = slots.Where(s => s.Time >= DateTimeOffset.Now.AddMinutes(-5));
+                    slots = slots.Where(s => s.Time >= DateTimeOffset.UtcNow.AddMinutes(-5));
                 }
                 return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }

@@ -624,27 +624,30 @@
             <param name="logger"></param>
             <param name="slotRepository"></param>
         </member>
-        <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String)">
+        <member name="M:CovidMassTesting.Controllers.SlotController.ListDaySlotsByPlace(System.String,System.String)">
             <summary>
             Shows available days per place
             </summary>
             <param name="placeId"></param>
+            <param name="showAll">0|1 If not filled in or 0, it does not show past slots</param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.SlotController.ListHourSlotsByPlaceAndDaySlotId(System.String,System.Int64)">
+        <member name="M:CovidMassTesting.Controllers.SlotController.ListHourSlotsByPlaceAndDaySlotId(System.String,System.Int64,System.String)">
             <summary>
             Shows available hours at specific day and place
             </summary>
             <param name="placeId"></param>
             <param name="daySlotId"></param>
+            <param name="showAll">0|1 If not filled in or 0, it does not show past slots</param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.SlotController.ListMinuteSlotsByPlaceAndHourSlotId(System.String,System.Int64)">
+        <member name="M:CovidMassTesting.Controllers.SlotController.ListMinuteSlotsByPlaceAndHourSlotId(System.String,System.Int64,System.String)">
             <summary>
             List specific minute slots at specific hour and place
             </summary>
             <param name="placeId"></param>
             <param name="hourSlotId"></param>
+            <param name="showAll">0|1 If not filled in or 0, it does not show past slots</param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.SMS.GoSMSQueueSender">
