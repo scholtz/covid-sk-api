@@ -113,7 +113,11 @@ namespace CovidMassTesting.Controllers
                 var slots = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(placeId, hourSlotId);
                 if (showAll != "1")
                 {
-                    slots = slots.Where(s => DateTimeOffset.Compare(s.Time, DateTimeOffset.UtcNow.AddMinutes(-5)) >= 0);
+                    slots = slots.Where(s =>
+                    {
+                        logger.LogInformation($"DEBUGTIME: {s.Time.ToString("R")} {DateTimeOffset.UtcNow.AddMinutes(-5)} DateTimeOffset.Compare(s.Time, DateTimeOffset.UtcNow.AddMinutes(-5))");
+                        return DateTimeOffset.Compare(s.Time, DateTimeOffset.UtcNow.AddMinutes(-5)) >= 0;
+                    });
                 }
                 return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
