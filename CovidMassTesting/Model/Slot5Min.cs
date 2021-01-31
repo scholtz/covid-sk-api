@@ -27,6 +27,16 @@ namespace CovidMassTesting.Model
         /// </summary>
         public DateTimeOffset Time { get; set; }
         /// <summary>
+        /// Time from ticks
+        /// </summary>
+        public DateTimeOffset TimeFromTicks
+        {
+            get
+            {
+                return new DateTimeOffset(SlotId, TimeSpan.Zero);
+            }
+        }
+        /// <summary>
         /// Hour slot id
         /// </summary>
         public long HourSlotId { get; set; }
