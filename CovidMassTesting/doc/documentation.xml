@@ -66,13 +66,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.FixVisitorRC">
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixTestingTime">
             <summary>
             Fix stats
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.FixTestingTime">
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixVisitorPlace(System.Int32,System.String)">
             <summary>
             Fix stats
             </summary>

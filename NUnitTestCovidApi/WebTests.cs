@@ -512,8 +512,14 @@ namespace NUnitTestCovidApi
                 PersonType = "idcard",
                 Phone = "+421907000999",
                 RC = " 010101 /0008 ",
-                Product = productId
-
+                Product = productId,
+                BirthDayDay = 1,
+                BirthDayMonth = 1,
+                BirthDayYear = 2001,
+                City = "City",
+                Street = "Street",
+                StreetNo = "10",
+                ZIP = "10000",
             };
             var result = Register(client, visitor1);
             if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
@@ -530,7 +536,14 @@ namespace NUnitTestCovidApi
                 PersonType = "idcard",
                 Phone = "+421",
                 RC = "0101010019",
-                Product = productId
+                Product = productId,
+                BirthDayDay = 1,
+                BirthDayMonth = 1,
+                BirthDayYear = 2001,
+                City = "City2",
+                Street = "Street2",
+                StreetNo = "11",
+                ZIP = "10001",
             };
             result = Register(client, visitor2);
             if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
@@ -842,6 +855,13 @@ namespace NUnitTestCovidApi
                 Phone = "+421",
                 RC = "0101010008",
 
+                BirthDayDay = 1,
+                BirthDayMonth = 1,
+                BirthDayYear = 2001,
+                City = "City",
+                Street = "Street",
+                StreetNo = "10",
+                ZIP = "10000",
             };
 
             emailSender = web.Server.Services.GetService<CovidMassTesting.Controllers.Email.IEmailSender>();
@@ -1043,6 +1063,13 @@ namespace NUnitTestCovidApi
                 Phone = "+421",
                 RC = "0101010008",
 
+                BirthDayDay = 1,
+                BirthDayMonth = 1,
+                BirthDayYear = 2001,
+                City = "City",
+                Street = "Street",
+                StreetNo = "10",
+                ZIP = "10000",
             };
             request = Register(client, visitor);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
