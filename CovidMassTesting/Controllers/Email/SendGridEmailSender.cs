@@ -20,6 +20,7 @@ namespace CovidMassTesting.Controllers.Email
         private readonly string fromEmail;
         private readonly Dictionary<string, string> Name2Id;
         private readonly ILogger<SendGridController> logger;
+        private readonly IConfiguration configuration;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -37,7 +38,7 @@ namespace CovidMassTesting.Controllers.Email
             {
                 throw new ArgumentNullException(nameof(configuration));
             }
-
+            this.configuration = configuration;
             try
             {
                 this.logger = logger;
@@ -95,7 +96,6 @@ namespace CovidMassTesting.Controllers.Email
             }
             var msg = new SendGridMessage()
             {
-
                 TemplateId = Name2Id[data.TemplateId],
                 Personalizations = new List<Personalization>()
                 {
@@ -108,6 +108,17 @@ namespace CovidMassTesting.Controllers.Email
             msg.AddTo(new EmailAddress(toEmail, toName));
 
             msg.From = new EmailAddress(fromEmail, fromName);
+            if (!string.IsNullOrEmpty(configuration["ReplyToEmail"]))
+            {
+                if (!string.IsNullOrEmpty(configuration["ReplyToName"]))
+                {
+                    msg.ReplyTo = new EmailAddress(configuration["ReplyToEmail"], configuration["ReplyToName"]);
+                }
+                else
+                {
+                    msg.ReplyTo = new EmailAddress(configuration["ReplyToEmail"]);
+                }
+            }
             if (attachments.Any())
             {
                 msg.AddAttachments(attachments);
