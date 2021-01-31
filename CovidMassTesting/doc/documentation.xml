@@ -3653,6 +3653,11 @@
             DatumVysetrenia
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.VisitorSimplified.Miesto">
+            <summary>
+            Miesto vysetrenia
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Program">
             <summary>
             App

@@ -3098,7 +3098,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(sms.data.GetText().Contains("1984"));
         }/**/
 
-
+        /*
         [Test]
         public void TestFixTestingTime()
         {

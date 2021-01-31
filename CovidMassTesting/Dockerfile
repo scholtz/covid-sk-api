@@ -20,4 +20,11 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 RUN apt-get update && apt dist-upgrade -y && apt-get install -y libgdiplus
+
+ENV TZ=Europe/Bratislava
+ENV LANG sk_SK.UTF-8
+ENV LANGUAGE ${LANG}
+ENV LC_ALL ${LANG}
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 ENTRYPOINT ["dotnet", "CovidMassTesting.dll"]
