@@ -38,19 +38,21 @@ namespace CovidMassTesting.Controllers
         /// Shows available days per place
         /// </summary>
         /// <param name="placeId"></param>
+        /// <param name="showAll">0|1 If not filled in or 0, it does not show past slots</param>
         /// <returns></returns>
         [HttpGet("ListDaySlotsByPlace")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, Slot1Day>>> ListDaySlotsByPlace([FromQuery] string placeId)
+        public async Task<ActionResult<Dictionary<string, Slot1Day>>> ListDaySlotsByPlace([FromQuery] string placeId, [FromQuery] string showAll = "0")
         {
             try
             {
-                return Ok((
-                    await slotRepository.ListDaySlotsByPlace(placeId))
-                        .Where(s => s != null)
-                        .OrderBy(s => s.SlotId)
-                        .ToDictionary(p => p.Time.Ticks, p => p));
+                var slots = (await slotRepository.ListDaySlotsByPlace(placeId)).Where(s => s != null);
+                if (showAll != "1")
+                {
+                    slots = slots.Where(s => s.Time >= DateTimeOffset.Now.AddDays(-1));
+                }
+                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
             catch (Exception exc)
             {
@@ -64,15 +66,25 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="placeId"></param>
         /// <param name="daySlotId"></param>
+        /// <param name="showAll">0|1 If not filled in or 0, it does not show past slots</param>
         /// <returns></returns>
         [HttpGet("ListHourSlotsByPlaceAndDaySlotId")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, Slot1Hour>>> ListHourSlotsByPlaceAndDaySlotId([FromQuery] string placeId, [FromQuery] long daySlotId)
+        public async Task<ActionResult<Dictionary<string, Slot1Hour>>> ListHourSlotsByPlaceAndDaySlotId(
+            [FromQuery] string placeId,
+            [FromQuery] long daySlotId,
+            [FromQuery] string showAll = "0"
+            )
         {
             try
             {
-                return Ok((await slotRepository.ListHourSlotsByPlaceAndDaySlotId(placeId, daySlotId)).OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
+                var slots = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(placeId, daySlotId);
+                if (showAll != "1")
+                {
+                    slots = slots.Where(s => s.Time >= DateTimeOffset.Now.AddHours(-1));
+                }
+                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
             catch (Exception exc)
             {
@@ -86,15 +98,24 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="placeId"></param>
         /// <param name="hourSlotId"></param>
+        /// <param name="showAll">0|1 If not filled in or 0, it does not show past slots</param>
         /// <returns></returns>
         [HttpGet("ListMinuteSlotsByPlaceAndHourSlotId")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Dictionary<string, Slot5Min>>> ListMinuteSlotsByPlaceAndHourSlotId([FromQuery] string placeId, [FromQuery] long hourSlotId)
+        public async Task<ActionResult<Dictionary<string, Slot5Min>>> ListMinuteSlotsByPlaceAndHourSlotId(
+            [FromQuery] string placeId,
+            [FromQuery] long hourSlotId,
+            [FromQuery] string showAll = "0")
         {
             try
             {
-                return Ok((await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(placeId, hourSlotId)).OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
+                var slots = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(placeId, hourSlotId);
+                if (showAll != "1")
+                {
+                    slots = slots.Where(s => s.Time >= DateTimeOffset.Now.AddMinutes(-5));
+                }
+                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
             catch (Exception exc)
             {
