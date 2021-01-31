@@ -1452,7 +1452,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
                 if (place.OtherLimitations != null)
                 {
-                    foreach (var limit in place.OtherLimitations.Where(l => l.From.ToUniversalTime() <= slotH.Time.ToUniversalTime() && l.Until.ToUniversalTime() > slotH.Time.ToUniversalTime()))
+                    foreach (var limit in place.OtherLimitations.Where(l => l.From.Ticks <= slotH.SlotId && l.Until.Ticks > slotH.SlotId))
                     {
                         if (limit.HourLimit < LimitPer1HourSlot) LimitPer1HourSlot = limit.HourLimit;
                     }
