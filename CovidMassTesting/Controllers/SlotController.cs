@@ -115,7 +115,7 @@ namespace CovidMassTesting.Controllers
                 {
                     slots = slots.Where(s =>
                     {
-                        logger.LogInformation($"DEBUGTIME: {s.Time.ToString("R")} {DateTimeOffset.UtcNow.AddMinutes(-5)} DateTimeOffset.Compare(s.Time, DateTimeOffset.UtcNow.AddMinutes(-5))");
+                        logger.LogInformation($"DEBUGTIME: {s.Time.ToString("R")} {DateTimeOffset.Now.AddMinutes(-5)} {DateTimeOffset.Compare(s.Time, DateTimeOffset.UtcNow.AddMinutes(-5))}");
                         return DateTimeOffset.Compare(s.Time, DateTimeOffset.UtcNow.AddMinutes(-5)) >= 0;
                     });
                 }
