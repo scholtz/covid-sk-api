@@ -94,6 +94,28 @@ namespace CovidMassTesting.Controllers
                 {
                     visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
                 }
+
+                if (visitor.PersonType == "foreign")
+                {
+                    if (string.IsNullOrEmpty(visitor.Passport)) throw new Exception("Zadajte číslo cestovného dokladu prosím");
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(visitor.RC)) throw new Exception("Zadajte rodné číslo prosím");
+                }
+
+                if (string.IsNullOrEmpty(visitor.Street)) throw new Exception("Zadajte ulicu trvalého bydliska prosím");
+                if (string.IsNullOrEmpty(visitor.StreetNo)) throw new Exception("Zadajte číslo domu trvalého bydliska prosím");
+                if (string.IsNullOrEmpty(visitor.ZIP)) throw new Exception("Zadajte PSČ trvalého bydliska prosím");
+                if (string.IsNullOrEmpty(visitor.City)) throw new Exception("Zadajte mesto trvalého bydliska prosím");
+
+                if (string.IsNullOrEmpty(visitor.FirstName)) throw new Exception("Zadajte svoje meno prosím");
+                if (string.IsNullOrEmpty(visitor.LastName)) throw new Exception("Zadajte svoje priezvisko prosím");
+
+                if (!visitor.BirthDayYear.HasValue || visitor.BirthDayYear < 1900 || visitor.BirthDayYear > 2021) throw new Exception("Rok Vášho narodenia vyzerá byť chybne vyplnený");
+                if (!visitor.BirthDayDay.HasValue || visitor.BirthDayDay < 1 || visitor.BirthDayDay > 31) throw new Exception("Deň Vášho narodenia vyzerá byť chybne vyplnený");
+                if (!visitor.BirthDayMonth.HasValue || visitor.BirthDayMonth < 1 || visitor.BirthDayMonth > 12) throw new Exception("Mesiac Vášho narodenia vyzerá byť chybne vyplnený");
+
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
             catch (Exception exc)
