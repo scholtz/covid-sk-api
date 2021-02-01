@@ -202,6 +202,30 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// Global admin can fix visitor
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        [HttpPost("UpdateVisitor")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> UpdateVisitor([FromBody] Visitor visitor)
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_remove_users].Value);
+                logger.LogInformation($"UpdateVisitor: {User.Identity.Name} is updating visitor {visitor.Id}");
+                return Ok(await visitorRepository.SetVisitor(visitor, false));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+        /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>
         /// <param name="hash"></param>
