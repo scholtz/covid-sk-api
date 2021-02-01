@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CovidMassTesting.Controllers.Email
 {
@@ -20,13 +21,13 @@ namespace CovidMassTesting.Controllers.Email
         private readonly string fromEmail;
         private readonly Dictionary<string, string> Name2Id;
         private readonly ILogger<SendGridController> logger;
-        private readonly IConfiguration configuration;
+        private readonly IOptions<Model.Settings.SendGridConfiguration> settings;
         /// <summary>
         /// Constructor
         /// </summary>
         public SendGridController(
             ILogger<SendGridController> logger,
-            IConfiguration configuration
+            IOptions<Model.Settings.SendGridConfiguration> settings
             )
         {
             if (logger is null)
@@ -34,21 +35,19 @@ namespace CovidMassTesting.Controllers.Email
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            if (configuration is null)
+            if (settings is null)
             {
-                throw new ArgumentNullException(nameof(configuration));
+                throw new ArgumentNullException(nameof(settings));
             }
-            this.configuration = configuration;
+            this.settings = settings;
             try
             {
                 this.logger = logger;
-                var config = new Model.Settings.SendGridConfiguration();
-                configuration.GetSection("SendGrid").Bind(config);
-                if (string.IsNullOrEmpty(config.MailerApiKey)) throw new Exception("Invalid SendGrid configuration");
+                if (string.IsNullOrEmpty(settings.Value.MailerApiKey)) throw new Exception("Invalid SendGrid configuration");
 
-                client = new SendGridClient(config.MailerApiKey);
-                fromName = config.MailerFromName;
-                fromEmail = config.MailerFromEmail;
+                client = new SendGridClient(settings.Value.MailerApiKey);
+                fromName = settings.Value.MailerFromName;
+                fromEmail = settings.Value.MailerFromEmail;
 
                 var response = client.RequestAsync(
                     SendGridClient.Method.GET,
@@ -88,7 +87,7 @@ namespace CovidMassTesting.Controllers.Email
                 logger.LogDebug($"Message {data.TemplateId} not delivered because email is not defined");
                 return false;
             }
-            logger.LogInformation($"Sending {data.TemplateId} email to {toEmail}");
+            logger.LogInformation($"Sending {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
             if (!Name2Id.ContainsKey(data.TemplateId))
             {
                 System.Console.WriteLine($"Template not found: {data.TemplateId}: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
@@ -108,15 +107,15 @@ namespace CovidMassTesting.Controllers.Email
             msg.AddTo(new EmailAddress(toEmail, toName));
 
             msg.From = new EmailAddress(fromEmail, fromName);
-            if (!string.IsNullOrEmpty(configuration["ReplyToEmail"]))
+            if (!string.IsNullOrEmpty(settings.Value.ReplyToEmail))
             {
-                if (!string.IsNullOrEmpty(configuration["ReplyToName"]))
+                if (!string.IsNullOrEmpty(settings.Value.ReplyToName))
                 {
-                    msg.ReplyTo = new EmailAddress(configuration["ReplyToEmail"], configuration["ReplyToName"]);
+                    msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail, settings.Value.ReplyToName);
                 }
                 else
                 {
-                    msg.ReplyTo = new EmailAddress(configuration["ReplyToEmail"]);
+                    msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail);
                 }
             }
             if (attachments.Any())
@@ -125,6 +124,10 @@ namespace CovidMassTesting.Controllers.Email
             }
             var serialize = msg.Serialize();
             var response = await client.RequestAsync(SendGridClient.Method.POST, requestBody: serialize, urlPath: "mail/send");
+            if (response.IsSuccessStatusCode)
+            {
+                logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
+            }
             if (response.StatusCode == System.Net.HttpStatusCode.Accepted) return true;
 
             logger.LogError(await response.Body.ReadAsStringAsync());

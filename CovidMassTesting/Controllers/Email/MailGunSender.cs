@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using RestSharp;
 using RestSharp.Authenticators;
+using Microsoft.Extensions.Options;
 
 namespace CovidMassTesting.Controllers.Email
 {
@@ -18,13 +19,13 @@ namespace CovidMassTesting.Controllers.Email
     public class MailGunSender : IEmailSender
     {
         private readonly ILogger<MailGunSender> logger;
-        private readonly Model.Settings.MailGunConfiguration config;
+        private readonly IOptions<Model.Settings.MailGunConfiguration> settings;
         /// <summary>
         /// Constructor
         /// </summary>
         public MailGunSender(
             ILogger<MailGunSender> logger,
-            IConfiguration configuration
+            IOptions<Model.Settings.MailGunConfiguration> settings
             )
         {
             if (logger is null)
@@ -32,18 +33,15 @@ namespace CovidMassTesting.Controllers.Email
                 throw new ArgumentNullException(nameof(logger));
             }
 
-            if (configuration is null)
+            if (settings is null)
             {
-                throw new ArgumentNullException(nameof(configuration));
+                throw new ArgumentNullException(nameof(settings));
             }
             try
             {
                 this.logger = logger;
-                config = new Model.Settings.MailGunConfiguration();
-                configuration.GetSection("MailGun").Bind(config);
-
-                if (string.IsNullOrEmpty(config.ApiKey)) throw new Exception("Invalid MailGun configuration");
-
+                this.settings = settings;
+                if (string.IsNullOrEmpty(settings.Value.ApiKey)) throw new Exception("Invalid MailGun configuration");
             }
             catch (Exception exc)
             {
@@ -80,13 +78,13 @@ namespace CovidMassTesting.Controllers.Email
 
 
                 RestClient client = new RestClient();
-                client.BaseUrl = new Uri(config.Endpoint);
-                client.Authenticator = new HttpBasicAuthenticator("api", config.ApiKey);
+                client.BaseUrl = new Uri(settings.Value.Endpoint);
+                client.Authenticator = new HttpBasicAuthenticator("api", settings.Value.ApiKey);
 
                 RestRequest request = new RestRequest();
-                request.AddParameter("domain", config.Domain, ParameterType.UrlSegment);
+                request.AddParameter("domain", settings.Value.Domain, ParameterType.UrlSegment);
                 request.Resource = "{domain}/messages";
-                request.AddParameter("from", $"{config.MailerFromName} <{config.MailerFromEmail}>");
+                request.AddParameter("from", $"{settings.Value.MailerFromName} <{settings.Value.MailerFromEmail}>");
                 request.AddParameter("to", $"{toName} <{toEmail}>");
                 request.AddParameter("subject", subject);
                 request.AddParameter("template", data.TemplateId);
@@ -163,7 +161,12 @@ namespace CovidMassTesting.Controllers.Email
                     request.AddFile("attachment", Convert.FromBase64String(attachment.Content), attachment.Filename, attachment.Type);
                 }
                 request.Method = Method.POST;
+                logger.LogInformation($"Sending {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
                 var response = client.Execute(request);
+                if (response.IsSuccessful)
+                {
+                    logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
+                }
                 return response.IsSuccessful;
             }
             catch (Exception exc)

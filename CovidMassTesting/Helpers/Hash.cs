@@ -31,5 +31,14 @@ namespace CovidMassTesting.Helpers
                 .ToLowerInvariant();
 #pragma warning restore CA1308 // Normalize strings to uppercase
         }
+        /// <summary>
+        /// Allows to make hash of any string
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static string GetSHA256Hash(this string data)
+        {
+            return GetSHA256Hash(System.Text.Encoding.UTF8.GetBytes(data));
+        }
     }
 }

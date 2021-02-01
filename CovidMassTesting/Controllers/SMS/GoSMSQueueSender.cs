@@ -83,7 +83,7 @@ namespace CovidMassTesting.Controllers.SMS
                         QueueUrl = settings.Value.QueueURL,
                         MessageBody = JsonConvert.SerializeObject(msg)
                     };
-
+                    logger.LogInformation($"Sending SMS {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toPhone)}");
                     await amazonSQSClient.SendMessageAsync(sendMessageRequest);
                     return true;
                 }

@@ -210,10 +210,12 @@ namespace CovidMassTesting
 
             if (!string.IsNullOrEmpty(sendGridConfiguration?.MailerApiKey))
             {
+                services.Configure<Model.Settings.SendGridConfiguration>(Configuration.GetSection("SendGrid"));
                 services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
             }
             else if (!string.IsNullOrEmpty(mailGunConfiguration?.ApiKey))
             {
+                services.Configure<Model.Settings.MailGunConfiguration>(Configuration.GetSection("MailGun"));
                 services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
             }
             else

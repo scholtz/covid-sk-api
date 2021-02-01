@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Model.SMS;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
@@ -10,6 +11,16 @@ namespace CovidMassTesting.Controllers.SMS
     /// </summary>
     public class MockSMSSender : ISMSSender
     {
+        private readonly ILogger<MockSMSSender> logger;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="logger"></param>
+        public MockSMSSender(ILogger<MockSMSSender> logger)
+        {
+            this.logger = logger;
+        }
         /// <summary>
         /// For unit tests
         /// </summary>
@@ -34,7 +45,8 @@ namespace CovidMassTesting.Controllers.SMS
             }
 
             var msg = data.GetText();
-            System.Console.WriteLine($"SMS: {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
+            logger.LogInformation($"Sending SMS {Helpers.Hash.GetSHA256Hash("" + toPhone)}");
+            logger.LogInformation($"SMS: {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
 
             await Task.Delay(1);
             Data[DateTimeOffset.Now.Ticks] = (toPhone, data);

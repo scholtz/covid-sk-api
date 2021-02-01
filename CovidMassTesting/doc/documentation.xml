@@ -109,7 +109,7 @@
             Sendgrid email sender
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.MailGunSender.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.Email.MailGunSender},Microsoft.Extensions.Configuration.IConfiguration)">
+        <member name="M:CovidMassTesting.Controllers.Email.MailGunSender.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.Email.MailGunSender},Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.MailGunConfiguration})">
             <summary>
             Constructor
             </summary>
@@ -151,7 +151,7 @@
             Sendgrid email sender
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.Email.SendGridController},Microsoft.Extensions.Configuration.IConfiguration)">
+        <member name="M:CovidMassTesting.Controllers.Email.SendGridController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.Email.SendGridController},Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.SendGridConfiguration})">
             <summary>
             Constructor
             </summary>
@@ -713,6 +713,12 @@
             If no email sender is defined
             </summary>
         </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.MockSMSSender.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.SMS.MockSMSSender})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="logger"></param>
+        </member>
         <member name="P:CovidMassTesting.Controllers.SMS.MockSMSSender.Data">
             <summary>
             For unit tests
@@ -970,6 +976,13 @@
             </summary>
         </member>
         <member name="M:CovidMassTesting.Helpers.Hash.GetSHA256Hash(System.Byte[])">
+            <summary>
+            Allows to make hash of any string
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Hash.GetSHA256Hash(System.String)">
             <summary>
             Allows to make hash of any string
             </summary>
@@ -2456,6 +2469,11 @@
             Channel
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSConfiguration.CoHash">
+            <summary>
+            Logging info
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration">
             <summary>
             GoSMS Queue support
@@ -2484,6 +2502,11 @@
         <member name="P:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration.Channel">
             <summary>
             Channel
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.GoSMSQueueConfiguration.CoHash">
+            <summary>
+            CoHash
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Settings.MailGunConfiguration">
@@ -2516,6 +2539,11 @@
             From email
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.CoHash">
+            <summary>
+            CoHash for logging purposes
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.PDFQRConfiguration">
             <summary>
             Settings for pdf generation
@@ -2539,6 +2567,21 @@
         <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.MailerFromEmail">
             <summary>
             From email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.CoHash">
+            <summary>
+            CoHash fo logging purposes
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.ReplyToEmail">
+            <summary>
+            Reply to email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.SendGridConfiguration.ReplyToName">
+            <summary>
+            Reply to name
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Settings.User">

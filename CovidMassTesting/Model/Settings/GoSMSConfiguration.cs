@@ -26,6 +26,10 @@ namespace CovidMassTesting.Model.Settings
         /// Channel
         /// </summary>
         public int Channel { get; set; }
+        /// <summary>
+        /// Logging info
+        /// </summary>
+        public int CoHash { get; set; }
 
     }
 }

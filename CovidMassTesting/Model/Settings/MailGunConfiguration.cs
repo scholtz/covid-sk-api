@@ -30,5 +30,9 @@ namespace CovidMassTesting.Model.Settings
         /// From email
         /// </summary>
         public string MailerFromEmail { get; set; }
+        /// <summary>
+        /// CoHash for logging purposes
+        /// </summary>
+        public string CoHash { get; set; } = "";
     }
 }

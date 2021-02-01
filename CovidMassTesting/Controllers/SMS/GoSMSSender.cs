@@ -86,10 +86,13 @@ namespace CovidMassTesting.Controllers.SMS
                     recipients = toPhone
                 });
                 request.AddHeader("Authorization", $"Bearer {token}");
+
+                logger.LogInformation($"Sending SMS {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toPhone)}");
                 var response = await smsApiRestClient.ExecuteAsync(request);
 
-                if (response.StatusCode == System.Net.HttpStatusCode.OK)
+                if (response.IsSuccessful)
                 {
+                    logger.LogInformation($"Sending SMS OK {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toPhone)}");
                     return true;
                 }
                 logger.LogError($"Error sending sms: {response.Content}");
@@ -112,6 +115,7 @@ namespace CovidMassTesting.Controllers.SMS
             request.AddParameter("client_id", settings.Value.ClientId);
             request.AddParameter("client_secret", settings.Value.ClientSecret);
             request.AddParameter("grant_type", "client_credentials");
+
 
             var response = await smsApiRestClient.ExecuteAsync(request);
 
