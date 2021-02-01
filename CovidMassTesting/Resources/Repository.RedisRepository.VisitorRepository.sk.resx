@@ -121,7 +121,7 @@
     <value>Testovanie covidu</value>
   </data>
   <data name="Dear {0}, there were some technical issues with your test. Please visit the sampling place again and repeat the test procedure. You can use the same registration as before." xml:space="preserve">
-    <value>{0}, vyskytol sa technický problém s Vašim testom a test bude musieť byť vykonaný znovu. Dostavte sa znovu na odber vzorky. Môžete použíť rovnaký kód registrácie ako pri odoberaní prvej vzorky</value>
+    <value>{0}, zial Vas test nebolo mozne vyhodnotit. Prosim dostavte sa kedykolvek na opatovny test. Nemusite sa znovu registrovat.</value>
   </data>
   <data name="Dear {0}, we have updated your registration {1}. Time: {2}, Place: {3}" xml:space="preserve">
     <value>{0}, aktualizovali sme vašu registráciu {1}. Čas: {2}, Miesto: {3}</value>
