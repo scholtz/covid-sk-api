@@ -588,6 +588,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
                 case TestResult.TestIsBeingProcessing:
                     visitor.TestingTime = DateTimeOffset.UtcNow;
+                    visitor.ResultNotifiedCount = null;
+                    visitor.ResultNotifiedAt = null;
                     break;
             }
             visitor.LastUpdate = DateTimeOffset.Now;
