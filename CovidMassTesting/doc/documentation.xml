@@ -53,6 +53,13 @@
             <param name="email"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.UpdateVisitor(CovidMassTesting.Model.Visitor)">
+            <summary>
+            Global admin can fix visitor
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.DropDatabase(System.String)">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.

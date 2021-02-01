@@ -2116,7 +2116,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             hoursDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(3, hoursDictionary.Count);
+            Assert.IsTrue(hoursDictionary.Count >= 1);
             hourSlot = hoursDictionary.Values.First();
 
             request = ListMinuteSlotsByPlaceAndHourSlotId(client, second.Id, hourSlot.SlotId.ToString());
