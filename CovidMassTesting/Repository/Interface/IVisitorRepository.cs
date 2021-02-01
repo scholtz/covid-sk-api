@@ -211,6 +211,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<int> FixTestingTime();
         /// <summary>
+        /// Returns number of corrected verification data
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> FixVerificationData();
+        /// <summary>
         /// Fix year
         /// </summary>
         /// <returns></returns>

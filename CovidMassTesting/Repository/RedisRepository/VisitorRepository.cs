@@ -2666,6 +2666,63 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
         /// <summary>
+        /// Fix verification data
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> FixVerificationData()
+        {
+            int ret = 0;
+            logger.LogInformation($"FixTestingTime");
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt, false);
+                    if (visitor == null) continue;
+                    if (string.IsNullOrEmpty(visitor.VerificationId)) continue;
+                    var updated = false;
+                    var data = await GetResultVerification(visitor.VerificationId);
+                    if (data == null) continue;
+                    if (visitor.TestingTime.HasValue && data.Time != visitor.TestingTime)
+                    {
+                        data.Time = visitor.TestingTime.Value;
+                        updated = true;
+                    }
+                    switch (visitor.Result)
+                    {
+                        case TestResult.PositiveWaitingForCertificate:
+                        case TestResult.PositiveCertificateTaken:
+
+                            if (data.Result != TestResult.PositiveWaitingForCertificate)
+                            {
+                                data.Result = TestResult.PositiveWaitingForCertificate;
+                                updated = true;
+                            }
+                            break;
+                        case TestResult.NegativeWaitingForCertificate:
+                        case TestResult.NegativeCertificateTaken:
+
+                            if (data.Result != TestResult.NegativeWaitingForCertificate)
+                            {
+                                data.Result = TestResult.NegativeWaitingForCertificate;
+                                updated = true;
+                            }
+                            break;
+                    }
+                    if (updated)
+                    {
+                        await SetResult(data, false);
+                        ret++;
+                    }
+                }
+            }
+
+            logger.LogInformation($"FixTestingTime Done");
+
+            return ret;
+        }
+
+        /// <summary>
         /// Fix. Set to visitor the test result and time of the test
         /// 
         /// tries to match visitors by name with the test results list 

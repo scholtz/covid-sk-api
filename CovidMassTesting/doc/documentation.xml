@@ -78,6 +78,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixVerificationData">
+            <summary>
+            Fix verification data
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -4475,6 +4481,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixVerificationData">
+            <summary>
+            Returns number of corrected verification data
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixBirthYear">
             <summary>
             Fix year
@@ -6141,6 +6153,12 @@
             Fix. Set to visitor the test result and time of the test
             
             tries to match visitors by name with the test results list 
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixVerificationData">
+            <summary>
+            Fix verification data
             </summary>
             <returns></returns>
         </member>
