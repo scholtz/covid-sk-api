@@ -903,6 +903,34 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                         if (!string.IsNullOrEmpty(visitor.VerificationId))
                         {
+
+                            var verification = await GetResultVerification(visitor.VerificationId);
+                            var newVerificationState = "";
+                            switch (visitor.Result)
+                            {
+
+                                case TestResult.PositiveCertificateTaken:
+                                case TestResult.PositiveWaitingForCertificate:
+                                    if (visitor.Result != TestResult.PositiveWaitingForCertificate)
+                                    {
+                                        newVerificationState = TestResult.PositiveWaitingForCertificate;
+                                    }
+                                    break;
+                                case TestResult.NegativeCertificateTaken:
+                                case TestResult.NegativeWaitingForCertificate:
+                                    if (visitor.Result != TestResult.NegativeWaitingForCertificate)
+                                    {
+                                        newVerificationState = TestResult.NegativeWaitingForCertificate;
+                                    }
+                                    break;
+                            }
+                            if (!string.IsNullOrEmpty(newVerificationState) || verification.Time != visitor.TestingTime.Value)
+                            {
+                                verification.Result = newVerificationState;
+                                verification.Time = visitor.TestingTime.Value;
+                                await SetResult(verification, false);
+                            }
+
                             var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
@@ -914,15 +942,26 @@ namespace CovidMassTesting.Repository.RedisRepository
                         }
                         else
                         {
-                            var verificationData = GetResultVerification(visitor.VerificationId);
+                            var state = TestResult.NotTaken;
+                            switch (visitor.Result)
+                            {
 
+                                case TestResult.PositiveCertificateTaken:
+                                case TestResult.PositiveWaitingForCertificate:
+                                    state = TestResult.PositiveWaitingForCertificate;
+                                    break;
+                                case TestResult.NegativeCertificateTaken:
+                                case TestResult.NegativeWaitingForCertificate:
+                                    state = TestResult.NegativeWaitingForCertificate;
+                                    break;
+                            }
                             var result = await SetResult(new VerificationData()
                             {
                                 Id = Guid.NewGuid().ToString(),
                                 Name = $"{visitor.FirstName} {visitor.LastName}",
                                 Product = product?.Name,
                                 TestingAddress = place?.Address,
-                                Result = visitor.Result,
+                                Result = state,
                                 TestingEntity = pp?.CompanyName,
                                 Time = visitor.TestingTime ?? DateTimeOffset.Now
                             }, true);

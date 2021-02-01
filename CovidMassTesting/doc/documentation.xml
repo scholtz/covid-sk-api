@@ -2744,6 +2744,11 @@
             Slot time object
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.TimeFromTicks">
+            <summary>
+            Time from ticks
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Slot5Min.HourSlotId">
             <summary>
             Hour slot id
