@@ -500,7 +500,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
             await MapTestingSetToVisitorCode(codeInt, testCodeClear);
-            await UpdateTestingState(codeInt, "test-not-processed", testCodeClear);
+            await UpdateTestingState(codeInt, TestResult.TestIsBeingProcessing, testCodeClear);
             return testCodeClear;
         }
         /// <summary>
@@ -587,13 +587,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                     visitor.TestingTime = DateTimeOffset.UtcNow;
                     visitor.ResultNotifiedCount = null;
                     visitor.ResultNotifiedAt = null;
+                    visitor.TestingSet = testingSet;
                     break;
             }
             visitor.LastUpdate = DateTimeOffset.Now;
-            if (state == "test-not-processed")
-            {
-                visitor.TestingSet = testingSet;
-            }
             await SetVisitor(visitor, false);
 
             try
