@@ -146,8 +146,10 @@
             {{Name}}, je nám to ľúto, ale vyskytol sa technický problém s Vašim testom a bude ho znovu zopakovať. Prosím navštívte odberné miesto znovu. Registrovať sa nemusíte. Kód registrácie ostáva rovnaký.
         {{else if isCS}}
             {{Name}}, je nám to líto, ale vyskytl se technický problém s Vaším testem a bude ho znovu zopakovat. Prosím navštivte odběrné místo znovu. Registrovat se nemusíte. Kód registrace zůstává stejný.
-        {{else}}
+        {{else if isEN}}
             {{Name}}, we're sorry, but your test was not successful and will need to be retaken. You can visit the testing place again any time with your previous registration.
+        {{else}}
+            {{Name}}, je nám to ľúto, ale vyskytol sa technický problém s Vašim testom a bude ho znovu zopakovať. Prosím navštívte odberné miesto znovu. Registrovať sa nemusíte. Kód registrácie ostáva rovnaký.
         {{/if}} 
         
         </span></div><div></div></div></td>
@@ -175,16 +177,20 @@
             Ďakujeme, že ste využili možnosť registrácie na test.
         {{else if isCS}}
             Děkujeme, že jste využili možnost registrace na test.
-        {{else}}
+        {{else if isEN}}
             Thank you for using the test registration option.
+        {{else}}
+            Ďakujeme, že ste využili možnosť registrácie na test.
         {{/if}} 
         </span><span style="color: #888888; font-family: arial, helvetica, sans-serif; font-size: 14px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; letter-spacing: normal; orphans: 2; text-align: start; text-indent: 0px; text-transform: none; white-space: pre-wrap; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; background-color: rgb(255, 255, 255); text-decoration-style: initial; text-decoration-color: initial; float: none; display: inline">
         {{#if isSK}}
             Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
         {{else if isCS}}
             Šetříte čas nejen sobě, ale zlepšujete plynulost samotného testování a snazší práci testovacímu týmu. Děkujeme.
-        {{else}}
+        {{else if isEN}}
             Not only you save your time, but you also improve the smoothness of the testing itself and make the work of the testing team easier. We thank you.
+        {{else}}
+            Šetríte čas nielen sebe, ale zlepšujete plynulosť samotného testovania a uľahčujete prácu testovaciemu tímu. Ďakujeme.
         {{/if}} 
         </span></div><div></div></div></td>
       </tr>
@@ -202,16 +208,20 @@
             Neposielať emaily
         {{else if isCS}}
             Neposílat emaily
-        {{else}}
+        {{else if isEN}}
             Unsubscribe
+        {{else}}
+            Neposielať emaily
         {{/if}}
   </a> - <a href="{{{unsubscribe_preferences}}}" target="_blank" class="Unsubscribe--unsubscribePreferences" style="">
         {{#if isSK}}
             Možnosti nastavenia emailov
         {{else if isCS}}
             Možnosti nastavení emailů
-        {{else}}
+        {{else if isEN}}
             Unsubscribe Preferences
+        {{else}}
+            Možnosti nastavenia emailov
         {{/if}}
         </a></p></div></td>
                                       </tr>
