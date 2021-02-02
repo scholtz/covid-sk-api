@@ -4,15 +4,12 @@ using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
-using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
-using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
@@ -1103,7 +1100,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             else
             {
-                if (visitor.Result != TestResult.NegativeCertificateTaken || visitor.Result != TestResult.NegativeWaitingForCertificate) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
+                if (visitor.Result != TestResult.NegativeCertificateTaken && visitor.Result != TestResult.NegativeWaitingForCertificate) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
                 if (!visitor.TestingTime.HasValue) throw new Exception("S Vašim testom sa vyskytla technická chyba, kontaktujte podporu prosím");
                 if (visitor.TestingTime.Value.AddDays(5) > DateTimeOffset.Now)
                 {
