@@ -1560,7 +1560,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                         if (previous.TestingTime.Value.AddDays(2) > DateTimeOffset.Now)
                         {
-                            throw new Exception("Test si môžete vykonať najskôr za 2 dni");
+                            throw new Exception("Test si môžete vykonať najskôr za 3 dni");
                         }
                     }
                 }
