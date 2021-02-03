@@ -91,6 +91,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixSendRegistrationSMS">
+            <summary>
+            Fix verification data
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -4569,6 +4575,12 @@
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixVerificationData">
             <summary>
             Returns number of corrected verification data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixSendRegistrationSMS">
+            <summary>
+            FixSendRegistrationSMS
             </summary>
             <returns></returns>
         </member>

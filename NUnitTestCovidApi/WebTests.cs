@@ -102,7 +102,7 @@ namespace NUnitTestCovidApi
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
                         new KeyValuePair<string, string>("testingDay",$"{DateTimeOffset.Now.ToString("yyyy-MM-dd")}T00:00:00+00:00"),
                         new KeyValuePair<string, string>("from","22"),
-                        new KeyValuePair<string, string>("until","23"),
+                        new KeyValuePair<string, string>("until","24"),
                     })
                 ).Result;
         }
@@ -763,7 +763,7 @@ namespace NUnitTestCovidApi
             {
                 new TimeUpdate()
                 {
-                    Date = DateTimeOffset.Now,
+                    Date = DateTimeOffset.Now.AddDays(1),
                     OpeningHoursTemplateId= 1,
                     PlaceId = firstPlace.Id,
                     Type = "set"
@@ -771,14 +771,14 @@ namespace NUnitTestCovidApi
 
                 new TimeUpdate()
                 {
-                    Date = DateTimeOffset.Now,
+                    Date = DateTimeOffset.Now.AddDays(1),
                     OpeningHoursTemplateId= 2,
                     PlaceId = secondPlace.Id,
                     Type = "set"
                 },
                 new TimeUpdate()
                 {
-                    Date = DateTimeOffset.Now.AddDays(1),
+                    Date = DateTimeOffset.Now.AddDays(2),
                     OpeningHoursTemplateId= 1,
                     PlaceId = secondPlace.Id,
                     Type = "set"
@@ -786,7 +786,7 @@ namespace NUnitTestCovidApi
 
                 new TimeUpdate()
                 {
-                    Date = DateTimeOffset.Now.AddDays(1),
+                    Date = DateTimeOffset.Now.AddDays(2),
                     OpeningHoursTemplateId= 2,
                     PlaceId = firstPlace.Id,
                     Type = "set"
