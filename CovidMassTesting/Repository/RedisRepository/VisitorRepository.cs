@@ -1558,7 +1558,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             throw new Exception("Prosím, zostaňte doma. Váš predchádzajúci test preukázal prítomnosť covidu.");
                         }
 
-                        if (previous.TestingTime.Value.AddDays(2) > DateTimeOffset.Now)
+                        if (previous.TestingTime.Value.AddDays(3) > DateTimeOffset.Now)
                         {
                             throw new Exception("Test si môžete vykonať najskôr za 3 dni");
                         }
