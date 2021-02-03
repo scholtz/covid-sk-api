@@ -2749,10 +2749,70 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (visitor.ChosenPlaceId != "BA333") continue;
                     if (visitor.ChosenSlot < 637481916000000000) continue;
 
+                    var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                    var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
+
+                    var oldCulture = CultureInfo.CurrentCulture;
+                    var oldUICulture = CultureInfo.CurrentUICulture;
+                    var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                    CultureInfo.CurrentCulture = specifiedCulture;
+                    CultureInfo.CurrentUICulture = specifiedCulture;
+
+
+                    var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
+
+                    try
+                    {
+                        //var product = await placeRepository.GetPlaceProduct();
+                        var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                        var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+
+                        var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product?.Name);
+                        attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                        {
+                            Content = Convert.ToBase64String(pdf),
+                            Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slot.TimeInCET.ToString("MMdd")}.pdf",
+                            Type = "application/pdf",
+                            Disposition = "attachment"
+                        });
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, "Error generating file");
+                    }
+                    var code = visitor.Id.ToString();
+
+                    await emailSender.SendEmail(
+                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                        visitor.Email,
+                        $"{visitor.FirstName} {visitor.LastName}",
+                        new Model.Email.VisitorRegistrationEmail(visitor.Language)
+                        {
+                            Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                            Name = $"{visitor.FirstName} {visitor.LastName}",
+                            Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                            Place = place.Name,
+                            PlaceDescription = place.Description
+                        }, attachments);
+
+                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    {
+                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                            string.Format(
+                                Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_,
+                                $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                                $"{visitor.FirstName} {visitor.LastName}",
+                                $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                                place.Name
+                        )));
+                    }
+                    CultureInfo.CurrentCulture = oldCulture;
+                    CultureInfo.CurrentUICulture = oldUICulture;
+
                 }
             }
 
-            logger.LogInformation($"FixTestingTime Done {ret}");
+            logger.LogInformation($"FixSendRegistrationSMS Done {ret}");
 
             return ret;
         }
