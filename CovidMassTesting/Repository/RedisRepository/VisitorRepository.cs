@@ -2035,7 +2035,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var slot = slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot).Result;
 
-            data.Date = slot.TimeInCET.ToString("dd.MM.yyyy") + slot.Description;
+            data.Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}";
 
             switch (visitor.PersonType)
             {
