@@ -115,7 +115,8 @@ namespace CovidMassTesting.Controllers
                 if (!visitor.BirthDayYear.HasValue || visitor.BirthDayYear < 1900 || visitor.BirthDayYear > 2021) throw new Exception("Rok Vášho narodenia vyzerá byť chybne vyplnený");
                 if (!visitor.BirthDayDay.HasValue || visitor.BirthDayDay < 1 || visitor.BirthDayDay > 31) throw new Exception("Deň Vášho narodenia vyzerá byť chybne vyplnený");
                 if (!visitor.BirthDayMonth.HasValue || visitor.BirthDayMonth < 1 || visitor.BirthDayMonth > 12) throw new Exception("Mesiac Vášho narodenia vyzerá byť chybne vyplnený");
-
+                visitor.RegistrationTime = DateTimeOffset.UtcNow;
+                visitor.SelfRegistration = true;
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
             catch (Exception exc)
@@ -202,6 +203,13 @@ namespace CovidMassTesting.Controllers
                     && !User.IsMedicTester(userRepository, placeProviderRepository))
                     throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
 
+                if (!visitor.RegistrationTime.HasValue)
+                {
+                    visitor.RegistrationTime = DateTimeOffset.UtcNow;
+                    visitor.SelfRegistration = false;
+                }
+                visitor.RegistrationUpdatedByManager = User.GetEmail();
+                logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 return Ok(await visitorRepository.Register(visitor, User.GetEmail()));
             }
             catch (Exception exc)

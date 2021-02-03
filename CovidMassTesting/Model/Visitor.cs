@@ -93,6 +93,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public long ChosenSlot { get; set; }
         /// <summary>
+        /// ChosenSlotTime
+        /// </summary>
+        public DateTimeOffset ChosenSlotTime { get { return new DateTimeOffset(ChosenSlot, TimeSpan.Zero); } }
+        /// <summary>
         /// Chosen place
         /// </summary>
         public string ChosenPlaceId { get; set; }
@@ -113,7 +117,18 @@ namespace CovidMassTesting.Model
         /// Last change
         /// </summary>
         public int? ResultNotifiedCount { get; set; }
-
+        /// <summary>
+        /// Visitor has registered by himself
+        /// </summary>
+        public bool? SelfRegistration { get; set; }
+        /// <summary>
+        /// If administration worker changes the data we store this information
+        /// </summary>
+        public string RegistrationUpdatedByManager { get; set; }
+        /// <summary>
+        /// Registration time
+        /// </summary>
+        public DateTimeOffset? RegistrationTime { get; set; }
         /// <summary>
         /// Real time when the test has been taken
         /// </summary>
