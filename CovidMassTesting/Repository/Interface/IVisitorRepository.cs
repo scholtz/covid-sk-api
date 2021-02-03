@@ -216,6 +216,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<int> FixVerificationData();
         /// <summary>
+        /// FixSendRegistrationSMS
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> FixSendRegistrationSMS();
+        /// <summary>
         /// Fix year
         /// </summary>
         /// <returns></returns>

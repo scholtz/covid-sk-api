@@ -2017,7 +2017,9 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             data.Name = $"{visitor.FirstName} {visitor.LastName}";
 
-            data.Date = new DateTimeOffset(visitor.ChosenSlot, TimeSpan.Zero).ToString("f");
+            var slot = slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot).Result;
+
+            data.Date = slot.TimeInCET.ToString("dd.MM.yyyy") + slot.Description;
 
             switch (visitor.PersonType)
             {
@@ -2711,7 +2713,28 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
 
-            logger.LogInformation($"FixTestingTime Done");
+            logger.LogInformation($"FixTestingTime Done {ret}");
+
+            return ret;
+        }
+        public async Task<int> FixSendRegistrationSMS()
+        {
+            int ret = 0;
+            logger.LogInformation($"FixSendRegistrationSMS");
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt, false);
+                    if (visitor == null) continue;
+
+                    if (visitor.ChosenPlaceId != "BA333") continue;
+                    if (visitor.ChosenSlot < 637481916000000000) continue;
+
+                }
+            }
+
+            logger.LogInformation($"FixTestingTime Done {ret}");
 
             return ret;
         }
