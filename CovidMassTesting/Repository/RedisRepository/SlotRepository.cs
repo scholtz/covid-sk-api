@@ -32,6 +32,8 @@ namespace CovidMassTesting.Repository.RedisRepository
 
         private readonly string REDIS_KEY_SLOT_OBJECTS_M = "SLOTS_M";
         private readonly string REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR = "SLOTS_M_DP_LIST";
+        private readonly TimeSpan TimeZoneOffset = new TimeSpan(1, 0, 0);
+
 
         /// <summary>
         /// Constructor
@@ -82,8 +84,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         Time = day,
                         OpeningHours = openingHours,
                         OpeningHoursTemplate = openingHoursTemplate,
-
-                        Description = (day + TimeZoneInfo.Local.GetUtcOffset(day)).ToString("dd.MM.yyyy", CultureInfo.CurrentCulture)
+                        Description = (day + TimeZoneOffset).ToString("dd.MM.yyyy", CultureInfo.CurrentCulture)
                     });
                     if (!result)
                     {
@@ -96,8 +97,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
 
-            var start = day;
-            var end = day.AddDays(1);
+            var start = day - TimeZoneOffset;
+            var startInZone = start.ToOffset(TimeZoneOffset);
+            var end = start.AddDays(1);
             var iterator = TimeSpan.Zero;
 
             var listH = (await ListHourSlotsByPlaceAndDaySlotId(placeId, testingDay)).ToDictionary(t => t.Time.Ticks, t => t);
@@ -108,7 +110,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var tNext = t.AddHours(1);
 
 
-                if (hoursParsed.HasAnySlotWithinHourOpen(iterator))
+                if (hoursParsed.HasAnySlotWithinHourOpen(iterator + TimeZoneOffset))
                 {
                     if (!listH.ContainsKey(t.Ticks))
                     {
@@ -120,7 +122,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Time = t,
                             DaySlotId = day.Ticks,
                             TestingDayId = testingDay,
-                            Description = $"{(t).ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tNext).ToString("HH:mm", CultureInfo.CurrentCulture)}"
+                            Description = $"{(t + TimeZoneOffset).ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tNext + TimeZoneOffset).ToString("HH:mm", CultureInfo.CurrentCulture)}"
                         });
                     }
                 }
@@ -155,7 +157,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     lastH = tMin.Hour;
                 }
 
-                if (hoursParsed.IsTimeWhenIsOpen(iterator))
+                if (hoursParsed.IsTimeWhenIsOpen(iterator + TimeZoneOffset))
                 {
                     if (!listM.ContainsKey(tMin.Ticks))
                     {
@@ -167,7 +169,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Time = tMin,
                             TestingDayId = testingDay,
                             HourSlotId = t.Ticks,
-                            Description = $"{(tMin).ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tMinNext).ToString("HH:mm", CultureInfo.CurrentCulture)}"
+                            Description = $"{(tMin + TimeZoneOffset).ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tMinNext + TimeZoneOffset).ToString("HH:mm", CultureInfo.CurrentCulture)}"
                         });
                     }
                 }
