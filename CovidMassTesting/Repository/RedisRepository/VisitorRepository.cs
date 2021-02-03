@@ -1525,7 +1525,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
 
             }
-            if (previous == null || (previous.TestingTime.HasValue && previous.TestingTime < DateTimeOffset.Now.AddDays(-3)))
+            if (previous == null)
             {
                 // new registration
                 logger.LogInformation($"New registration");
@@ -1561,6 +1561,22 @@ namespace CovidMassTesting.Repository.RedisRepository
                         if (previous.TestingTime.Value.AddDays(3) > DateTimeOffset.Now)
                         {
                             throw new Exception("Test si môžete vykonať najskôr za 3 dni");
+                        }
+                        else
+                        {
+                            // new registration
+                            logger.LogInformation($"New updated registration");
+
+                            var ret2 = await Add(visitor);
+
+                            await slotRepository.IncrementRegistration5MinSlot(slotM);
+                            await slotRepository.IncrementRegistrationHourSlot(slotH);
+                            await slotRepository.IncrementRegistrationDaySlot(slotD);
+                            await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+
+                            logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+
+                            return ret2;
                         }
                     }
                 }
