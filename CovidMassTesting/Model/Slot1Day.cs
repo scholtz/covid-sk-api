@@ -23,6 +23,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public DateTimeOffset Time { get; set; }
         /// <summary>
+        /// Time in UTC+01:00
+        /// </summary>
+        public DateTimeOffset TimeInCET { get { return Time.ToOffset(new TimeSpan(1, 0, 0)); } }
+        /// <summary>
         /// Description
         /// </summary>
         public string Description { get; set; }

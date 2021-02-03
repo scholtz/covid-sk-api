@@ -2715,6 +2715,11 @@
             Time
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Slot1Day.TimeInCET">
+            <summary>
+            Time in UTC+01:00
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Slot1Day.Description">
             <summary>
             Description
@@ -2760,6 +2765,11 @@
             Time
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Slot1Hour.TimeInCET">
+            <summary>
+            Time in UTC+01:00
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Slot1Hour.DaySlotId">
             <summary>
             Day id
@@ -2798,6 +2808,11 @@
         <member name="P:CovidMassTesting.Model.Slot5Min.Time">
             <summary>
             Slot time object
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.TimeInCET">
+            <summary>
+            Time in UTC+01:00
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Slot5Min.TimeFromTicks">
@@ -3597,6 +3612,11 @@
             Chosen time slot
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.ChosenSlotTime">
+            <summary>
+            ChosenSlotTime
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.ChosenPlaceId">
             <summary>
             Chosen place
@@ -3620,6 +3640,21 @@
         <member name="P:CovidMassTesting.Model.Visitor.ResultNotifiedCount">
             <summary>
             Last change
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.SelfRegistration">
+            <summary>
+            Visitor has registered by himself
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.RegistrationUpdatedByManager">
+            <summary>
+            If administration worker changes the data we store this information
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.RegistrationTime">
+            <summary>
+            Registration time
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Visitor.TestingTime">

@@ -1373,12 +1373,18 @@ namespace NUnitTestCovidApi
             var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(minutes.Count > 0);
 
+
+            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
+            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
+            noSMSSender?.Data.Clear();
             var minute = minutes.Values.First();
             var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
 
-
-
             Assert.IsTrue(registered.Count >= 2);
+            var sms = noSMSSender.Data.Values.First();
+            var text = sms.data.GetText();
+            Assert.IsTrue(text.Contains(minute.Description));
+
             var registrationManager = users.First(u => u.Name == "MedicTester");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -1403,14 +1409,12 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabToken}");
 
-            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
-            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
-            noSMSSender?.Data.Clear();
 
             var iVisitor = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
             var visitor1 = iVisitor.GetVisitor(registered[0].Id).Result;
             visitor1.TestingTime = DateTimeOffset.Now.AddMinutes(-16);
             iVisitor.SetVisitor(visitor1, false);
+            noSMSSender?.Data.Clear();
 
             // TEST mark as sick
             request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
@@ -1427,7 +1431,7 @@ namespace NUnitTestCovidApi
             }
             iVisitor.ProcessSingle().Wait();
             Assert.AreEqual(1, noSMSSender?.Data.Count);
-            var sms = noSMSSender.Data.Values.First();
+            sms = noSMSSender.Data.Values.First();
             Assert.AreEqual(registered[0].Phone, sms.toPhone);
             Assert.IsTrue(sms.data.GetText().Contains("POSITIVE"));
             //Assert.IsTrue(sms.data.GetText().Contains(DateTime.Now.ToString("dd.MM.yyyy")));
