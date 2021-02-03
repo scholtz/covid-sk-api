@@ -110,7 +110,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var tNext = t.AddHours(1);
 
 
-                if (hoursParsed.HasAnySlotWithinHourOpen(iterator + TimeZoneOffset))
+                if (hoursParsed.HasAnySlotWithinHourOpen(iterator))
                 {
                     if (!listH.ContainsKey(t.Ticks))
                     {
@@ -157,7 +157,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     lastH = tMin.Hour;
                 }
 
-                if (hoursParsed.IsTimeWhenIsOpen(iterator + TimeZoneOffset))
+                if (hoursParsed.IsTimeWhenIsOpen(iterator))
                 {
                     if (!listM.ContainsKey(tMin.Ticks))
                     {
