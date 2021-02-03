@@ -1807,6 +1807,11 @@
             Identification of testing provider
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.TestingName">
+            <summary>
+            Name of the testing place
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.TestingAddress">
             <summary>
             Address where user has been tested
@@ -6160,7 +6165,7 @@
             <param name="resultguid"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -6181,12 +6186,13 @@
             <param name="resultguid"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
             <summary>
             Creates pdf from registration
             </summary>
             <param name="visitor"></param>
             <param name="testingEntity"></param>
+            <param name="placeName"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
             <returns></returns>

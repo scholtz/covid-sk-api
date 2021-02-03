@@ -48,6 +48,10 @@ namespace CovidMassTesting.Model.Mustache
         /// </summary>
         public string TestingEntity { get; set; }
         /// <summary>
+        /// Name of the testing place
+        /// </summary>
+        public string TestingName { get; set; }
+        /// <summary>
         /// Address where user has been tested
         /// </summary>
         public string TestingAddress { get; set; }
