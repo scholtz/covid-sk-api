@@ -1525,7 +1525,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
 
             }
-            if (previous == null || (visitor.TestingTime.HasValue && visitor.TestingTime < DateTimeOffset.Now.AddDays(-3)))
+            if (previous == null || (previous.TestingTime.HasValue && previous.TestingTime < DateTimeOffset.Now.AddDays(-3)))
             {
                 // new registration
                 logger.LogInformation($"New registration");
