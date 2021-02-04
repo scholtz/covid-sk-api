@@ -1908,7 +1908,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     var visitor = await GetVisitor(visitorIdInt);
                     if (visitor == null) continue;
                     if (string.IsNullOrEmpty(visitor.TestingSet)
-                        && visitor.ChosenSlot < DateTimeOffset.UtcNow.Ticks
+                        //&& visitor.ChosenSlot < DateTimeOffset.UtcNow.Ticks
                         )
                     {
                         ret.Add(visitor);
