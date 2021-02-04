@@ -157,8 +157,9 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
+        /// <param name="sign">Sign and password protect</param>
         /// <returns></returns>
-        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid);
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, bool sign = true);
 
         /// <summary>
         /// Decode visitor data from database
@@ -173,6 +174,14 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="pass"></param>
         /// <returns></returns>
         public Task<byte[]> GetPublicPDF(int code, string pass);
+        /// <summary>
+        /// Generate unsigned PDF for printing usage
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public Task<byte[]> GetResultPDFByEmployee(int code, string user);
+
         /// <summary>
         /// Allow person to request one resend for free
         /// </summary>
@@ -229,5 +238,11 @@ namespace CovidMassTesting.Repository.Interface
         public Task<bool> ProcessSingle();
 
         public Task<Result> SetResultObject(Result result, bool mustBeNew);
+        /// <summary>
+        /// Format personal number or passport
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public string FormatDocument(string input);
     }
 }

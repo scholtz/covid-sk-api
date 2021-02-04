@@ -550,6 +550,14 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.PrintCertificateByDocumentManager(System.String,System.String)">
+            <summary>
+            PrintCertificateByDocumentManager
+            </summary>
+            <param name="registrationCode"></param>
+            <param name="personalNumber"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.ResendResult(System.String,System.String,System.String)">
             <summary>
             Person can resend his results one more time on request
@@ -4507,7 +4515,7 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -4516,6 +4524,7 @@
             <param name="placeAddress"></param>
             <param name="product"></param>
             <param name="resultguid"></param>
+            <param name="sign">Sign and password protect</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetResultVerification(System.String)">
@@ -4531,6 +4540,14 @@
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetResultPDFByEmployee(System.Int32,System.String)">
+            <summary>
+            Generate unsigned PDF for printing usage
+            </summary>
+            <param name="code"></param>
+            <param name="user"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ResendResults(System.Int32,System.String)">
@@ -4593,6 +4610,13 @@
             <summary>
             Fix year
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FormatDocument(System.String)">
+            <summary>
+            Format personal number or passport
+            </summary>
+            <param name="input"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
@@ -5996,6 +6020,14 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetResultPDFByEmployee(System.Int32,System.String)">
+            <summary>
+            Generate PDF file with test result
+            </summary>
+            <param name="code"></param>
+            <param name="user"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Enqueued(System.Int32,System.String)">
             <summary>
             When person comes to the queue he can mark him as in the queue
@@ -6175,7 +6207,7 @@
             <param name="product"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean)">
             <summary>
             Creates pdf from test result
             </summary>

@@ -276,6 +276,50 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// PrintCertificateByDocumentManager
+        /// </summary>
+        /// <param name="registrationCode"></param>
+        /// <param name="personalNumber"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("PrintCertificateByDocumentManager")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Result>> PrintCertificateByDocumentManager([FromForm] string registrationCode, [FromForm] string personalNumber)
+        {
+            try
+            {
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+
+                var normalizePersonalNumber = visitorRepository.FormatDocument(personalNumber);
+                if (!string.IsNullOrEmpty(normalizePersonalNumber))
+                {
+                    var visitor = await visitorRepository.GetVisitorByPersonalNumber(personalNumber);
+                    if (visitor != null)
+                    {
+
+                        var data = await visitorRepository.GetResultPDFByEmployee(visitor.Id, User.GetEmail());
+                        return File(data, "application/pdf", "result.pdf");
+                    }
+                }
+                var codeClear = FormatBarCode(registrationCode);
+                if (int.TryParse(codeClear, out var codeInt))
+                {
+                    var data = await visitorRepository.GetResultPDFByEmployee(codeInt, User.GetEmail());
+                    return File(data, "application/pdf", "result.pdf");
+                }
+                throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
         /// <summary>
         /// Person can resend his results one more time on request
         /// </summary>

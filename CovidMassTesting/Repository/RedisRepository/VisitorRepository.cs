@@ -345,7 +345,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return visitor;
         }
-        protected string FormatDocument(string input)
+        public string FormatDocument(string input)
         {
             return input?
                 .ToUpper()
@@ -811,7 +811,42 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
         }
+        /// <summary>
+        /// Generate PDF file with test result
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public async Task<byte[]> GetResultPDFByEmployee(int code, string user)
+        {
+            var visitor = await GetVisitor(code);
+            if (visitor == null)
+            {
+                throw new Exception("Skontrolujte prosím správne zadanie kódu registrácie.");
+            }
+            if (string.IsNullOrEmpty(user))
+            {
+                throw new Exception("Unauthorized access");
+            }
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveWaitingForCertificate:
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTaken:
+                    // process
+                    break;
+                default:
+                    throw new Exception("Test je v stave: " + visitor.Result);
+            }
 
+            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            //var product = await placeRepository.GetPlaceProduct();
+            var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+            var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, false);
+        }
 
         public async Task<bool> ResendResults(int code, string pass)
         {
@@ -2097,9 +2132,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
         /// <returns></returns>
-        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, bool sign = true)
         {
-            var password = "";
+            string password;
 
             switch (visitor.PersonType)
             {
@@ -2115,17 +2150,25 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid);
             using var pdfStreamEncrypted = new MemoryStream();
-            var writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
-                            new iText.Kernel.Pdf.WriterProperties()
-                                    .SetStandardEncryption(
-                                        Encoding.ASCII.GetBytes(password),
-                                        Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
-                                        iText.Kernel.Pdf.EncryptionConstants.ALLOW_PRINTING,
-                                        iText.Kernel.Pdf.EncryptionConstants.ENCRYPTION_AES_256
-                                    )
+            iText.Kernel.Pdf.PdfWriter writer;
+            if (sign)
+            {
+                writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted,
+                                new iText.Kernel.Pdf.WriterProperties()
+                                        .SetStandardEncryption(
+                                            Encoding.ASCII.GetBytes(password),
+                                            Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
+                                            iText.Kernel.Pdf.EncryptionConstants.ALLOW_PRINTING,
+                                            iText.Kernel.Pdf.EncryptionConstants.ENCRYPTION_AES_256
+                                        )
 
-                         //                                    .SetPdfVersion(iText.Kernel.Pdf.PdfVersion.PDF_1_4)
-                         );
+                             //                                    .SetPdfVersion(iText.Kernel.Pdf.PdfVersion.PDF_1_4)
+                             );
+            }
+            else
+            {
+                writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted);
+            }
             iText.Kernel.Pdf.PdfDocument pdfDocument = new iText.Kernel.Pdf.PdfDocument(writer);
             pdfDocument.SetDefaultPageSize(iText.Kernel.Geom.PageSize.A4);
             var settings = new iText.Html2pdf.ConverterProperties()
@@ -2133,7 +2176,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             );
             iText.Html2pdf.HtmlConverter.ConvertToPdf(html, pdfDocument, settings);
             writer.Close();
-
+            if (!sign)
+            {
+                return pdfStreamEncrypted.ToArray();
+            }
             if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
             //var pages = pdfDocument.GetNumberOfPages();
             try
