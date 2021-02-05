@@ -52,6 +52,18 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool InsuranceOnly { get; set; }
         /// <summary>
+        /// Only for parents who need the test for the school verification
+        /// </summary>
+        public bool? SchoolOnly { get; set; } = false;
+        /// <summary>
+        /// Corporations may check this on and only its employees are eligible for the testing
+        /// </summary>
+        public bool? EmployeesOnly { get; set; } = false;
+        /// <summary>
+        /// Collect insurance organisation
+        /// </summary>
+        public bool? CollectInsurance { get; set; } = true;
+        /// <summary>
         /// Extend
         /// </summary>
         /// <param name="placeProviderRepository"></param>
@@ -65,6 +77,9 @@ namespace CovidMassTesting.Model
                 CustomPrice = this.CustomPrice,
                 From = From,
                 InsuranceOnly = InsuranceOnly,
+                CollectInsurance = CollectInsurance,
+                EmployeesOnly = EmployeesOnly,
+                SchoolOnly = SchoolOnly,
                 PlaceId = PlaceId,
                 PlaceProviderId = PlaceProviderId,
                 Price = Price,

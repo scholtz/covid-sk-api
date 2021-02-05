@@ -742,6 +742,9 @@ namespace CovidMassTesting.Controllers
                     placeProduct.Id = Guid.NewGuid().ToString();
                     placeProduct.PlaceProviderId = User.GetPlaceProvider();
                     placeProduct.InsuranceOnly = product.InsuranceOnly;
+                    placeProduct.CollectInsurance = product.CollectInsurance;
+                    placeProduct.SchoolOnly = product.SchoolOnly;
+                    placeProduct.EmployeesOnly = product.EmployeesOnly;
                     placeProduct = await placeRepository.SetProductPlace(placeProduct);
                     logger.LogInformation($"ProductPlace {place.Name} has been created");
                 }
