@@ -67,8 +67,27 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Return information about current user
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("Me")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<UserPublic>> Me()
+        {
+            try
+            {
+                return Ok(await userRepository.GetPublicUser(User.GetEmail()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
 
-
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// List invitations to place provider for generic users
         /// </summary>

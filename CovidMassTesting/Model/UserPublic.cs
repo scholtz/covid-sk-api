@@ -30,5 +30,9 @@ namespace CovidMassTesting.Model
         /// Place at which person is assigned. All person's registrations will be placed to this location
         /// </summary>
         public string Place { get; set; }
+        /// <summary>
+        /// Last time user has updated his location
+        /// </summary>
+        public DateTimeOffset? PlaceLastCheck { get; set; }
     }
 }

@@ -50,6 +50,10 @@ namespace CovidMassTesting.Model
         /// Place at which person is assigned. All person's registrations will be placed to this location
         /// </summary>
         public string Place { get; set; }
+        /// <summary>
+        /// Last time user has updated his location
+        /// </summary>
+        public DateTimeOffset? PlaceLastCheck { get; set; }
 
         /// <summary>
         /// Converts to public export (password is not sent out)
@@ -62,7 +66,8 @@ namespace CovidMassTesting.Model
                 Email = Email,
                 Name = Name,
                 Roles = Roles,
-                Place = Place
+                Place = Place,
+                PlaceLastCheck = PlaceLastCheck
             };
         }
     }

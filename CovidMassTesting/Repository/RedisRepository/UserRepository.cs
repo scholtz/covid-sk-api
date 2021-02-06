@@ -366,8 +366,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (place == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
             var user = await GetUser(email, placeProviderId);
             user.Place = placeId;
+            user.PlaceLastCheck = DateTimeOffset.UtcNow;
             return await SetUser(user, false);
         }
+
         /// <summary>
         /// Create admin users from the configuration
         /// </summary>
@@ -612,6 +614,8 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return (await GetUser(email, null)).ToPublic();
         }
+
+
         /// <summary>
         /// Administrator is authorized to delete all data in the database
         /// </summary>
