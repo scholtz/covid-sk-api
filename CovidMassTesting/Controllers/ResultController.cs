@@ -637,7 +637,7 @@ namespace CovidMassTesting.Controllers
                 ) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
                 logger.LogInformation($"ListExportableDays: {User.GetEmail()}");
 
-                return Ok(visitorRepository.ListExportableDays());
+                return Ok(await visitorRepository.ListExportableDays());
             }
             catch (Exception exc)
             {
