@@ -16,6 +16,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting
@@ -133,7 +134,7 @@ namespace CovidMassTesting
                                         .AllowCredentials();
                 });
             });
-
+            ThreadPool.SetMinThreads(20, 20);
             var redisConfiguration = new RedisConfiguration();
             try
             {
@@ -143,6 +144,8 @@ namespace CovidMassTesting
             {
                 Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
             }
+
+            if (redisConfiguration.SyncTimeout < 10000) redisConfiguration.SyncTimeout = 10000;
             if (string.IsNullOrEmpty(redisConfiguration.Hosts?.FirstOrDefault()?.Host))
             {
                 services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
