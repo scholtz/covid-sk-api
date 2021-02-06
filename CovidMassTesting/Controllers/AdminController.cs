@@ -200,7 +200,7 @@ namespace CovidMassTesting.Controllers
 
                 if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
 
-                return Ok(visitorRepository.FixPersonPlace(day, newPlaceId, user));
+                return Ok(await visitorRepository.FixPersonPlace(day, newPlaceId, user));
             }
             catch (Exception exc)
             {

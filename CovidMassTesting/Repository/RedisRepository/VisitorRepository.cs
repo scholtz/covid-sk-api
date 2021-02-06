@@ -2955,7 +2955,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
-
+        /// <summary>
+        /// Fix person place by day and user
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="newPlaceId"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
         public async Task<int> FixPersonPlace(string day, string newPlaceId, string user)
         {
 
@@ -2971,9 +2977,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                         if (visitor == null) continue;
                         if (visitor.VerifiedBy == user)
                         {
-                            visitor.ChosenPlaceId = newPlaceId;
-                            await SetVisitor(visitor, false);
-                            ret++;
+                            if (visitor.ChosenPlaceId != newPlaceId)
+                            {
+                                visitor.ChosenPlaceId = newPlaceId;
+                                await SetVisitor(visitor, false);
+                                ret++;
+                            }
                         }
                     }
                     catch (Exception exc)
