@@ -970,8 +970,6 @@ namespace CovidMassTesting.Repository.RedisRepository
         private async Task SendResults(Visitor visitor)
         {
 
-            visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-            await SetVisitor(visitor, false);
 
             switch (visitor.Result)
             {
@@ -1115,6 +1113,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
+
+                    visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
+                    await SetVisitor(visitor, false);
                     break;
             }
         }
