@@ -82,12 +82,13 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                logger.LogInformation($"Me: {User.GetEmail()}");
                 var ret = await userRepository.GetPublicUser(User.GetEmail());
                 if (!string.IsNullOrEmpty(ret.Place))
                 {
                     ret.PlaceObj = await placeRepository.GetPlace(ret.Place);
                 }
-                return Ok();
+                return Ok(ret);
             }
             catch (Exception exc)
             {
