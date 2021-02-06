@@ -626,7 +626,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListExportableDays")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<IEnumerable<DateTimeOffset>>> ListExportableDays()
+        public async Task<ActionResult<IEnumerable<TextValue>>> ListExportableDays()
         {
             try
             {
@@ -637,7 +637,11 @@ namespace CovidMassTesting.Controllers
                 ) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
                 logger.LogInformation($"ListExportableDays: {User.GetEmail()}");
 
-                return Ok(await visitorRepository.ListExportableDays());
+                return Ok((await visitorRepository.ListExportableDays()).Select(t => new TextValue()
+                {
+                    Text = t.ToString("dd.MM.yyyy"),
+                    Value = t.ToString("o")
+                }));
             }
             catch (Exception exc)
             {

@@ -1874,7 +1874,6 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 foreach (var dayStr in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}"))
                 {
-                    logger.LogInformation("ListExportableDays day: " + dayStr);
                     ret.Add(new DateTimeOffset(long.Parse(dayStr), TimeSpan.Zero));
                 }
             }
