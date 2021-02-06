@@ -265,6 +265,14 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<int> FixBirthYear();
         /// <summary>
+        /// Fix place by person id ad day
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="newPlaceId"></param>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public Task<int> FixPersonPlace(string day, string newPlaceId, string user);
+        /// <summary>
         /// Process single result
         /// </summary>
         /// <returns></returns>

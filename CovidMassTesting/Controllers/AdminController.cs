@@ -175,6 +175,41 @@ namespace CovidMassTesting.Controllers
         }
 
         /// <summary>
+        /// Fix corrupted stats
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FixPersonPlace")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> FixPersonPlace([FromForm] string day, [FromForm] string newPlaceId, [FromForm] string user)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(day))
+                {
+                    throw new ArgumentNullException(nameof(day));
+                }
+                if (string.IsNullOrEmpty(newPlaceId))
+                {
+                    throw new ArgumentNullException(nameof(newPlaceId));
+                }
+                if (string.IsNullOrEmpty(user))
+                {
+                    throw new ArgumentNullException(nameof(user));
+                }
+
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+
+                return Ok(visitorRepository.FixPersonPlace(day, newPlaceId, user));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// Administrator is allowed to invite other users and set their groups
         /// </summary>
         /// <param name="email"></param>

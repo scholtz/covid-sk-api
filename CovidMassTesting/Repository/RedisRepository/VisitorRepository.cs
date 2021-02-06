@@ -2955,6 +2955,39 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+
+        public async Task<int> FixPersonPlace(string day, string newPlaceId, string user)
+        {
+
+            int ret = 0;
+            logger.LogInformation($"FixPersonPlace {day} {newPlaceId} {user}");
+            foreach (var visitorId in (await ListAllKeys(DateTimeOffset.Parse(day))))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    try
+                    {
+                        var visitor = await GetVisitor(visitorIdInt, false);
+                        if (visitor == null) continue;
+                        if (visitor.VerifiedBy == user)
+                        {
+                            visitor.ChosenPlaceId = newPlaceId;
+                            await SetVisitor(visitor, false);
+                            ret++;
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, "FixPersonPlace error: " + exc.Message);
+                    }
+                }
+            }
+
+            logger.LogInformation($"FixPersonPlace Done {ret}");
+
+            return ret;
+        }
+
         public async Task<int> FixSendRegistrationSMS()
         {
             int ret = 0;

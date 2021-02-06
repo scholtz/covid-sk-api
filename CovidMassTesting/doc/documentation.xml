@@ -46,6 +46,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixPersonPlace(System.String,System.String,System.String)">
+            <summary>
+            Fix corrupted stats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.RemoveUser(System.String)">
             <summary>
             Administrator is allowed to invite other users and set their groups
@@ -4754,6 +4760,15 @@
             <summary>
             Fix year
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.FixPersonPlace(System.String,System.String,System.String)">
+            <summary>
+            Fix place by person id ad day
+            </summary>
+            <param name="day"></param>
+            <param name="newPlaceId"></param>
+            <param name="user"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProcessSingle">
