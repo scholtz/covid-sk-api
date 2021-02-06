@@ -642,7 +642,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (!string.IsNullOrEmpty(adminWorker))
                     {
                         var user = await userRepository.GetPublicUser(adminWorker);
-                        if (visitor.ChosenPlaceId != user.Place)
+                        if (!string.IsNullOrEmpty(user.Place) && visitor.ChosenPlaceId != user.Place)
                         {
                             logger.LogInformation($"User has changed place from {visitor.ChosenPlaceId} to {user.Place} {code.GetHashCode()}");
                             visitor.ChosenPlaceId = user.Place;
