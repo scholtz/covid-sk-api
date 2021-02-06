@@ -182,7 +182,11 @@ namespace CovidMassTesting.Controllers
             {
                 if (string.IsNullOrEmpty(placeId))
                 {
-                    throw new ArgumentException(localizer[Controllers_UserController.Place_must_not_be_empty].Value);
+                    if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                    {
+                        // pp admin and global admin can reset location
+                        throw new ArgumentException(localizer[Controllers_UserController.Place_must_not_be_empty].Value);
+                    }
                 }
 
                 if (!User.IsRegistrationManager(userRepository, placeProviderRepository)

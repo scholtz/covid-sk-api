@@ -361,13 +361,22 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<bool> SetLocation(string email, string placeId, string placeProviderId)
         {
-            if (string.IsNullOrEmpty(placeId)) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
-            var place = await placeRepository.GetPlace(placeId);
-            if (place == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
-            var user = await GetUser(email, placeProviderId);
-            user.Place = placeId;
-            user.PlaceLastCheck = DateTimeOffset.UtcNow;
-            return await SetUser(user, false);
+            if (string.IsNullOrEmpty(placeId))
+            {
+                var user = await GetUser(email, placeProviderId);
+                user.Place = null;
+                user.PlaceLastCheck = null;
+                return await SetUser(user, false);
+            }
+            else
+            {
+                var place = await placeRepository.GetPlace(placeId);
+                if (place == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.Invalid_place_provided].Value);
+                var user = await GetUser(email, placeProviderId);
+                user.Place = placeId;
+                user.PlaceLastCheck = DateTimeOffset.UtcNow;
+                return await SetUser(user, false);
+            }
         }
 
         /// <summary>
