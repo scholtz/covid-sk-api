@@ -639,6 +639,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                     visitor.TestingSet = testingSet;
                     visitor.VerifiedBy = adminWorker;
                     visitor.VerifiedFromIP = ipAddress;
+                    if (!string.IsNullOrEmpty(adminWorker))
+                    {
+                        var user = await userRepository.GetPublicUser(adminWorker);
+                        if (visitor.ChosenPlaceId != user.Place)
+                        {
+                            logger.LogInformation($"User has changed place from {visitor.ChosenPlaceId} to {user.Place} {code.GetHashCode()}");
+                            visitor.ChosenPlaceId = user.Place;
+                        }
+                    }
+
                     break;
             }
             visitor.LastUpdate = DateTimeOffset.Now;
