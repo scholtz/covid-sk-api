@@ -31,6 +31,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Place { get; set; }
         /// <summary>
+        /// In some cases fetch the place (eg in Me method)
+        /// </summary>
+        public Place PlaceObj { get; set; }
+        /// <summary>
         /// Last time user has updated his location
         /// </summary>
         public DateTimeOffset? PlaceLastCheck { get; set; }

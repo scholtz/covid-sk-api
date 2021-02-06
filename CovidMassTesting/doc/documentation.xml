@@ -770,7 +770,7 @@
             Controller that manages user requests
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.UserController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.UserController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             Constructor
             </summary>
@@ -782,6 +782,12 @@
         <member name="M:CovidMassTesting.Controllers.UserController.List">
             <summary>
             List all public information of all users
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.Me">
+            <summary>
+            Return information about current user
             </summary>
             <returns></returns>
         </member>
@@ -3184,6 +3190,21 @@
             Test result is negative. Certificate has been given to visitor.
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.TextValue">
+            <summary>
+            Prepared for List in bootstrap-vue
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TextValue.Text">
+            <summary>
+            Display value
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.TextValue.Value">
+            <summary>
+            Inner value
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.TimeUpdate">
             <summary>
             Time update action
@@ -3420,6 +3441,11 @@
             Place at which person is assigned. All person's registrations will be placed to this location
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.User.PlaceLastCheck">
+            <summary>
+            Last time user has updated his location
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Model.User.ToPublic">
             <summary>
             Converts to public export (password is not sent out)
@@ -3449,6 +3475,16 @@
         <member name="P:CovidMassTesting.Model.UserPublic.Place">
             <summary>
             Place at which person is assigned. All person's registrations will be placed to this location
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.UserPublic.PlaceObj">
+            <summary>
+            In some cases fetch the place (eg in Me method)
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.UserPublic.PlaceLastCheck">
+            <summary>
+            Last time user has updated his location
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.VerificationData">

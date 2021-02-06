@@ -25,6 +25,7 @@ namespace CovidMassTesting.Controllers
         private readonly ILogger<PlaceController> logger;
         private readonly IUserRepository userRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
+        private readonly IPlaceRepository placeRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -36,13 +37,15 @@ namespace CovidMassTesting.Controllers
             IStringLocalizer<UserController> localizer,
             ILogger<PlaceController> logger,
             IUserRepository userRepository,
-            IPlaceProviderRepository placeProviderRepository
+            IPlaceProviderRepository placeProviderRepository,
+            IPlaceRepository placeRepository
             )
         {
             this.localizer = localizer;
             this.logger = logger;
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
+            this.placeRepository = placeRepository;
         }
         /// <summary>
         /// List all public information of all users
@@ -79,7 +82,12 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                return Ok(await userRepository.GetPublicUser(User.GetEmail()));
+                var ret = await userRepository.GetPublicUser(User.GetEmail());
+                if (!string.IsNullOrEmpty(ret.Place))
+                {
+                    ret.PlaceObj = await placeRepository.GetPlace(ret.Place);
+                }
+                return Ok();
             }
             catch (Exception exc)
             {
