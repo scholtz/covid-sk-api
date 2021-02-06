@@ -558,18 +558,18 @@ namespace CovidMassTesting.Controllers
         [HttpGet("FinalDataExport")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult> FinalDataExport([FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        public async Task<ActionResult> FinalDataExport([FromQuery] DateTimeOffset? day = null, [FromQuery] int from = 0, [FromQuery] int count = 9999999)
         {
             try
             {
                 if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
-                logger.LogInformation($"User {User.GetEmail()} is exporting sick visitors");
+                logger.LogInformation($"User {User.GetEmail()} is exporting sick visitors {day}");
 
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 writer.Write("Test");
-                var data = await visitorRepository.ListSickVisitors(from, count);
+                var data = await visitorRepository.ListSickVisitors(day, from, count);
 
                 csv.WriteRecords(data);
                 writer.Flush();
@@ -592,7 +592,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ProofOfWorkExport")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult> ProofOfWorkExport([FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        public async Task<ActionResult> ProofOfWorkExport([FromQuery] DateTimeOffset? day = null, [FromQuery] int from = 0, [FromQuery] int count = 9999999)
         {
             try
             {
@@ -603,7 +603,7 @@ namespace CovidMassTesting.Controllers
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 writer.Write("Test");
-                var data = await visitorRepository.ProofOfWorkExport(from, count);
+                var data = await visitorRepository.ProofOfWorkExport(day, from, count);
 
                 csv.WriteRecords(data);
                 writer.Flush();
@@ -618,6 +618,33 @@ namespace CovidMassTesting.Controllers
             }
         }
 
+        /// <summary>
+        /// ListExportableDays
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListExportableDays")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<DateTimeOffset>>> ListExportableDays()
+        {
+            try
+            {
+                if (
+                    !User.IsDataExporter(userRepository, placeProviderRepository)
+                        &&
+                    !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)
+                ) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                logger.LogInformation($"ListExportableDays: {User.GetEmail()}");
+
+                return Ok(visitorRepository.ListExportableDays());
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 
         /// <summary>
         /// This method exports all visitors who are in state in processing
@@ -627,7 +654,7 @@ namespace CovidMassTesting.Controllers
         [HttpGet("ListVisitorsInProcess")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult> ListVisitorsInProcess([FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        public async Task<ActionResult> ListVisitorsInProcess([FromQuery] DateTimeOffset? day = null, [FromQuery] int from = 0, [FromQuery] int count = 9999999)
         {
             try
             {
@@ -636,7 +663,7 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ListVisitorsInProcess(from, count);
+                var data = await visitorRepository.ListVisitorsInProcess(day, from, count);
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -659,6 +686,7 @@ namespace CovidMassTesting.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult> ListAllVisitorsWhoDidNotCome(
+            [FromQuery] DateTimeOffset? day = null,
             [FromQuery] int from = 0, [FromQuery] int count = 9999999)
         {
             try
@@ -668,7 +696,7 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ListAllVisitorsWhoDidNotCome(from, count);
+                var data = await visitorRepository.ListAllVisitorsWhoDidNotCome(day, from, count);
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();

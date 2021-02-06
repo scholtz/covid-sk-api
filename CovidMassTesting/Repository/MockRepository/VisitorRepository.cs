@@ -25,6 +25,10 @@ namespace CovidMassTesting.Repository.MockRepository
         private readonly ConcurrentDictionary<string, string> verification = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<string, int> testing2code = new ConcurrentDictionary<string, int>();
         private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
+
+        private readonly ConcurrentDictionary<long, ConcurrentDictionary<int, int>> day2visitor = new ConcurrentDictionary<long, ConcurrentDictionary<int, int>>();
+        private readonly ConcurrentDictionary<long, long> days = new ConcurrentDictionary<long, long>();
+
         private readonly SortedSet<string> docqueue = new SortedSet<string>();
         private readonly Queue<string> resultqueue = new Queue<string>();
         private readonly IConfiguration configuration;
@@ -143,9 +147,13 @@ namespace CovidMassTesting.Repository.MockRepository
         /// List all keys
         /// </summary>
         /// <returns></returns>
-        public override async Task<IEnumerable<string>> ListAllKeys()
+        public override async Task<IEnumerable<string>> ListAllKeys(DateTimeOffset? day = null)
         {
             logger.LogInformation($"Visitor.ListAllKeys");
+            if (day.HasValue)
+            {
+                return day2visitor[day.Value.Ticks].Values.Select(v => v.ToString());
+            }
             return data.Keys.Select(k => k.ToString());
         }
         /// <summary>
@@ -333,6 +341,37 @@ namespace CovidMassTesting.Repository.MockRepository
             }
             dataResults[result.Id] = result;
             return result;
+        }
+
+        public override async Task<bool> MapDay(long day)
+        {
+            days[day] = day;
+            return true;
+        }
+        public override async Task<bool> MapDayToVisitorCode(long day, int visitorCode)
+        {
+            if (!day2visitor.ContainsKey(day)) day2visitor[day] = new ConcurrentDictionary<int, int>();
+            day2visitor[day][visitorCode] = visitorCode;
+            return true;
+        }
+        public override async Task<bool> UnMapDay(long day)
+        {
+            if (days.TryRemove(day, out var item))
+            {
+                return true;
+            }
+            return false;
+        }
+        public override async Task<bool> UnMapDayToVisitorCode(long day, int visitorCode)
+        {
+            if (!day2visitor.ContainsKey(day)) return false;
+            if (!day2visitor[day].ContainsKey(visitorCode)) return false;
+            if (day2visitor[day].TryRemove(visitorCode, out var item))
+            {
+                return true;
+            }
+            return false;
+
         }
     }
 }

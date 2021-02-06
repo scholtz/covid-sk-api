@@ -38,6 +38,8 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_RESULTS_NEW_OBJECTS = "RESULTSLIST";
         private readonly string REDIS_KEY_TEST2VISITOR = "TEST2VISITOR";
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
+        private readonly string REDIS_KEY_DAY2VISITOR = "DAY2VISITOR";
+        private readonly string REDIS_KEY_OPENDAYS = "OPENDAYS";
         private readonly string REDIS_KEY_DOCUMENT_QUEUE = "DOCUMENT_QUEUE";
         private readonly string REDIS_KEY_RESULT_QUEUE = "RESULT_QUEUE";
         private readonly IEmailSender emailSender;
@@ -118,7 +120,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
-
+            await MapDayToVisitorCode(slot.TestingDayId, visitor.Id);
             var oldCulture = CultureInfo.CurrentCulture;
             var oldUICulture = CultureInfo.CurrentUICulture;
             var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
@@ -451,6 +453,46 @@ namespace CovidMassTesting.Repository.RedisRepository
             );
         }
         /// <summary>
+        /// When 
+        ///  - visitor registers
+        ///  - visitor comes to the place at different day
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="visitorCode"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> MapDayToVisitorCode(long day, int visitorCode)
+        {
+            await MapDay(day);
+            return await redisCacheClient.Db0.HashSetAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{day}",
+                Encoding.ASCII.GetBytes($"{day}{visitorCode}{configuration["key"]}").GetSHA256Hash(),
+                visitorCode
+            );
+        }
+        public virtual Task<bool> UnMapDayToVisitorCode(long day, int visitorCode)
+        {
+            return redisCacheClient.Db0.HashDeleteAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{day}",
+                Encoding.ASCII.GetBytes($"{day}{visitorCode}{configuration["key"]}").GetSHA256Hash()
+            );
+        }
+        public virtual Task<bool> MapDay(long day)
+        {
+            return redisCacheClient.Db0.HashSetAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}",
+                day.ToString(),
+                day
+            );
+        }
+        public virtual Task<bool> UnMapDay(long day)
+        {
+            return redisCacheClient.Db0.HashDeleteAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}",
+                day.ToString()
+            );
+        }
+
+        /// <summary>
         /// Removes personal number
         /// </summary>
         /// <param name="personalNumber"></param>
@@ -525,10 +567,12 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (visitor.TestingTime.HasValue)
             {
                 var confWait = configuration["minWaitTimeForResultMinutes"] ?? "15";
-
-                if (visitor.TestingTime.Value.AddMinutes(int.Parse(confWait)) > DateTimeOffset.Now)
+                if (state != TestResult.TestMustBeRepeated)
                 {
-                    return false;
+                    if (visitor.TestingTime.Value.AddMinutes(int.Parse(confWait)) > DateTimeOffset.Now)
+                    {
+                        return false;
+                    }
                 }
             }
 #if SaveASAP
@@ -592,7 +636,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             visitor.LastUpdate = DateTimeOffset.Now;
             await SetVisitor(visitor, false);
-
+            var time = DateTimeOffset.Now;
+            await MapDayToVisitorCode(new DateTimeOffset(time.Year, time.Month, time.Day, 0, 0, 0, TimeSpan.Zero).Ticks, visitor.Id);
             try
             {
                 // update slots stats
@@ -1226,9 +1271,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Lists all keys
         /// </summary>
         /// <returns></returns>
-        public virtual Task<IEnumerable<string>> ListAllKeys()
+        public virtual async Task<IEnumerable<string>> ListAllKeys(DateTimeOffset? day = null)
         {
-            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
+            if (day.HasValue)
+            {
+                var keys = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{day.Value.Ticks}";
+                return await redisCacheClient.Db0.HashValuesAsync<string>(keys);
+            }
+            return await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
         }
         public virtual Task<IEnumerable<string>> ListAllKeysResults()
         {
@@ -1702,6 +1752,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                         await slotRepository.DecrementRegistrationHourSlot(slotHPrev);
                         await slotRepository.DecrementRegistrationDaySlot(slotDPrev);
 
+                        await UnMapDayToVisitorCode(slotDPrev.SlotId, visitor.Id);
+
+
                         logger.LogInformation($"Decremented: M-{slotMPrev.SlotId}, {slotHPrev.SlotId}, {slotDPrev.SlotId}");
                     }
                     catch (Exception exc)
@@ -1711,6 +1764,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     await slotRepository.IncrementRegistration5MinSlot(slotM);
                     await slotRepository.IncrementRegistrationHourSlot(slotH);
                     await slotRepository.IncrementRegistrationDaySlot(slotD);
+                    await MapDayToVisitorCode(slotD.SlotId, visitor.Id);
 
                     logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
                 }
@@ -1764,8 +1818,15 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}"))
             {
-
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}", item);
+            }
+            foreach (var dayStr in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}"))
+            {
+                foreach (var day2visitorKey in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{dayStr}"))
+                {
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{dayStr}", day2visitorKey);
+                }
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}", dayStr);
             }
             ret += (int)await redisCacheClient.Db0.SetRemoveAllAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}");
             ret += (int)await redisCacheClient.Db0.SetRemoveAllAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}");
@@ -1778,14 +1839,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
+        /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListSickVisitors(int from = 0, int count = 9999999)
+        public async Task<IEnumerable<Visitor>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListSickVisitors {from} {count}");
             var ret = new List<Visitor>();
-            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
@@ -1802,16 +1864,29 @@ namespace CovidMassTesting.Repository.RedisRepository
         }
 
         /// <summary>
+        /// ListExportableDays
+        /// </summary>
+        /// <returns></returns>
+        public async Task<IEnumerable<DateTimeOffset>> ListExportableDays()
+        {
+            var ret = new List<DateTimeOffset>();
+            foreach (var dayStr in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}"))
+            {
+                ret.Add(new DateTimeOffset(long.Parse(dayStr), TimeSpan.Zero));
+            }
+            return ret.OrderBy(d => d.Ticks);
+        }
+        /// <summary>
         /// Export for institution that pays for the tests
         /// </summary>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ProofOfWorkExport {from} {count}");
             var ret = new List<VisitorSimplified>();
-            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
@@ -1866,10 +1941,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
+        /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListVisitorsInProcess(int from = 0, int count = 9999999)
+        public async Task<IEnumerable<Visitor>> ListVisitorsInProcess(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListVisitorsInProcess {from} {count}");
 
@@ -1893,15 +1969,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
+        /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(int from = 0, int count = 9999999)
+        public async Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListAllVisitorsWhoDidNotCome {from} {count}");
 
             var ret = new List<Visitor>();
-            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
@@ -2778,6 +2855,45 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             logger.LogInformation($"FixTestingTime Done {ret}");
+
+            return ret;
+        }
+        /// <summary>
+        /// FixMapVisitorToDay
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> FixMapVisitorToDay()
+        {
+            int ret = 0;
+            logger.LogInformation($"FixMapVisitorToDay");
+            foreach (var visitorId in (await ListAllKeys()))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    try
+                    {
+                        var visitor = await GetVisitor(visitorIdInt, false);
+                        if (visitor == null) continue;
+                        if (visitor.TestingTime.HasValue)
+                        {
+                            var time = new DateTimeOffset(visitor.TestingTime.Value.Year, visitor.TestingTime.Value.Month, visitor.TestingTime.Value.Day, 0, 0, 0, TimeSpan.Zero);
+                            await MapDayToVisitorCode(time.Ticks, visitor.Id);
+                        }
+                        else
+                        {
+                            var time = new DateTimeOffset(visitor.ChosenSlotTime.Year, visitor.ChosenSlotTime.Month, visitor.ChosenSlotTime.Day, 0, 0, 0, TimeSpan.Zero);
+                            await MapDayToVisitorCode(time.Ticks, visitor.Id);
+                        }
+                        ret++;
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, "FixMapVisitorToDay error: " + exc.Message);
+                    }
+                }
+            }
+
+            logger.LogInformation($"FixMapVisitorToDay Done {ret}");
 
             return ret;
         }

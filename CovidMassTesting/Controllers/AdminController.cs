@@ -416,6 +416,29 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Fix verification data
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FixMapVisitorToDay")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> FixMapVisitorToDay()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                logger.LogInformation($"FixMapVisitorToDay");
+
+                return Ok(await visitorRepository.FixMapVisitorToDay());
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 #if UseFixes
         [HttpPost("Fix01")]
         [ProducesResponseType(200)]

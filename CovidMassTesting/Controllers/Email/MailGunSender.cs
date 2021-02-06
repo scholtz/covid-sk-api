@@ -73,7 +73,7 @@ namespace CovidMassTesting.Controllers.Email
                     logger.LogDebug($"Message {data.TemplateId} not delivered because email is not defined");
                     return false;
                 }
-                logger.LogInformation($"Sending {data.TemplateId} email to {toEmail}");
+                //logger.LogInformation($"Sending {data.TemplateId} email to {toEmail}");
 
 
 

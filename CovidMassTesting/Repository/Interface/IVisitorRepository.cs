@@ -99,17 +99,17 @@ namespace CovidMassTesting.Repository.Interface
         /// Lists all sick visitors
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListSickVisitors(int from = 0, int count = 9999999);
+        public Task<IEnumerable<Visitor>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
         /// This method exports all visitors who are in state in processing
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListVisitorsInProcess(int from = 0, int count = 9999999);
+        public Task<IEnumerable<Visitor>> ListVisitorsInProcess(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
         /// This method exports all visitors who are in state in processing
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(int from = 0, int count = 9999999);
+        public Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999);
 
         public Task<IEnumerable<Visitor>> ListAllVisitorsAtPlace(
             string placeId,
@@ -125,7 +125,13 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(int from = 0, int count = 9999999);
+        public Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+
+        /// <summary>
+        /// ListExportableDays
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<DateTimeOffset>> ListExportableDays();
         /// <summary>
         /// Test storage
         /// </summary>
@@ -230,13 +236,26 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<int> FixSendRegistrationSMS();
         /// <summary>
+        /// FixMapVisitorToDay
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> FixMapVisitorToDay();
+        /// <summary>
         /// Fix year
         /// </summary>
         /// <returns></returns>
         public Task<int> FixBirthYear();
-
+        /// <summary>
+        /// Process single result
+        /// </summary>
+        /// <returns></returns>
         public Task<bool> ProcessSingle();
-
+        /// <summary>
+        /// Set result
+        /// </summary>
+        /// <param name="result"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
         public Task<Result> SetResultObject(Result result, bool mustBeNew);
         /// <summary>
         /// Format personal number or passport
