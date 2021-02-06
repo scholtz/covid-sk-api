@@ -2020,6 +2020,40 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+        /// <summary>
+        /// All visitors
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Visitor>> ListAllVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ListAllVisitors {from} {count}");
+
+            var ret = new List<Visitor>();
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    ret.Add(visitor);
+                }
+            }
+            logger.LogInformation($"ListAllVisitors {from} {count} END - {ret.Count}");
+
+            return ret;
+        }
+        /// <summary>
+        /// Visitors at place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <param name="fromRegTime"></param>
+        /// <param name="untilRegTime"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public async Task<IEnumerable<Visitor>> ListAllVisitorsAtPlace(
             string placeId,
             DateTimeOffset fromRegTime,

@@ -113,7 +113,23 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999);
-
+        /// <summary>
+        /// List all
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<Visitor>> ListAllVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        /// <summary>
+        /// List all at place
+        /// </summary>
+        /// <param name="placeId"></param>
+        /// <param name="fromRegTime"></param>
+        /// <param name="untilRegTime"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public Task<IEnumerable<Visitor>> ListAllVisitorsAtPlace(
             string placeId,
             DateTimeOffset fromRegTime,

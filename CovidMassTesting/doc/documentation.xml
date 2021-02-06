@@ -644,6 +644,15 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ListAllVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            Export all visitors
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.FormatBarCode(System.String)">
             <summary>
             Format the visitor code
@@ -4585,6 +4594,26 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListAllVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            List all
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListAllVisitorsAtPlace(System.String,System.DateTimeOffset,System.DateTimeOffset,System.Int32,System.Int32)">
+            <summary>
+            List all at place
+            </summary>
+            <param name="placeId"></param>
+            <param name="fromRegTime"></param>
+            <param name="untilRegTime"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
             <summary>
             ProofOfWorkExport
@@ -6329,6 +6358,26 @@
             List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
             </summary>
             <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAllVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            All visitors
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAllVisitorsAtPlace(System.String,System.DateTimeOffset,System.DateTimeOffset,System.Int32,System.Int32)">
+            <summary>
+            Visitors at place
+            </summary>
+            <param name="placeId"></param>
+            <param name="fromRegTime"></param>
+            <param name="untilRegTime"></param>
             <param name="from"></param>
             <param name="count"></param>
             <returns></returns>
