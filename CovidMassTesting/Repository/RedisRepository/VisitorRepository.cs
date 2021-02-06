@@ -1870,9 +1870,17 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<IEnumerable<DateTimeOffset>> ListExportableDays()
         {
             var ret = new List<DateTimeOffset>();
-            foreach (var dayStr in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}"))
+            try
             {
-                ret.Add(new DateTimeOffset(long.Parse(dayStr), TimeSpan.Zero));
+                foreach (var dayStr in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}"))
+                {
+                    logger.LogInformation("ListExportableDays day: " + dayStr);
+                    ret.Add(new DateTimeOffset(long.Parse(dayStr), TimeSpan.Zero));
+                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, "ListExportableDays error");
             }
             return ret.OrderBy(d => d.Ticks);
         }
