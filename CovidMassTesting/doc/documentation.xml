@@ -1028,6 +1028,18 @@
             <param name="data"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Helpers.IP">
+            <summary>
+            IP extensions
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.IP.GetIPAddress(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            ip address
+            </summary>
+            <param name="httpContext"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Helpers.OpeningHours">
             <summary>
             OpeningHours extension
@@ -3784,6 +3796,16 @@
             Time when test has been confirmed by lab
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.VerifiedBy">
+            <summary>
+            Administration worker who has validated the person identity
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.VerifiedFromIP">
+            <summary>
+            Administration worker IP adddress
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.VisitorSimplified">
             <summary>
             NCZI - Datova veta pre registracny system Ag testov
@@ -4485,12 +4507,14 @@
             <param name="state"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ConnectVisitorToTest(System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String)">
             <summary>
             Bind visitor to specific test
             </summary>
             <param name="codeInt"></param>
             <param name="testCodeClear"></param>
+            <param name="adminWorker"></param>
+            <param name="ipAddress"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitor(System.Int32,System.Boolean)">
@@ -4498,6 +4522,7 @@
             Load visitor
             </summary>
             <param name="codeInt"></param>
+            <param name="fixOnLoad"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String)">
@@ -6085,12 +6110,14 @@
             <param name="personalNumber"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ConnectVisitorToTest(System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String)">
             <summary>
             Map visitor code to testing code
             </summary>
             <param name="codeInt"></param>
             <param name="testCodeClear"></param>
+            <param name="adminWorker"></param>
+            <param name="ipAddress"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String)">
@@ -6109,13 +6136,16 @@
             <param name="state"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.String,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.String,System.Boolean,System.String,System.String)">
             <summary>
             Updates testing state
             </summary>
             <param name="code"></param>
             <param name="state"></param>
             <param name="testingSet"></param>
+            <param name="updateStats"></param>
+            <param name="adminWorker"></param>
+            <param name="ipAddress"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetTest(System.Int32,System.String)">

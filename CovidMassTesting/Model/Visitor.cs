@@ -154,5 +154,13 @@ namespace CovidMassTesting.Model
         /// </summary>
         public DateTimeOffset? TestResultTime { get; set; }
         public DateTimeOffset? LastStatusCheck { get; set; }
+        /// <summary>
+        /// Administration worker who has validated the person identity
+        /// </summary>
+        public string VerifiedBy { get; set; }
+        /// <summary>
+        /// Administration worker IP adddress
+        /// </summary>
+        public string VerifiedFromIP { get; set; }
     }
 }

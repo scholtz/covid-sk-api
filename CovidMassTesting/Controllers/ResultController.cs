@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
@@ -11,6 +13,7 @@ using CovidMassTesting.Resources;
 using CsvHelper;
 using GoogleReCaptcha.V3.Interface;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
@@ -159,7 +162,7 @@ namespace CovidMassTesting.Controllers
                 var testCodeClear = FormatBarCode(testCode);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
-                    return Ok(await visitorRepository.ConnectVisitorToTest(codeInt, testCodeClear));
+                    return Ok(await visitorRepository.ConnectVisitorToTest(codeInt, testCodeClear, User.GetEmail(), HttpContext.GetIPAddress()));
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }

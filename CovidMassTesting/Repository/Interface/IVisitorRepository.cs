@@ -50,12 +50,15 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="codeInt"></param>
         /// <param name="testCodeClear"></param>
+        /// <param name="adminWorker"></param>
+        /// <param name="ipAddress"></param>
         /// <returns></returns>
-        public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear);
+        public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string ipAddress);
         /// <summary>
         /// Load visitor
         /// </summary>
         /// <param name="codeInt"></param>
+        /// <param name="fixOnLoad"></param>
         /// <returns></returns>
         public Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true);
         /// <summary>
