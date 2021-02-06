@@ -1974,7 +1974,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"ListVisitorsInProcess {from} {count}");
 
             var ret = new List<Visitor>();
-            foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
