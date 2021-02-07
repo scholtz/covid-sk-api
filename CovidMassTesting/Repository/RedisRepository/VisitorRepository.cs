@@ -1930,6 +1930,30 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
         /// <summary>
+        /// List visitors who has passed the test
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<VisitorAnonymized>> ListAnonymizedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ListAnonymizedVisitors {from} {count}");
+            var ret = new List<VisitorAnonymized>();
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+
+                    ret.Add(new VisitorAnonymized(visitor, configuration["key"]));
+                }
+            }
+            logger.LogInformation($"ListAnonymizedVisitors {from} {count} END - {ret.Count}");
+            return ret;
+        }
+        /// <summary>
         /// ListExportableDays
         /// </summary>
         /// <returns></returns>

@@ -109,6 +109,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<IEnumerable<Visitor>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
+        /// ListAnonymizedVisitors
+        /// </summary>
+        /// <returns></returns>
+        public Task<IEnumerable<VisitorAnonymized>> ListAnonymizedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        /// <summary>
         /// This method exports all visitors who are in state in processing
         /// </summary>
         /// <returns></returns>

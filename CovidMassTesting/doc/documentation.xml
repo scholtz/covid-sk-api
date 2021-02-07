@@ -635,6 +635,15 @@
             <param name="count"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ListAnonymizedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            List visitors tested at specified day
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
             <summary>
             Proof of work.. Export for army or other institution with names of visitors
@@ -3830,6 +3839,190 @@
             Administration worker IP adddress
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Id">
+            <summary>
+            Registration code. 9-digit, formatted 000-000-000 for visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Language">
+            <summary>
+            Language in which we will communicate to the visitor
+            
+            sk | en
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.PersonType">
+            <summary>
+            Type of person
+            
+            idcard|child|foreign
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Passport">
+            <summary>
+            Passport number if person type is foreigner
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.RC">
+            <summary>
+            Personal number if person type is idcard or child
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.BirthDayDay">
+            <summary>
+            BirthDay - day
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.BirthDayMonth">
+            <summary>
+            BirthDay - month
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.BirthDayYear">
+            <summary>
+            BirthDay - year
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.FirstName">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.LastName">
+            <summary>
+            Last name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.ZIP">
+            <summary>
+            ZIP - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.City">
+            <summary>
+            City - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Street">
+            <summary>
+            Street - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.StreetNo">
+            <summary>
+            StreetNo - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Address">
+            <summary>
+            Address - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Phone">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Insurance">
+            <summary>
+            Insurance
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.ChosenSlot">
+            <summary>
+            Chosen time slot
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.ChosenSlotTime">
+            <summary>
+            ChosenSlotTime
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.ChosenPlaceId">
+            <summary>
+            Chosen place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Result">
+            <summary>
+            Test result. Available options are in Model.TestResult
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.TestingSet">
+            <summary>
+            Testing set identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.LastUpdate">
+            <summary>
+            Last change
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.ResultNotifiedCount">
+            <summary>
+            Last change
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.SelfRegistration">
+            <summary>
+            Visitor has registered by himself
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.RegistrationUpdatedByManager">
+            <summary>
+            If administration worker changes the data we store this information
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.RegistrationTime">
+            <summary>
+            Registration time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.TestingTime">
+            <summary>
+            Real time when the test has been taken
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Enqueued">
+            <summary>
+            Time, when visitor has clicked that he is in the queue
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Product">
+            <summary>
+            Product id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.VerificationId">
+            <summary>
+            Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Token">
+            <summary>
+            Captcha token. After it is used it is removed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.TestResultTime">
+            <summary>
+            Time when test has been confirmed by lab
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.VerifiedBy">
+            <summary>
+            Administration worker who has validated the person identity
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.VerifiedFromIP">
+            <summary>
+            Administration worker IP adddress
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.VisitorSimplified">
             <summary>
             NCZI - Datova veta pre registracny system Ag testov
@@ -4600,6 +4793,12 @@
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
             <summary>
             Lists all tested visitors
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListAnonymizedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            ListAnonymizedVisitors
             </summary>
             <returns></returns>
         </member>
@@ -6361,6 +6560,15 @@
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            List visitors who has passed the test
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAnonymizedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
             <summary>
             List visitors who has passed the test
             </summary>

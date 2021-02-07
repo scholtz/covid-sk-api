@@ -628,6 +628,47 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// List visitors tested at specified day
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListAnonymizedVisitors")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> ListAnonymizedVisitors([FromQuery] DateTimeOffset? day = null, [FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        {
+            try
+            {
+                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                logger.LogInformation($"ListAnonymizedVisitors: User {User.GetEmail()} is exporting anonymized visitors {day}");
+
+                using var stream = new MemoryStream();
+                using var writer = new StreamWriter(stream);
+                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                writer.Write("Test");
+                var data = await visitorRepository.ListAnonymizedVisitors(day, from, count);
+
+                csv.WriteRecords(data);
+                writer.Flush();
+                var ret = stream.ToArray();
+                logger.LogInformation($"ListAnonymizedVisitors: Export size: {ret.Length}");
+                var name = $"all-anonymized-alldays-{from}-{count}.csv";
+                if (day.HasValue)
+                {
+                    name = $"all-anonymized-{day.Value.Ticks}-{from}-{count}.csv";
+                }
+                return File(ret, "text/csv", name);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// Proof of work.. Export for army or other institution with names of visitors
         /// </summary>
         /// <returns></returns>
