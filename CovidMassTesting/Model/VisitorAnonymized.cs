@@ -18,7 +18,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Registration code. 9-digit, formatted 000-000-000 for visitors
         /// </summary>
-        public string Id { get { return $"{cohash}{visitor.Id}".GetSHA256Hash(); } }
+        public string Id { get { return $"{cohash}{visitor.Id}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Language in which we will communicate to the visitor
         /// 
@@ -34,11 +34,11 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Passport number if person type is foreigner
         /// </summary>
-        public string Passport { get { return $"{cohash}{visitor.Passport}".GetSHA256Hash(); } }
+        public string Passport { get { return $"{cohash}{visitor.Passport}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Personal number if person type is idcard or child
         /// </summary>
-        public string RC { get { return $"{cohash}{visitor.RC}".GetSHA256Hash(); } }
+        public string RC { get { return $"{cohash}{visitor.RC}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// BirthDay - day
         /// </summary>
@@ -54,11 +54,11 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Name
         /// </summary>
-        public string FirstName { get { return $"{cohash}{visitor.FirstName}".GetSHA256Hash(); } }
+        public string FirstName { get { return $"{cohash}{visitor.FirstName}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Last name
         /// </summary>
-        public string LastName { get { return $"{cohash}{visitor.LastName}".GetSHA256Hash(); } }
+        public string LastName { get { return $"{cohash}{visitor.LastName}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// ZIP - Pernament address
         /// </summary>
@@ -70,23 +70,23 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Street - Pernament address
         /// </summary>
-        public string Street { get { return $"{cohash}{visitor.Street}".GetSHA256Hash(); } }
+        public string Street { get { return $"{cohash}{visitor.Street}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// StreetNo - Pernament address
         /// </summary>
-        public string StreetNo { get { return $"{cohash}{visitor.StreetNo}".GetSHA256Hash(); } }
+        public string StreetNo { get { return $"{cohash}{visitor.StreetNo}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Address - Pernament address
         /// </summary>
-        public string Address { get { return $"{cohash}{visitor.Address}".GetSHA256Hash(); } }
+        public string Address { get { return $"{cohash}{visitor.Address}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Email
         /// </summary>
-        public string Email { get { return $"{cohash}{visitor.Email}".GetSHA256Hash(); } }
+        public string Email { get { return $"{cohash}{visitor.Email}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Phone
         /// </summary>
-        public string Phone { get { return $"{cohash}{visitor.Phone}".GetSHA256Hash(); } }
+        public string Phone { get { return $"{cohash}{visitor.Phone}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Insurance
         /// </summary>
@@ -111,7 +111,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Testing set identifier
         /// </summary>
-        public string TestingSet { get { return $"{cohash}{visitor.TestingSet}".GetSHA256Hash(); } }
+        public string TestingSet { get { return $"{cohash}{visitor.TestingSet}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Last change
         /// </summary>
@@ -127,7 +127,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// If administration worker changes the data we store this information
         /// </summary>
-        public string RegistrationUpdatedByManager { get { return $"{cohash}{visitor.RegistrationUpdatedByManager}".GetSHA256Hash(); } }
+        public string RegistrationUpdatedByManager { get { return $"{cohash}{visitor.RegistrationUpdatedByManager}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Registration time
         /// </summary>
@@ -147,11 +147,11 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
         /// </summary>
-        public string VerificationId { get { return $"{cohash}{visitor.VerificationId}".GetSHA256Hash(); } }
+        public string VerificationId { get { return $"{cohash}{visitor.VerificationId}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Captcha token. After it is used it is removed
         /// </summary>
-        public string Token { get { return $"{cohash}{visitor.Token}".GetSHA256Hash(); } }
+        public string Token { get { return $"{cohash}{visitor.Token}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Time when test has been confirmed by lab
         /// </summary>
@@ -160,10 +160,10 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Administration worker who has validated the person identity
         /// </summary>
-        public string VerifiedBy { get { return $"{cohash}{visitor.VerifiedBy}".GetSHA256Hash(); } }
+        public string VerifiedBy { get { return $"{cohash}{visitor.VerifiedBy}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
         /// Administration worker IP adddress
         /// </summary>
-        public string VerifiedFromIP { get { return $"{cohash}{visitor.VerifiedFromIP}".GetSHA256Hash(); } }
+        public string VerifiedFromIP { get { return $"{cohash}{visitor.VerifiedFromIP}".GetSHA256Hash().Substring(0, 10); } }
     }
 }
