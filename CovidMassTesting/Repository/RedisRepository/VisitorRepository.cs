@@ -1873,6 +1873,19 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (visitor == null) continue;
                     if (!string.IsNullOrEmpty(visitor.TestingSet))
                     {
+
+                        if (day.HasValue && visitor.TestingTime.HasValue)
+                        {
+                            if (visitor.TestingTime < day.Value || visitor.TestingTime > day.Value.AddDays(1))
+                            {
+                                // export only visitors at specified day
+                                continue;
+                            }
+                        }
+                        if (visitor.Result != TestResult.PositiveCertificateTaken || visitor.Result != TestResult.PositiveWaitingForCertificate)
+                        {
+                            continue;
+                        }
                         ret.Add(visitor);
                     }
                 }
@@ -1880,7 +1893,42 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"ListSickVisitors {from} {count} END - {ret.Count}");
             return ret;
         }
+        /// <summary>
+        /// List visitors who has passed the test
+        /// </summary>
+        /// <param name="day"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Visitor>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ListTestedVisitors {from} {count}");
+            var ret = new List<Visitor>();
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    var visitor = await GetVisitor(visitorIdInt);
+                    if (visitor == null) continue;
+                    if (!string.IsNullOrEmpty(visitor.TestingSet))
+                    {
 
+                        if (day.HasValue && visitor.TestingTime.HasValue)
+                        {
+                            if (visitor.TestingTime < day.Value || visitor.TestingTime > day.Value.AddDays(1))
+                            {
+                                // export only visitors at specified day
+                                continue;
+                            }
+                        }
+
+                        ret.Add(visitor);
+                    }
+                }
+            }
+            logger.LogInformation($"ListTestedVisitors {from} {count} END - {ret.Count}");
+            return ret;
+        }
         /// <summary>
         /// ListExportableDays
         /// </summary>
@@ -1904,6 +1952,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// Export for institution that pays for the tests
         /// </summary>
+        /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
@@ -1919,6 +1968,15 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (visitor == null) continue;
                     if (visitor.TestingTime.HasValue && visitor.TestingTime.Value > DateTimeOffset.MinValue)
                     {
+                        if (day.HasValue)
+                        {
+                            if (visitor.TestingTime < day.Value || visitor.TestingTime > day.Value.AddDays(1))
+                            {
+                                // export only visitors at specified day
+                                continue;
+                            }
+                        }
+
                         var rc = visitor.RC;
                         if (visitor.PersonType == "foreign") rc = visitor.Passport;
 
