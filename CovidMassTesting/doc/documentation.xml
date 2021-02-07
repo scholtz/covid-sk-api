@@ -626,6 +626,15 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            List visitors tested at specified day
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
             <summary>
             Proof of work.. Export for army or other institution with names of visitors
@@ -4588,6 +4597,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            Lists all tested visitors
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListVisitorsInProcess(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
             <summary>
             This method exports all visitors who are in state in processing
@@ -6345,6 +6360,15 @@
             <param name="count"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            List visitors who has passed the test
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListExportableDays">
             <summary>
             ListExportableDays
@@ -6355,6 +6379,7 @@
             <summary>
             Export for institution that pays for the tests
             </summary>
+            <param name="day"></param>
             <param name="from"></param>
             <param name="count"></param>
             <returns></returns>
@@ -6518,6 +6543,15 @@
             <summary>
             FixMapVisitorToDay
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixPersonPlace(System.String,System.String,System.String)">
+            <summary>
+            Fix person place by day and user
+            </summary>
+            <param name="day"></param>
+            <param name="newPlaceId"></param>
+            <param name="user"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Fix03">

@@ -461,6 +461,14 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Accept.Clear();
             return ret;
         }
+        private HttpResponseMessage ListTestedVisitors(HttpClient client, int from, int count)
+        {
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/csv"));
+            var ret = client.GetAsync($"Result/ListTestedVisitors?from={from}&count={count}").Result;
+            client.DefaultRequestHeaders.Accept.Clear();
+            return ret;
+        }
+
         private HttpResponseMessage SetLocation(HttpClient client, string placeId)
         {
             return client.PostAsync("User/SetLocation",
@@ -1802,6 +1810,18 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(resultExport.Contains(registered[0].Id.ToString()));
             Assert.IsTrue(resultExport.Contains(registered[0].Phone));
             Assert.IsTrue(resultExport.Contains(registered[0].RC));
+            Assert.IsFalse(resultExport.Contains(registered[1].Id.ToString()));
+            Assert.IsFalse(resultExport.Contains(registered[1].RC));
+
+            request = ListTestedVisitors(client, 0, 100);
+            stream = new MemoryStream();
+            request.Content.CopyToAsync(stream).Wait();
+            resultExport = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.IsNotNull(resultExport);
+            Assert.IsTrue(resultExport.Contains("111111111"));
+            Assert.IsTrue(resultExport.Contains(registered[0].Id.ToString()));
+            Assert.IsTrue(resultExport.Contains(registered[0].Phone));
+            Assert.IsTrue(resultExport.Contains(registered[0].RC));
             Assert.IsTrue(resultExport.Contains(registered[1].Id.ToString()));
             Assert.IsTrue(resultExport.Contains(registered[1].RC));
 
@@ -1886,6 +1906,18 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {dataExporterToken}");
             request = FinalDataExport(client, 0, 100);
+            stream = new MemoryStream();
+            request.Content.CopyToAsync(stream).Wait();
+            resultExport = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.IsNotNull(resultExport);
+            Assert.IsTrue(resultExport.Contains("111111111"));
+            Assert.IsTrue(resultExport.Contains(registered[0].Id.ToString()));
+            Assert.IsTrue(resultExport.Contains(registered[0].Phone));
+            Assert.IsTrue(resultExport.Contains(registered[0].RC));
+            Assert.IsFalse(resultExport.Contains(registered[1].Id.ToString()));
+            Assert.IsFalse(resultExport.Contains(registered[1].RC));
+
+            request = ListTestedVisitors(client, 0, 100);
             stream = new MemoryStream();
             request.Content.CopyToAsync(stream).Wait();
             resultExport = Encoding.UTF8.GetString(stream.ToArray());

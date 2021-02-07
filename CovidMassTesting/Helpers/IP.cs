@@ -28,7 +28,7 @@ namespace CovidMassTesting.Helpers
                 {
                     ip = IPAddress.Parse(headers["X-Forwarded-For"].ToString().Split(',', StringSplitOptions.RemoveEmptyEntries)[0]);
                 }
-                return ip.ToString();
+                return ip?.ToString() ?? "";
             }
             catch
             {

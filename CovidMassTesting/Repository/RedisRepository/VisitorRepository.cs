@@ -1882,7 +1882,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 continue;
                             }
                         }
-                        if (visitor.Result != TestResult.PositiveCertificateTaken || visitor.Result != TestResult.PositiveWaitingForCertificate)
+                        if (visitor.Result != TestResult.PositiveCertificateTaken && visitor.Result != TestResult.PositiveWaitingForCertificate)
                         {
                             continue;
                         }
