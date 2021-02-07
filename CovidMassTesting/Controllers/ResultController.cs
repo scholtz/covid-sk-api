@@ -642,7 +642,14 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (User.IsAdmin(userRepository))
+                {
+                    // ok
+                }
+                else
+                {
+                    if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
                 logger.LogInformation($"ListAnonymizedVisitors: User {User.GetEmail()} is exporting anonymized visitors {day}");
 
                 using var stream = new MemoryStream();
