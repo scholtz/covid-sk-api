@@ -81,6 +81,7 @@ namespace CovidMassTesting
                 });
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
                 c.DocumentFilter<Model.Docs.SwashbuckleFilter>();
+
                 c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Description = "Bearer token.",

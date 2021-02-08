@@ -31,7 +31,7 @@ namespace CovidMassTesting.Model.Docs
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
 
         {
-
+            swaggerDoc.Servers.Clear();
             swaggerDoc.Servers.Add(new OpenApiServer { Url = _swaggerDocHost });
 
         }
