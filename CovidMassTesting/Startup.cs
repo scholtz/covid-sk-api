@@ -68,6 +68,7 @@ namespace CovidMassTesting
                 {
                     Title = "Covid Mass Testing API",
                     Version = "v1",
+
                     Description = "This API has been created for optimisation of time required to take sample from person for Covid-19 test.\n" +
                     "Medical personel scans the bar code on the testing set, scans the bar code of the person registration, and performs test.\n" +
                     "After that the person is free to go home. This application aims to create mass testing possible with minimal risk of contamination from testing personel and minimising the queues in front of testing location.\n" +
@@ -79,7 +80,7 @@ namespace CovidMassTesting
                     "JWTTokenSecret > openssl rand - base64 32\n"
                 });
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
-
+                c.DocumentFilter<Model.Docs.SwashbuckleFilter>();
                 c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
                     Description = "Bearer token.",
