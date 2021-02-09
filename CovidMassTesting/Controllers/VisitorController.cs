@@ -219,5 +219,55 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Returns ECIES public key for private data encryption
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        [HttpPost("GetPublicKey")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [RequestSizeLimit(2000)]
+        public async Task<ActionResult<Visitor>> GetPublicKey()
+        {
+            try
+            {
+                return configuration["ECIES-Public"]
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Tester is allowed to fetch the private key for the encrypted QR code with sensitive data to be decrypted
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("GetPrivateKey")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [RequestSizeLimit(2000)]
+        public async Task<ActionResult<Visitor>> GetPrivateKey()
+        {
+            try
+            {
+                if (!User.IsMedicTester(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only MedicTester role is allowed to fetch the private key");
+                }
+
+                return configuration["ECIES-Private"]
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
     }
 }
