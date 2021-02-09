@@ -224,7 +224,7 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="visitor"></param>
         /// <returns></returns>
-        [HttpPost("GetPublicKey")]
+        [HttpGet("GetPublicKey")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [RequestSizeLimit(2000)]
@@ -247,7 +247,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="visitor"></param>
         /// <returns></returns>
         [Authorize]
-        [HttpPost("GetPrivateKey")]
+        [HttpGet("GetPrivateKey")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [RequestSizeLimit(2000)]

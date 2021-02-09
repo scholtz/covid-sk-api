@@ -959,6 +959,20 @@
             <param name="visitor"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.GetPublicKey">
+            <summary>
+            Returns ECIES public key for private data encryption
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.GetPrivateKey">
+            <summary>
+            Tester is allowed to fetch the private key for the encrypted QR code with sensitive data to be decrypted
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Helpers.Aes">
             <summary>
             https://gist.github.com/magicsih/be06c2f60288b54d9f52856feb96ce8c
