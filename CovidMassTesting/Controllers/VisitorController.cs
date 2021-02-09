@@ -228,11 +228,11 @@ namespace CovidMassTesting.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [RequestSizeLimit(2000)]
-        public async Task<ActionResult<Visitor>> GetPublicKey()
+        public async Task<ActionResult<string>> GetPublicKey()
         {
             try
             {
-                return configuration["ECIES-Public"]
+                return configuration["ECIES-Public"];
             }
             catch (Exception exc)
             {
@@ -251,7 +251,7 @@ namespace CovidMassTesting.Controllers
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [RequestSizeLimit(2000)]
-        public async Task<ActionResult<Visitor>> GetPrivateKey()
+        public async Task<ActionResult<string>> GetPrivateKey()
         {
             try
             {
@@ -260,7 +260,7 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Only MedicTester role is allowed to fetch the private key");
                 }
 
-                return configuration["ECIES-Private"]
+                return configuration["ECIES-Private"];
             }
             catch (Exception exc)
             {
