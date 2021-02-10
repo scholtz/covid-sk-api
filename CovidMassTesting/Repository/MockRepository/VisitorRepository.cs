@@ -26,6 +26,10 @@ namespace CovidMassTesting.Repository.MockRepository
         private readonly ConcurrentDictionary<string, int> testing2code = new ConcurrentDictionary<string, int>();
         private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
 
+        private readonly ConcurrentDictionary<string, string> registrations = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, string> id2registration = new ConcurrentDictionary<string, string>();
+
+
         private readonly ConcurrentDictionary<long, ConcurrentDictionary<int, int>> day2visitor = new ConcurrentDictionary<long, ConcurrentDictionary<int, int>>();
         private readonly ConcurrentDictionary<long, long> days = new ConcurrentDictionary<long, long>();
 
@@ -372,6 +376,73 @@ namespace CovidMassTesting.Repository.MockRepository
             }
             return false;
 
+        }
+
+
+        public override async Task<Registration> GetRegistration(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            logger.LogInformation($"Registration loaded from database: {(configuration["key"] + id).GetSHA256Hash()}");
+            var encoded = registrations[id];
+            if (string.IsNullOrEmpty(encoded)) return null;
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var decoded = aes.DecryptFromBase64String(encoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(decoded);
+        }
+        public override async Task<bool> RemoveRegistration(string id)
+        {
+            if (registrations.TryRemove(id, out var _))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public override async Task<Registration> SetRegistration(Registration registration, bool mustBeNew)
+        {
+            if (registration is null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
+            registration.LastUpdate = DateTimeOffset.Now;
+
+            var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(registration);
+            logger.LogInformation($"Setting object {registration.Id.GetHashCode()}");
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var encoded = aes.EncryptToBase64String(objectToEncode);
+            if (mustBeNew && registrations.ContainsKey(registration.Id)) throw new Exception("Must be new");
+            registrations[registration.Id] = encoded;
+            if (!string.IsNullOrEmpty(registration.RC))
+            {
+                await MapHashedIdToRegistration($"{configuration["key"]}-{registration.RC}".GetSHA256Hash(), registration.Id);
+            }
+            if (!string.IsNullOrEmpty(registration.Passport))
+            {
+                await MapHashedIdToRegistration($"{configuration["key"]}-{registration.Passport}".GetSHA256Hash(), registration.Id);
+            }
+            foreach (var item in registration.CompanyIdentifiers)
+            {
+                await MapHashedIdToRegistration(MakeCompanyPeronalNumberHash(item.CompanyId, item.EmployeeId), registration.Id);
+            }
+            return registration;
+        }
+        public override async Task<IEnumerable<string>> ListAllRegistrationKeys()
+        {
+            return registrations.Keys;
+        }
+
+        public override async Task MapHashedIdToRegistration(string hashedId, string registrationId)
+        {
+            id2registration[hashedId] = registrationId;
+        }
+        public override async Task UnMapHashedIdToRegistration(string hashedId)
+        {
+            id2registration.TryRemove(hashedId, out var _);
+        }
+        public override async Task<string> GetRegistrationIdFromHashedId(string hashedId)
+        {
+            if (!id2registration.ContainsKey(hashedId)) return null;
+            return id2registration[hashedId];
         }
     }
 }

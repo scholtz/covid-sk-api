@@ -1233,7 +1233,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(days.Count > 0);
-
+            if (DateTime.Now.Hour >= 23) return;
             var day = days.First().Value;
             request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -2150,7 +2150,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(1, daySlot.OpeningHoursTemplate);
             request = ListHourSlotsByPlaceAndDaySlotId(client, second.Id, daySlot.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-
+            if (DateTime.Now.Hour >= 23) return;
             hoursDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(hoursDictionary.Count >= 1);
             hourSlot = hoursDictionary.Values.First();
@@ -2732,7 +2732,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(days.Count > 0);
-
+            if (DateTime.Now.Hour >= 23) return;
             var day = days.Last().Value;
             request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
@@ -3347,6 +3347,49 @@ namespace NUnitTestCovidApi
             {
                 Console.WriteLine(exc.Message);
             }
+
+        }
+        [Test]
+        public async Task TestUploadEmployees()
+        {
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
+            var admin = users.First(u => u.Name == "Admin");
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = admin.Email,
+                PrivatePhone = "+421 907 000000",
+                MainContact = "Admin Person"
+            };
+
+            var request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+
+            request = AuthenticateUser(client, admin.Email, admin.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            var stream1 = new MemoryStream(Encoding.UTF8.GetBytes("Meno;Priezvisko;Dátum narodenia;IdČ;Ulica a číslo domu;Súpisné číslo;Orientačné číslo;Miesto;Pošt.smer.č./miesto;e-mail;Telefónne číslo;Osobné číslo\n" +
+                "Meno;Priezvisko;01/01/2000;0001010009;Ulica;1;2;Poprad;058 01;test@rychlejsie.sk;0903000000;100"
+            ));
+            using var formData = new MultipartFormDataContent();
+            using var content = new StreamContent(stream1);
+            formData.Add(content, "files", "upload.csv");
+            var response = await client.PostAsync("Visitor/UploadEmployees", formData);
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(responseString, "1");
 
         }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>

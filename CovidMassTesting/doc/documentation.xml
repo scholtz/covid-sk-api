@@ -973,6 +973,12 @@
             <param name="visitor"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.UploadEmployees">
+            <summary>
+            Upload employees - PP Administrator can upload employees
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Helpers.Aes">
             <summary>
             https://gist.github.com/magicsih/be06c2f60288b54d9f52856feb96ce8c
@@ -1208,6 +1214,26 @@
         <member name="P:CovidMassTesting.Model.AuthData.CoData">
             <summary>
             CoData is unique per sign in request. Server generated
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.CompanyIdentifier">
+            <summary>
+            One person can be employed in multiple companies
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.CompanyIdentifier.CompanyName">
+            <summary>
+            Company name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.CompanyIdentifier.CompanyId">
+            <summary>
+            Company identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.CompanyIdentifier.EmployeeId">
+            <summary>
+            Employee identifier in the company
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Currency">
@@ -2505,6 +2531,105 @@
         <member name="P:CovidMassTesting.Model.Product.LastUpdate">
             <summary>
             Time when resource was last updated
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Id">
+            <summary>
+            Registration Identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Language">
+            <summary>
+            Language in which we will communicate to the visitor
+            
+            sk | en
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.FirstName">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.LastName">
+            <summary>
+            Last name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.BirthDayDay">
+            <summary>
+            BirthDay - day
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.BirthDayMonth">
+            <summary>
+            BirthDay - month
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.BirthDayYear">
+            <summary>
+            BirthDay - year
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.PersonType">
+            <summary>
+            Type of person
+            
+            idcard|child|foreign
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Passport">
+            <summary>
+            Passport number if person type is foreigner
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.RC">
+            <summary>
+            Personal number if person type is idcard or child
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.ZIP">
+            <summary>
+            ZIP - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.City">
+            <summary>
+            City - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Street">
+            <summary>
+            Street - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.StreetNo">
+            <summary>
+            StreetNo - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Phone">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.CompanyIdentifiers">
+            <summary>
+            Identifier within the company
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Created">
+            <summary>
+            Time when registration has been created
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.LastUpdate">
+            <summary>
+            Time when registration has been last updated
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Result">
@@ -5020,6 +5145,36 @@
             <param name="input"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetRegistration(CovidMassTesting.Model.Registration,System.Boolean)">
+            <summary>
+            Long term Registration
+            </summary>
+            <param name="registration"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.MakeCompanyPeronalNumberHash(System.String,System.String)">
+            <summary>
+            Make hash from company personal number
+            </summary>
+            <param name="companyId"></param>
+            <param name="employeeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetRegistrationIdFromHashedId(System.String)">
+            <summary>
+            RegistrationId From Hashed Id
+            </summary>
+            <param name="hashedId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetRegistration(System.String)">
+            <summary>
+            Loads registration
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -6305,11 +6460,25 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveRegistration(System.String)">
+            <summary>
+            Remove registration
+            </summary>
+            <param name="id"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitor(System.Int32,System.Boolean)">
             <summary>
             Decode visitor data from database
             </summary>
             <param name="codeInt"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetRegistration(System.String)">
+            <summary>
+            Loads registrtion.  
+            </summary>
+            <param name="id"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FixVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
@@ -6328,12 +6497,36 @@
             <param name="mustBeNew"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetRegistration(CovidMassTesting.Model.Registration,System.Boolean)">
+            <summary>
+            Add or update registration
+            </summary>
+            <param name="registration"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.MakeCompanyPeronalNumberHash(System.String,System.String)">
+            <summary>
+            Make hash from company personal number
+            </summary>
+            <param name="companyId"></param>
+            <param name="employeeId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.MapTestingSetToVisitorCode(System.Int32,System.String)">
             <summary>
             Maps testing code to visitor code
             </summary>
             <param name="codeInt"></param>
             <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.MapHashedIdToRegistration(System.String,System.String)">
+            <summary>
+            Maps testing code to visitor code
+            </summary>
+            <param name="hashedId"></param>
+            <param name="registrationId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UnMapTestingSet(System.String)">
@@ -6343,11 +6536,25 @@
             <param name="testCodeClear"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UnMapHashedIdToRegistration(System.String)">
+            <summary>
+            UnMapHashedIdToRegistration
+            </summary>
+            <param name="hashedId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GETVisitorCodeFromTesting(System.String)">
             <summary>
             Returns visitor code from testing code
             </summary>
             <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetRegistrationIdFromHashedId(System.String)">
+            <summary>
+            GetRegistrationIdFromHashedId
+            </summary>
+            <param name="hashedId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.MapPersonalNumberToVisitorCode(System.String,System.Int32)">
@@ -6471,6 +6678,12 @@
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAllKeys(System.Nullable{System.DateTimeOffset})">
             <summary>
             Lists all keys
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAllRegistrationKeys">
+            <summary>
+            Lists all keys for Registrations
             </summary>
             <returns></returns>
         </member>

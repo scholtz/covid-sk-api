@@ -33,6 +33,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly ISlotRepository slotRepository;
         private readonly IUserRepository userRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
+        private readonly string REDIS_KEY_REGISTATION_OBJECTS = "REGISTRATION";
+        private readonly string REDIS_KEY_ID2REGISTATION = "REDIS_KEY_ID2REGISTATION";
+
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
         private readonly string REDIS_KEY_RESULTVERIFICATION_OBJECTS = "RESULTS";
         private readonly string REDIS_KEY_RESULTS_NEW_OBJECTS = "RESULTSLIST";
@@ -188,6 +191,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", id.ToString(CultureInfo.InvariantCulture));
             return true;
         }
+        /// <summary>
+        /// Remove registration
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> RemoveRegistration(string id)
+        {
+            await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}", id);
+            return true;
+        }
         public virtual async Task<bool> RemoveResult(string id)
         {
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", id);
@@ -214,6 +227,21 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 return ret;
             }
+        }
+        /// <summary>
+        /// Loads registrtion.  
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual async Task<Registration> GetRegistration(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return null;
+            logger.LogInformation($"Registration loaded from database: {(configuration["key"] + id).GetSHA256Hash()}");
+            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}", id);
+            if (string.IsNullOrEmpty(encoded)) return null;
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var decoded = aes.DecryptFromBase64String(encoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(decoded);
         }
         public virtual Task<Result> GetResultObject(string id)
         {
@@ -391,6 +419,53 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return visitor;
         }
+        /// <summary>
+        /// Add or update registration
+        /// </summary>
+        /// <param name="registration"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        public virtual async Task<Registration> SetRegistration(Registration registration, bool mustBeNew)
+        {
+            if (registration is null)
+            {
+                throw new ArgumentNullException(nameof(registration));
+            }
+            registration.LastUpdate = DateTimeOffset.Now;
+
+            var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(registration);
+            logger.LogInformation($"Setting object {registration.Id.GetHashCode()}");
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var encoded = aes.EncryptToBase64String(objectToEncode);
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}", registration.Id, encoded, mustBeNew);
+            if (mustBeNew && !ret)
+            {
+                throw new Exception("Error creating record in the database");
+            }
+            if (!string.IsNullOrEmpty(registration.RC))
+            {
+                await MapHashedIdToRegistration($"{configuration["key"]}-{registration.RC}".GetSHA256Hash(), registration.Id);
+            }
+            if (!string.IsNullOrEmpty(registration.Passport))
+            {
+                await MapHashedIdToRegistration($"{configuration["key"]}-{registration.Passport}".GetSHA256Hash(), registration.Id);
+            }
+            foreach (var item in registration.CompanyIdentifiers)
+            {
+                await MapHashedIdToRegistration(MakeCompanyPeronalNumberHash(item.CompanyId, item.EmployeeId), registration.Id);
+            }
+            return registration;
+        }
+        /// <summary>
+        /// Make hash from company personal number
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        public string MakeCompanyPeronalNumberHash(string companyId, string employeeId)
+        {
+            return $"{configuration["key"]}-{companyId}-{employeeId}".GetSHA256Hash();
+        }
 
         public virtual async Task<Result> SetResultObject(Result result, bool mustBeNew)
         {
@@ -417,6 +492,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", testCodeClear, codeInt);
         }
         /// <summary>
+        /// Maps testing code to visitor code
+        /// </summary>
+        /// <param name="hashedId"></param>
+        /// <param name="registrationId"></param>
+        /// <returns></returns>
+        public virtual async Task MapHashedIdToRegistration(string hashedId, string registrationId)
+        {
+            await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_ID2REGISTATION}", hashedId, registrationId);
+        }
+        /// <summary>
         /// Removes testing code
         /// </summary>
         /// <param name="testCodeClear"></param>
@@ -424,6 +509,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         public virtual async Task UnMapTestingSet(string testCodeClear)
         {
             await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", testCodeClear);
+        }
+        /// <summary>
+        /// UnMapHashedIdToRegistration
+        /// </summary>
+        /// <param name="hashedId"></param>
+        /// <returns></returns>
+        public virtual async Task UnMapHashedIdToRegistration(string hashedId)
+        {
+            await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_ID2REGISTATION}", hashedId);
         }
         /// <summary>
         /// Returns visitor code from testing code
@@ -435,6 +529,18 @@ namespace CovidMassTesting.Repository.RedisRepository
             return redisCacheClient.Db0.HashGetAsync<int?>(
                 $"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}",
                 testCodeClear
+            );
+        }
+        /// <summary>
+        /// GetRegistrationIdFromHashedId
+        /// </summary>
+        /// <param name="hashedId"></param>
+        /// <returns></returns>
+        public virtual Task<string> GetRegistrationIdFromHashedId(string hashedId)
+        {
+            return redisCacheClient.Db0.HashGetAsync<string>(
+                $"{configuration["db-prefix"]}{REDIS_KEY_ID2REGISTATION}",
+                hashedId
             );
         }
         /// <summary>
@@ -1298,6 +1404,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
         }
+        /// <summary>
+        /// Lists all keys for Registrations
+        /// </summary>
+        /// <returns></returns>
+        public virtual Task<IEnumerable<string>> ListAllRegistrationKeys()
+        {
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}");
+        }
         public virtual Task<IEnumerable<string>> ListAllKeysResults()
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}");
@@ -1826,6 +1940,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", item);
             }
+            foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}"))
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}", item);
+            }
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}"))
             {
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", item);
@@ -1833,6 +1951,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}"))
             {
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}", item);
+            }
+            foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_ID2REGISTATION}"))
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_ID2REGISTATION}", item);
             }
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_PERSONAL_NUMBER2VISITOR}"))
             {

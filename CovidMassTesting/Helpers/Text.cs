@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Helpers
@@ -26,5 +27,7 @@ namespace CovidMassTesting.Helpers
             }
             return retVal.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }
+
+
     }
 }

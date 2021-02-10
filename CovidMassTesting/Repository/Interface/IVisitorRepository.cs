@@ -300,5 +300,31 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="input"></param>
         /// <returns></returns>
         public string FormatDocument(string input);
+        /// <summary>
+        /// Long term Registration
+        /// </summary>
+        /// <param name="registration"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        public Task<Registration> SetRegistration(Registration registration, bool mustBeNew);
+        /// <summary>
+        /// Make hash from company personal number
+        /// </summary>
+        /// <param name="companyId"></param>
+        /// <param name="employeeId"></param>
+        /// <returns></returns>
+        public string MakeCompanyPeronalNumberHash(string companyId, string employeeId);
+        /// <summary>
+        /// RegistrationId From Hashed Id
+        /// </summary>
+        /// <param name="hashedId"></param>
+        /// <returns></returns>
+        public Task<string> GetRegistrationIdFromHashedId(string hashedId);
+        /// <summary>
+        /// Loads registration
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public Task<Registration> GetRegistration(string id);
     }
 }

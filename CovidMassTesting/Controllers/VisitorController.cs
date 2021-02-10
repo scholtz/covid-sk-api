@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using CovidMassTesting.Helpers;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CovidMassTesting.Model;
@@ -11,6 +13,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic.FileIO;
+using SlugGenerator;
 
 namespace CovidMassTesting.Controllers
 {
@@ -261,6 +265,99 @@ namespace CovidMassTesting.Controllers
                 }
 
                 return configuration["ECIES-Private"];
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Upload employees - PP Administrator can upload employees
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("UploadEmployees"), RequestSizeLimit(1000000)]
+        public async Task<ActionResult<int>> UploadEmployees()
+        {
+            try
+            {
+                if (Request.Form.Files.Count != 1) throw new Exception("Please upload file");
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can upload employees");
+                }
+                var ret = 0;
+                var file = Request.Form.Files[0];
+
+                using var stream = new MemoryStream();
+                file.CopyTo(stream);
+
+                var outStream = new MemoryStream(stream.ToArray());
+                using TextFieldParser csvParser = new TextFieldParser(outStream);
+                csvParser.CommentTokens = new string[] { "#" };
+                csvParser.SetDelimiters(new string[] { ";" });
+                csvParser.HasFieldsEnclosedInQuotes = true;
+                var line = 0;
+                var n2k = new Dictionary<string, int>();
+                while (!csvParser.EndOfData)
+                {
+                    line++;
+                    string[] fields = csvParser.ReadFields();
+
+                    if (line == 1)
+                    {
+                        for (int i = 0; i < fields.Length; i++)
+                        {
+                            n2k[fields[i].GenerateSlug()] = i;
+                        }
+                        continue;
+                    }
+                    var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+
+                    var reg = new Registration()
+                    {
+                        FirstName = fields[n2k["meno"]],
+                        LastName = fields[n2k["priezvisko"]],
+                        City = fields[n2k["miesto"]],
+                        Phone = fields[n2k["telefonne-cislo"]],
+                        RC = fields[n2k["idc"]],
+                        StreetNo = fields[n2k["supisne-cislo"]] + "/" + fields[n2k["supisne-cislo"]],
+                        Street = fields[n2k["ulica-a-cislo-domu"]],
+                        Email = fields[n2k["email"]],
+                        ZIP = fields[n2k["postsmercmiesto"]],
+                        CompanyIdentifiers = new List<CompanyIdentifier>()
+                        {
+                            new CompanyIdentifier()
+                            {
+                                CompanyId = pp.CompanyId,
+                                CompanyName = pp.CompanyName,
+                                EmployeeId = fields[n2k["osobne-cislo"]]
+                            }
+                        }
+                    };
+                    if (DateTimeOffset.TryParse(fields[n2k["datum-narodenia"]], out var date))
+                    {
+                        reg.BirthDayDay = date.Day;
+                        reg.BirthDayMonth = date.Month;
+                        reg.BirthDayYear = date.Year;
+                    }
+                    var oldId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, fields[n2k["osobne-cislo"]]));
+                    var old = await visitorRepository.GetRegistration(oldId);
+                    if (old == null)
+                    {
+                        reg.Created = DateTimeOffset.UtcNow;
+                    }
+                    else
+                    {
+                        reg.Created = old.Created;
+                    }
+
+                    reg = await visitorRepository.SetRegistration(reg, false);
+                    ret++;
+                }
+
+                return Ok(ret);
             }
             catch (Exception exc)
             {
