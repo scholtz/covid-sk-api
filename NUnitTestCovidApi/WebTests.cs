@@ -519,7 +519,7 @@ namespace NUnitTestCovidApi
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
                         new KeyValuePair<string, string>("chosenSlotId",chosenSlotId.ToString()),
                         new KeyValuePair<string, string>("chosenPlaceId",chosenPlaceId),
-                        new KeyValuePair<string, string>("personCompanyId",personCompanyId),
+                        new KeyValuePair<string, string>("employeeNumber",personCompanyId),
                         new KeyValuePair<string, string>("pass",pass),
                         new KeyValuePair<string, string>("product",product),
                         new KeyValuePair<string, string>("token",token),
