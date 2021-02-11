@@ -145,7 +145,7 @@ namespace CovidMassTesting.Controllers
         public async Task<ActionResult<Visitor>> RegisterWithCompanyRegistration(
             [FromForm] long chosenSlotId,
             [FromForm] string chosenPlaceId,
-            [FromForm] string personCompanyId,
+            [FromForm] string employeeNumber,
             [FromForm] string pass,
             [FromForm] string product,
             [FromForm] string token
@@ -179,7 +179,7 @@ namespace CovidMassTesting.Controllers
                     ChosenSlot = chosenSlotId
                 };
 
-                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, personCompanyId));
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
                 var reg = await visitorRepository.GetRegistration(regId);
                 if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x01)");
                 if (reg.PersonType == "foreign")
