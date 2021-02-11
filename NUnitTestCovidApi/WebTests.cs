@@ -517,7 +517,7 @@ namespace NUnitTestCovidApi
 
             return client.PostAsync("Visitor/RegisterWithCompanyRegistration",
                     new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
-                        new KeyValuePair<string, string>("chosenSlotId",chosenSlotId.ToString()),
+                        new KeyValuePair<string, string>("chosenSlot",chosenSlotId.ToString()),
                         new KeyValuePair<string, string>("chosenPlaceId",chosenPlaceId),
                         new KeyValuePair<string, string>("employeeNumber",personCompanyId),
                         new KeyValuePair<string, string>("pass",pass),

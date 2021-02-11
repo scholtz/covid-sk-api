@@ -143,7 +143,7 @@ namespace CovidMassTesting.Controllers
         [ProducesResponseType(400)]
         [RequestSizeLimit(2000)]
         public async Task<ActionResult<Visitor>> RegisterWithCompanyRegistration(
-            [FromForm] long chosenSlotId,
+            [FromForm] long chosenSlot,
             [FromForm] string chosenPlaceId,
             [FromForm] string employeeNumber,
             [FromForm] string pass,
