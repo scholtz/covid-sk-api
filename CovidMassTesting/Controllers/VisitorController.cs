@@ -176,7 +176,7 @@ namespace CovidMassTesting.Controllers
                 var visitor = new Visitor()
                 {
                     ChosenPlaceId = chosenPlaceId,
-                    ChosenSlot = chosenSlotId
+                    ChosenSlot = chosenSlot
                 };
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
