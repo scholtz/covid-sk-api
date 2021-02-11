@@ -181,14 +181,14 @@ namespace CovidMassTesting.Controllers
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, personCompanyId));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x01)");
                 if (reg.PersonType == "foreign")
                 {
-                    if (pass.Length < 4 || !reg.Passport.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                    if (pass.Length < 4 || !reg.Passport.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x02)");
                 }
                 else
                 {
-                    if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                    if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x03)");
                 }
 
                 visitor.FirstName = reg.FirstName;
