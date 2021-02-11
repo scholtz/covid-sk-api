@@ -147,6 +147,7 @@ namespace CovidMassTesting.Controllers
             [FromForm] string chosenPlaceId,
             [FromForm] string personCompanyId,
             [FromForm] string pass,
+            [FromForm] string product,
             [FromForm] string token
             )
         {
@@ -204,6 +205,7 @@ namespace CovidMassTesting.Controllers
                 visitor.PersonType = reg.PersonType;
                 visitor.Passport = reg.Passport;
                 visitor.RC = reg.RC;
+                visitor.Product = product;
 
 
                 var time = new DateTimeOffset(visitor.ChosenSlot, TimeSpan.Zero);
