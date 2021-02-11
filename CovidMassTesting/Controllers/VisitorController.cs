@@ -414,6 +414,28 @@ namespace CovidMassTesting.Controllers
                     }
                     var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
                     logger.LogInformation($"Import: {pp.CompanyId} {fields[n2k["osobne-cislo"]]}");
+
+                    if (n2k.ContainsKey("rodne-cislo"))
+                    {
+                        n2k["idc"] = n2k["rodne-cislo"];
+                    }
+                    if (n2k.ContainsKey("dat-nar"))
+                    {
+                        n2k["datum-narodenia"] = n2k["dat-nar"];
+                    }
+                    if (n2k.ContainsKey("postsmercmiesto"))
+                    {
+                        n2k["psc"] = n2k["postsmercmiesto"];
+                    }
+                    if (n2k.ContainsKey("e-mail"))
+                    {
+                        n2k["email"] = n2k["e-mail"];
+                    }
+                    if (n2k.ContainsKey("oc"))
+                    {
+                        n2k["osobne-cislo"] = n2k["oc"];
+                    }
+
                     var reg = new Registration()
                     {
                         FirstName = fields[n2k["meno"]],
@@ -424,7 +446,7 @@ namespace CovidMassTesting.Controllers
                         StreetNo = fields[n2k["supisne-cislo"]] + "/" + fields[n2k["supisne-cislo"]],
                         Street = fields[n2k["ulica-a-cislo-domu"]],
                         Email = fields[n2k["email"]],
-                        ZIP = fields[n2k["postsmercmiesto"]],
+                        ZIP = fields[n2k["psc"]],
                         CompanyIdentifiers = new List<CompanyIdentifier>()
                         {
                             new CompanyIdentifier()
@@ -435,6 +457,7 @@ namespace CovidMassTesting.Controllers
                             }
                         }
                     };
+
                     if (DateTimeOffset.TryParse(fields[n2k["datum-narodenia"]], out var date))
                     {
                         reg.BirthDayDay = date.Day;

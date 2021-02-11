@@ -3401,7 +3401,7 @@ namespace NUnitTestCovidApi
             Assert.IsFalse(string.IsNullOrEmpty(adminToken));
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
 
-            var stream1 = new MemoryStream(Encoding.UTF8.GetBytes("Meno;Priezvisko;Dátum narodenia;IdČ;Ulica a číslo domu;Súpisné číslo;Orientačné číslo;Miesto;Pošt.smer.č./miesto;e-mail;Telefónne číslo;Osobné číslo\n" +
+            var stream1 = new MemoryStream(Encoding.UTF8.GetBytes("Meno;Priezvisko;Dátum narodenia;Rodné číslo;Ulica a číslo domu;Súpisné číslo;Orientačné číslo;Miesto;Pošt.smer.č./miesto;e-mail;Telefónne číslo;Osobné číslo\n" +
                 "Meno;Priezvisko;01/01/2000;0001010009;Ulica;1;2;Poprad;058 01;test@rychlejsie.sk;0903000000;100"
             ));
             using var formData = new MultipartFormDataContent();
@@ -3458,6 +3458,7 @@ namespace NUnitTestCovidApi
             Assert.IsNotNull(visitor);
             Assert.AreEqual(place.Id, visitor.ChosenPlaceId);
             Assert.AreEqual(minute.SlotId, visitor.ChosenSlot);
+            Assert.AreEqual("0001010009", visitor.RC);
         }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
