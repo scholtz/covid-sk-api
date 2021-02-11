@@ -444,6 +444,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             if (!string.IsNullOrEmpty(registration.RC))
             {
+                logger.LogInformation($"Company: " + $"{configuration["key"]}-{registration.RC}".GetSHA256Hash());
                 await MapHashedIdToRegistration($"{configuration["key"]}-{registration.RC}".GetSHA256Hash(), registration.Id);
             }
             if (!string.IsNullOrEmpty(registration.Passport))
@@ -452,6 +453,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             foreach (var item in registration.CompanyIdentifiers)
             {
+                logger.LogInformation($"Company: {item.CompanyId} {item.EmployeeId}");
                 await MapHashedIdToRegistration(MakeCompanyPeronalNumberHash(item.CompanyId, item.EmployeeId), registration.Id);
             }
             return registration;

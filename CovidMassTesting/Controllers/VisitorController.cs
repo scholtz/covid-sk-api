@@ -413,7 +413,7 @@ namespace CovidMassTesting.Controllers
                         continue;
                     }
                     var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
-
+                    logger.LogInformation($"Import: {pp.CompanyId} {fields[n2k["osobne-cislo"]]}");
                     var reg = new Registration()
                     {
                         FirstName = fields[n2k["meno"]],
