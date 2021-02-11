@@ -441,6 +441,12 @@ namespace CovidMassTesting.Controllers
                         reg.BirthDayMonth = date.Month;
                         reg.BirthDayYear = date.Year;
                     }
+                    reg.Phone = reg.Phone?.Replace(" ", "").Replace("/", "") ?? "";
+                    if (reg.Phone.Length > 5 && reg.Phone.Length <= 10 && reg.Phone.StartsWith("0"))
+                    {
+                        reg.Phone = "+421" + reg.Phone.Substring(1);
+                    }
+
                     var oldId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, fields[n2k["osobne-cislo"]]));
                     var old = await visitorRepository.GetRegistration(oldId);
                     if (old == null)
