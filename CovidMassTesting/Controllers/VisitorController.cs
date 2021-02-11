@@ -29,6 +29,7 @@ namespace CovidMassTesting.Controllers
         private readonly IVisitorRepository visitorRepository;
         private readonly IUserRepository userRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
+        private readonly IPlaceRepository placeRepository;
         private readonly GoogleReCaptcha.V3.Interface.ICaptchaValidator captchaValidator;
         private readonly IConfiguration configuration;
         /// <summary>
@@ -38,6 +39,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="visitorRepository"></param>
         /// <param name="userRepository"></param>
         /// <param name="placeProviderRepository"></param>
+        /// <param name="placeRepository"></param>
         /// <param name="configuration"></param>
         /// <param name="captchaValidator"></param>
         public VisitorController(
@@ -45,6 +47,7 @@ namespace CovidMassTesting.Controllers
             IVisitorRepository visitorRepository,
             IUserRepository userRepository,
             IPlaceProviderRepository placeProviderRepository,
+            IPlaceRepository placeRepository,
             IConfiguration configuration,
             GoogleReCaptcha.V3.Interface.ICaptchaValidator captchaValidator
             )
@@ -55,6 +58,7 @@ namespace CovidMassTesting.Controllers
             this.captchaValidator = captchaValidator;
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
+            this.placeRepository = placeRepository;
         }
         /// <summary>
         /// Public method for pre registration. Result is returned with Visitor.id which is the main identifier of the visit and should be shown in the bar code
@@ -119,6 +123,99 @@ namespace CovidMassTesting.Controllers
                 if (!visitor.BirthDayYear.HasValue || visitor.BirthDayYear < 1900 || visitor.BirthDayYear > 2021) throw new Exception("Rok Vášho narodenia vyzerá byť chybne vyplnený");
                 if (!visitor.BirthDayDay.HasValue || visitor.BirthDayDay < 1 || visitor.BirthDayDay > 31) throw new Exception("Deň Vášho narodenia vyzerá byť chybne vyplnený");
                 if (!visitor.BirthDayMonth.HasValue || visitor.BirthDayMonth < 1 || visitor.BirthDayMonth > 12) throw new Exception("Mesiac Vášho narodenia vyzerá byť chybne vyplnený");
+                visitor.RegistrationTime = DateTimeOffset.UtcNow;
+                visitor.SelfRegistration = true;
+                return Ok(await visitorRepository.Register(visitor, ""));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Public method for pre registration of company workers.
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("RegisterWithCompanyRegistration")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [RequestSizeLimit(2000)]
+        public async Task<ActionResult<Visitor>> RegisterWithCompanyRegistration(
+            [FromForm] long chosenSlotId,
+            [FromForm] string chosenPlaceId,
+            [FromForm] string personCompanyId,
+            [FromForm] string pass,
+            [FromForm] string token
+            )
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
+                {
+                    if (string.IsNullOrEmpty(token))
+                    {
+                        throw new Exception("Please provide captcha");
+                    }
+
+                    var validation = await captchaValidator.IsCaptchaPassedAsync(token);
+                    if (!validation)
+                    {
+                        throw new Exception("Please provide valid captcha");
+                    }
+                }
+                var place = await placeRepository.GetPlace(chosenPlaceId);
+                if (place == null) throw new Exception("Place not found");
+                if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Place provider missing");
+                var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
+                if (pp == null) throw new Exception("Place provider missing");
+
+
+                var visitor = new Visitor()
+                {
+                    ChosenPlaceId = chosenPlaceId,
+                    ChosenSlot = chosenSlotId
+                };
+
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, personCompanyId));
+                var reg = await visitorRepository.GetRegistration(regId);
+                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                if (reg.PersonType == "foreign")
+                {
+                    if (pass.Length < 4 || !reg.Passport.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                }
+                else
+                {
+                    if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                }
+
+                visitor.FirstName = reg.FirstName;
+                visitor.LastName = reg.LastName;
+                visitor.BirthDayDay = reg.BirthDayDay;
+                visitor.BirthDayMonth = reg.BirthDayMonth;
+                visitor.BirthDayYear = reg.BirthDayYear;
+                visitor.City = reg.City;
+                visitor.Street = reg.Street;
+                visitor.StreetNo = reg.StreetNo;
+                visitor.ZIP = reg.ZIP;
+                visitor.Email = reg.Email;
+                visitor.Phone = reg.Phone;
+                visitor.PersonType = reg.PersonType;
+                visitor.Passport = reg.Passport;
+                visitor.RC = reg.RC;
+
+
+                var time = new DateTimeOffset(visitor.ChosenSlot, TimeSpan.Zero);
+                if (time.AddMinutes(10) < DateTimeOffset.Now)
+                {
+                    throw new Exception("Na tento termín sa nedá zaregistrovať pretože časový úsek je už ukončený");
+                }
+                if (string.IsNullOrEmpty(visitor.Address))
+                {
+                    visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
+                }
+
                 visitor.RegistrationTime = DateTimeOffset.UtcNow;
                 visitor.SelfRegistration = true;
                 return Ok(await visitorRepository.Register(visitor, ""));
