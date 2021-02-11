@@ -505,6 +505,28 @@ namespace NUnitTestCovidApi
             Console.WriteLine($"cleared {dataDeleted} items");
         }
 
+        private HttpResponseMessage RegisterWithCompanyRegistration(
+            HttpClient client,
+            long chosenSlotId,
+            string chosenPlaceId,
+            string personCompanyId,
+             string pass,
+            string product,
+            string token)
+        {
+
+            return client.PostAsync("Visitor/RegisterWithCompanyRegistration",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("chosenSlotId",chosenSlotId.ToString()),
+                        new KeyValuePair<string, string>("chosenPlaceId",chosenPlaceId),
+                        new KeyValuePair<string, string>("personCompanyId",personCompanyId),
+                        new KeyValuePair<string, string>("pass",pass),
+                        new KeyValuePair<string, string>("product",product),
+                        new KeyValuePair<string, string>("token",token),
+                    })
+                ).Result;
+
+        }
         private List<Visitor> RegisterTestVisitors(HttpClient client, string placeId, long slotId, string productId)
         {
             var Registered = new List<Visitor>();
@@ -3391,6 +3413,51 @@ namespace NUnitTestCovidApi
 
             Assert.AreEqual(responseString, "1");
 
+
+            SetupDebugPlaces(client);
+            var pr1 = SetupDebugProduct(client);
+
+            request = CheckSlotsDay1(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            client.DefaultRequestHeaders.Clear();
+
+            request = ListPlaces(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var places = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(places.Count > 0);
+            var place = places.First().Value;
+            request = ListDaySlotsByPlace(client, place.Id);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(days.Count > 0);
+
+            var day = days.First().Value;
+            request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var hours = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(hours.Count > 0);
+
+            var hour = hours.First().Value;
+            request = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var minutes = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(minutes.Count > 0);
+
+            var minute = minutes.Values.First();
+
+            request = RegisterWithCompanyRegistration(client, minute.SlotId, place.Id, "101", "0009", pr1.Id, "");
+            // bad company id
+            Assert.AreEqual(HttpStatusCode.BadRequest, request.StatusCode);
+
+            request = RegisterWithCompanyRegistration(client, minute.SlotId, place.Id, "100", "0009", pr1.Id, "");
+
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
+
+            var visitor = JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
+            Assert.IsNotNull(visitor);
+            Assert.AreEqual(place.Id, visitor.ChosenPlaceId);
+            Assert.AreEqual(minute.SlotId, visitor.ChosenSlot);
         }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {

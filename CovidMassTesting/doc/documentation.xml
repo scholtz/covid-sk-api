@@ -921,7 +921,7 @@
             This controller manages public registrations
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.VisitorController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.VisitorController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,Microsoft.Extensions.Configuration.IConfiguration,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
+        <member name="M:CovidMassTesting.Controllers.VisitorController.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.VisitorController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,Microsoft.Extensions.Configuration.IConfiguration,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
             <summary>
             constructor
             </summary>
@@ -929,6 +929,7 @@
             <param name="visitorRepository"></param>
             <param name="userRepository"></param>
             <param name="placeProviderRepository"></param>
+            <param name="placeRepository"></param>
             <param name="configuration"></param>
             <param name="captchaValidator"></param>
         </member>
@@ -939,6 +940,12 @@
             Request size is limitted.
             </summary>
             <param name="visitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.RegisterWithCompanyRegistration(System.Int64,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Public method for pre registration of company workers.
+            </summary>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Enqueued(System.String,System.String,System.String)">
