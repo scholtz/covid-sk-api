@@ -466,6 +466,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public string MakeCompanyPeronalNumberHash(string companyId, string employeeId)
         {
+            logger.LogInformation("MakeCompanyPeronalNumberHash '{companyId}' '{employeeId}'")
             return $"{configuration["key"]}-{companyId}-{employeeId}".GetSHA256Hash();
         }
 
