@@ -956,6 +956,13 @@
             <param name="product"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.LoadVisitorByEmployeeNumber(System.String)">
+            <summary>
+            LoadVisitor information by tester with personal number
+            </summary>
+            <param name="employeeNumber"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Enqueued(System.String,System.String,System.String)">
             <summary>
             When person comes to the queue he can mark him as in the queue

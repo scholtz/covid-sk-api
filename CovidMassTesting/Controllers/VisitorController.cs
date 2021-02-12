@@ -236,7 +236,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="product"></param>
         /// <returns></returns>
         [Authorize]
-        [HttpPost("RegisterByManager")]
+        [HttpPost("RegisterEmployeeByManager")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         [RequestSizeLimit(2000)]
