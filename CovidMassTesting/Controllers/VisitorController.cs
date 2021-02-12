@@ -190,7 +190,7 @@ namespace CovidMassTesting.Controllers
                 {
                     if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x03)");
                 }
-
+                visitor.PersonType = string.IsNullOrEmpty(reg.PersonType) ? "idcard" : reg.PersonType;
                 visitor.FirstName = reg.FirstName;
                 visitor.LastName = reg.LastName;
                 visitor.BirthDayDay = reg.BirthDayDay;
@@ -541,6 +541,7 @@ namespace CovidMassTesting.Controllers
 
                     var reg = new Registration()
                     {
+                        PersonType = "idcard",
                         FirstName = fields[n2k["meno"]],
                         LastName = fields[n2k["priezvisko"]],
                         City = fields[n2k["miesto"]],

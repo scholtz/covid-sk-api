@@ -256,6 +256,8 @@ namespace CovidMassTesting.Repository.RedisRepository
         protected async Task<Visitor> FixVisitor(Visitor visitor, bool save)
         {
             var updated = false;
+            if (string.IsNullOrEmpty(visitor.PersonType)) visitor.PersonType = "idcard";
+
             if (string.IsNullOrEmpty(visitor.Address))
             {
                 visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
