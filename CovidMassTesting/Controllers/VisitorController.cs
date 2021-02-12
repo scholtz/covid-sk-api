@@ -229,7 +229,67 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Registration manager can register visitor with employee number
+        /// </summary>
+        /// <param name="employeeNumber"></param>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("RegisterByManager")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [RequestSizeLimit(2000)]
+        public async Task<ActionResult<Visitor>> RegisterEmployeeByManager(
+            [FromForm] string employeeNumber,
+            [FromForm] string product
+        )
+        {
+            try
+            {
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
+                    && !User.IsMedicTester(userRepository, placeProviderRepository))
+                    throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
 
+
+                var visitor = new Visitor()
+                {
+                };
+
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
+                var reg = await visitorRepository.GetRegistration(regId);
+                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca");
+
+
+                visitor.FirstName = reg.FirstName;
+                visitor.LastName = reg.LastName;
+                visitor.BirthDayDay = reg.BirthDayDay;
+                visitor.BirthDayMonth = reg.BirthDayMonth;
+                visitor.BirthDayYear = reg.BirthDayYear;
+                visitor.City = reg.City;
+                visitor.Street = reg.Street;
+                visitor.StreetNo = reg.StreetNo;
+                visitor.ZIP = reg.ZIP;
+                visitor.Email = reg.Email;
+                visitor.Phone = reg.Phone;
+                visitor.PersonType = reg.PersonType;
+                visitor.Passport = reg.Passport;
+                visitor.RC = reg.RC;
+                visitor.Product = product;
+                visitor.RegistrationTime = DateTimeOffset.UtcNow;
+                visitor.SelfRegistration = false;
+
+                visitor.RegistrationUpdatedByManager = User.GetEmail();
+                logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
+                return Ok(await visitorRepository.Register(visitor, User.GetEmail()));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// When person comes to the queue he can mark him as in the queue
         /// 
