@@ -948,6 +948,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.RegisterEmployeeByManager(System.String,System.String)">
+            <summary>
+            Registration manager can register visitor with employee number
+            </summary>
+            <param name="employeeNumber"></param>
+            <param name="product"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Enqueued(System.String,System.String,System.String)">
             <summary>
             When person comes to the queue he can mark him as in the queue

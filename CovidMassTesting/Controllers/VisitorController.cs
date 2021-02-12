@@ -252,6 +252,9 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
 
 
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                if (pp == null) throw new Exception("Place provider missing");
+
                 var visitor = new Visitor()
                 {
                 };
