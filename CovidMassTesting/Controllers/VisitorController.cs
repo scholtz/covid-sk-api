@@ -294,6 +294,46 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// LoadVisitor information by tester with personal number
+        /// </summary>
+        /// <param name="employeeNumber"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("LoadVisitorByEmployeeNumber")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [RequestSizeLimit(2000)]
+        public async Task<ActionResult<Visitor>> LoadVisitorByEmployeeNumber(
+            [FromForm] string employeeNumber
+        )
+        {
+            try
+            {
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
+                    && !User.IsMedicTester(userRepository, placeProviderRepository))
+                    throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
+
+
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                if (pp == null) throw new Exception("Place provider missing");
+
+
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
+                var reg = await visitorRepository.GetRegistration(regId);
+                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca");
+
+
+                return Ok(await visitorRepository.GetVisitorByPersonalNumber(reg.RC));
+
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// When person comes to the queue he can mark him as in the queue
         /// 
         /// It can help other people to check the queue time
