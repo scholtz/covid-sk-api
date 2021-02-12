@@ -81,57 +81,63 @@ namespace CovidMassTesting.Controllers.Email
             IEnumerable<Attachment> attachments
             )
         {
-            if (data == null) throw new Exception("Please define data for email");
-            if (string.IsNullOrEmpty(toEmail))
+            try
             {
-                logger.LogDebug($"Message {data.TemplateId} not delivered because email is not defined");
-                return false;
-            }
-            logger.LogInformation($"Sending {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
-            if (!Name2Id.ContainsKey(data.TemplateId))
-            {
-                System.Console.WriteLine($"Template not found: {data.TemplateId}: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
-                return false;
-            }
-            var msg = new SendGridMessage()
-            {
-                TemplateId = Name2Id[data.TemplateId],
-                Personalizations = new List<Personalization>()
+                if (data == null) throw new Exception("Please define data for email");
+                if (string.IsNullOrEmpty(toEmail))
+                {
+                    logger.LogDebug($"Message {data.TemplateId} not delivered because email is not defined");
+                    return false;
+                }
+                logger.LogInformation($"Sending {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
+                if (!Name2Id.ContainsKey(data.TemplateId))
+                {
+                    System.Console.WriteLine($"Template not found: {data.TemplateId}: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
+                    return false;
+                }
+                var msg = new SendGridMessage()
+                {
+                    TemplateId = Name2Id[data.TemplateId],
+                    Personalizations = new List<Personalization>()
                 {
                     new Personalization()
                     {
                         TemplateData = data
                     }
                 }
-            };
-            msg.AddTo(new EmailAddress(toEmail, toName));
+                };
+                msg.AddTo(new EmailAddress(toEmail, toName));
 
-            msg.From = new EmailAddress(fromEmail, fromName);
-            if (!string.IsNullOrEmpty(settings.Value.ReplyToEmail))
-            {
-                if (!string.IsNullOrEmpty(settings.Value.ReplyToName))
+                msg.From = new EmailAddress(fromEmail, fromName);
+                if (!string.IsNullOrEmpty(settings.Value.ReplyToEmail))
                 {
-                    msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail, settings.Value.ReplyToName);
+                    if (!string.IsNullOrEmpty(settings.Value.ReplyToName))
+                    {
+                        msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail, settings.Value.ReplyToName);
+                    }
+                    else
+                    {
+                        msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail);
+                    }
                 }
-                else
+                if (attachments.Any())
                 {
-                    msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail);
+                    msg.AddAttachments(attachments);
                 }
-            }
-            if (attachments.Any())
-            {
-                msg.AddAttachments(attachments);
-            }
-            var serialize = msg.Serialize();
-            var response = await client.RequestAsync(SendGridClient.Method.POST, requestBody: serialize, urlPath: "mail/send");
-            if (response.IsSuccessStatusCode)
-            {
-                logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
-            }
-            if (response.StatusCode == System.Net.HttpStatusCode.Accepted) return true;
+                var serialize = msg.Serialize();
+                var response = await client.RequestAsync(SendGridClient.Method.POST, requestBody: serialize, urlPath: "mail/send");
+                if (response.IsSuccessStatusCode)
+                {
+                    logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
+                }
+                if (response.StatusCode == System.Net.HttpStatusCode.Accepted) return true;
 
-            logger.LogError(await response.Body.ReadAsStringAsync());
-            logger.LogError(serialize);
+                logger.LogError(await response.Body.ReadAsStringAsync());
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, "Error while sending email through sendgrid");
+            }
             return false;
         }
     }
