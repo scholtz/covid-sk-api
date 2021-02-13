@@ -1289,13 +1289,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             var visitor = await GetVisitor(code);
             if (visitor == null)
             {
-                throw new Exception($"Registrácia s kódom '{code}' nebola nájdená. Pravdepodobne už bola vymazaná skôr.");
-            }
-            var beforeTest = !visitor.TestingTime.HasValue;
-            if (visitor == null)
-            {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Test_does_not_exists].Value);
             }
+            var beforeTest = !visitor.TestingTime.HasValue;
             if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
             {
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
