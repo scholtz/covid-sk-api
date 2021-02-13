@@ -1287,6 +1287,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
             }
             var visitor = await GetVisitor(code);
+            if (visitor == null)
+            {
+                throw new Exception($"Registrácia s kódom '{code}' nebola nájdená. Pravdepodobne už bola vymazaná skôr.");
+            }
             var beforeTest = !visitor.TestingTime.HasValue;
             if (visitor == null)
             {
