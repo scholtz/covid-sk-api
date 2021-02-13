@@ -693,7 +693,6 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                writer.Write("Test");
                 var data = await visitorRepository.ProofOfWorkExport(day, from, count);
 
                 csv.WriteRecords(data);

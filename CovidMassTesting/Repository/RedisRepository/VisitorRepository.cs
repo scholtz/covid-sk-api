@@ -2153,6 +2153,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                         ret.Add(new VisitorSimplified()
                         {
+                            TypVysetrenia = "AG test",
                             Meno = visitor.FirstName,
                             Priezvisko = visitor.LastName,
                             RodneCislo = rc,
