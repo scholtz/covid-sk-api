@@ -328,5 +328,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="id"></param>
         /// <returns></returns>
         public Task<Registration> GetRegistration(string id);
+        /// <summary>
+        /// GETVisitorCodeFromTesting code
+        /// </summary>
+        /// <param name="testCodeClear"></param>
+        /// <returns></returns>
+        public Task<int?> GETVisitorCodeFromTesting(string testCodeClear);
     }
 }
