@@ -586,7 +586,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (string.IsNullOrEmpty(placeProviderId))
             {
-                throw new ArgumentException($"'{nameof(placeProviderId)}' cannot be null or empty", nameof(placeProviderId));
+                return false;
             }
 
             if (role == null)

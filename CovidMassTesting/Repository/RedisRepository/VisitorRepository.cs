@@ -673,14 +673,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="code"></param>
         /// <param name="state"></param>
+        /// <param name="isAdmin"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateTestWithoutNotification(int code, string state)
+        public async Task<bool> UpdateTestWithoutNotification(int code, string state, bool isAdmin)
         {
             var visitor = await GetVisitor(code);
             if (visitor.TestingTime.HasValue)
             {
                 var confWait = configuration["minWaitTimeForResultMinutes"] ?? "15";
-                if (state != TestResult.TestMustBeRepeated)
+                if (!isAdmin && state != TestResult.TestMustBeRepeated)
                 {
                     if (visitor.TestingTime.Value.AddMinutes(int.Parse(confWait)) > DateTimeOffset.Now)
                     {
@@ -1445,8 +1446,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="testCode"></param>
         /// <param name="result"></param>
+        /// <param name="isAdmin"></param>
         /// <returns></returns>
-        public async Task<Result> SetTestResult(string testCode, string result)
+        public async Task<Result> SetTestResult(string testCode, string result, bool isAdmin)
         {
             var visitorCode = await GETVisitorCodeFromTesting(testCode);
             var ret = new Result()
@@ -1461,7 +1463,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (visitorCode.HasValue)
             {
                 ret.Matched = true;
-                ret.TimeIsValid = await UpdateTestWithoutNotification(visitorCode.Value, result);
+                ret.TimeIsValid = await UpdateTestWithoutNotification(visitorCode.Value, result, isAdmin);
             }
             await SetResultObject(ret, false);
             if (ret.TimeIsValid)
@@ -1572,8 +1574,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Removes document from queue and sets the test as taken
         /// </summary>
         /// <param name="testId"></param>
+        /// <param name="isAdmin"></param>
         /// <returns></returns>
-        public async Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId)
+        public async Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId, bool isAdmin)
         {
             var first = await GetFirstItemFromQueue();
             if (first != testId) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.You_can_remove_only_first_item_from_the_queue].Value);
@@ -1583,10 +1586,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             switch (visitor.Result)
             {
                 case TestResult.NegativeWaitingForCertificate:
-                    await SetTestResult(testId, TestResult.NegativeCertificateTaken);
+                    await SetTestResult(testId, TestResult.NegativeCertificateTaken, isAdmin);
                     break;
                 case TestResult.PositiveWaitingForCertificate:
-                    await SetTestResult(testId, TestResult.PositiveCertificateTaken);
+                    await SetTestResult(testId, TestResult.PositiveCertificateTaken, isAdmin);
                     break;
             }
             return await RemoveFromDocQueue(testId);
@@ -3052,7 +3055,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 visitor.Result = TestResult.TestMustBeRepeated;
                                 visitor.ResultNotifiedAt = null;
                                 await SetVisitor(visitor, false);
-                                await SetTestResult(visitor.TestingSet, result);
+                                await SetTestResult(visitor.TestingSet, result, true);
                             }
                             else
                             {

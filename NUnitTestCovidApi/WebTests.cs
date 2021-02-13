@@ -3342,7 +3342,7 @@ namespace NUnitTestCovidApi
             }).Result;
 
             iVisitor.ConnectVisitorToTest(vis1.Id, "12345", "aa@bb.cc", "");
-            iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate);
+            iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate, true);
 
             var vis2 = iVisitor.Add(visitor = new Visitor()
             {

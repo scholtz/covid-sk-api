@@ -74,8 +74,9 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="testCode"></param>
         /// <param name="result"></param>
+        /// <param name="isAdmin"></param>
         /// <returns></returns>
-        public Task<Result> SetTestResult(string testCode, string result);
+        public Task<Result> SetTestResult(string testCode, string result, bool isAdmin);
         /// <summary>
         /// Get visitor by personal number
         /// </summary>
@@ -91,8 +92,9 @@ namespace CovidMassTesting.Repository.Interface
         /// Removes test from test queue and mark test as taken
         /// </summary>
         /// <param name="testId"></param>
+        /// <param name="isAdmin"></param>
         /// <returns></returns>
-        public Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId);
+        public Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId, bool isAdmin);
         /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>

@@ -4911,12 +4911,13 @@
             <param name="managerEmail"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetTestResult(System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetTestResult(System.String,System.String,System.Boolean)">
             <summary>
             Set test result
             </summary>
             <param name="testCode"></param>
             <param name="result"></param>
+            <param name="isAdmin"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitorByPersonalNumber(System.String)">
@@ -4932,11 +4933,12 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(System.String,System.Boolean)">
             <summary>
             Removes test from test queue and mark test as taken
             </summary>
             <param name="testId"></param>
+            <param name="isAdmin"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllData">
@@ -6629,12 +6631,13 @@
             <param name="state"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestWithoutNotification(System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestWithoutNotification(System.Int32,System.String,System.Boolean)">
             <summary>
             Updates the visitor test result
             </summary>
             <param name="code"></param>
             <param name="state"></param>
+            <param name="isAdmin"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.String,System.Boolean,System.String,System.String)">
@@ -6722,12 +6725,13 @@
             <param name="personalNumber"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetTestResult(System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetTestResult(System.String,System.String,System.Boolean)">
             <summary>
             Set test result
             </summary>
             <param name="testCode"></param>
             <param name="result"></param>
+            <param name="isAdmin"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.AddToDocQueue(System.String)">
@@ -6750,11 +6754,12 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(System.String,System.Boolean)">
             <summary>
             Removes document from queue and sets the test as taken
             </summary>
             <param name="testId"></param>
+            <param name="isAdmin"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetFirstItemFromQueue">

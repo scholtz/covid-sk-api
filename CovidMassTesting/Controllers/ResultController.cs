@@ -454,13 +454,13 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new ArgumentException(localizer[Controllers_ResultController.Result_of_the_test_must_not_be_empty].Value);
                 }
-
+                var isAdmin = await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository);
                 switch (result)
                 {
                     case TestResult.NegativeWaitingForCertificate:
                     case TestResult.PositiveWaitingForCertificate:
                     case TestResult.TestMustBeRepeated:
-                        return Ok(await visitorRepository.SetTestResult(FormatBarCode(testCode), result));
+                        return Ok(await visitorRepository.SetTestResult(FormatBarCode(testCode), result, isAdmin));
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_result_state].Value);
             }
@@ -511,8 +511,9 @@ namespace CovidMassTesting.Controllers
                 }
 
                 if (!User.IsDocumentManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+                var isAdmin = await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository);
                 var code = FormatBarCode(testId);
-                var ret = await visitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(code);
+                var ret = await visitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(code, isAdmin);
                 return Ok(ret);
             }
             catch (Exception exc)
