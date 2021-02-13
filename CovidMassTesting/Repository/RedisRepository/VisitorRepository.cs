@@ -2647,7 +2647,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             catch (Exception exc)
             {
-                logger.LogError(exc, "Error while signing the pdf document");
+                logger.LogError(exc, $"Error while signing the pdf document - {exc.Message}");
                 return pdfStreamEncrypted.ToArray();
             }
         }
