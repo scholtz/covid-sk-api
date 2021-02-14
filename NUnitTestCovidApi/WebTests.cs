@@ -2784,8 +2784,10 @@ namespace NUnitTestCovidApi
             filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, filteredPlaces.Count);
             Assert.AreEqual(2, filteredPlaces.Values.First().Registrations);
-            Assert.AreEqual(118, filteredPlaces.Values.First().AvailableSlotsToday);
-
+            if (DateTime.Now.Hour < 21)
+            {
+                Assert.AreEqual(118, filteredPlaces.Values.First().AvailableSlotsToday);
+            }
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");
 
