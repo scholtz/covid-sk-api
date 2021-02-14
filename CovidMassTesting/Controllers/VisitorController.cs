@@ -181,14 +181,14 @@ namespace CovidMassTesting.Controllers
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x01)");
+                if (reg == null) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
                 if (reg.PersonType == "foreign")
                 {
-                    if (pass.Length < 4 || !reg.Passport.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x02)");
+                    if (pass.Length < 4 || !reg.Passport.EndsWith(pass)) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
                 }
                 else
                 {
-                    if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné číslo zamestnanca aj posledné štyri číslice z rodného čísla (0x03)");
+                    if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
                 }
                 visitor.PersonType = string.IsNullOrEmpty(reg.PersonType) ? "idcard" : reg.PersonType;
                 visitor.FirstName = reg.FirstName;
@@ -261,7 +261,7 @@ namespace CovidMassTesting.Controllers
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca");
+                if (reg == null) throw new Exception("Zadajte platné osobné číslo zamestnanca");
 
 
                 visitor.FirstName = reg.FirstName;
@@ -320,7 +320,7 @@ namespace CovidMassTesting.Controllers
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null) throw new Exception("Zadajte platné číslo zamestnanca");
+                if (reg == null) throw new Exception("Zadajte platné osobné číslo zamestnanca");
 
 
                 return Ok(await visitorRepository.GetVisitorByPersonalNumber(reg.RC));
