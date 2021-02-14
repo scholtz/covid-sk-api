@@ -2784,7 +2784,7 @@ namespace NUnitTestCovidApi
             filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, filteredPlaces.Count);
             Assert.AreEqual(2, filteredPlaces.Values.First().Registrations);
-            if (DateTime.Now.Hour < 21)
+            if (DateTime.Now.Hour < 20)
             {
                 Assert.AreEqual(118, filteredPlaces.Values.First().AvailableSlotsToday);
             }
