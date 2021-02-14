@@ -552,7 +552,7 @@ namespace NUnitTestCovidApi
                 ZIP = "10000",
             };
             var result = Register(client, visitor1);
-            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
+            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor " + result.Content.ReadAsStringAsync().Result);
             Registered.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(result.Content.ReadAsStringAsync().Result));
             Visitor visitor2 = new Visitor()
             {
@@ -2348,7 +2348,7 @@ namespace NUnitTestCovidApi
 
 
         [Test]
-        public void RoleMedicTesterPPTest()
+        public async Task RoleMedicTesterPPTest()
         {
             DropDatabase();
 
@@ -2749,7 +2749,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var places = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(places.Count > 0);
-            var place = places.First().Value;
+            var place = places.Values.FirstOrDefault(p => p.Name == "Odberné miesto 2");
             request = ListDaySlotsByPlace(client, place.Id);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var days = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(request.Content.ReadAsStringAsync().Result);
@@ -2774,16 +2774,17 @@ namespace NUnitTestCovidApi
             filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, filteredPlaces.Count);
             //Assert.AreEqual(120, filteredPlaces.Values.First().AvailableSlotsToday);
-
+            var placeId = filteredPlaces.First().Value.Id;
+            Assert.AreEqual(placeId, place.Id);
             var minute = minutes.Values.Last();
-            var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
+            var registered = RegisterTestVisitors(client, placeId, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
             request = ListFiltered(client, "vac-doctor", "all");
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             filteredPlaces = JsonConvert.DeserializeObject<Dictionary<string, Place>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, filteredPlaces.Count);
-            //            Assert.AreEqual(2, filteredPlaces.Values.First().Registrations);
-            //            Assert.AreEqual(118, filteredPlaces.Values.First().AvailableSlotsToday);
+            Assert.AreEqual(2, filteredPlaces.Values.First().Registrations);
+            Assert.AreEqual(118, filteredPlaces.Values.First().AvailableSlotsToday);
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken}");

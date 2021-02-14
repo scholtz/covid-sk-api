@@ -165,6 +165,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 }
             }
             dataM[key] = slot;
+            await Task.Delay(1);
             return true;
         }
         /// <summary>
