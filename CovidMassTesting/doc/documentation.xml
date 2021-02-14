@@ -109,6 +109,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.GetVisitorCodeFromTestCode(System.String)">
+            <summary>
+            Fix verification data
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.IEmailSender">
             <summary>
             Interface for email client
@@ -4719,7 +4725,7 @@
             <param name="companyName"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListAll">
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListAll(System.String)">
             <summary>
             List all users
             </summary>
@@ -5199,6 +5205,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GETVisitorCodeFromTesting(System.String)">
+            <summary>
+            GETVisitorCodeFromTesting code
+            </summary>
+            <param name="testCodeClear"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -5489,7 +5502,7 @@
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.ListAll">
+        <member name="M:CovidMassTesting.Repository.MockRepository.UserRepository.ListAll(System.String)">
             <summary>
             Returns all users
             </summary>
@@ -6335,7 +6348,7 @@
             <param name="invitationId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ListAll">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ListAll(System.String)">
             <summary>
             Lists all users 
             </summary>

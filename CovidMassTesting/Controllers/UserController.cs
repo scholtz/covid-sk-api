@@ -61,7 +61,7 @@ namespace CovidMassTesting.Controllers
             {
                 if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Admin_role_can_list_users].Value);
 
-                return Ok((await userRepository.ListAll()).ToDictionary(p => p.Email, p => p.ToPublic()));
+                return Ok((await userRepository.ListAll(User.GetPlaceProvider())).ToDictionary(p => p.Email, p => p.ToPublic()));
             }
             catch (Exception exc)
             {

@@ -283,7 +283,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Lists all users 
         /// </summary>
         /// <returns></returns>
-        public virtual async Task<IEnumerable<User>> ListAll()
+        public virtual async Task<IEnumerable<User>> ListAll(string placeProviderId)
         {
             var ret = new List<User>();
             var list = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_USERS_OBJECTS}");
@@ -291,7 +291,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    ret.Add(await GetUser(item, null));
+                    ret.Add(await GetUser(item, placeProviderId));
                 }
                 catch (Exception exc)
                 {

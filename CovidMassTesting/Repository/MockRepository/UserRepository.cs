@@ -110,9 +110,9 @@ namespace CovidMassTesting.Repository.MockRepository
         /// Returns all users
         /// </summary>
         /// <returns></returns>
-        public override async Task<IEnumerable<User>> ListAll()
+        public override async Task<IEnumerable<User>> ListAll(string placeProviderId)
         {
-            return data.Values;
+            return data.Keys.Select(u => GetUser(u, placeProviderId).Result);
         }
         /// <summary>
         /// Get invitation

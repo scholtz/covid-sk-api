@@ -23,7 +23,7 @@ namespace CovidMassTesting.Repository.Interface
         /// List all users
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<User>> ListAll();
+        public Task<IEnumerable<User>> ListAll(string placeProviderId);
         /// <summary>
         /// Create admins from configuration
         /// </summary>
