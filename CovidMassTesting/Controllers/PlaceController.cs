@@ -80,16 +80,22 @@ namespace CovidMassTesting.Controllers
                 {
                     list = await placeRepository.ListAll();
                     list = list.Where(p => p.IsVisible == true);
-                    list = await EnrichWithEmptySlots(list);
-                    Cache = new ConcurrentBag<Place>(list);
+                    var toCache = new ConcurrentBag<Place>(list);
+                    EnrichWithEmptySlots(ref toCache);
+                    Cache = toCache;
                     CacheTime = DateTimeOffset.Now;
+                    list = Cache;
                 }
             }
             else
             {
                 list = await placeRepository.ListAll();
                 list = list.Where(p => p.IsVisible == true);
-                list = await EnrichWithEmptySlots(list.ToArray());
+                var toCache = new ConcurrentBag<Place>(list);
+                EnrichWithEmptySlots(ref toCache);
+                Cache = toCache;
+                CacheTime = DateTimeOffset.Now;
+                list = Cache;
             }
             return list;
         }
@@ -148,47 +154,60 @@ namespace CovidMassTesting.Controllers
             }
         }
 
-        private async Task<IEnumerable<Place>> EnrichWithEmptySlots(IEnumerable<Place> list, int daysCount = 1)
+        private bool EnrichWithEmptySlots(ref ConcurrentBag<Place> list, int daysCount = 1)
         {
             var ret = new List<Place>();
-            foreach (var item in list)
+
+            Parallel.ForEach(list, item =>
             {
-                var total = 0;
-                var days = await slotRepository.ListDaySlotsByPlace(item.Id);
-                foreach (var day in
-                    days.Where(d =>
-                        d.Time >= DateTimeOffset.UtcNow.AddDays(-1)
-                        && d.Time < DateTimeOffset.UtcNow.AddDays(daysCount - 1)
-                ))
+                try
                 {
-                    var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(item.Id, day.SlotId);
-                    foreach (var hour in hours)
+                    var total = 0;
+                    var days = slotRepository.ListDaySlotsByPlace(item.Id).Result;
+                    foreach (var day in
+                        days.Where(d =>
+                            d.Time >= DateTimeOffset.UtcNow.AddDays(-1)
+                            && d.Time < DateTimeOffset.UtcNow.AddDays(daysCount - 1)
+                    ))
                     {
-                        if (hour.Time < DateTimeOffset.Now.AddHours(-1)) continue;
-                        var count = item.LimitPer1HourSlot - hour.Registrations;
-                        var countMAggregated = 0;
-                        if (count > 0)
+                        var hours = slotRepository.ListHourSlotsByPlaceAndDaySlotId(item.Id, day.SlotId).Result;
+                        foreach (var hour in hours)
                         {
-                            var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId);
-                            foreach (var minute in minutes)
+                            if (hour.Time < DateTimeOffset.Now.AddHours(-1)) continue;
+                            var count = item.LimitPer1HourSlot - hour.Registrations;
+                            if (hour.Registrations == 2)
                             {
-                                if (minute.Time < DateTimeOffset.Now.AddMinutes(-5)) continue;
-                                var countm = item.LimitPer5MinSlot - minute.Registrations;
-                                if (countm > 0)
+                                int x = 0;
+                                x++;
+                            }
+
+                            var countMAggregated = 0;
+                            if (count > 0)
+                            {
+                                var minutes = slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId).Result;
+                                foreach (var minute in minutes)
                                 {
-                                    countMAggregated += countm;
+                                    if (minute.Time < DateTimeOffset.Now.AddMinutes(-5)) continue;
+                                    var countm = item.LimitPer5MinSlot - minute.Registrations;
+                                    if (countm > 0)
+                                    {
+                                        countMAggregated += countm;
+                                    }
                                 }
                             }
+                            total += Math.Min(countMAggregated, count);
                         }
-                        total += Math.Min(countMAggregated, count);
+                        item.AvailableSlotsTodayUpdate = DateTimeOffset.UtcNow;
+                        item.AvailableSlotsToday = total;
                     }
-                    item.AvailableSlotsTodayUpdate = DateTimeOffset.UtcNow;
-                    item.AvailableSlotsToday = total;
                 }
-                ret.Add(item);
-            }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, exc.Message);
+                }
+            });
 
-            return ret;
+            return true;
         }
 
         /// <summary>
