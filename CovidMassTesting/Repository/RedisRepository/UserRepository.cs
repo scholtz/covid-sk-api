@@ -100,7 +100,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 localizer[Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place],
                 user.Email,
                 user.Name,
-                new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name)
+                new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                 {
                     Name = user.Name,
                     Password = pass,
@@ -692,7 +692,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     localizer[Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place],
                     user.Email,
                     user.Name,
-                    new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name)
+                    new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                     {
                         Name = user.Name,
                         Roles = user.Roles?.ToArray(),

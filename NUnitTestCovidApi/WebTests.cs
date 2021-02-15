@@ -3095,7 +3095,7 @@ namespace NUnitTestCovidApi
                 $"Test {DateTimeOffset.Now.ToString("f")}",
                 "ludkosk@gmail.com",
                 "CovidL",
-                new CovidMassTesting.Model.Email.InvitationEmail("sk")
+                new CovidMassTesting.Model.Email.InvitationEmail("sk", configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                 {
                     Name = "Ludo",
                     IsSK = true,

@@ -10,6 +10,18 @@
         /// </summary>
         public abstract string TemplateId { get; }
         /// <summary>
+        /// Support email
+        /// </summary>
+        public string SupportEmail { get; set; }
+        /// <summary>
+        /// Support phone
+        /// </summary>
+        public string SupportPhone { get; set; }
+        /// <summary>
+        /// Website
+        /// </summary>
+        public string Website { get; set; }
+        /// <summary>
         /// Is English
         /// </summary>
         public bool IsEN { get; set; }

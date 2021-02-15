@@ -1339,6 +1339,21 @@
             Identifier of the template
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.SupportEmail">
+            <summary>
+            Support email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.SupportPhone">
+            <summary>
+            Support phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.IEmail.Website">
+            <summary>
+            Website
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Email.IEmail.IsEN">
             <summary>
             Is English
@@ -1375,11 +1390,14 @@
             User with permissions to invite other people can invite them and 
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.InvitationEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.InvitationEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.InvitationEmail.TemplateId">
             <summary>
@@ -1421,11 +1439,14 @@
             Email sent when test was not positive not negative, and needs to be repeated
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.PersonalDataRemovedEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.PersonalDataRemovedEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.PersonalDataRemovedEmail.TemplateId">
             <summary>
@@ -1442,11 +1463,14 @@
             User with permissions to invite other people can invite them and 
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.RolesUpdatedEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.RolesUpdatedEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.RolesUpdatedEmail.TemplateId">
             <summary>
@@ -1473,11 +1497,14 @@
             Email template for visitor change registration
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorChangeRegistrationEmail.TemplateId">
             <summary>
@@ -1519,11 +1546,14 @@
             Visitor registration email
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.VisitorRegistrationEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.VisitorRegistrationEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorRegistrationEmail.TemplateId">
             <summary>
@@ -1565,11 +1595,14 @@
             Sends information to visitor that his test has been processed
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingInProcessEmail.TemplateId">
             <summary>
@@ -1586,11 +1619,14 @@
             Sends information to visitor that his test has been processed
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.VisitorTestingResultEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.VisitorTestingResultEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingResultEmail.TemplateId">
             <summary>
@@ -1612,11 +1648,14 @@
             Email sent when test was not positive not negative, and needs to be repeated
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.#ctor(System.String)">
+        <member name="M:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.#ctor(System.String,System.String,System.String,System.String)">
             <summary>
             Constructor
             </summary>
-            <param name="language"></param>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
         </member>
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.TemplateId">
             <summary>

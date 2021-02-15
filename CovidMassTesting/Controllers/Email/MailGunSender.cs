@@ -101,6 +101,10 @@ namespace CovidMassTesting.Controllers.Email
                 request.AddParameter("v:isEN", data.IsEN);
                 request.AddParameter("v:isHU", data.IsHU);
 
+                request.AddParameter("v:Website", data.Website);
+                request.AddParameter("v:SupportEmail", data.SupportEmail);
+                request.AddParameter("v:SupportPhone", data.SupportPhone);
+
                 if (data is InvitationEmail)
                 {
                     var emailData = data as InvitationEmail;

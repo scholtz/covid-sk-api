@@ -157,7 +157,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                 visitor.Email,
                 $"{visitor.FirstName} {visitor.LastName}",
-                new Model.Email.VisitorRegistrationEmail(visitor.Language)
+                new Model.Email.VisitorRegistrationEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                 {
                     Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                     Name = $"{visitor.FirstName} {visitor.LastName}",
@@ -823,7 +823,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                         visitor.Email,
                         $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorTestingToBeRepeatedEmail(visitor.Language)
+                        new Model.Email.VisitorTestingToBeRepeatedEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                         {
                             Name = $"{visitor.FirstName} {visitor.LastName}",
                         });
@@ -844,7 +844,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                         visitor.Email,
                         $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorTestingInProcessEmail(visitor.Language)
+                        new Model.Email.VisitorTestingInProcessEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                         {
                             Name = $"{visitor.FirstName} {visitor.LastName}",
                         });
@@ -1187,7 +1187,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                         visitor.Email,
                         $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorTestingResultEmail(visitor.Language)
+                        new Model.Email.VisitorTestingResultEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                         {
                             Name = $"{visitor.FirstName} {visitor.LastName}",
                             IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
@@ -1349,7 +1349,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                     visitor.Email,
                     $"{visitor.FirstName} {visitor.LastName}",
-                    new Model.Email.PersonalDataRemovedEmail(visitor.Language)
+                    new Model.Email.PersonalDataRemovedEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                     {
                         Name = $"{visitor.FirstName} {visitor.LastName}",
                     });
@@ -1853,7 +1853,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                         visitor.Email,
                         $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorChangeRegistrationEmail(visitor.Language)
+                        new Model.Email.VisitorChangeRegistrationEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                         {
                             Code = codeFormatted,
                             Name = $"{visitor.FirstName} {visitor.LastName}",
@@ -3281,7 +3281,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
                             visitor.Email,
                             $"{visitor.FirstName} {visitor.LastName}",
-                            new Model.Email.VisitorRegistrationEmail(visitor.Language)
+                            new Model.Email.VisitorRegistrationEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                             {
                                 Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                                 Name = $"{visitor.FirstName} {visitor.LastName}",
