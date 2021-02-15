@@ -334,5 +334,12 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="testCodeClear"></param>
         /// <returns></returns>
         public Task<int?> GETVisitorCodeFromTesting(string testCodeClear);
+        /// <summary>
+        /// Company registrations export
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public Task<IEnumerable<Registration>> ExportRegistrations(int from = 0, int count = 9999999);
     }
 }

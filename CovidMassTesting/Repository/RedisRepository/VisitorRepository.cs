@@ -2177,6 +2177,23 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
         /// <summary>
+        /// Export company registrations
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Registration>> ExportRegistrations(int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ExportRegistrations {from} {count}");
+            var ret = new List<Registration>();
+            foreach (var regId in (await ListAllRegistrationKeys()).OrderBy(i => i).Skip(from).Take(count))
+            {
+                ret.Add(await GetRegistration(regId));
+            }
+            logger.LogInformation($"ExportRegistrations {from} {count} END - {ret.Count}");
+            return ret;
+        }
+        /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
         /// <param name="day"></param>

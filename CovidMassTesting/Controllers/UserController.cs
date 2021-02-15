@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
+using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
@@ -26,6 +28,7 @@ namespace CovidMassTesting.Controllers
         private readonly IUserRepository userRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly IPlaceRepository placeRepository;
+        private readonly IVisitorRepository visitorRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -33,11 +36,14 @@ namespace CovidMassTesting.Controllers
         /// <param name="logger"></param>
         /// <param name="userRepository"></param>
         /// <param name="placeProviderRepository"></param>
+        /// <param name="visitorRepository"></param>
+        /// <param name="placeRepository"></param>
         public UserController(
             IStringLocalizer<UserController> localizer,
             ILogger<PlaceController> logger,
             IUserRepository userRepository,
             IPlaceProviderRepository placeProviderRepository,
+            IVisitorRepository visitorRepository,
             IPlaceRepository placeRepository
             )
         {
@@ -46,6 +52,7 @@ namespace CovidMassTesting.Controllers
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
             this.placeRepository = placeRepository;
+            this.visitorRepository = visitorRepository;
         }
         /// <summary>
         /// List all public information of all users
@@ -339,6 +346,39 @@ namespace CovidMassTesting.Controllers
             {
                 logger.LogError(exc, exc.Message);
 
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// This method exports company registrations
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("CompanyRegistrationsExport")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> CompanyRegistrationsExport([FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        {
+            try
+            {
+                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                logger.LogInformation($"CompanyRegistrationsExport: User {User.GetEmail()} is exporting data");
+
+                using var stream = new MemoryStream();
+                using var writer = new StreamWriter(stream);
+                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                writer.Write("Test");
+                var data = await visitorRepository.ExportRegistrations(from, count);
+
+                csv.WriteRecords(data);
+                writer.Flush();
+                var ret = stream.ToArray();
+                logger.LogInformation($"CompanyRegistrationsExport: Export size: {ret.Length}");
+                return File(ret, "text/csv", $"company-registrations-{from}-{count}.csv");
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }

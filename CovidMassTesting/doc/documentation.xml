@@ -809,7 +809,7 @@
             Controller that manages user requests
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.UserController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository)">
+        <member name="M:CovidMassTesting.Controllers.UserController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.UserController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceController},CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceRepository)">
             <summary>
             Constructor
             </summary>
@@ -817,6 +817,8 @@
             <param name="logger"></param>
             <param name="userRepository"></param>
             <param name="placeProviderRepository"></param>
+            <param name="visitorRepository"></param>
+            <param name="placeRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.UserController.List">
             <summary>
@@ -900,6 +902,12 @@
             Set place provider
             </summary>
             <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.UserController.CompanyRegistrationsExport(System.Int32,System.Int32)">
+            <summary>
+            This method exports company registrations
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.VersionController">
@@ -5212,6 +5220,14 @@
             <param name="testCodeClear"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ExportRegistrations(System.Int32,System.Int32)">
+            <summary>
+            Company registrations export
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -6855,6 +6871,14 @@
             Export for institution that pays for the tests
             </summary>
             <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ExportRegistrations(System.Int32,System.Int32)">
+            <summary>
+            Export company registrations
+            </summary>
             <param name="from"></param>
             <param name="count"></param>
             <returns></returns>
