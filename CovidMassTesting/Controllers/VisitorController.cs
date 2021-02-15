@@ -153,6 +153,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                if (string.IsNullOrEmpty(pass))
+                {
+                    throw new Exception("Zadajte posledné štyri číslice z rodného čísla");
+                }
                 if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
                 {
                     if (string.IsNullOrEmpty(token))
@@ -184,10 +188,18 @@ namespace CovidMassTesting.Controllers
                 if (reg == null) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
                 if (reg.PersonType == "foreign")
                 {
+                    if (string.IsNullOrEmpty(reg.RC))
+                    {
+                        throw new Exception("Vaša registrácia nemá správne vyplnené číslo pasu");
+                    }
                     if (pass.Length < 4 || !reg.Passport.EndsWith(pass)) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
                 }
                 else
                 {
+                    if (string.IsNullOrEmpty(reg.RC))
+                    {
+                        throw new Exception("Vaša registrácia nemá správne vyplnené rodné číslo");
+                    }
                     if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
                 }
                 visitor.PersonType = string.IsNullOrEmpty(reg.PersonType) ? "idcard" : reg.PersonType;
