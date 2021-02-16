@@ -797,6 +797,18 @@ namespace CovidMassTesting.Repository.RedisRepository
             await SetPlaceProvider(pp);
             return true;
         }
+
+        /// <summary>
+        /// Get product
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="productId"></param>
+        public async Task<Product> GetProduct(string placeProviderId, string productId)
+        {
+            var pp = await GetPlaceProvider(placeProviderId);
+            if (pp == null) throw new Exception("Unable to find place provider");
+            return pp.Products.FirstOrDefault(p => p.Id == productId);
+        }
         /// <summary>
         /// Add pp with category
         /// </summary>

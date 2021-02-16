@@ -125,6 +125,30 @@ namespace CovidMassTesting.Controllers
                 if (!visitor.BirthDayMonth.HasValue || visitor.BirthDayMonth < 1 || visitor.BirthDayMonth > 12) throw new Exception("Mesiac Vášho narodenia vyzerá byť chybne vyplnený");
                 visitor.RegistrationTime = DateTimeOffset.UtcNow;
                 visitor.SelfRegistration = true;
+
+                var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                if (place == null) throw new Exception("Vybrané miesto nebolo nájdené");
+
+                var product = await placeProviderRepository.GetProduct(place.PlaceProviderId, visitor.Product);
+                if (product == null) throw new Exception("Vybraná služba nebola nájdená");
+
+                if (product.EmployeesRegistration == true)
+                {
+                    if (string.IsNullOrEmpty(visitor.EmployeeId)) throw new Exception("Zadajte prosím osobné číslo zamestnanca");
+                    var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
+                    if (pp == null) throw new Exception("Miesto má nastavené chybnú spoločnosť. Prosím kontaktujte podporu s chybou 0x021561");
+                    var hash = visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, visitor.EmployeeId));
+                    var regId = await visitorRepository.GetRegistrationIdFromHashedId(hash);
+                    var reg = await visitorRepository.GetRegistration(regId);
+                    if (reg == null) throw new Exception("Zadajte prosím platné osobné číslo zamestnanca");
+                    var rc = reg.RC ?? "";
+                    if (rc.Length > 4) rc = rc.Substring(rc.Length - 4);
+                    if (string.IsNullOrEmpty(visitor.RC) || !visitor.RC.EndsWith(rc))
+                    {
+                        throw new Exception("Časť poskytnutého rodného čísla od zamestnávateľa vyzerá byť rozdielne od čísla zadaného v registračnom formulári");
+                    }
+                }
+
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
             catch (Exception exc)

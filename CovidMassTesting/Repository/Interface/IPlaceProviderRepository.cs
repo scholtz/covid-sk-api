@@ -172,6 +172,14 @@ namespace CovidMassTesting.Repository.Interface
         Task<IEnumerable<PlaceProduct>> ListPlaceProductByCategory(string category);
 
         /// <summary>
+        /// Get product
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="productId"></param>
+        Task<Product> GetProduct(string placeProviderId, string productId);
+
+
+        /// <summary>
         /// Add to export the all products
         /// </summary>
         /// <param name="ret"></param>
