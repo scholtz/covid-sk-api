@@ -35,6 +35,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? EmployeesOnly { get; set; } = false;
         /// <summary>
+        /// Corporations may check this on and only its employees can self register
+        /// </summary>
+        public bool? EmployeesRegistration { get; set; } = false;
+        /// <summary>
         /// Collect insurance organisation
         /// </summary>
         public bool? CollectInsurance { get; set; } = true;

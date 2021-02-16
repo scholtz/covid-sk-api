@@ -197,6 +197,7 @@ namespace CovidMassTesting.Repository.Interface
                             InsuranceOnly = product.InsuranceOnly,
                             CollectInsurance = product.CollectInsurance,
                             EmployeesOnly = product.EmployeesOnly,
+                            EmployeesRegistration = product.EmployeesRegistration,
                             SchoolOnly = product.SchoolOnly
                         });
                     }

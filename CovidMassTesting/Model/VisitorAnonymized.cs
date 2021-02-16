@@ -40,6 +40,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string RC { get { return $"{cohash}{visitor.RC}".GetSHA256Hash().Substring(0, 10); } }
         /// <summary>
+        /// Employee id if applicable
+        /// </summary>
+        public string EmployeeId { get { return $"{cohash}{visitor.EmployeeId}".GetSHA256Hash().Substring(0, 10); } }
+        /// <summary>
         /// BirthDay - day
         /// </summary>
         public int? BirthDayDay { get { return null; } }
