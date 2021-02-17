@@ -2370,6 +2370,11 @@
             Corporations may check this on and only its employees are eligible for the testing
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.EmployeesRegistration">
+            <summary>
+            Corporations may check this on and only its employees can self register
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.PlaceProduct.CollectInsurance">
             <summary>
             Collect insurance organisation
@@ -2571,6 +2576,11 @@
         <member name="P:CovidMassTesting.Model.Product.EmployeesOnly">
             <summary>
             Corporations may check this on and only its employees are eligible for the testing
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.EmployeesRegistration">
+            <summary>
+            Corporations may check this on and only its employees can self register
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Product.CollectInsurance">
@@ -3898,6 +3908,11 @@
             Personal number if person type is idcard or child
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.EmployeeId">
+            <summary>
+            Employee id if applicable
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.BirthDayDay">
             <summary>
             BirthDay - day
@@ -4080,6 +4095,11 @@
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.RC">
             <summary>
             Personal number if person type is idcard or child
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.EmployeeId">
+            <summary>
+            Employee id if applicable
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.BirthDayDay">
@@ -4509,6 +4529,13 @@
             </summary>
             <param name="category"></param>
             <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetProduct(System.String,System.String)">
+            <summary>
+            Get product
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="productId"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ExtendByAllProducts(System.Collections.Generic.List{CovidMassTesting.Model.PlaceProduct},CovidMassTesting.Model.PlaceProvider,System.String[])">
             <summary>
@@ -6003,6 +6030,13 @@
             </summary>
             <param name="placeProviderId"></param>
             <param name="product"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetProduct(System.String,System.String)">
+            <summary>
+            Get product
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="productId"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.CombinePPWithCategory(System.String,System.String)">
             <summary>

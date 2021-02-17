@@ -57,14 +57,14 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="placeId"></param>
         /// <returns></returns>
-        public override async Task<PlaceProvider> GetPlaceProvider(string placeId)
+        public override async Task<PlaceProvider> GetPlaceProvider(string placeProviderId)
         {
-            if (string.IsNullOrEmpty(placeId))
+            if (string.IsNullOrEmpty(placeProviderId))
             {
-                throw new ArgumentException($"'{nameof(placeId)}' cannot be null or empty", nameof(placeId));
+                throw new ArgumentException($"'{nameof(placeProviderId)}' cannot be null or empty", nameof(placeProviderId));
             }
 
-            return data[placeId];
+            return data[placeProviderId];
         }
         /// <summary>
         /// List all
