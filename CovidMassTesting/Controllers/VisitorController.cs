@@ -132,17 +132,21 @@ namespace CovidMassTesting.Controllers
                 var product = await placeProviderRepository.GetProduct(place.PlaceProviderId, visitor.Product);
                 if (product == null) throw new Exception("Vybraná služba nebola nájdená");
 
+                logger.LogInformation($"EmployeesRegistration: {product.EmployeesRegistration}");
                 if (product.EmployeesRegistration == true)
                 {
+                    logger.LogInformation($"EmployeesRegistration 2: {visitor.EmployeeId}");
                     if (string.IsNullOrEmpty(visitor.EmployeeId)) throw new Exception("Zadajte prosím osobné číslo zamestnanca");
                     var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
                     if (pp == null) throw new Exception("Miesto má nastavené chybnú spoločnosť. Prosím kontaktujte podporu s chybou 0x021561");
                     var hash = visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, visitor.EmployeeId));
                     var regId = await visitorRepository.GetRegistrationIdFromHashedId(hash);
                     var reg = await visitorRepository.GetRegistration(regId);
+                    logger.LogInformation($"EmployeesRegistration 3: {hash} {regId} {reg?.Id}");
                     if (reg == null) throw new Exception("Zadajte prosím platné osobné číslo zamestnanca");
                     var rc = reg.RC ?? "";
                     if (rc.Length > 4) rc = rc.Substring(rc.Length - 4);
+                    logger.LogInformation($"EmployeesRegistration 4: {rc}");
                     if (string.IsNullOrEmpty(visitor.RC) || !visitor.RC.EndsWith(rc))
                     {
                         throw new Exception("Časť poskytnutého rodného čísla od zamestnávateľa vyzerá byť rozdielna od čísla zadaného v registračnom formulári");
