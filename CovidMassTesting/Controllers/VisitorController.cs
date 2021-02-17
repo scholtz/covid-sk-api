@@ -129,11 +129,29 @@ namespace CovidMassTesting.Controllers
                 var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
                 if (place == null) throw new Exception("Vybrané miesto nebolo nájdené");
 
-                var product = await placeProviderRepository.GetProduct(place.PlaceProviderId, visitor.Product);
-                if (product == null) throw new Exception("Vybraná služba nebola nájdená");
+                PlaceProduct placeProduct = null;
+                try
+                {
+                    placeProduct = await placeRepository.GetPlaceProduct(visitor.Product);
+                }
+                catch { }
+                Product product = null;
+                try
+                {
+                    if (placeProduct == null)
+                    {
+                        product = await placeProviderRepository.GetProduct(place.PlaceProviderId, visitor.Product);
+                    }
+                }
+                catch { }
+
+                if (product == null && placeProduct == null)
+                {
+                    throw new Exception("Vybraná služba nebola nájdená");
+                }
 
                 //logger.LogInformation($"EmployeesRegistration: {product.EmployeesRegistration}");
-                if (product.EmployeesRegistration == true)
+                if (placeProduct?.EmployeesRegistration == true || product?.EmployeesRegistration == true)
                 {
                     logger.LogInformation($"EmployeesRegistration 2: {visitor.EmployeeId}");
                     if (string.IsNullOrEmpty(visitor.EmployeeId)) throw new Exception("Zadajte prosím osobné číslo zamestnanca");
