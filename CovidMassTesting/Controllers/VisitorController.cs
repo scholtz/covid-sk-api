@@ -145,7 +145,7 @@ namespace CovidMassTesting.Controllers
                     if (rc.Length > 4) rc = rc.Substring(rc.Length - 4);
                     if (string.IsNullOrEmpty(visitor.RC) || !visitor.RC.EndsWith(rc))
                     {
-                        throw new Exception("Časť poskytnutého rodného čísla od zamestnávateľa vyzerá byť rozdielne od čísla zadaného v registračnom formulári");
+                        throw new Exception("Časť poskytnutého rodného čísla od zamestnávateľa vyzerá byť rozdielna od čísla zadaného v registračnom formulári");
                     }
                 }
 
