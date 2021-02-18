@@ -33,6 +33,7 @@ namespace CovidMassTesting.Controllers
         private readonly ILogger<ResultController> logger;
         private readonly IVisitorRepository visitorRepository;
         private readonly IUserRepository userRepository;
+        private readonly IPlaceRepository placeRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly ICaptchaValidator captchaValidator;
         /// <summary>
@@ -43,6 +44,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="logger"></param>
         /// <param name="visitorRepository"></param>
         /// <param name="userRepository"></param>
+        /// <param name="placeRepository"></param>
         /// <param name="placeProviderRepository"></param>
         /// <param name="captchaValidator"></param>
         public ResultController(
@@ -51,6 +53,7 @@ namespace CovidMassTesting.Controllers
             ILogger<ResultController> logger,
             IVisitorRepository visitorRepository,
             IUserRepository userRepository,
+            IPlaceRepository placeRepository,
             IPlaceProviderRepository placeProviderRepository,
             ICaptchaValidator captchaValidator
             )
@@ -60,6 +63,7 @@ namespace CovidMassTesting.Controllers
             this.logger = logger;
             this.visitorRepository = visitorRepository;
             this.userRepository = userRepository;
+            this.placeRepository = placeRepository;
             this.placeProviderRepository = placeProviderRepository;
             this.captchaValidator = captchaValidator;
         }
@@ -572,8 +576,10 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                writer.Write("Test");
+
                 var data = await visitorRepository.ListSickVisitors(day, from, count);
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                data = data.Where(p => places.Contains(p.ChosenPlaceId));
 
                 csv.WriteRecords(data);
                 writer.Flush();
@@ -605,12 +611,13 @@ namespace CovidMassTesting.Controllers
                 if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
                 logger.LogInformation($"User {User.GetEmail()} is exporting tested visitors {day}");
 
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                writer.Write("Test");
                 var data = await visitorRepository.ListTestedVisitors(day, from, count);
-
+                data = data.Where(p => places.Contains(p.ChosenPlaceId));
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -643,9 +650,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
+                bool isAdmin = false;
                 if (User.IsAdmin(userRepository))
                 {
                     // ok
+                    isAdmin = true;
                 }
                 else
                 {
@@ -656,8 +665,14 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                writer.Write("Test");
+
                 var data = await visitorRepository.ListAnonymizedVisitors(day, from, count);
+
+                if (!isAdmin)
+                {
+                    var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                    data = data.Where(p => places.Contains(p.ChosenPlaceId));
+                }
 
                 csv.WriteRecords(data);
                 writer.Flush();
@@ -694,8 +709,8 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ProofOfWorkExport(day, from, count);
-
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                var data = await visitorRepository.ProofOfWorkExport(day, from, count, places);
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();

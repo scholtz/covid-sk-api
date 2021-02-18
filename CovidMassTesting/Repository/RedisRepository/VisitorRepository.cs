@@ -2109,9 +2109,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
+        /// <param name="filterPlaces"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999, HashSet<string> filterPlaces = null)
         {
+            if (filterPlaces is null)
+            {
+                throw new ArgumentNullException(nameof(filterPlaces));
+            }
+
             logger.LogInformation($"ProofOfWorkExport {from} {count}");
             var ret = new List<VisitorSimplified>();
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
@@ -2120,6 +2126,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     var visitor = await GetVisitor(visitorIdInt);
                     if (visitor == null) continue;
+                    if (!filterPlaces.Contains(visitor.ChosenPlaceId)) continue;
                     if (visitor.TestingTime.HasValue && visitor.TestingTime.Value > DateTimeOffset.MinValue)
                     {
                         if (day.HasValue)

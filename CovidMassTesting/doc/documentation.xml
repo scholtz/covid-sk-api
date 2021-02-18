@@ -517,7 +517,7 @@
             This controller manages test results
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.ResultController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
+        <member name="M:CovidMassTesting.Controllers.ResultController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.ResultController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.ResultController},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,GoogleReCaptcha.V3.Interface.ICaptchaValidator)">
             <summary>
             Constructor
             </summary>
@@ -526,6 +526,7 @@
             <param name="logger"></param>
             <param name="visitorRepository"></param>
             <param name="userRepository"></param>
+            <param name="placeRepository"></param>
             <param name="placeProviderRepository"></param>
             <param name="captchaValidator"></param>
         </member>
@@ -5077,12 +5078,14 @@
             <param name="count"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.Collections.Generic.HashSet{System.String})">
             <summary>
             ProofOfWorkExport
             </summary>
+            <param name="day"></param>
             <param name="from"></param>
             <param name="count"></param>
+            <param name="filterPlaces"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListExportableDays">
@@ -6939,13 +6942,14 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.Collections.Generic.HashSet{System.String})">
             <summary>
             Export for institution that pays for the tests
             </summary>
             <param name="day"></param>
             <param name="from"></param>
             <param name="count"></param>
+            <param name="filterPlaces"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ExportRegistrations(System.Int32,System.Int32)">
