@@ -654,7 +654,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(2, filteredPlaces.Values.FirstOrDefault(p => p.Id == place1.Id).Registrations);
             if (DateTime.Now.Hour < 20 && DateTime.Now.Hour > 0)
             {
-                Assert.AreEqual(118, filteredPlaces.Values.First().AvailableSlotsToday);
+                Assert.AreEqual(158, filteredPlaces.Values.First().AvailableSlotsToday);
             }
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicPersonToken1}");
