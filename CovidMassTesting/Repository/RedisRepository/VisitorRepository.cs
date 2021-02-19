@@ -39,6 +39,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_VISITORS_OBJECTS = "VISITOR";
         private readonly string REDIS_KEY_RESULTVERIFICATION_OBJECTS = "RESULTS";
         private readonly string REDIS_KEY_RESULTS_NEW_OBJECTS = "RESULTSLIST";
+        private readonly string REDIS_KEY_TEST2RESULTS_NEW_OBJECTS = "TEST2RESULTID";
         private readonly string REDIS_KEY_TEST2VISITOR = "TEST2VISITOR";
         private readonly string REDIS_KEY_PERSONAL_NUMBER2VISITOR = "PNUM2VISITOR";
         private readonly string REDIS_KEY_DAY2VISITOR = "DAY2VISITOR";
@@ -258,6 +259,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         public virtual Task<Result> GetResultObject(string id)
         {
             return redisCacheClient.Db0.HashGetAsync<Result>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", id);
+        }
+        public virtual async Task<Result> GetResultObjectByTestId(string testId)
+        {
+            var id = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_TEST2RESULTS_NEW_OBJECTS}", testId);
+            return await redisCacheClient.Db0.HashGetAsync<Result>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", id);
         }
         /// <summary>
         /// Fills in missing data if possible
@@ -499,6 +505,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new Exception("Error creating record in the database");
             }
+
+            await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2RESULTS_NEW_OBJECTS}", result.TestingSetId, result.Id, false);
             return result;
         }
         /// <summary>
@@ -1467,6 +1475,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}");
         }
+        public virtual Task<IEnumerable<string>> ListAllTestsKeys()
+        {
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2RESULTS_NEW_OBJECTS}");
+        }
         /// <summary>
         /// Lists all result keys
         /// </summary>
@@ -1602,22 +1614,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                     return true;
                 }
                 obj = await GetResultObject(msg);
+                var latestResult = await GetResultObjectByTestId(obj.TestingSetId);
 
                 var visitorCode = await GETVisitorCodeFromTesting(obj.TestingSetId);
-
-                if (obj.State == Result.Values.NotFound)
-                {
-                    // check again
-                    if (!visitorCode.HasValue)
-                    {
-                        return true; // put the message to the trash
-                    }
-                }
-
                 if (visitorCode.HasValue)
                 {
-                    logger.LogInformation($"SendResults: processing {obj.State}");
-                    await UpdateTestingState(visitorCode.Value, obj.State);
+                    logger.LogInformation($"SendResults: processing {latestResult.State}");
+                    await UpdateTestingState(visitorCode.Value, latestResult.State);
                 }
                 else
                 {
@@ -2059,6 +2062,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}"))
             {
                 await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", item);
+            }
+            foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2RESULTS_NEW_OBJECTS}"))
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2RESULTS_NEW_OBJECTS}", item);
             }
             foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_TEST2VISITOR}"))
             {

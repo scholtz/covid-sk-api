@@ -24,6 +24,7 @@ namespace CovidMassTesting.Repository.MockRepository
         private readonly ConcurrentDictionary<string, Result> dataResults = new ConcurrentDictionary<string, Result>();
         private readonly ConcurrentDictionary<string, string> verification = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<string, int> testing2code = new ConcurrentDictionary<string, int>();
+        private readonly ConcurrentDictionary<string, string> testing2lastresult = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<string, int> pname2code = new ConcurrentDictionary<string, int>();
 
         private readonly ConcurrentDictionary<string, string> registrations = new ConcurrentDictionary<string, string>();
@@ -342,6 +343,7 @@ namespace CovidMassTesting.Repository.MockRepository
             }
 
             verification[verificationData.Id] = encoded;
+
             return verificationData;
         }
 
@@ -388,6 +390,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 }
             }
             dataResults[result.Id] = result;
+            testing2lastresult[result.TestingSetId] = result.Id;
             return result;
         }
 
@@ -516,5 +519,15 @@ namespace CovidMassTesting.Repository.MockRepository
 
             return id2registration[hashedId];
         }
+        public async override Task<Result> GetResultObjectByTestId(string testId)
+        {
+            var id = testing2lastresult[testId];
+            return await GetResultObject(id);
+        }
+        public async override Task<IEnumerable<string>> ListAllTestsKeys()
+        {
+            return testing2lastresult.Keys;
+        }
+
     }
 }
