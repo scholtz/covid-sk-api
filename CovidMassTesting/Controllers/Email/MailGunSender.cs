@@ -95,6 +95,16 @@ namespace CovidMassTesting.Controllers.Email
                 request.AddParameter("subject", subject);
                 request.AddParameter("template", data.TemplateId);
 
+                if (!string.IsNullOrEmpty(settings.Value.ReplyToEmail))
+                {
+                    var name = settings.Value.ReplyToEmail;
+                    if (!string.IsNullOrEmpty(settings.Value.ReplyToName))
+                    {
+                        name = $"{settings.Value.ReplyToName} <{settings.Value.ReplyToEmail}>";
+                    }
+                    request.AddParameter("h:Reply-To", name);
+                }
+
                 request.AddParameter("v:IsCS", data.IsCS);
                 request.AddParameter("v:IsSK", data.IsSK);
                 request.AddParameter("v:IsDE", data.IsDE);
