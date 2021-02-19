@@ -1585,16 +1585,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var confWait = configuration["minWaitTimeForFinalResultsMinutes"] ?? "5";
             var waitInt = int.Parse(confWait);
-            if (obj.Time.AddMinutes(waitInt) > DateTimeOffset.Now)
+            var delay = obj.Time.AddMinutes(waitInt) - DateTimeOffset.Now;
+            if (delay > TimeSpan.Zero)
             {
                 await AddToResultQueue(msg); // put at the end of the queue .. in case we close this app we cannot loose the data
-
-                var delay = DateTimeOffset.Now - obj.Time.AddMinutes(waitInt);
-                if (delay > TimeSpan.Zero)
-                {
-                    logger.LogInformation($"Waiting {delay} for next task");
-                    await Task.Delay(delay);
-                }
+                logger.LogInformation($"Waiting {delay} for next task");
+                await Task.Delay(delay);
             }
             var random = new Random();
             var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 1000));
