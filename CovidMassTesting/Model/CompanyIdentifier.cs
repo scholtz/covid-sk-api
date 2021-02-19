@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace CovidMassTesting.Model
+﻿namespace CovidMassTesting.Model
 {
     /// <summary>
     /// One person can be employed in multiple companies

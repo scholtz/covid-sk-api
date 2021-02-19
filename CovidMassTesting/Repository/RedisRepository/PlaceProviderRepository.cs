@@ -71,10 +71,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                 try
                 {
                     var lastCandidate = await ProInvoiceGetLastId();
-                    if (lastCandidate.HasValue) last = lastCandidate.Value;
+                    if (lastCandidate.HasValue)
+                    {
+                        last = lastCandidate.Value;
+                    }
                 }
                 catch { }
-                if (invoice.InvoiceId != last + 1) throw new Exception("Invalid invoice number");
+                if (invoice.InvoiceId != last + 1)
+                {
+                    throw new Exception("Invalid invoice number");
+                }
 
                 await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PRO_INVOICES_OBJECTS}", invoice.InvoiceId.ToString(), invoice);
                 return invoice;
@@ -132,10 +138,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                 try
                 {
                     var lastCandidate = await RealInvoiceGetLastId();
-                    if (lastCandidate.HasValue) last = lastCandidate.Value;
+                    if (lastCandidate.HasValue)
+                    {
+                        last = lastCandidate.Value;
+                    }
                 }
                 catch { }
-                if (invoice.InvoiceId != last + 1) throw new Exception("Invalid invoice number");
+                if (invoice.InvoiceId != last + 1)
+                {
+                    throw new Exception("Invalid invoice number");
+                }
 
                 await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_REAL_INVOICES_OBJECTS}", invoice.InvoiceId.ToString(), invoice);
                 return invoice;
@@ -349,7 +361,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<PlaceProvider> Register(PlaceProvider placeProvider)
         {
-            if (string.IsNullOrEmpty(placeProvider?.CompanyId)) throw new Exception("Company trade registry ID has not been entered");
+            if (string.IsNullOrEmpty(placeProvider?.CompanyId))
+            {
+                throw new Exception("Company trade registry ID has not been entered");
+            }
+
             placeProvider.PlaceProviderId = placeProvider.CompanyId.Trim();
             PlaceProvider place = null;
             try
@@ -370,12 +386,19 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<ProformaInvoice> IssueProformaInvoiceRegistrations(string placeProviderId, int registrations, string currency)
         {
             var placeProvider = await GetPlaceProvider(placeProviderId);
-            if (placeProvider == null) throw new Exception("Place provider not found");
+            if (placeProvider == null)
+            {
+                throw new Exception("Place provider not found");
+            }
+
             var last = ProInvoiceFormat;
             try
             {
                 var lastCandidate = await ProInvoiceGetLastId();
-                if (lastCandidate.HasValue) last = lastCandidate.Value;
+                if (lastCandidate.HasValue)
+                {
+                    last = lastCandidate.Value;
+                }
             }
             catch { }
 
@@ -419,12 +442,19 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<ProformaInvoice> IssueProformaInvoice(string placeProviderId, string slaLevel, int registrations, string currency, DateTimeOffset slaFrom, DateTimeOffset slaUntil)
         {
             var placeProvider = await GetPlaceProvider(placeProviderId);
-            if (placeProvider == null) throw new Exception("Place provider not found");
+            if (placeProvider == null)
+            {
+                throw new Exception("Place provider not found");
+            }
+
             var last = ProInvoiceFormat;
             try
             {
                 var lastCandidate = await ProInvoiceGetLastId();
-                if (lastCandidate.HasValue) last = lastCandidate.Value;
+                if (lastCandidate.HasValue)
+                {
+                    last = lastCandidate.Value;
+                }
             }
             catch { }
 
@@ -469,12 +499,19 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<ProformaInvoice> IssueRealInvoiceRegistrations(string placeProviderId, int registrations, string currency)
         {
             var placeProvider = await GetPlaceProvider(placeProviderId);
-            if (placeProvider == null) throw new Exception("Place provider not found");
+            if (placeProvider == null)
+            {
+                throw new Exception("Place provider not found");
+            }
+
             var last = ProInvoiceFormat;
             try
             {
                 var lastCandidate = await RealInvoiceGetLastId();
-                if (lastCandidate.HasValue) last = lastCandidate.Value;
+                if (lastCandidate.HasValue)
+                {
+                    last = lastCandidate.Value;
+                }
             }
             catch { }
 
@@ -519,12 +556,19 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Invoice> IssueRealInvoice(string placeProviderId, string slaLevel, int registrations, string currency, DateTimeOffset slaFrom, DateTimeOffset slaUntil)
         {
             var placeProvider = await GetPlaceProvider(placeProviderId);
-            if (placeProvider == null) throw new Exception("Place provider not found");
+            if (placeProvider == null)
+            {
+                throw new Exception("Place provider not found");
+            }
+
             var last = RealInvoiceFormat;
             try
             {
                 var lastCandidate = await RealInvoiceGetLastId();
-                if (lastCandidate.HasValue) last = lastCandidate.Value;
+                if (lastCandidate.HasValue)
+                {
+                    last = lastCandidate.Value;
+                }
             }
             catch { }
 
@@ -566,7 +610,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public decimal GetVATMultiplier(string country)
         {
-            if (country == TaxDomicil) return TaxRate;
+            if (country == TaxDomicil)
+            {
+                return TaxRate;
+            }
+
             return 1;
         }
 
@@ -594,20 +642,31 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(role));
             }
 
-            if (role.Length == 0) return true;
+            if (role.Length == 0)
+            {
+                return true;
+            }
+
             var place = await GetPlaceProvider(placeProviderId);
             if (place != null)
             {
                 if (role.Contains(Groups.PPAdmin))
                 {
-                    if (place.MainEmail == email) return true;
+                    if (place.MainEmail == email)
+                    {
+                        return true;
+                    }
                 }
 
                 if (place.Allocations != null)
                 {
                     foreach (var allocation in place.Allocations)
                     {
-                        if (allocation.User != email) continue;
+                        if (allocation.User != email)
+                        {
+                            continue;
+                        }
+
                         foreach (var group in role)
                         {
                             if (allocation.Role == group)
@@ -625,7 +684,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     if (place.Group2Emails.ContainsKey(group))
                     {
-                        if (place.Group2Emails[group].Contains(email)) return true;
+                        if (place.Group2Emails[group].Contains(email))
+                        {
+                            return true;
+                        }
                     }
                 }
             }
@@ -643,14 +705,25 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             var pp = await GetPlaceProvider(placeProviderId);
             var ret = new HashSet<string>();
-            if (pp == null) return ret;
-            if (pp.MainEmail == email) ret.Add(Groups.PPAdmin);
+            if (pp == null)
+            {
+                return ret;
+            }
+
+            if (pp.MainEmail == email)
+            {
+                ret.Add(Groups.PPAdmin);
+            }
+
             foreach (var group in pp.Allocations
                 ?.Where(a => a.User == email)
                 ?.Select(a => a.Role)
                 .Distinct())
             {
-                if (!ret.Contains(group)) ret.Add(group);
+                if (!ret.Contains(group))
+                {
+                    ret.Add(group);
+                }
             }
             return ret;
         }
@@ -673,11 +746,27 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception("Wrong role defined in the allocation");
             }
             var place = await placeRepository.GetPlace(placeId);
-            if (place == null) throw new Exception("Place not found");
-            if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Unable to find place within scope of place provider");
+            if (place == null)
+            {
+                throw new Exception("Place not found");
+            }
+
+            if (string.IsNullOrEmpty(place.PlaceProviderId))
+            {
+                throw new Exception("Unable to find place within scope of place provider");
+            }
+
             var pp = await GetPlaceProvider(place.PlaceProviderId);
-            if (pp == null) throw new Exception("Unable to find place provider");
-            if (pp.Allocations == null) pp.Allocations = new List<PersonAllocation>();
+            if (pp == null)
+            {
+                throw new Exception("Unable to find place provider");
+            }
+
+            if (pp.Allocations == null)
+            {
+                pp.Allocations = new List<PersonAllocation>();
+            }
+
             allocation.Id = Guid.NewGuid().ToString();
             allocation.PlaceId = placeId;
             pp.Allocations.Add(allocation);
@@ -694,13 +783,33 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<bool> RemovePersonAllocation(string allocationId, string placeId)
         {
             var place = await placeRepository.GetPlace(placeId);
-            if (place == null) throw new Exception("Place not found");
-            if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Unable to find place within scope of place provider");
+            if (place == null)
+            {
+                throw new Exception("Place not found");
+            }
+
+            if (string.IsNullOrEmpty(place.PlaceProviderId))
+            {
+                throw new Exception("Unable to find place within scope of place provider");
+            }
+
             var pp = await GetPlaceProvider(place.PlaceProviderId);
-            if (pp == null) throw new Exception("Unable to find place provider");
-            if (pp.Allocations == null) pp.Allocations = new List<PersonAllocation>();
+            if (pp == null)
+            {
+                throw new Exception("Unable to find place provider");
+            }
+
+            if (pp.Allocations == null)
+            {
+                pp.Allocations = new List<PersonAllocation>();
+            }
+
             var allocationToRemove = pp.Allocations.FirstOrDefault(a => a.Id == allocationId);
-            if (allocationToRemove == null) throw new Exception("Allocation not found");
+            if (allocationToRemove == null)
+            {
+                throw new Exception("Allocation not found");
+            }
+
             pp.Allocations.Remove(allocationToRemove);
             await SetPlaceProvider(pp);
             return true;
@@ -714,8 +823,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<IEnumerable<PersonAllocation>> ListAllocations(string placeId)
         {
             var place = await placeRepository.GetPlace(placeId);
-            if (place == null) throw new Exception("Place not found");
-            if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Unable to find place within scope of place provider");
+            if (place == null)
+            {
+                throw new Exception("Place not found");
+            }
+
+            if (string.IsNullOrEmpty(place.PlaceProviderId))
+            {
+                throw new Exception("Unable to find place within scope of place provider");
+            }
+
             var pp = await GetPlaceProvider(place.PlaceProviderId);
             return pp.Allocations?.Where(p => p.PlaceId == placeId);
         }
@@ -727,7 +844,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<IEnumerable<Product>> ListProducts(string placeProviderId)
         {
             var pp = await GetPlaceProvider(placeProviderId);
-            if (pp == null) throw new Exception("Unable to find place provider");
+            if (pp == null)
+            {
+                throw new Exception("Unable to find place provider");
+            }
 
             return pp.Products;
         }
@@ -741,10 +861,20 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Product> AddProduct(string placeProviderId, Product product)
         {
             var pp = await GetPlaceProvider(placeProviderId);
-            if (pp == null) throw new Exception("Unable to find place provider");
+            if (pp == null)
+            {
+                throw new Exception("Unable to find place provider");
+            }
 
-            if (pp.Products == null) pp.Products = new List<Product>();
-            if (pp.Products.Any(p => p.Id == product.Id)) throw new Exception("Product with same ID already exists");
+            if (pp.Products == null)
+            {
+                pp.Products = new List<Product>();
+            }
+
+            if (pp.Products.Any(p => p.Id == product.Id))
+            {
+                throw new Exception("Product with same ID already exists");
+            }
 
             pp.Products.Add(product);
             await SetPlaceProvider(pp);
@@ -762,9 +892,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Product> SetProduct(string placeProviderId, Product product)
         {
             var pp = await GetPlaceProvider(placeProviderId);
-            if (pp == null) throw new Exception("Unable to find place provider");
+            if (pp == null)
+            {
+                throw new Exception("Unable to find place provider");
+            }
 
-            if (pp.Products == null) pp.Products = new List<Product>();
+            if (pp.Products == null)
+            {
+                pp.Products = new List<Product>();
+            }
+
             var old = pp.Products.FirstOrDefault(p => p.Id == product.Id);
             if (old != null)
             {
@@ -788,11 +925,22 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<bool> DeleteProduct(string placeProviderId, Product product)
         {
             var pp = await GetPlaceProvider(placeProviderId);
-            if (pp == null) throw new Exception("Unable to find place provider");
+            if (pp == null)
+            {
+                throw new Exception("Unable to find place provider");
+            }
 
-            if (pp.Products == null) pp.Products = new List<Product>();
+            if (pp.Products == null)
+            {
+                pp.Products = new List<Product>();
+            }
+
             var old = pp.Products.FirstOrDefault(p => p.Id == product.Id);
-            if (old == null) throw new Exception("Product does not exists");
+            if (old == null)
+            {
+                throw new Exception("Product does not exists");
+            }
+
             pp.Products.Remove(old);
             await SetPlaceProvider(pp);
             return true;
@@ -806,7 +954,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Product> GetProduct(string placeProviderId, string productId)
         {
             var pp = await GetPlaceProvider(placeProviderId);
-            if (pp == null) throw new Exception("Unable to find place provider");
+            if (pp == null)
+            {
+                throw new Exception("Unable to find place provider");
+            }
+
             return pp.Products.FirstOrDefault(p => p.Id == productId);
         }
         /// <summary>

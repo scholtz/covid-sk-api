@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model
 {
@@ -13,7 +10,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// id
         /// </summary>
-        public long SlotId { get { return Time.Ticks; } }
+        public long SlotId => Time.Ticks;
         /// <summary>
         /// place
         /// </summary>
@@ -25,7 +22,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Time in UTC+01:00
         /// </summary>
-        public DateTimeOffset TimeInCET { get { return Time.ToOffset(new TimeSpan(1, 0, 0)); } }
+        public DateTimeOffset TimeInCET => Time.ToOffset(new TimeSpan(1, 0, 0));
         /// <summary>
         /// Description
         /// </summary>

@@ -38,7 +38,11 @@ namespace CovidMassTesting.Controllers.SMS
 
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            if (string.IsNullOrEmpty(settings.Value.QueueURL)) throw new Exception(localizer["Invalid SMS endpoint"].Value);
+            if (string.IsNullOrEmpty(settings.Value.QueueURL))
+            {
+                throw new Exception(localizer["Invalid SMS endpoint"].Value);
+            }
+
             var sqsConfig = new AmazonSQSConfig
             {
                 RegionEndpoint = RegionEndpoint.GetBySystemName(settings.Value.Region)

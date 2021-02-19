@@ -2,7 +2,6 @@
 using CovidMassTesting.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -48,7 +47,7 @@ namespace NUnitTestCovidApi
             var rand = data.CoData;
             /// Authenticate
             var pass = admin.Password;
-            for (int i = 0; i < 99; i++)
+            for (var i = 0; i < 99; i++)
             {
                 pass = Encoding.ASCII.GetBytes($"{pass}{cohash}").GetSHA256Hash();
             }
@@ -62,7 +61,7 @@ namespace NUnitTestCovidApi
         protected List<Visitor> RegisterTestVisitors(HttpClient client, string placeId, long slotId, string productId)
         {
             var Registered = new List<Visitor>();
-            Visitor visitor1 = new Visitor()
+            var visitor1 = new Visitor()
             {
                 Address = "addr",
                 Email = "email@scholtz.sk",
@@ -84,9 +83,13 @@ namespace NUnitTestCovidApi
                 ZIP = "10000",
             };
             var result = Register(client, visitor1);
-            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor " + result.Content.ReadAsStringAsync().Result);
+            if (result.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("Unable to make visitor " + result.Content.ReadAsStringAsync().Result);
+            }
+
             Registered.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(result.Content.ReadAsStringAsync().Result));
-            Visitor visitor2 = new Visitor()
+            var visitor2 = new Visitor()
             {
                 Address = "addr",
                 Email = "email@scholtz.sk",
@@ -108,7 +111,11 @@ namespace NUnitTestCovidApi
                 ZIP = "10001",
             };
             result = Register(client, visitor2);
-            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
+            if (result.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("Unable to make visitor");
+            }
+
             Registered.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(result.Content.ReadAsStringAsync().Result));
 
             return Registered;
@@ -116,7 +123,7 @@ namespace NUnitTestCovidApi
         protected List<Visitor> RegisterTestVisitors2(HttpClient client, string placeId, long slotId, string productId)
         {
             var Registered = new List<Visitor>();
-            Visitor visitor1 = new Visitor()
+            var visitor1 = new Visitor()
             {
                 Address = "addr",
                 Email = "email@scholtz.sk",
@@ -138,9 +145,13 @@ namespace NUnitTestCovidApi
                 ZIP = "10000",
             };
             var result = Register(client, visitor1);
-            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor " + result.Content.ReadAsStringAsync().Result);
+            if (result.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("Unable to make visitor " + result.Content.ReadAsStringAsync().Result);
+            }
+
             Registered.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(result.Content.ReadAsStringAsync().Result));
-            Visitor visitor2 = new Visitor()
+            var visitor2 = new Visitor()
             {
                 Address = "addr",
                 Email = "email@scholtz.sk",
@@ -162,7 +173,11 @@ namespace NUnitTestCovidApi
                 ZIP = "10001",
             };
             result = Register(client, visitor2);
-            if (result.StatusCode != HttpStatusCode.OK) throw new Exception("Unable to make visitor");
+            if (result.StatusCode != HttpStatusCode.OK)
+            {
+                throw new Exception("Unable to make visitor");
+            }
+
             Registered.Add(Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(result.Content.ReadAsStringAsync().Result));
 
             return Registered;
@@ -854,11 +869,11 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(user1.LastName, responseVisitor.LastName);
             Assert.AreEqual(user1.Address, responseVisitor.Address);
 
-            string test1 = "111-111-111";
+            var test1 = "111-111-111";
             response = ConnectVisitorToTest(client, registered1[0].Id.ToString(), test1);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
 
-            string test2 = "222-222-222";
+            var test2 = "222-222-222";
             response = ConnectVisitorToTest(client, registered1[1].Id.ToString(), test2);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
 

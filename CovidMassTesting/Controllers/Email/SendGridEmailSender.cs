@@ -1,13 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using CovidMassTesting.Model.Email;
+﻿using CovidMassTesting.Model.Email;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace CovidMassTesting.Controllers.Email
 {
@@ -43,7 +42,10 @@ namespace CovidMassTesting.Controllers.Email
             try
             {
                 this.logger = logger;
-                if (string.IsNullOrEmpty(settings.Value.MailerApiKey)) throw new Exception("Invalid SendGrid configuration");
+                if (string.IsNullOrEmpty(settings.Value.MailerApiKey))
+                {
+                    throw new Exception("Invalid SendGrid configuration");
+                }
 
                 client = new SendGridClient(settings.Value.MailerApiKey);
                 fromName = settings.Value.MailerFromName;
@@ -55,7 +57,11 @@ namespace CovidMassTesting.Controllers.Email
                     queryParams: "{\"generations\": \"dynamic\"}").Result.Body.ReadAsStringAsync().Result;
 
                 var list = Newtonsoft.Json.JsonConvert.DeserializeObject<SendgridTemplates>(response);
-                if (list.Templates.Length == 0) throw new Exception("Email templates are not set up in sendgrid");
+                if (list.Templates.Length == 0)
+                {
+                    throw new Exception("Email templates are not set up in sendgrid");
+                }
+
                 Name2Id = list.Templates.ToDictionary(k => k.Name, k => k.Id);
                 logger.LogInformation($"SendGridController configured {list.Templates.Length}");
             }
@@ -83,7 +89,11 @@ namespace CovidMassTesting.Controllers.Email
         {
             try
             {
-                if (data == null) throw new Exception("Please define data for email");
+                if (data == null)
+                {
+                    throw new Exception("Please define data for email");
+                }
+
                 if (string.IsNullOrEmpty(toEmail))
                 {
                     logger.LogDebug($"Message {data.TemplateId} not delivered because email is not defined");
@@ -130,7 +140,10 @@ namespace CovidMassTesting.Controllers.Email
                 {
                     logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
                 }
-                if (response.StatusCode == System.Net.HttpStatusCode.Accepted) return true;
+                if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
+                {
+                    return true;
+                }
 
                 logger.LogError(await response.Body.ReadAsStringAsync());
             }

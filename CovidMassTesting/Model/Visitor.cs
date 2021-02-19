@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model
 {
@@ -99,7 +96,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// ChosenSlotTime
         /// </summary>
-        public DateTimeOffset ChosenSlotTime { get { return new DateTimeOffset(ChosenSlot, TimeSpan.Zero); } }
+        public DateTimeOffset ChosenSlotTime => new DateTimeOffset(ChosenSlot, TimeSpan.Zero);
         /// <summary>
         /// Chosen place
         /// </summary>

@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Threading.Tasks;
 
 namespace CovidMassTesting.Helpers
 {
@@ -20,7 +17,7 @@ namespace CovidMassTesting.Helpers
         public static string GetSHA256Hash(this byte[] data)
         {
             byte[] hashOut;
-            using (SHA256 hasher = SHA256.Create())
+            using (var hasher = SHA256.Create())
             {
                 hashOut = hasher.ComputeHash(data);
             }

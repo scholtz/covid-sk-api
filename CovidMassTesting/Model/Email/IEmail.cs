@@ -51,26 +51,26 @@
             {
                 case "sk":
                 case "sk-SK":
-                    this.IsSK = true;
+                    IsSK = true;
                     break;
 
                 case "cs":
                 case "cs-CZ":
-                    this.IsCS = true;
+                    IsCS = true;
                     break;
 
                 case "hu":
                 case "hu-HU":
-                    this.IsHU = true;
+                    IsHU = true;
                     break;
 
                 case "de":
                 case "de-AT":
                 case "de-DE":
-                    this.IsDE = true;
+                    IsDE = true;
                     break;
                 default:
-                    this.IsEN = true;
+                    IsEN = true;
                     break;
             }
         }

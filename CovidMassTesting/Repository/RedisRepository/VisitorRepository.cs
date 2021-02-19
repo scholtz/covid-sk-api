@@ -215,7 +215,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"Visitor loaded from database: {codeInt.GetHashCode()}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", codeInt.ToString());
-            if (string.IsNullOrEmpty(encoded)) return null;
+            if (string.IsNullOrEmpty(encoded))
+            {
+                return null;
+            }
+
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             var ret = Newtonsoft.Json.JsonConvert.DeserializeObject<Visitor>(decoded);
@@ -235,10 +239,18 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual async Task<Registration> GetRegistration(string id)
         {
-            if (string.IsNullOrEmpty(id)) return null;
+            if (string.IsNullOrEmpty(id))
+            {
+                return null;
+            }
+
             logger.LogInformation($"Registration loaded from database: {(configuration["key"] + id).GetSHA256Hash()}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}", id);
-            if (string.IsNullOrEmpty(encoded)) return null;
+            if (string.IsNullOrEmpty(encoded))
+            {
+                return null;
+            }
+
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(decoded);
@@ -256,7 +268,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         protected async Task<Visitor> FixVisitor(Visitor visitor, bool save)
         {
             var updated = false;
-            if (string.IsNullOrEmpty(visitor.PersonType)) visitor.PersonType = "idcard";
+            if (string.IsNullOrEmpty(visitor.PersonType))
+            {
+                visitor.PersonType = "idcard";
+            }
 
             if (string.IsNullOrEmpty(visitor.Address))
             {
@@ -618,7 +633,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="personalNumber"></param>
         /// <returns></returns>
-        public async virtual Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
+        public virtual async Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
         {
 
             var ret = await redisCacheClient.Db0.HashGetAsync<int?>(
@@ -646,7 +661,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string ipAddress)
         {
-            var visitorCode = await this.GETVisitorCodeFromTesting(testCodeClear);
+            var visitorCode = await GETVisitorCodeFromTesting(testCodeClear);
             if (visitorCode.HasValue)
             {
                 if (codeInt != visitorCode)
@@ -711,13 +726,17 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await GetVisitor(code);
-            if (visitor == null) throw new Exception(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found].Value, code));
+            if (visitor == null)
+            {
+                throw new Exception(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found].Value, code));
+            }
+
             if (visitor.Result == state && visitor.ResultNotifiedAt.HasValue)
             {
                 // repeated requests should not send emails
                 return true;
             }
-            bool forceSend = false;
+            var forceSend = false;
 
             if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
             {
@@ -1303,12 +1322,23 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             if (beforeTest)
             {
-                if (visitor.Result != TestResult.NotTaken) throw new Exception("Test môže byť zmazaný iba ak ste ešte neprišli na test");
+                if (visitor.Result != TestResult.NotTaken)
+                {
+                    throw new Exception("Test môže byť zmazaný iba ak ste ešte neprišli na test");
+                }
             }
             else
             {
-                if (visitor.Result != TestResult.NegativeCertificateTaken && visitor.Result != TestResult.NegativeWaitingForCertificate) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
-                if (!visitor.TestingTime.HasValue) throw new Exception("S Vašim testom sa vyskytla technická chyba, kontaktujte podporu prosím");
+                if (visitor.Result != TestResult.NegativeCertificateTaken && visitor.Result != TestResult.NegativeWaitingForCertificate)
+                {
+                    throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
+                }
+
+                if (!visitor.TestingTime.HasValue)
+                {
+                    throw new Exception("S Vašim testom sa vyskytla technická chyba, kontaktujte podporu prosím");
+                }
+
                 if (visitor.TestingTime.Value.AddDays(5) > DateTimeOffset.Now)
                 {
                     throw new Exception("Test ešte nemôžeme vymazať pretože údaje ešte neboli finálne spracované pre hygienu. Test sa môže zmazať 5 dní od vykonania testu.");
@@ -1438,7 +1468,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Visitor> GetVisitorByPersonalNumber(string personalNumber)
         {
             var code = await GETVisitorCodeFromPersonalNumber(personalNumber);
-            if (!code.HasValue) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Unknown_personal_number].Value);
+            if (!code.HasValue)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Unknown_personal_number].Value);
+            }
+
             return await GetVisitor(code.Value);
         }
         /// <summary>
@@ -1490,7 +1524,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId, DateTimeOffset.UtcNow.Ticks);
         }
 
-        public async virtual Task<bool> AddToResultQueue(string resultId)
+        public virtual async Task<bool> AddToResultQueue(string resultId)
         {
             return await redisCacheClient.Db0.ListAddToLeftAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", resultId) > 0;
             //return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", resultId, DateTimeOffset.UtcNow.Ticks);
@@ -1504,7 +1538,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return redisCacheClient.Db0.SortedSetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId);
         }
-        public async virtual Task<string> PopFromResultQueue()
+        public virtual async Task<string> PopFromResultQueue()
         {
             return await redisCacheClient.Db0.ListGetFromRightAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}");
 
@@ -1521,7 +1555,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<bool> ProcessSingle()
         {
             var msg = await PopFromResultQueue();
-            if (string.IsNullOrEmpty(msg)) return false;
+            if (string.IsNullOrEmpty(msg))
+            {
+                return false;
+            }
+
             var obj = await GetResultObject(msg);
             if (obj == null)
             {
@@ -1579,9 +1617,17 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<bool> RemoveFromDocQueueAndSetTestStateAsTaken(string testId, bool isAdmin)
         {
             var first = await GetFirstItemFromQueue();
-            if (first != testId) throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.You_can_remove_only_first_item_from_the_queue].Value);
+            if (first != testId)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.You_can_remove_only_first_item_from_the_queue].Value);
+            }
+
             var visitorCode = await GETVisitorCodeFromTesting(testId);
-            if (!visitorCode.HasValue) throw new Exception(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found].Value, visitorCode));
+            if (!visitorCode.HasValue)
+            {
+                throw new Exception(string.Format(localizer[Repository_RedisRepository_VisitorRepository.Visitor_with_code__0__not_found].Value, visitorCode));
+            }
+
             var visitor = await GetVisitor(visitorCode.Value);
             switch (visitor.Result)
             {
@@ -1613,7 +1659,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Visitor> GetNextTest()
         {
             var firstTest = await GetFirstItemFromQueue();
-            if (firstTest == null) return null;
+            if (firstTest == null)
+            {
+                return null;
+            }
+
             var visitor = await GETVisitorCodeFromTesting(firstTest);
             if (!visitor.HasValue)
             {
@@ -1641,12 +1691,20 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 // register to manager place and nearest slot
 
-                UserPublic manager = await userRepository.GetPublicUser(managerEmail);
+                var manager = await userRepository.GetPublicUser(managerEmail);
 
                 visitor.ChosenPlaceId = manager.Place;
-                if (string.IsNullOrEmpty(visitor.ChosenPlaceId)) throw new Exception("Vyberte si najskôr miesto kde sa nachádzate.");
+                if (string.IsNullOrEmpty(visitor.ChosenPlaceId))
+                {
+                    throw new Exception("Vyberte si najskôr miesto kde sa nachádzate.");
+                }
+
                 var currentSlot = await slotRepository.GetCurrentSlot(manager.Place);
-                if (currentSlot == null) throw new Exception("Unable to select testing slot.");
+                if (currentSlot == null)
+                {
+                    throw new Exception("Unable to select testing slot.");
+                }
+
                 visitor.ChosenSlot = currentSlot.SlotId;
             }
             visitor = await FixVisitor(visitor, false);
@@ -1714,7 +1772,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     foreach (var limit in place.OtherLimitations.Where(l => l.From.Ticks <= slotH.SlotId && l.Until.Ticks > slotH.SlotId))
                     {
-                        if (limit.HourLimit < LimitPer1HourSlot) LimitPer1HourSlot = limit.HourLimit;
+                        if (limit.HourLimit < LimitPer1HourSlot)
+                        {
+                            LimitPer1HourSlot = limit.HourLimit;
+                        }
                     }
                 }
                 if (slotH.Registrations >= LimitPer1HourSlot)
@@ -1921,11 +1982,23 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public static string FormatPhone(string number)
         {
-            if (number == null) number = "";
+            if (number == null)
+            {
+                number = "";
+            }
+
             number = number.Replace(" ", "");
             number = number.Replace("\t", "");
-            if (number.StartsWith("00", true, CultureInfo.InvariantCulture)) number = "+" + number[2..];
-            if (number.StartsWith("0", true, CultureInfo.InvariantCulture)) number = "+421" + number[1..];
+            if (number.StartsWith("00", true, CultureInfo.InvariantCulture))
+            {
+                number = "+" + number[2..];
+            }
+
+            if (number.StartsWith("0", true, CultureInfo.InvariantCulture))
+            {
+                number = "+421" + number[1..];
+            }
+
             return number;
         }
         /// <summary>
@@ -2000,7 +2073,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     if (!string.IsNullOrEmpty(visitor.TestingSet))
                     {
 
@@ -2039,7 +2116,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     if (!string.IsNullOrEmpty(visitor.TestingSet))
                     {
 
@@ -2075,7 +2156,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
 
                     ret.Add(new VisitorAnonymized(visitor, configuration["key"]));
                 }
@@ -2125,8 +2209,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
-                    if (!filterPlaces.Contains(visitor.ChosenPlaceId)) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
+                    if (!filterPlaces.Contains(visitor.ChosenPlaceId))
+                    {
+                        continue;
+                    }
+
                     if (visitor.TestingTime.HasValue && visitor.TestingTime.Value > DateTimeOffset.MinValue)
                     {
                         if (day.HasValue)
@@ -2139,7 +2231,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                         }
 
                         var rc = visitor.RC;
-                        if (visitor.PersonType == "foreign") rc = visitor.Passport;
+                        if (visitor.PersonType == "foreign")
+                        {
+                            rc = visitor.Passport;
+                        }
 
                         var result = "";
                         if (visitor.Result == TestResult.NegativeCertificateTaken ||
@@ -2217,7 +2312,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     if (visitor.Result == TestResult.TestIsBeingProcessing)
                     {
                         ret.Add(visitor);
@@ -2245,7 +2344,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     if (string.IsNullOrEmpty(visitor.TestingSet)
                         //&& visitor.ChosenSlot < DateTimeOffset.UtcNow.Ticks
                         )
@@ -2275,7 +2378,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     ret.Add(visitor);
                 }
             }
@@ -2308,7 +2415,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     if (visitor.ChosenPlaceId == placeId
                         && visitor.ChosenSlot >= fromRegTime.ToUniversalTime().Ticks
                         && visitor.ChosenSlot < untilRegTime.ToUniversalTime().Ticks
@@ -2332,7 +2443,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             var toSave = rand.Next(100000, 900000);
             await redisCacheClient.Db0.AddAsync("TEST", toSave);
             var ret = await redisCacheClient.Db0.GetAsync<int>("TEST");
-            if (toSave != ret) throw new Exception("Storage does not work");
+            if (toSave != ret)
+            {
+                throw new Exception("Storage does not work");
+            }
+
             return ret;
         }
         /// <summary>
@@ -2405,9 +2520,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
             data.Product = product;
 
-            QRCoder.QRCodeGenerator qrGenerator = new QRCoder.QRCodeGenerator();
-            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.H);
-            QRCoder.QRCode qrCode = new QRCoder.QRCode(qrCodeData);
+            var qrGenerator = new QRCoder.QRCodeGenerator();
+            var qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.H);
+            var qrCode = new QRCoder.QRCode(qrCodeData);
             using var outData = new MemoryStream();
             qrCode.GetGraphic(20).Save(outData, System.Drawing.Imaging.ImageFormat.Png);
             var pngBytes = outData.ToArray();
@@ -2437,9 +2552,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             CultureInfo.CurrentCulture = specifiedCulture;
             CultureInfo.CurrentUICulture = specifiedCulture;
 
-            var data = new Model.Mustache.TestRegistration();
-
-            data.Name = $"{visitor.FirstName} {visitor.LastName}";
+            var data = new Model.Mustache.TestRegistration
+            {
+                Name = $"{visitor.FirstName} {visitor.LastName}"
+            };
 
             var slot = slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot).Result;
 
@@ -2466,7 +2582,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.BirthDayMonth = visitor.BirthDayMonth;
             data.BirthDayYear = visitor.BirthDayYear;
 
-            BarcodeLib.Barcode b = new BarcodeLib.Barcode();
+            var b = new BarcodeLib.Barcode();
             var formatted = visitor.Id.ToString();
             if (formatted.Length == 9)
             {
@@ -2474,15 +2590,15 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             data.RegistrationCode = formatted;
 
-            Image img = b.Encode(BarcodeLib.TYPE.CODE39, formatted, Color.Black, Color.White, 300, 120);
+            var img = b.Encode(BarcodeLib.TYPE.CODE39, formatted, Color.Black, Color.White, 300, 120);
             using var outDataBar = new MemoryStream();
             img.Save(outDataBar, System.Drawing.Imaging.ImageFormat.Png);
             var barBytes = outDataBar.ToArray();
             data.BarCode = Convert.ToBase64String(barBytes).Replace("\n", "");
 
-            QRCoder.QRCodeGenerator qrGenerator = new QRCoder.QRCodeGenerator();
-            QRCoder.QRCodeData qrCodeData = qrGenerator.CreateQrCode(visitor.Id.ToString(), QRCoder.QRCodeGenerator.ECCLevel.H);
-            QRCoder.QRCode qrCode = new QRCoder.QRCode(qrCodeData);
+            var qrGenerator = new QRCoder.QRCodeGenerator();
+            var qrCodeData = qrGenerator.CreateQrCode(visitor.Id.ToString(), QRCoder.QRCodeGenerator.ECCLevel.H);
+            var qrCode = new QRCoder.QRCode(qrCodeData);
             using var outData = new MemoryStream();
             qrCode.GetGraphic(20).Save(outData, System.Drawing.Imaging.ImageFormat.Png);
             var qrBytes = outData.ToArray();
@@ -2542,7 +2658,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 writer = new iText.Kernel.Pdf.PdfWriter(pdfStreamEncrypted);
             }
-            iText.Kernel.Pdf.PdfDocument pdfDocument = new iText.Kernel.Pdf.PdfDocument(writer);
+            var pdfDocument = new iText.Kernel.Pdf.PdfDocument(writer);
             pdfDocument.SetDefaultPageSize(iText.Kernel.Geom.PageSize.A4);
             var settings = new iText.Html2pdf.ConverterProperties()
                 .SetFontProvider(new iText.Html2pdf.Resolver.Font.DefaultFontProvider(false, true, false)
@@ -2553,23 +2669,28 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 return pdfStreamEncrypted.ToArray();
             }
-            if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
+            if (string.IsNullOrEmpty(configuration["CertChain"]))
+            {
+                return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
+            }
             //var pages = pdfDocument.GetNumberOfPages();
             try
             {
-                Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
+                var pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
                 string alias = null;
                 foreach (var a in pk12.Aliases)
                 {
                     alias = ((string)a);
                     if (pk12.IsKeyEntry(alias))
+                    {
                         break;
+                    }
                 }
 
                 var pk = pk12.GetKey(alias).Key;
                 var ce = pk12.GetCertificateChain(alias);
                 var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
-                for (int k = 0; k < ce.Length; ++k)
+                for (var k = 0; k < ce.Length; ++k)
                 {
                     chain[k] = ce[k].Certificate;
                 }
@@ -2631,7 +2752,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                          //                                    .SetPdfVersion(iText.Kernel.Pdf.PdfVersion.PDF_1_4)
                          );
-            iText.Kernel.Pdf.PdfDocument pdfDocument = new iText.Kernel.Pdf.PdfDocument(writer);
+            var pdfDocument = new iText.Kernel.Pdf.PdfDocument(writer);
             pdfDocument.SetDefaultPageSize(iText.Kernel.Geom.PageSize.A4);
             var settings = new iText.Html2pdf.ConverterProperties()
                 .SetFontProvider(new iText.Html2pdf.Resolver.Font.DefaultFontProvider(false, true, false)
@@ -2639,23 +2760,29 @@ namespace CovidMassTesting.Repository.RedisRepository
             iText.Html2pdf.HtmlConverter.ConvertToPdf(html, pdfDocument, settings);
             writer.Close();
 
-            if (string.IsNullOrEmpty(configuration["CertChain"])) return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
+            if (string.IsNullOrEmpty(configuration["CertChain"]))
+            {
+                return pdfStreamEncrypted.ToArray(); // return not signed password protected pdf
+            }
+
             try
             {
                 //var pages = pdfDocument.GetNumberOfPages();
-                Org.BouncyCastle.Pkcs.Pkcs12Store pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
+                var pk12 = new Org.BouncyCastle.Pkcs.Pkcs12Store(new FileStream(configuration["CertChain"], FileMode.Open, FileAccess.Read), configuration["CertChainPass"].ToCharArray());
                 string alias = null;
                 foreach (var a in pk12.Aliases)
                 {
                     alias = ((string)a);
                     if (pk12.IsKeyEntry(alias))
+                    {
                         break;
+                    }
                 }
 
                 var pk = pk12.GetKey(alias).Key;
                 var ce = pk12.GetCertificateChain(alias);
                 var chain = new Org.BouncyCastle.X509.X509Certificate[ce.Length];
-                for (int k = 0; k < ce.Length; ++k)
+                for (var k = 0; k < ce.Length; ++k)
                 {
                     chain[k] = ce[k].Certificate;
                 }
@@ -2698,30 +2825,30 @@ namespace CovidMassTesting.Repository.RedisRepository
             byte[] pass,
             Org.BouncyCastle.X509.X509Certificate[] chain,
             Org.BouncyCastle.Crypto.ICipherParameters pk,
-            String digestAlgorithm,
+            string digestAlgorithm,
             iText.Signatures.PdfSigner.CryptoStandard subfilter,
-            String reason,
-            String location,
+            string reason,
+            string location,
             int pages
         )
         {
-            using MemoryStream outputMemoryStream = new MemoryStream();
-            using MemoryStream memoryStream = new MemoryStream(src);
-            using MemoryStream signerMemoryStream = new MemoryStream();
+            using var outputMemoryStream = new MemoryStream();
+            using var memoryStream = new MemoryStream(src);
+            using var signerMemoryStream = new MemoryStream();
 
             var readerProperties = new iText.Kernel.Pdf.ReaderProperties();
             readerProperties.SetPassword(pass);
 
-            using iText.Kernel.Pdf.PdfReader pdfReader = new iText.Kernel.Pdf.PdfReader(memoryStream, readerProperties);
-            iText.Signatures.PdfSigner signer =
+            using var pdfReader = new iText.Kernel.Pdf.PdfReader(memoryStream, readerProperties);
+            var signer =
                 new iText.Signatures.PdfSigner(
                     pdfReader,
                     signerMemoryStream,
                     new iText.Kernel.Pdf.StampingProperties());
 
             // Create the signature appearance
-            iText.Kernel.Geom.Rectangle rect = new iText.Kernel.Geom.Rectangle(350, 100, 200, 100);
-            iText.Signatures.PdfSignatureAppearance appearance = signer.GetSignatureAppearance();
+            var rect = new iText.Kernel.Geom.Rectangle(350, 100, 200, 100);
+            var appearance = signer.GetSignatureAppearance();
             appearance.SetReason(reason)
                 .SetLocation(location)
                 // Specify if the appearance before field is signed will be used
@@ -2754,7 +2881,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTVERIFICATION_OBJECTS}", id.ToString());
-            if (string.IsNullOrEmpty(encoded)) return null;
+            if (string.IsNullOrEmpty(encoded))
+            {
+                return null;
+            }
+
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<VerificationData>(decoded);
@@ -2801,7 +2932,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     if (!visitor.TestingTime.HasValue || visitor.TestingTime == DateTimeOffset.MinValue)
                     {
                         continue;
@@ -2886,7 +3021,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     var name = $"{visitor.FirstName} {visitor.LastName}";
 
                     if (!string.IsNullOrEmpty(visitor.Phone))
@@ -2915,7 +3054,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<int> FixBirthYear()
         {
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixBirthYear");
 
             foreach (var visitorId in (await ListAllKeys()))
@@ -2923,7 +3062,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt, false);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     var year = visitor.BirthDayYear;
                     var newVisitor = await FixVisitor(visitor, true);
                     if (
@@ -2955,7 +3098,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<int> FixStats()
         {
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixStats");
             var stats = new Dictionary<string, Stat>();
 
@@ -2964,7 +3107,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt, false);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
 
                     if (!stats.ContainsKey(visitor.ChosenPlaceId))
                     {
@@ -2985,7 +3131,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             var places = await placeRepository.ListAll();
             foreach (var p in places)
             {
-                if (!stats.ContainsKey(p.Id)) continue;
+                if (!stats.ContainsKey(p.Id))
+                {
+                    continue;
+                }
+
                 var fix = false;
                 if (p.Registrations != stats[p.Id].Reg)
                 {
@@ -3024,7 +3174,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
         public async Task<int> FixVisitorRC()
         {
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixVisitorRC");
             var stats = new Dictionary<string, Stat>();
 
@@ -3033,7 +3183,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt, false);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         await MapPersonalNumberToVisitorCode(visitor.RC, visitor.Id);
@@ -3052,7 +3206,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         }
         public async Task<int> FixTestingTime()
         {
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixTestingTime");
             var limit = DateTimeOffset.Parse("2021-01-30T08:00:00+01:00");
             foreach (var visitorId in (await ListAllKeys()))
@@ -3060,7 +3214,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt, false);
-                    if (visitor == null) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
                     if (visitor.TestingTime.HasValue)
                     {
                         if (
@@ -3104,18 +3262,30 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<int> FixVerificationData()
         {
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixTestingTime");
             foreach (var visitorId in (await ListAllKeys()))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     var visitor = await GetVisitor(visitorIdInt, false);
-                    if (visitor == null) continue;
-                    if (string.IsNullOrEmpty(visitor.VerificationId)) continue;
+                    if (visitor == null)
+                    {
+                        continue;
+                    }
+
+                    if (string.IsNullOrEmpty(visitor.VerificationId))
+                    {
+                        continue;
+                    }
+
                     var updated = false;
                     var data = await GetResultVerification(visitor.VerificationId);
-                    if (data == null) continue;
+                    if (data == null)
+                    {
+                        continue;
+                    }
+
                     if (visitor.TestingTime.HasValue && data.Time != visitor.TestingTime)
                     {
                         data.Time = visitor.TestingTime.Value;
@@ -3160,7 +3330,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<int> FixMapVisitorToDay()
         {
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixMapVisitorToDay");
             foreach (var visitorId in (await ListAllKeys()))
             {
@@ -3169,7 +3339,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                     try
                     {
                         var visitor = await GetVisitor(visitorIdInt, false);
-                        if (visitor == null) continue;
+                        if (visitor == null)
+                        {
+                            continue;
+                        }
+
                         if (visitor.TestingTime.HasValue)
                         {
                             var time = new DateTimeOffset(visitor.TestingTime.Value.Year, visitor.TestingTime.Value.Month, visitor.TestingTime.Value.Day, 0, 0, 0, TimeSpan.Zero);
@@ -3203,7 +3377,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<int> FixPersonPlace(string day, string newPlaceId, string user)
         {
 
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixPersonPlace {day} {newPlaceId} {user}");
             foreach (var visitorId in (await ListAllKeys(DateTimeOffset.Parse(day))))
             {
@@ -3212,7 +3386,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                     try
                     {
                         var visitor = await GetVisitor(visitorIdInt, false);
-                        if (visitor == null) continue;
+                        if (visitor == null)
+                        {
+                            continue;
+                        }
+
                         if (visitor.VerifiedBy == user)
                         {
                             if (visitor.ChosenPlaceId != newPlaceId)
@@ -3237,7 +3415,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
         public async Task<int> FixSendRegistrationSMS()
         {
-            int ret = 0;
+            var ret = 0;
             logger.LogInformation($"FixSendRegistrationSMS");
             foreach (var visitorId in (await ListAllKeys()))
             {
@@ -3246,10 +3424,20 @@ namespace CovidMassTesting.Repository.RedisRepository
                     try
                     {
                         var visitor = await GetVisitor(visitorIdInt, false);
-                        if (visitor == null) continue;
+                        if (visitor == null)
+                        {
+                            continue;
+                        }
 
-                        if (visitor.ChosenPlaceId != "BA333") continue;
-                        if (visitor.ChosenSlot < 637481916000000000) continue;
+                        if (visitor.ChosenPlaceId != "BA333")
+                        {
+                            continue;
+                        }
+
+                        if (visitor.ChosenSlot < 637481916000000000)
+                        {
+                            continue;
+                        }
 
                         var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
                         var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);

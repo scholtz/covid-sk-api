@@ -15,9 +15,9 @@
         public VisitorTestingToBeRepeatedEmail(string language, string url, string supportEmail, string supportPhone)
         {
             SetLanguage(language);
-            this.Website = url;
-            this.SupportEmail = supportEmail;
-            this.SupportPhone = supportPhone;
+            Website = url;
+            SupportEmail = supportEmail;
+            SupportPhone = supportPhone;
         }
         /// <summary>
         /// Template identifier

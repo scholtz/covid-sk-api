@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace CovidMassTesting.Model.Email
+﻿namespace CovidMassTesting.Model.Email
 {
     /// <summary>
     /// Sends information to visitor that his test has been processed
@@ -20,9 +15,9 @@ namespace CovidMassTesting.Model.Email
         public VisitorTestingInProcessEmail(string language, string url, string supportEmail, string supportPhone)
         {
             SetLanguage(language);
-            this.Website = url;
-            this.SupportEmail = supportEmail;
-            this.SupportPhone = supportPhone;
+            Website = url;
+            SupportEmail = supportEmail;
+            SupportPhone = supportPhone;
         }
         /// <summary>
         /// Template identifier

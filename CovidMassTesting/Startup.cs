@@ -147,7 +147,11 @@ namespace CovidMassTesting
                 Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
             }
 
-            if (redisConfiguration.SyncTimeout < 10000) redisConfiguration.SyncTimeout = 10000;
+            if (redisConfiguration.SyncTimeout < 10000)
+            {
+                redisConfiguration.SyncTimeout = 10000;
+            }
+
             if (string.IsNullOrEmpty(redisConfiguration.Hosts?.FirstOrDefault()?.Host))
             {
                 services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);

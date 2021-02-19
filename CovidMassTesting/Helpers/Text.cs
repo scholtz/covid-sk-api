@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-
-namespace CovidMassTesting.Helpers
+﻿namespace CovidMassTesting.Helpers
 {
     /// <summary>
     /// Text helper
@@ -18,12 +12,14 @@ namespace CovidMassTesting.Helpers
         /// <returns></returns>
         public static string RemoveDiacritism(string Text)
         {
-            string stringFormD = Text.Normalize(System.Text.NormalizationForm.FormD);
-            System.Text.StringBuilder retVal = new System.Text.StringBuilder();
-            for (int index = 0; index < stringFormD.Length; index++)
+            var stringFormD = Text.Normalize(System.Text.NormalizationForm.FormD);
+            var retVal = new System.Text.StringBuilder();
+            for (var index = 0; index < stringFormD.Length; index++)
             {
                 if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(stringFormD[index]) != System.Globalization.UnicodeCategory.NonSpacingMark)
+                {
                     retVal.Append(stringFormD[index]);
+                }
             }
             return retVal.ToString().Normalize(System.Text.NormalizationForm.FormC);
         }

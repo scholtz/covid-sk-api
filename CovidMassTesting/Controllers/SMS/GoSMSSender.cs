@@ -1,13 +1,10 @@
 ﻿using CovidMassTesting.Model.SMS;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using RestSharp;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers.SMS
@@ -38,7 +35,11 @@ namespace CovidMassTesting.Controllers.SMS
             this.localizer = localizer ?? throw new ArgumentNullException(nameof(localizer));
             this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
             this.settings = settings ?? throw new ArgumentNullException(nameof(settings));
-            if (string.IsNullOrEmpty(settings.Value.Endpoint)) throw new Exception(localizer["Invalid SMS endpoint"].Value);
+            if (string.IsNullOrEmpty(settings.Value.Endpoint))
+            {
+                throw new Exception(localizer["Invalid SMS endpoint"].Value);
+            }
+
             smsApiRestClient = new RestClient(settings.Value.Endpoint);
         }
 
@@ -129,9 +130,9 @@ namespace CovidMassTesting.Controllers.SMS
 
                 if (data.expires_in > 0)
                 {
-                    this.tokenExpire = DateTimeOffset.Now.AddSeconds(data.expires_in).AddSeconds(-10);
+                    tokenExpire = DateTimeOffset.Now.AddSeconds(data.expires_in).AddSeconds(-10);
                 }
-                this.token = data.access_token;
+                token = data.access_token;
                 return token;
             }
 

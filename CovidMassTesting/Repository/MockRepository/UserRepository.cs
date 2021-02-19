@@ -98,10 +98,17 @@ namespace CovidMassTesting.Repository.MockRepository
             if (!string.IsNullOrEmpty(placeProviderId))
             {
                 var groups = await placeProviderRepository.GetUserGroups(email, placeProviderId);
-                if (ret.Roles == null) ret.Roles = new List<string>();
+                if (ret.Roles == null)
+                {
+                    ret.Roles = new List<string>();
+                }
+
                 foreach (var group in groups)
                 {
-                    if (!ret.Roles.Contains(group)) ret.Roles.Add(group);
+                    if (!ret.Roles.Contains(group))
+                    {
+                        ret.Roles.Add(group);
+                    }
                 }
             }
             return ret;
@@ -119,7 +126,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="invitationId"></param>
         /// <returns></returns>
-        public async override Task<Invitation> GetInvitation(string invitationId)
+        public override async Task<Invitation> GetInvitation(string invitationId)
         {
             if (invitaions.TryGetValue(invitationId, out var inv))
             {
@@ -132,7 +139,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public async override Task<IEnumerable<Invitation>> ListInvitationsByPP(string placeProviderId)
+        public override async Task<IEnumerable<Invitation>> ListInvitationsByPP(string placeProviderId)
         {
             return invitaions.Values.Where(i => i.PlaceProviderId == placeProviderId).OrderByDescending(i => i.LastUpdate);
         }
@@ -141,7 +148,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="email"></param>
         /// <returns></returns>
-        public async override Task<IEnumerable<Invitation>> ListInvitationsByEmail(string email)
+        public override async Task<IEnumerable<Invitation>> ListInvitationsByEmail(string email)
         {
             return invitaions.Values.Where(i => i.Email == email).OrderByDescending(i => i.LastUpdate);
         }
@@ -151,7 +158,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="invitation"></param>
         /// <param name="mustBeNew"></param>
         /// <returns></returns>
-        public async override Task<Invitation> SetInvitation(Invitation invitation, bool mustBeNew)
+        public override async Task<Invitation> SetInvitation(Invitation invitation, bool mustBeNew)
         {
             invitaions[invitation.InvitationId] = invitation;
             return invitation;

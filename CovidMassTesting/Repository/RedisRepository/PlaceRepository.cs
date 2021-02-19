@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.RedisRepository
@@ -151,9 +150,20 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 throw new ArgumentNullException(nameof(placeProduct));
             }
-            if (string.IsNullOrEmpty(placeProduct.PlaceProviderId)) throw new Exception("Place provider is empty");
-            if (string.IsNullOrEmpty(placeProduct.PlaceId)) throw new Exception("Place is empty");
-            if (string.IsNullOrEmpty(placeProduct.ProductId)) throw new Exception("Product is empty");
+            if (string.IsNullOrEmpty(placeProduct.PlaceProviderId))
+            {
+                throw new Exception("Place provider is empty");
+            }
+
+            if (string.IsNullOrEmpty(placeProduct.PlaceId))
+            {
+                throw new Exception("Place is empty");
+            }
+
+            if (string.IsNullOrEmpty(placeProduct.ProductId))
+            {
+                throw new Exception("Product is empty");
+            }
 
             try
             {
@@ -208,11 +218,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="placeId"></param>
         /// <returns></returns>
-        public async virtual Task<List<PlaceProduct>> ListPlaceProductByPlace(string placeId)
+        public virtual async Task<List<PlaceProduct>> ListPlaceProductByPlace(string placeId)
         {
             var ret = new List<PlaceProduct>();
             var place = await GetPlace(placeId);
-            if (place == null) throw new Exception("Place not found");
+            if (place == null)
+            {
+                throw new Exception("Place not found");
+            }
+
             foreach (var id in (await redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PLACE}_{placeId}")))
             {
                 var item = await GetPlaceProduct(id);
@@ -228,7 +242,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="placeProvider"></param>
         /// <returns></returns>
-        public async virtual Task<List<PlaceProduct>> ListPlaceProductByPlaceProvider(PlaceProvider placeProvider)
+        public virtual async Task<List<PlaceProduct>> ListPlaceProductByPlaceProvider(PlaceProvider placeProvider)
         {
             var ret = new List<PlaceProduct>();
             foreach (var id in (await redisCacheClient.Db0.SetMembersAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_PRODUCT_PLACES_BY_PP}_{placeProvider.PlaceProviderId}")))

@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using CovidMassTesting.Helpers;
+﻿using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
-using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
@@ -14,6 +7,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
 {
@@ -130,7 +129,10 @@ namespace CovidMassTesting.Controllers
                     {
                         foreach (var key in ret.Keys)
                         {
-                            if (ret[key].LimitPer1HourSlot > confLimit) ret[key].LimitPer1HourSlot = confLimit;
+                            if (ret[key].LimitPer1HourSlot > confLimit)
+                            {
+                                ret[key].LimitPer1HourSlot = confLimit;
+                            }
                         }
                     }
                 }
@@ -140,7 +142,10 @@ namespace CovidMassTesting.Controllers
                     {
                         foreach (var key in ret.Keys)
                         {
-                            if (ret[key].LimitPer1HourSlot > confLimit) ret[key].LimitPer1HourSlot = confLimit;
+                            if (ret[key].LimitPer1HourSlot > confLimit)
+                            {
+                                ret[key].LimitPer1HourSlot = confLimit;
+                            }
                         }
                     }
                 }
@@ -173,11 +178,15 @@ namespace CovidMassTesting.Controllers
                         var hours = slotRepository.ListHourSlotsByPlaceAndDaySlotId(item.Id, day.SlotId).Result;
                         foreach (var hour in hours)
                         {
-                            if (hour.Time < DateTimeOffset.Now.AddHours(-1)) continue;
+                            if (hour.Time < DateTimeOffset.Now.AddHours(-1))
+                            {
+                                continue;
+                            }
+
                             var count = item.LimitPer1HourSlot - hour.Registrations;
                             if (hour.Registrations == 2)
                             {
-                                int x = 0;
+                                var x = 0;
                                 x++;
                             }
 
@@ -187,7 +196,11 @@ namespace CovidMassTesting.Controllers
                                 var minutes = slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId).Result;
                                 foreach (var minute in minutes)
                                 {
-                                    if (minute.Time < DateTimeOffset.Now.AddMinutes(-5)) continue;
+                                    if (minute.Time < DateTimeOffset.Now.AddMinutes(-5))
+                                    {
+                                        continue;
+                                    }
+
                                     var countm = item.LimitPer5MinSlot - minute.Registrations;
                                     if (countm > 0)
                                     {
@@ -226,8 +239,15 @@ namespace CovidMassTesting.Controllers
                 var places = await ListAllPlaces();
 
 
-                if (string.IsNullOrEmpty(category)) category = "all";
-                if (string.IsNullOrEmpty(availability)) availability = "all";
+                if (string.IsNullOrEmpty(category))
+                {
+                    category = "all";
+                }
+
+                if (string.IsNullOrEmpty(availability))
+                {
+                    availability = "all";
+                }
 
                 if (category != "all")
                 {
@@ -244,7 +264,11 @@ namespace CovidMassTesting.Controllers
                     }
                     var pprs = await placeProviderRepository.ListPlaceProductByCategory(category);
 
-                    if (onlyInsured) pprs = pprs.Where(ppr => ppr.InsuranceOnly == true);
+                    if (onlyInsured)
+                    {
+                        pprs = pprs.Where(ppr => ppr.InsuranceOnly == true);
+                    }
+
                     var ids = pprs.Select(ppr => ppr.PlaceId).Distinct().Where(id => !string.IsNullOrEmpty(id)).ToHashSet();
                     places = places.Where(place => ids.Contains(place.Id));
                 }
@@ -280,7 +304,11 @@ namespace CovidMassTesting.Controllers
             try
             {
                 var isGlobalAdmin = User.IsAdmin(userRepository);
-                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) return Ok(null);
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    return Ok(null);
+                }
+
                 var list = (await placeRepository.ListAll());
                 //if (isGlobalAdmin) return Ok(list.ToDictionary(p => p.Id, p => p));
                 return Ok(list.Where(p => p.PlaceProviderId == User.GetPlaceProvider()).OrderBy(p => p.Name).ToDictionary(p => p.Id, p => p));
@@ -310,7 +338,11 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentNullException(nameof(actions));
                 }
                 var isGlobalAdmin = User.IsAdmin(userRepository);
-                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception("You must be place provider admin to be able to set openning hours");
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("You must be place provider admin to be able to set openning hours");
+                }
+
                 var list = (await placeRepository.ListAll());
                 if (!isGlobalAdmin)
                 {
@@ -321,11 +353,15 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("You cannot manage all places you have selected");
                 }
-                Dictionary<string, Place> places = new Dictionary<string, Place>();
+                var places = new Dictionary<string, Place>();
                 foreach (var placeId in ids)
                 {
                     places[placeId] = await placeRepository.GetPlace(placeId);
-                    if (places[placeId] == null) throw new Exception($"Invalid place with id {placeId}");
+                    if (places[placeId] == null)
+                    {
+                        throw new Exception($"Invalid place with id {placeId}");
+                    }
+
                     foreach (var action in actions.Where(a => a.PlaceId == placeId))
                     {
                         if (action.Type == "set")
@@ -354,13 +390,17 @@ namespace CovidMassTesting.Controllers
                         }
                     }
                 }
-                int ret = 0;
+                var ret = 0;
 
                 foreach (var action in actions)
                 {
                     foreach (var placeId in ids)
                     {
-                        if (action.PlaceId != "__ALL__" && action.PlaceId != placeId) continue;
+                        if (action.PlaceId != "__ALL__" && action.PlaceId != placeId)
+                        {
+                            continue;
+                        }
+
                         var hours = "";
                         var dayTicks = DateTimeOffset.Parse(action.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
                         if (action.Type == "set")
@@ -411,7 +451,10 @@ namespace CovidMassTesting.Controllers
             try
             {
                 var isGlobalAdmin = User.IsAdmin(userRepository);
-                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception("You must be place provider admin to be able to set openning hours");
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("You must be place provider admin to be able to set openning hours");
+                }
 
                 IEnumerable<Place> list;
                 if (string.IsNullOrEmpty(placeId) || placeId == "__ALL__")
@@ -431,11 +474,17 @@ namespace CovidMassTesting.Controllers
 
                 if (string.IsNullOrEmpty(placeId) || placeId == "__ALL__")
                 {
-                    if (!list.Any()) throw new Exception("Create place first");
+                    if (!list.Any())
+                    {
+                        throw new Exception("Create place first");
+                    }
                 }
                 else
                 {
-                    if (!ids.Contains(placeId)) throw new Exception("You are not allowed to manage this place");
+                    if (!ids.Contains(placeId))
+                    {
+                        throw new Exception("You are not allowed to manage this place");
+                    }
                 }
 
                 var ret = new Dictionary<long, DayTimeManagement>();
@@ -496,7 +545,10 @@ namespace CovidMassTesting.Controllers
             try
             {
                 var isGlobalAdmin = User.IsAdmin(userRepository);
-                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                }
 
                 if (place is null)
                 {
@@ -547,8 +599,16 @@ namespace CovidMassTesting.Controllers
                 else
                 {
                     // update existing
-                    if (!isGlobalAdmin && string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("You are not allowed to manage this place");
-                    if (!isGlobalAdmin && place.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You are not allowed to manage this place");
+                    if (!isGlobalAdmin && string.IsNullOrEmpty(place.PlaceProviderId))
+                    {
+                        throw new Exception("You are not allowed to manage this place");
+                    }
+
+                    if (!isGlobalAdmin && place.PlaceProviderId != User.GetPlaceProvider())
+                    {
+                        throw new Exception("You are not allowed to manage this place");
+                    }
+
                     place.Healthy = oldPlace.Healthy;
                     place.Sick = oldPlace.Sick;
                     if (string.IsNullOrEmpty(place.PlaceProviderId))
@@ -593,7 +653,11 @@ namespace CovidMassTesting.Controllers
             try
             {
                 var isGlobalAdmin = User.IsAdmin(userRepository);
-                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                }
+
                 var place = await placeRepository.GetPlace(placeId);
 
                 if (place is null)
@@ -648,7 +712,11 @@ namespace CovidMassTesting.Controllers
             try
             {
                 var isGlobalAdmin = User.IsAdmin(userRepository);
-                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                if (!isGlobalAdmin && !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                }
+
                 var place = await placeRepository.GetPlace(placeId);
 
                 if (place is null)
@@ -691,7 +759,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                }
 
                 if (place is null)
                 {
@@ -738,10 +809,21 @@ namespace CovidMassTesting.Controllers
 
             try
             {
-                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                }
+
                 var place = await placeRepository.GetPlace(placeProduct.PlaceId);
-                if (place == null) throw new Exception("Place not found");
-                if (place.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define product only for your places");
+                if (place == null)
+                {
+                    throw new Exception("Place not found");
+                }
+
+                if (place.PlaceProviderId != User.GetPlaceProvider())
+                {
+                    throw new Exception("You can define product only for your places");
+                }
 
                 var update = true;
                 if (string.IsNullOrEmpty(placeProduct.Id))
@@ -753,7 +835,10 @@ namespace CovidMassTesting.Controllers
 
                 var products = await placeProviderRepository.ListProducts(User.GetPlaceProvider());
                 var product = products.FirstOrDefault(p => p.Id == placeProduct.ProductId);
-                if (product == null) throw new Exception("Product not found");
+                if (product == null)
+                {
+                    throw new Exception("Product not found");
+                }
 
                 if (!update)
                 {
@@ -771,7 +856,10 @@ namespace CovidMassTesting.Controllers
                 else
                 {
                     // update existing
-                    if (placeProduct.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define place products only for your places");
+                    if (placeProduct.PlaceProviderId != User.GetPlaceProvider())
+                    {
+                        throw new Exception("You can define place products only for your places");
+                    }
 
                     var oldPlaceProduct = await placeRepository.GetPlaceProduct(placeProduct.Id);
 
@@ -805,10 +893,21 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_PlaceController.Only_admin_is_allowed_to_manage_testing_places].Value);
+                }
+
                 var productPlace = await placeRepository.GetPlaceProduct(placeProductid);
-                if (productPlace == null) throw new Exception("Place not found");
-                if (productPlace.PlaceProviderId != User.GetPlaceProvider()) throw new Exception("You can define product only for your places");
+                if (productPlace == null)
+                {
+                    throw new Exception("Place not found");
+                }
+
+                if (productPlace.PlaceProviderId != User.GetPlaceProvider())
+                {
+                    throw new Exception("You can define product only for your places");
+                }
 
                 return Ok(await placeRepository.DeletePlaceProduct(productPlace));
             }

@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace CovidMassTesting.Helpers
 {
@@ -19,7 +16,11 @@ namespace CovidMassTesting.Helpers
         /// <returns></returns>
         public static string GetIPAddress(this HttpContext httpContext)
         {
-            if (httpContext == null) return "";
+            if (httpContext == null)
+            {
+                return "";
+            }
+
             try
             {
                 var ip = httpContext.Connection?.RemoteIpAddress;

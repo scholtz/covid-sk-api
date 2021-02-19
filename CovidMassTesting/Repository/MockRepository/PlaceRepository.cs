@@ -86,7 +86,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="placeProductid"></param>
         /// <returns></returns>
-        public async override Task<PlaceProduct> GetPlaceProduct(string placeProductid)
+        public override async Task<PlaceProduct> GetPlaceProduct(string placeProductid)
         {
             return dataPlaceProduct[placeProductid];
         }
@@ -95,7 +95,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="placeProduct"></param>
         /// <returns></returns>
-        public async override Task<PlaceProduct> SetProductPlace(PlaceProduct placeProduct)
+        public override async Task<PlaceProduct> SetProductPlace(PlaceProduct placeProduct)
         {
             dataPlaceProduct[placeProduct.Id] = placeProduct;
             return placeProduct;
@@ -105,10 +105,14 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="placeProduct"></param>
         /// <returns></returns>
-        public async override Task<bool> DeletePlaceProduct(PlaceProduct placeProduct)
+        public override async Task<bool> DeletePlaceProduct(PlaceProduct placeProduct)
         {
             dataPlaceProduct.TryRemove(placeProduct.Id, out var removed);
-            if (removed == null) return false;
+            if (removed == null)
+            {
+                return false;
+            }
+
             return true;
         }
         /// <summary>
@@ -116,7 +120,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="placeId"></param>
         /// <returns></returns>
-        public async override Task<List<PlaceProduct>> ListPlaceProductByPlace(string placeId)
+        public override async Task<List<PlaceProduct>> ListPlaceProductByPlace(string placeId)
         {
             return dataPlaceProduct.Values.Where(p => p.PlaceId == placeId).ToList();
         }
@@ -125,7 +129,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// </summary>
         /// <param name="placeProvider"></param>
         /// <returns></returns>
-        public async override Task<List<PlaceProduct>> ListPlaceProductByPlaceProvider(PlaceProvider placeProvider)
+        public override async Task<List<PlaceProduct>> ListPlaceProductByPlaceProvider(PlaceProvider placeProvider)
         {
             return dataPlaceProduct.Values.Where(p => p.PlaceProviderId == placeProvider.PlaceProviderId).ToList();
         }

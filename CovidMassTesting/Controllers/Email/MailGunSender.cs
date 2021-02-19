@@ -1,15 +1,12 @@
-﻿using Microsoft.Extensions.Logging;
-using CovidMassTesting.Model.Email;
-using SendGrid;
+﻿using CovidMassTesting.Model.Email;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using RestSharp;
+using RestSharp.Authenticators;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using RestSharp;
-using RestSharp.Authenticators;
-using Microsoft.Extensions.Options;
 
 namespace CovidMassTesting.Controllers.Email
 {
@@ -41,7 +38,10 @@ namespace CovidMassTesting.Controllers.Email
             {
                 this.logger = logger;
                 this.settings = settings;
-                if (string.IsNullOrEmpty(settings.Value.ApiKey)) throw new Exception("Invalid MailGun configuration");
+                if (string.IsNullOrEmpty(settings.Value.ApiKey))
+                {
+                    throw new Exception("Invalid MailGun configuration");
+                }
             }
             catch (Exception exc)
             {
@@ -67,7 +67,11 @@ namespace CovidMassTesting.Controllers.Email
         {
             try
             {
-                if (data == null) throw new Exception("Please define data for email");
+                if (data == null)
+                {
+                    throw new Exception("Please define data for email");
+                }
+
                 if (string.IsNullOrEmpty(toEmail))
                 {
                     logger.LogDebug($"Message {data.TemplateId} not delivered because email is not defined");
@@ -77,11 +81,13 @@ namespace CovidMassTesting.Controllers.Email
 
 
 
-                RestClient client = new RestClient();
-                client.BaseUrl = new Uri(settings.Value.Endpoint);
-                client.Authenticator = new HttpBasicAuthenticator("api", settings.Value.ApiKey);
+                var client = new RestClient
+                {
+                    BaseUrl = new Uri(settings.Value.Endpoint),
+                    Authenticator = new HttpBasicAuthenticator("api", settings.Value.ApiKey)
+                };
 
-                RestRequest request = new RestRequest();
+                var request = new RestRequest();
                 request.AddParameter("domain", settings.Value.Domain, ParameterType.UrlSegment);
                 request.Resource = "{domain}/messages";
                 request.AddParameter("from", $"{settings.Value.MailerFromName} <{settings.Value.MailerFromEmail}>");

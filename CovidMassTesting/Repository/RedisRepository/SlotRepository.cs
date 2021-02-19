@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Repository.RedisRepository
@@ -60,7 +59,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<int> CheckSlots(long testingDay, string placeId, string openingHours = "09:00-20:00", int openingHoursTemplate = 0)
         {
-            int ret = 0;
+            var ret = 0;
             var day = new DateTimeOffset(testingDay, TimeSpan.Zero);
             var list = await ListDaySlotsByPlace(placeId);
             if (string.IsNullOrEmpty(openingHours))
@@ -568,14 +567,30 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             var days = await ListDaySlotsByPlace(place);
             var currentDay = days.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
-            if (currentDay == null) throw new Exception("Toto miesto dnes nie je otvorené");
+            if (currentDay == null)
+            {
+                throw new Exception("Toto miesto dnes nie je otvorené");
+            }
+
             var hours = await ListHourSlotsByPlaceAndDaySlotId(place, currentDay.SlotId);
-            if (hours == null) throw new Exception("Toto miesto dnes nie je otvorené");
+            if (hours == null)
+            {
+                throw new Exception("Toto miesto dnes nie je otvorené");
+            }
+
             var currentHour = hours.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
-            if (currentHour == null) currentHour = hours.Last();
+            if (currentHour == null)
+            {
+                currentHour = hours.Last();
+            }
+
             var minutes = await ListMinuteSlotsByPlaceAndHourSlotId(place, currentHour.SlotId);
             var ret = minutes.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
-            if (ret == null) return minutes.Last();
+            if (ret == null)
+            {
+                return minutes.Last();
+            }
+
             return ret;
         }
         /// <summary>

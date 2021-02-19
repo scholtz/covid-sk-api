@@ -92,7 +92,11 @@ namespace CovidMassTesting.Repository.MockRepository
             }
             visitor = await FixVisitor(visitor, false);
 
-            if (mustBeNew && data.ContainsKey(visitor.Id)) throw new Exception("Item already exists");
+            if (mustBeNew && data.ContainsKey(visitor.Id))
+            {
+                throw new Exception("Item already exists");
+            }
+
             data[visitor.Id] = visitor;
             logger.LogInformation($"Visitor.Set {visitor.Id}");
             return visitor;
@@ -135,7 +139,10 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true)
         {
-            if (!data.ContainsKey(codeInt)) return null;
+            if (!data.ContainsKey(codeInt))
+            {
+                return null;
+            }
 
             logger.LogInformation($"Visitor.Get {codeInt}");
             if (fixOnLoad)
@@ -167,8 +174,16 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task<int?> GETVisitorCodeFromPersonalNumber(string personalNumber)
         {
-            if (!pname2code.ContainsKey(personalNumber)) personalNumber = FormatDocument(personalNumber);
-            if (!pname2code.ContainsKey(personalNumber)) return null;
+            if (!pname2code.ContainsKey(personalNumber))
+            {
+                personalNumber = FormatDocument(personalNumber);
+            }
+
+            if (!pname2code.ContainsKey(personalNumber))
+            {
+                return null;
+            }
+
             logger.LogInformation($"Visitor.GETVisitorCodeFromPersonalNumber {personalNumber}");
             return pname2code[personalNumber];
         }
@@ -179,7 +194,11 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task<int?> GETVisitorCodeFromTesting(string testCodeClear)
         {
-            if (!testing2code.ContainsKey(testCodeClear)) return null;
+            if (!testing2code.ContainsKey(testCodeClear))
+            {
+                return null;
+            }
+
             logger.LogInformation($"Visitor.GETVisitorCodeFromTesting {testCodeClear}");
             return testing2code[testCodeClear];
         }
@@ -215,7 +234,10 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             personalNumber = FormatDocument(personalNumber);
             logger.LogInformation($"Visitor.UnMapPersonalNumber {personalNumber}");
-            if (pname2code.ContainsKey(personalNumber)) pname2code.TryRemove(personalNumber, out var _);
+            if (pname2code.ContainsKey(personalNumber))
+            {
+                pname2code.TryRemove(personalNumber, out var _);
+            }
         }
         /// <summary>
         /// Unmap testing set
@@ -225,7 +247,10 @@ namespace CovidMassTesting.Repository.MockRepository
         public override async Task UnMapTestingSet(string testCodeClear)
         {
             logger.LogInformation($"Visitor.UnMapTestingSet {testCodeClear}");
-            if (testing2code.ContainsKey(testCodeClear)) testing2code.TryRemove(testCodeClear, out var _);
+            if (testing2code.ContainsKey(testCodeClear))
+            {
+                testing2code.TryRemove(testCodeClear, out var _);
+            }
         }
         /// <summary>
         /// Removes id
@@ -235,7 +260,11 @@ namespace CovidMassTesting.Repository.MockRepository
         public override async Task<bool> Remove(int id)
         {
             logger.LogInformation($"Visitor.Remove {id}");
-            if (!data.ContainsKey(id)) return false;
+            if (!data.ContainsKey(id))
+            {
+                return false;
+            }
+
             data.TryRemove(id, out var _);
             return true;
         }
@@ -261,8 +290,12 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             using var rand = new RandomGenerator();
             var toSave = rand.Next(100000, 900000);
-            this.TestInt = toSave;
-            if (toSave != TestInt) throw new Exception("Storage does not work");
+            TestInt = toSave;
+            if (toSave != TestInt)
+            {
+                throw new Exception("Storage does not work");
+            }
+
             return toSave;
         }
 
@@ -277,7 +310,11 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             logger.LogInformation($"VerificationData loaded from database: {id.GetHashCode()}");
             var encoded = verification[id];
-            if (string.IsNullOrEmpty(encoded)) return null;
+            if (string.IsNullOrEmpty(encoded))
+            {
+                return null;
+            }
+
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<VerificationData>(decoded);
@@ -299,49 +336,56 @@ namespace CovidMassTesting.Repository.MockRepository
             logger.LogInformation($"Setting verificationData {verificationData.Id.GetHashCode()}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var encoded = aes.EncryptToBase64String(objectToEncode);
-            if (mustBeNew && verification.ContainsKey(verificationData.Id)) throw new Exception("Must be new");
+            if (mustBeNew && verification.ContainsKey(verificationData.Id))
+            {
+                throw new Exception("Must be new");
+            }
+
             verification[verificationData.Id] = encoded;
             return verificationData;
         }
 
-        public async override Task<bool> AddToResultQueue(string resultId)
+        public override async Task<bool> AddToResultQueue(string resultId)
         {
             resultqueue.Enqueue(resultId);
             return true;
         }
-        public async override Task<string> GetFirstItemFromResultQueue()
+        public override async Task<string> GetFirstItemFromResultQueue()
         {
             logger.LogInformation($"Visitor.GetFirstItemFromResultQueue");
             return resultqueue.FirstOrDefault();
         }
-        public async override Task<Result> GetResultObject(string id)
+        public override async Task<Result> GetResultObject(string id)
         {
             return dataResults[id];
         }
-        public async override Task<IEnumerable<string>> ListAllKeysResults()
+        public override async Task<IEnumerable<string>> ListAllKeysResults()
         {
             return dataResults.Keys;
         }
-        public async override Task<IEnumerable<string>> ListAllResultKeys()
+        public override async Task<IEnumerable<string>> ListAllResultKeys()
         {
             return verification.Keys;
         }
-        public async override Task<string> PopFromResultQueue()
+        public override async Task<string> PopFromResultQueue()
         {
             resultqueue.TryDequeue(out var ret);
             logger.LogInformation($"Visitor.RemoveFromDocQueue {ret}");
             return ret;
         }
-        public async override Task<bool> RemoveResult(string id)
+        public override async Task<bool> RemoveResult(string id)
         {
             dataResults.TryRemove(id, out var removed);
             return removed != null;
         }
-        public async override Task<Result> SetResultObject(Result result, bool mustBeNew)
+        public override async Task<Result> SetResultObject(Result result, bool mustBeNew)
         {
             if (mustBeNew)
             {
-                if (dataResults.ContainsKey(result.Id)) throw new Exception("Result must be new");
+                if (dataResults.ContainsKey(result.Id))
+                {
+                    throw new Exception("Result must be new");
+                }
             }
             dataResults[result.Id] = result;
             return result;
@@ -354,7 +398,11 @@ namespace CovidMassTesting.Repository.MockRepository
         }
         public override async Task<bool> MapDayToVisitorCode(long day, int visitorCode)
         {
-            if (!day2visitor.ContainsKey(day)) day2visitor[day] = new ConcurrentDictionary<int, int>();
+            if (!day2visitor.ContainsKey(day))
+            {
+                day2visitor[day] = new ConcurrentDictionary<int, int>();
+            }
+
             day2visitor[day][visitorCode] = visitorCode;
             return true;
         }
@@ -368,8 +416,16 @@ namespace CovidMassTesting.Repository.MockRepository
         }
         public override async Task<bool> UnMapDayToVisitorCode(long day, int visitorCode)
         {
-            if (!day2visitor.ContainsKey(day)) return false;
-            if (!day2visitor[day].ContainsKey(visitorCode)) return false;
+            if (!day2visitor.ContainsKey(day))
+            {
+                return false;
+            }
+
+            if (!day2visitor[day].ContainsKey(visitorCode))
+            {
+                return false;
+            }
+
             if (day2visitor[day].TryRemove(visitorCode, out var item))
             {
                 return true;
@@ -381,10 +437,18 @@ namespace CovidMassTesting.Repository.MockRepository
 
         public override async Task<Registration> GetRegistration(string id)
         {
-            if (string.IsNullOrEmpty(id)) return null;
+            if (string.IsNullOrEmpty(id))
+            {
+                return null;
+            }
+
             logger.LogInformation($"Registration loaded from database: {(configuration["key"] + id).GetSHA256Hash()}");
             var encoded = registrations[id];
-            if (string.IsNullOrEmpty(encoded)) return null;
+            if (string.IsNullOrEmpty(encoded))
+            {
+                return null;
+            }
+
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var decoded = aes.DecryptFromBase64String(encoded);
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Registration>(decoded);
@@ -410,7 +474,11 @@ namespace CovidMassTesting.Repository.MockRepository
             logger.LogInformation($"Setting object {registration.Id.GetHashCode()}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
             var encoded = aes.EncryptToBase64String(objectToEncode);
-            if (mustBeNew && registrations.ContainsKey(registration.Id)) throw new Exception("Must be new");
+            if (mustBeNew && registrations.ContainsKey(registration.Id))
+            {
+                throw new Exception("Must be new");
+            }
+
             registrations[registration.Id] = encoded;
             if (!string.IsNullOrEmpty(registration.RC))
             {
@@ -441,7 +509,11 @@ namespace CovidMassTesting.Repository.MockRepository
         }
         public override async Task<string> GetRegistrationIdFromHashedId(string hashedId)
         {
-            if (!id2registration.ContainsKey(hashedId)) return null;
+            if (!id2registration.ContainsKey(hashedId))
+            {
+                return null;
+            }
+
             return id2registration[hashedId];
         }
     }

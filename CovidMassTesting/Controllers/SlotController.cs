@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
-using CovidMassTesting.Model;
-using CovidMassTesting.Repository;
+﻿using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
 {

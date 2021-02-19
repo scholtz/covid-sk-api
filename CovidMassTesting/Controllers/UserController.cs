@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using CovidMassTesting.Model;
-using CovidMassTesting.Repository;
+﻿using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using CsvHelper;
@@ -13,6 +6,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
 {
@@ -66,7 +65,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_UserController.Only_user_with_Admin_role_can_list_users].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_UserController.Only_user_with_Admin_role_can_list_users].Value);
+                }
 
                 return Ok((await userRepository.ListAll(User.GetPlaceProvider())).ToDictionary(p => p.Email, p => p.ToPublic()));
             }
@@ -163,7 +165,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
 
                 return Ok(await userRepository.ListInvitationsByPP(User.GetPlaceProvider()));
             }
@@ -198,7 +203,9 @@ namespace CovidMassTesting.Controllers
 
                 if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
                         && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
                     throw new Exception(localizer[Controllers_UserController.Only_user_with_Registration_Manager_role_can_select_his_own_place_].Value);
+                }
 
                 return Ok(await userRepository.SetLocation(User.GetEmail(), placeId, User.GetPlaceProvider()));
             }
@@ -361,7 +368,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"CompanyRegistrationsExport: User {User.GetEmail()} is exporting data");
 
                 using var stream = new MemoryStream();

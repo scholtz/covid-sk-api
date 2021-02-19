@@ -1,11 +1,5 @@
 ﻿//#define UseFixes
-using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Threading.Tasks;
 using CovidMassTesting.Model;
-using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
 {
@@ -78,7 +76,9 @@ namespace CovidMassTesting.Controllers
             try
             {
                 if (!User.IsAdmin(userRepository))
+                {
                     throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
 
                 var ret = 0;
                 foreach (var item in await placeRepository.ListAll())
@@ -109,7 +109,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
 
                 return Ok(await userRepository.Add(new Model.User()
                 {
@@ -141,8 +144,10 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentNullException(nameof(placeId));
                 }
 
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
-
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
 
                 var place = await placeRepository.GetPlace(placeId);
                 switch (type)
@@ -198,7 +203,10 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentNullException(nameof(user));
                 }
 
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
 
                 return Ok(await visitorRepository.FixPersonPlace(day, newPlaceId, user));
             }
@@ -221,11 +229,21 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_remove_users].Value);
-                if (User.GetEmail() == email) throw new Exception(localizer[Controllers_AdminController.You_cannot_remove_yourself].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_remove_users].Value);
+                }
+
+                if (User.GetEmail() == email)
+                {
+                    throw new Exception(localizer[Controllers_AdminController.You_cannot_remove_yourself].Value);
+                }
 
                 var mustKeepUsers = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
-                if (mustKeepUsers.Any(u => u.Email == email)) throw new Exception(localizer[Controllers_AdminController.This_user_is_protected_by_the_configuration].Value);
+                if (mustKeepUsers.Any(u => u.Email == email))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.This_user_is_protected_by_the_configuration].Value);
+                }
 
                 return Ok(await userRepository.Remove(email));
             }
@@ -248,7 +266,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_remove_users].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_remove_users].Value);
+                }
+
                 logger.LogInformation($"UpdateVisitor: {User.Identity.Name} is updating visitor {visitor.Id}");
                 return Ok(await visitorRepository.SetVisitor(visitor, false));
             }
@@ -272,9 +294,16 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_drop_database].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_drop_database].Value);
+                }
+
                 var drop = await userRepository.DropDatabaseAuthorize(User.GetEmail(), hash);
-                if (!drop) throw new Exception(localizer[Controllers_AdminController.Invalid_user_or_password].Value);
+                if (!drop)
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Invalid_user_or_password].Value);
+                }
 
                 var ret = 0;
                 ret += await placeRepository.DropAllData();
@@ -322,7 +351,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
                 return Ok(await visitorRepository.FixStats());
             }
             catch (Exception exc)
@@ -367,7 +400,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
                 return Ok(await visitorRepository.FixTestingTime());
             }
             catch (Exception exc)
@@ -388,11 +425,18 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
                 logger.LogInformation($"FixVisitorPlace {visitorId} {placeId}");
 
                 var visitor = await visitorRepository.GetVisitor(visitorId);
-                if (visitor == null) throw new Exception("Visitor not found");
+                if (visitor == null)
+                {
+                    throw new Exception("Visitor not found");
+                }
 
                 visitor.ChosenPlaceId = placeId;
 
@@ -416,7 +460,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
                 logger.LogInformation($"FixVerificationData");
 
                 return Ok(await visitorRepository.FixVerificationData());
@@ -439,7 +487,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
                 logger.LogInformation($"FixSendRegistrationSMS");
 
                 return Ok(await visitorRepository.FixSendRegistrationSMS());
@@ -462,7 +514,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
                 logger.LogInformation($"FixMapVisitorToDay");
 
                 return Ok(await visitorRepository.FixMapVisitorToDay());
@@ -485,7 +541,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository)) throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
                 logger.LogInformation($"GetVisitorCodeFromTestCode by {User.GetEmail()} {testingCode}");
                 return Ok(await visitorRepository.GETVisitorCodeFromTesting(testingCode));
             }

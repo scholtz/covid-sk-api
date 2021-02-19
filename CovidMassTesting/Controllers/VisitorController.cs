@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using CovidMassTesting.Helpers;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using CovidMassTesting.Model;
-using CovidMassTesting.Repository;
+﻿using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,6 +6,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualBasic.FileIO;
 using SlugGenerator;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
 {
@@ -105,29 +100,72 @@ namespace CovidMassTesting.Controllers
 
                 if (visitor.PersonType == "foreign")
                 {
-                    if (string.IsNullOrEmpty(visitor.Passport)) throw new Exception("Zadajte číslo cestovného dokladu prosím");
+                    if (string.IsNullOrEmpty(visitor.Passport))
+                    {
+                        throw new Exception("Zadajte číslo cestovného dokladu prosím");
+                    }
                 }
                 else
                 {
-                    if (string.IsNullOrEmpty(visitor.RC)) throw new Exception("Zadajte rodné číslo prosím");
+                    if (string.IsNullOrEmpty(visitor.RC))
+                    {
+                        throw new Exception("Zadajte rodné číslo prosím");
+                    }
                 }
 
-                if (string.IsNullOrEmpty(visitor.Street)) throw new Exception("Zadajte ulicu trvalého bydliska prosím");
-                if (string.IsNullOrEmpty(visitor.StreetNo)) throw new Exception("Zadajte číslo domu trvalého bydliska prosím");
-                if (string.IsNullOrEmpty(visitor.ZIP)) throw new Exception("Zadajte PSČ trvalého bydliska prosím");
-                if (string.IsNullOrEmpty(visitor.City)) throw new Exception("Zadajte mesto trvalého bydliska prosím");
+                if (string.IsNullOrEmpty(visitor.Street))
+                {
+                    throw new Exception("Zadajte ulicu trvalého bydliska prosím");
+                }
 
-                if (string.IsNullOrEmpty(visitor.FirstName)) throw new Exception("Zadajte svoje meno prosím");
-                if (string.IsNullOrEmpty(visitor.LastName)) throw new Exception("Zadajte svoje priezvisko prosím");
+                if (string.IsNullOrEmpty(visitor.StreetNo))
+                {
+                    throw new Exception("Zadajte číslo domu trvalého bydliska prosím");
+                }
 
-                if (!visitor.BirthDayYear.HasValue || visitor.BirthDayYear < 1900 || visitor.BirthDayYear > 2021) throw new Exception("Rok Vášho narodenia vyzerá byť chybne vyplnený");
-                if (!visitor.BirthDayDay.HasValue || visitor.BirthDayDay < 1 || visitor.BirthDayDay > 31) throw new Exception("Deň Vášho narodenia vyzerá byť chybne vyplnený");
-                if (!visitor.BirthDayMonth.HasValue || visitor.BirthDayMonth < 1 || visitor.BirthDayMonth > 12) throw new Exception("Mesiac Vášho narodenia vyzerá byť chybne vyplnený");
+                if (string.IsNullOrEmpty(visitor.ZIP))
+                {
+                    throw new Exception("Zadajte PSČ trvalého bydliska prosím");
+                }
+
+                if (string.IsNullOrEmpty(visitor.City))
+                {
+                    throw new Exception("Zadajte mesto trvalého bydliska prosím");
+                }
+
+                if (string.IsNullOrEmpty(visitor.FirstName))
+                {
+                    throw new Exception("Zadajte svoje meno prosím");
+                }
+
+                if (string.IsNullOrEmpty(visitor.LastName))
+                {
+                    throw new Exception("Zadajte svoje priezvisko prosím");
+                }
+
+                if (!visitor.BirthDayYear.HasValue || visitor.BirthDayYear < 1900 || visitor.BirthDayYear > 2021)
+                {
+                    throw new Exception("Rok Vášho narodenia vyzerá byť chybne vyplnený");
+                }
+
+                if (!visitor.BirthDayDay.HasValue || visitor.BirthDayDay < 1 || visitor.BirthDayDay > 31)
+                {
+                    throw new Exception("Deň Vášho narodenia vyzerá byť chybne vyplnený");
+                }
+
+                if (!visitor.BirthDayMonth.HasValue || visitor.BirthDayMonth < 1 || visitor.BirthDayMonth > 12)
+                {
+                    throw new Exception("Mesiac Vášho narodenia vyzerá byť chybne vyplnený");
+                }
+
                 visitor.RegistrationTime = DateTimeOffset.UtcNow;
                 visitor.SelfRegistration = true;
 
                 var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
-                if (place == null) throw new Exception("Vybrané miesto nebolo nájdené");
+                if (place == null)
+                {
+                    throw new Exception("Vybrané miesto nebolo nájdené");
+                }
 
                 PlaceProduct placeProduct = null;
                 try
@@ -154,16 +192,32 @@ namespace CovidMassTesting.Controllers
                 if (placeProduct?.EmployeesRegistration == true || product?.EmployeesRegistration == true)
                 {
                     logger.LogInformation($"EmployeesRegistration 2: {visitor.EmployeeId}");
-                    if (string.IsNullOrEmpty(visitor.EmployeeId)) throw new Exception("Zadajte prosím osobné číslo zamestnanca");
+                    if (string.IsNullOrEmpty(visitor.EmployeeId))
+                    {
+                        throw new Exception("Zadajte prosím osobné číslo zamestnanca");
+                    }
+
                     var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
-                    if (pp == null) throw new Exception("Miesto má nastavené chybnú spoločnosť. Prosím kontaktujte podporu s chybou 0x021561");
+                    if (pp == null)
+                    {
+                        throw new Exception("Miesto má nastavené chybnú spoločnosť. Prosím kontaktujte podporu s chybou 0x021561");
+                    }
+
                     var hash = visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, visitor.EmployeeId);
                     var regId = await visitorRepository.GetRegistrationIdFromHashedId(hash);
                     var reg = await visitorRepository.GetRegistration(regId);
                     logger.LogInformation($"EmployeesRegistration 3: {hash} {regId} {reg?.Id}");
-                    if (reg == null) throw new Exception("Zadajte prosím platné osobné číslo zamestnanca");
+                    if (reg == null)
+                    {
+                        throw new Exception("Zadajte prosím platné osobné číslo zamestnanca");
+                    }
+
                     var rc = reg.RC ?? "";
-                    if (rc.Length > 4) rc = rc.Substring(rc.Length - 4);
+                    if (rc.Length > 4)
+                    {
+                        rc = rc.Substring(rc.Length - 4);
+                    }
+
                     logger.LogInformation($"EmployeesRegistration 4: {rc}");
                     if (string.IsNullOrEmpty(visitor.RC) || !visitor.RC.EndsWith(rc))
                     {
@@ -217,11 +271,21 @@ namespace CovidMassTesting.Controllers
                     }
                 }
                 var place = await placeRepository.GetPlace(chosenPlaceId);
-                if (place == null) throw new Exception("Place not found");
-                if (string.IsNullOrEmpty(place.PlaceProviderId)) throw new Exception("Place provider missing");
-                var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
-                if (pp == null) throw new Exception("Place provider missing");
+                if (place == null)
+                {
+                    throw new Exception("Place not found");
+                }
 
+                if (string.IsNullOrEmpty(place.PlaceProviderId))
+                {
+                    throw new Exception("Place provider missing");
+                }
+
+                var pp = await placeProviderRepository.GetPlaceProvider(place.PlaceProviderId);
+                if (pp == null)
+                {
+                    throw new Exception("Place provider missing");
+                }
 
                 var visitor = new Visitor()
                 {
@@ -231,14 +295,21 @@ namespace CovidMassTesting.Controllers
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                if (reg == null)
+                {
+                    throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                }
+
                 if (reg.PersonType == "foreign")
                 {
                     if (string.IsNullOrEmpty(reg.RC))
                     {
                         throw new Exception("Vaša registrácia nemá správne vyplnené číslo pasu");
                     }
-                    if (pass.Length < 4 || !reg.Passport.EndsWith(pass)) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                    if (pass.Length < 4 || !reg.Passport.EndsWith(pass))
+                    {
+                        throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                    }
                 }
                 else
                 {
@@ -246,7 +317,10 @@ namespace CovidMassTesting.Controllers
                     {
                         throw new Exception("Vaša registrácia nemá správne vyplnené rodné číslo");
                     }
-                    if (pass.Length < 4 || !reg.RC.EndsWith(pass)) throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                    if (pass.Length < 4 || !reg.RC.EndsWith(pass))
+                    {
+                        throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
+                    }
                 }
                 visitor.PersonType = string.IsNullOrEmpty(reg.PersonType) ? "idcard" : reg.PersonType;
                 visitor.FirstName = reg.FirstName;
@@ -307,11 +381,15 @@ namespace CovidMassTesting.Controllers
             {
                 if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
                     && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
                     throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
-
+                }
 
                 var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
-                if (pp == null) throw new Exception("Place provider missing");
+                if (pp == null)
+                {
+                    throw new Exception("Place provider missing");
+                }
 
                 var visitor = new Visitor()
                 {
@@ -319,8 +397,10 @@ namespace CovidMassTesting.Controllers
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null) throw new Exception("Zadajte platné osobné číslo zamestnanca");
-
+                if (reg == null)
+                {
+                    throw new Exception("Zadajte platné osobné číslo zamestnanca");
+                }
 
                 visitor.FirstName = reg.FirstName;
                 visitor.LastName = reg.LastName;
@@ -369,17 +449,22 @@ namespace CovidMassTesting.Controllers
             {
                 if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
                     && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
                     throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
-
+                }
 
                 var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
-                if (pp == null) throw new Exception("Place provider missing");
-
+                if (pp == null)
+                {
+                    throw new Exception("Place provider missing");
+                }
 
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null) throw new Exception("Zadajte platné osobné číslo zamestnanca");
-
+                if (reg == null)
+                {
+                    throw new Exception("Zadajte platné osobné číslo zamestnanca");
+                }
 
                 return Ok(await visitorRepository.GetVisitorByPersonalNumber(reg.RC));
 
@@ -465,7 +550,9 @@ namespace CovidMassTesting.Controllers
                 }
                 if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
                     && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
                     throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
+                }
 
                 if (!visitor.RegistrationTime.HasValue)
                 {
@@ -542,7 +629,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (Request.Form.Files.Count != 1) throw new Exception("Please upload file");
+                if (Request.Form.Files.Count != 1)
+                {
+                    throw new Exception("Please upload file");
+                }
+
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
                 {
                     throw new Exception("Only administrator can upload employees");
@@ -554,8 +645,10 @@ namespace CovidMassTesting.Controllers
                 file.CopyTo(stream);
 
                 var outStream = new MemoryStream(stream.ToArray());
-                using TextFieldParser csvParser = new TextFieldParser(outStream);
-                csvParser.CommentTokens = new string[] { "#" };
+                using var csvParser = new TextFieldParser(outStream)
+                {
+                    CommentTokens = new string[] { "#" }
+                };
                 csvParser.SetDelimiters(new string[] { ";" });
                 csvParser.HasFieldsEnclosedInQuotes = true;
                 var line = 0;
@@ -563,11 +656,11 @@ namespace CovidMassTesting.Controllers
                 while (!csvParser.EndOfData)
                 {
                     line++;
-                    string[] fields = csvParser.ReadFields();
+                    var fields = csvParser.ReadFields();
 
                     if (line == 1)
                     {
-                        for (int i = 0; i < fields.Length; i++)
+                        for (var i = 0; i < fields.Length; i++)
                         {
                             n2k[fields[i].GenerateSlug()] = i;
                         }

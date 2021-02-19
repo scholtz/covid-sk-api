@@ -1,11 +1,5 @@
 ﻿//#define DoRedisTests
 
-using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-
 namespace NUnitTestCovidApi
 {
 #if DoRedisTests

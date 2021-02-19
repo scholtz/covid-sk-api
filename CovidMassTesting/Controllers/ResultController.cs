@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using CovidMassTesting.Helpers;
+﻿using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
-using CovidMassTesting.Repository;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using CsvHelper;
@@ -18,6 +10,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
 {
@@ -118,7 +116,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository, placeProviderRepository) && !User.IsMedicTester(userRepository, placeProviderRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors"].Value);
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository) && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors"].Value);
+                }
 
                 if (string.IsNullOrEmpty(rc))
                 {
@@ -148,8 +149,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsRegistrationManager(userRepository, placeProviderRepository) && !User.IsMedicTester(userRepository, placeProviderRepository)) throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to register user to test"].Value);
-
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository) && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer["Only user with Registration Manager role or Medic Tester role is allowed to register user to test"].Value);
+                }
 
                 if (string.IsNullOrEmpty(visitorCode))
                 {
@@ -298,7 +301,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDocumentManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+                }
 
                 var normalizePersonalNumber = visitorRepository.FormatDocument(personalNumber);
                 if (!string.IsNullOrEmpty(normalizePersonalNumber))
@@ -447,7 +453,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsMedicLab(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Medic_Lab_role_is_allowed_to_set_results_of_tests].Value);
+                if (!User.IsMedicLab(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Medic_Lab_role_is_allowed_to_set_results_of_tests].Value);
+                }
 
                 if (string.IsNullOrEmpty(testCode))
                 {
@@ -487,7 +496,10 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDocumentManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data].Value);
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_fetch_visitor_data].Value);
+                }
 
                 return Ok(await visitorRepository.GetNextTest());
             }
@@ -514,7 +526,11 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException(localizer[Controllers_ResultController.Test_id_must_not_be_empty].Value);
                 }
 
-                if (!User.IsDocumentManager(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+                }
+
                 var isAdmin = await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository);
                 var code = FormatBarCode(testId);
                 var ret = await visitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(code, isAdmin);
@@ -570,7 +586,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"User {User.GetEmail()} is exporting sick visitors {day}");
 
                 using var stream = new MemoryStream();
@@ -608,7 +628,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"User {User.GetEmail()} is exporting tested visitors {day}");
 
                 var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
@@ -650,7 +674,7 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                bool isAdmin = false;
+                var isAdmin = false;
                 if (User.IsAdmin(userRepository))
                 {
                     // ok
@@ -658,7 +682,10 @@ namespace CovidMassTesting.Controllers
                 }
                 else
                 {
-                    if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                    if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                    {
+                        throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                    }
                 }
                 logger.LogInformation($"ListAnonymizedVisitors: User {User.GetEmail()} is exporting anonymized visitors {day}");
 
@@ -703,7 +730,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"User {User.GetEmail()} is exporting sick visitors");
 
                 using var stream = new MemoryStream();
@@ -740,7 +771,11 @@ namespace CovidMassTesting.Controllers
                     !User.IsDataExporter(userRepository, placeProviderRepository)
                         &&
                     !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)
-                ) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                )
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"ListExportableDays: {User.GetEmail()}");
 
                 return Ok((await visitorRepository.ListExportableDays()).Select(t => new TextValue()
@@ -768,7 +803,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"User {User.GetEmail()} is exporting visitors in process");
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
@@ -801,7 +840,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"User {User.GetEmail()} is exporting visitors in process");
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
@@ -836,7 +879,11 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsDataExporter(userRepository, placeProviderRepository)) throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
                 logger.LogInformation($"User {User.GetEmail()} is exporting visitors in process");
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
