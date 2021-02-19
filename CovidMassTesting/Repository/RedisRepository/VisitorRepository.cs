@@ -1570,52 +1570,72 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<bool> ProcessSingle()
         {
             var msg = await PopFromResultQueue();
-            if (string.IsNullOrEmpty(msg))
+            try
             {
-                return false;
-            }
-
-            var obj = await GetResultObject(msg);
-            if (obj == null)
-            {
-                logger.LogError("Result with id {msg} not found");
-                return false;
-            }
-            // if time is less then 5 minutes from the click allow to change result without notification
-
-            var confWait = configuration["minWaitTimeForFinalResultsMinutes"] ?? "5";
-            var waitInt = int.Parse(confWait);
-            var delay = obj.Time.AddMinutes(waitInt) - DateTimeOffset.Now;
-            if (delay > TimeSpan.Zero)
-            {
-                await AddToResultQueue(msg); // put at the end of the queue .. in case we close this app we cannot loose the data
-                logger.LogInformation($"Waiting {delay} for next task");
-                await Task.Delay(delay);
-            }
-            var random = new Random();
-            var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 1000));
-            await Task.Delay(randDelay);
-            obj = await GetResultObject(msg);
-
-            var visitorCode = await GETVisitorCodeFromTesting(obj.TestingSetId);
-
-            if (obj.State == Result.Values.NotFound)
-            {
-                // check again
-                if (!visitorCode.HasValue)
+                if (string.IsNullOrEmpty(msg))
                 {
-                    return true; // put the message to the trash
+                    return false;
+                }
+
+                var obj = await GetResultObject(msg);
+                if (obj == null)
+                {
+                    logger.LogError("Result with id {msg} not found");
+                    return false;
+                }
+                // if time is less then 5 minutes from the click allow to change result without notification
+
+                var confWait = configuration["minWaitTimeForFinalResultsMinutes"] ?? "5";
+                var waitInt = int.Parse(confWait);
+                var delay = obj.Time.AddMinutes(waitInt) - DateTimeOffset.Now;
+
+
+                var random = new Random();
+                var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 1000));
+                await Task.Delay(randDelay);
+
+                if (delay > TimeSpan.Zero)
+                {
+                    await AddToResultQueue(msg); // put at the end of the queue .. in case we close this app we cannot loose the data
+                    logger.LogInformation($"Waiting {delay} for next task");
+                    await Task.Delay(delay);
+                    return true;
+                }
+                obj = await GetResultObject(msg);
+
+                var visitorCode = await GETVisitorCodeFromTesting(obj.TestingSetId);
+
+                if (obj.State == Result.Values.NotFound)
+                {
+                    // check again
+                    if (!visitorCode.HasValue)
+                    {
+                        return true; // put the message to the trash
+                    }
+                }
+
+                if (visitorCode.HasValue)
+                {
+                    logger.LogInformation($"SendResults: processing {obj.State}");
+                    await UpdateTestingState(visitorCode.Value, obj.State);
+                }
+                else
+                {
+                    // put the message to the trash
                 }
             }
-
-            if (visitorCode.HasValue)
+            catch (Exception exc)
             {
-                logger.LogInformation($"SendResults: processing {obj.State}");
-                await UpdateTestingState(visitorCode.Value, obj.State);
-            }
-            else
-            {
-                // put the message to the trash
+                logger.LogError(exc, "!!!!!Error while processing line: " + exc.Message);
+                try
+                {
+                    await AddToResultQueue(msg);
+                }
+                catch (Exception exc2)
+                {
+                    logger.LogError(exc2, "!!!!!Error adding back to queue: " + exc2.Message);
+                }
+                await Task.Delay(10000);
             }
             return true;
         }
