@@ -367,6 +367,14 @@ namespace NUnitTestCovidApi
                 Registrations = 0,
                 OpeningHoursWorkDay = "20:00-23:59",
                 OpeningHoursOther1 = "23:45-23:59",
+                MedicalOversight = new List<MedicalOversight>()
+                {
+                    new MedicalOversight()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Nemocnica c. 1 je garant"
+                    }
+                }
             };
             response = RegisterPlace(client, plObj1);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
@@ -398,6 +406,15 @@ namespace NUnitTestCovidApi
                 Registrations = 0,
                 OpeningHoursWorkDay = "20:00-23:59",
                 OpeningHoursOther1 = "23:45-23:59",
+
+                MedicalOversight = new List<MedicalOversight>()
+                {
+                    new MedicalOversight()
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Name = "Nemocnica c. 2 je garant"
+                    }
+                }
             };
             response = RegisterPlace(client, plObj2);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);

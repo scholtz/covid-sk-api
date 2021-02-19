@@ -2698,7 +2698,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(html2.Contains("X Y"));
             Assert.IsTrue(html2.Contains("nedeľa 17. janu&#225;ra 2021 14:14"));
 
-            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString(), true, "Oversight");
             Assert.IsTrue(pdf.Length > 100);
 #if DEBUG
             File.WriteAllBytes("d:/covid/test-pdf.pdf", pdf);

@@ -1944,6 +1944,31 @@
             Prepayment invoice
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.MedicalOversight">
+            <summary>
+            Oversight
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.MedicalOversight.Id">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.MedicalOversight.Name">
+            <summary>
+            Name of medical 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.MedicalOversight.From">
+            <summary>
+            From 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.MedicalOversight.Until">
+            <summary>
+            Until
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Mustache.TestRegistration">
             <summary>
             Variables for PDF generation
@@ -2112,6 +2137,11 @@
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.ResultGUID">
             <summary>
             ResultGUID
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.Oversight">
+            <summary>
+            Oversight
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.PersonAllocation">
@@ -2304,6 +2334,11 @@
         <member name="P:CovidMassTesting.Model.Place.OtherLimitations">
             <summary>
             Limitations
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.MedicalOversight">
+            <summary>
+            Medical oversight
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.PlaceProduct">
@@ -5100,7 +5135,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -5109,6 +5144,7 @@
             <param name="placeAddress"></param>
             <param name="product"></param>
             <param name="resultguid"></param>
+            <param name="oversight"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Enqueued(System.Int32,System.String)">
@@ -5119,7 +5155,7 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -5129,6 +5165,7 @@
             <param name="product"></param>
             <param name="resultguid"></param>
             <param name="sign">Sign and password protect</param>
+            <param name="oversight"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetResultVerification(System.String)">
@@ -7004,7 +7041,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -7025,7 +7062,7 @@
             <param name="product"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -7034,6 +7071,8 @@
             <param name="placeAddress"></param>
             <param name="product"></param>
             <param name="resultguid"></param>
+            <param name="sign"></param>
+            <param name="oversight"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">

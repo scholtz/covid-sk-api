@@ -78,5 +78,9 @@ namespace CovidMassTesting.Model.Mustache
         /// ResultGUID
         /// </summary>
         public string ResultGUID { get; set; }
+        /// <summary>
+        /// Oversight
+        /// </summary>
+        public string Oversight { get; set; }
     }
 }

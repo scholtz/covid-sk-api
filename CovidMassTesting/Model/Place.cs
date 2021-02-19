@@ -134,5 +134,9 @@ namespace CovidMassTesting.Model
         /// Limitations
         /// </summary>
         public List<PlaceLimitation> OtherLimitations { get; set; } = new List<PlaceLimitation>();
+        /// <summary>
+        /// Medical oversight
+        /// </summary>
+        public List<MedicalOversight> MedicalOversight { get; set; } = new List<MedicalOversight>();
     }
 }

@@ -1001,8 +1001,20 @@ namespace CovidMassTesting.Repository.RedisRepository
             //var product = await placeRepository.GetPlaceProduct();
             var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
-
-            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
+            var oversight = GetOversight(place, visitor.TestingTime);
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, true, oversight);
+        }
+        private string GetOversight(Place place, DateTimeOffset? time)
+        {
+            if (!time.HasValue) return "";
+            if (place.MedicalOversight == null) return "";
+            var ret = place.MedicalOversight.FirstOrDefault(p => p.From.HasValue && p.From < time && p.Until.HasValue && p.Until > time);
+            if (ret != null) return ret.Name;
+            ret = place.MedicalOversight.Where(p => p.From.HasValue && !p.Until.HasValue).OrderBy(p => p.From.Value).FirstOrDefault();
+            if (ret != null) return ret.Name;
+            ret = place.MedicalOversight.FirstOrDefault(p => !p.From.HasValue && !p.Until.HasValue);
+            if (ret != null) return ret.Name;
+            return "";
         }
         /// <summary>
         /// Generate PDF file with test result
@@ -1037,8 +1049,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             //var product = await placeRepository.GetPlaceProduct();
             var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+            var oversight = GetOversight(place, visitor.TestingTime);
 
-            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, false);
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, false, oversight);
         }
 
         public async Task<bool> ResendResults(int code, string pass)
@@ -1150,8 +1163,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 verification.Time = visitor.TestingTime.Value;
                                 await SetResult(verification, false);
                             }
-
-                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId);
+                            var oversight = GetOversight(place, visitor.TestingTime);
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, true, oversight);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
                                 Content = Convert.ToBase64String(pdf),
@@ -1187,7 +1200,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                             }, true);
                             visitor.VerificationId = result.Id;
                             await SetVisitor(visitor, false);
-                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id);
+                            var oversight = GetOversight(place, visitor.TestingTime);
+
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id, true, oversight);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
                                 Content = Convert.ToBase64String(pdf),
@@ -2459,7 +2474,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
         /// <returns></returns>
-        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid)
+        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, string oversight)
         {
             var oldCulture = CultureInfo.CurrentCulture;
             var oldUICulture = CultureInfo.CurrentUICulture;
@@ -2519,7 +2534,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.ResultGUID = resultguid;
             data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
             data.Product = product;
-
+            data.Oversight = oversight;
             var qrGenerator = new QRCoder.QRCodeGenerator();
             var qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.H);
             var qrCode = new QRCoder.QRCode(qrCodeData);
@@ -2620,8 +2635,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
         /// <param name="resultguid"></param>
+        /// <param name="sign"></param>
+        /// <param name="oversight"></param>
         /// <returns></returns>
-        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, bool sign = true)
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, bool sign = true, string oversight = "")
         {
             string password;
 
@@ -2637,7 +2654,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
             }
 
-            var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid);
+            var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid, oversight);
             using var pdfStreamEncrypted = new MemoryStream();
             iText.Kernel.Pdf.PdfWriter writer;
             if (sign)
