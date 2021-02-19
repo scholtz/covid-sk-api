@@ -2923,6 +2923,16 @@
             CoHash for logging purposes
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.ReplyToEmail">
+            <summary>
+            Reply to email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.ReplyToName">
+            <summary>
+            Reply to name
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.PDFQRConfiguration">
             <summary>
             Settings for pdf generation
