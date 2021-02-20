@@ -1980,17 +1980,37 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
 
                         var slotMPrev = await slotRepository.Get5MinSlot(previous.ChosenPlaceId, previous.ChosenSlot);
-                        var slotHPrev = await slotRepository.GetHourSlot(previous.ChosenPlaceId, slotMPrev.HourSlotId);
-                        var slotDPrev = await slotRepository.GetDaySlot(previous.ChosenPlaceId, slotHPrev.DaySlotId);
+                        if (slotMPrev != null)
+                        {
+                            var slotHPrev = await slotRepository.GetHourSlot(previous.ChosenPlaceId, slotMPrev.HourSlotId);
+                            if (slotHPrev != null)
+                            {
+                                var slotDPrev = await slotRepository.GetDaySlot(previous.ChosenPlaceId, slotHPrev.DaySlotId);
+                                if (slotDPrev != null)
+                                {
+                                    await slotRepository.DecrementRegistration5MinSlot(slotMPrev);
+                                    await slotRepository.DecrementRegistrationHourSlot(slotHPrev);
+                                    await slotRepository.DecrementRegistrationDaySlot(slotDPrev);
 
-                        await slotRepository.DecrementRegistration5MinSlot(slotMPrev);
-                        await slotRepository.DecrementRegistrationHourSlot(slotHPrev);
-                        await slotRepository.DecrementRegistrationDaySlot(slotDPrev);
-
-                        await UnMapDayToVisitorCode(slotDPrev.SlotId, visitor.Id);
+                                    await UnMapDayToVisitorCode(slotDPrev.SlotId, visitor.Id);
 
 
-                        logger.LogInformation($"Decremented: M-{slotMPrev.SlotId}, {slotHPrev.SlotId}, {slotDPrev.SlotId}");
+                                    logger.LogInformation($"Decremented: M-{slotMPrev.SlotId}, {slotHPrev.SlotId}, {slotDPrev.SlotId}");
+                                }
+                                else
+                                {
+                                    logger.LogError($"D Slot does not exists: {previous.ChosenPlaceId}, {slotHPrev.DaySlotId}");
+                                }
+                            }
+                            else
+                            {
+                                logger.LogError($"H Slot does not exists: {previous.ChosenPlaceId}, {slotMPrev.HourSlotId}");
+                            }
+                        }
+                        else
+                        {
+                            logger.LogError($"M Slot does not exists: {previous.ChosenPlaceId}, {previous.ChosenSlot}");
+                        }
                     }
                     catch (Exception exc)
                     {
