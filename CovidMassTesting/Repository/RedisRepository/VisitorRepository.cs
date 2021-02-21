@@ -2229,7 +2229,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// ListExportableDays
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<DateTimeOffset>> ListExportableDays()
+        public virtual async Task<IEnumerable<DateTimeOffset>> ListExportableDays()
         {
             var ret = new List<DateTimeOffset>();
             try

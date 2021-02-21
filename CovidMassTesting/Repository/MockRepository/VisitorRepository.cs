@@ -401,6 +401,7 @@ namespace CovidMassTesting.Repository.MockRepository
         }
         public override async Task<bool> MapDayToVisitorCode(long day, int visitorCode)
         {
+            await MapDay(day);
             if (!day2visitor.ContainsKey(day))
             {
                 day2visitor[day] = new ConcurrentDictionary<int, int>();
@@ -528,6 +529,9 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             return testing2lastresult.Keys;
         }
-
+        public async override Task<IEnumerable<DateTimeOffset>> ListExportableDays()
+        {
+            return days.Values.Select(t => new DateTimeOffset(t, TimeSpan.Zero));
+        }
     }
 }

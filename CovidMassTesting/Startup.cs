@@ -217,6 +217,7 @@ namespace CovidMassTesting
                 services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.MockSMSSender>();
             }
 
+            services.AddSingleton<ScheduledTasks.ExportTask, ScheduledTasks.ExportTask>();
 
             var sendGridConfiguration = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
             var mailGunConfiguration = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
@@ -236,6 +237,7 @@ namespace CovidMassTesting
                 services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
             }
 
+            services.Configure<Model.Settings.ExportTaskConfiguration>(Configuration.GetSection("ExportTasks"));
         }
 
         /// <summary>
@@ -245,13 +247,17 @@ namespace CovidMassTesting
         /// <param name="env"></param>
         /// <param name="userRepository"></param>
         /// <param name="logger"></param>
-        /// <param name="visitorRepository"></param>        
+        /// <param name="visitorRepository"></param>
+        /// <param name="serviceProvider"></param>
+        /// <param name="lifeTime"></param>        
         public void Configure(
             IApplicationBuilder app,
             IWebHostEnvironment env,
             IUserRepository userRepository,
             ILogger<Startup> logger,
-            IVisitorRepository visitorRepository
+            IVisitorRepository visitorRepository,
+            IServiceProvider serviceProvider,
+            IHostApplicationLifetime lifeTime
             )
         {
             if (app is null)
@@ -338,6 +344,26 @@ namespace CovidMassTesting
             catch (Exception exc)
             {
                 Console.WriteLine(exc.Message);
+            }
+
+            if (Args?.Length > 0)
+            {
+                logger.LogInformation($"Executing task: {Args[0]}");
+
+                switch (Args[0])
+                {
+                    case "export":
+
+                        var exporter = serviceProvider.GetService<ScheduledTasks.ExportTask>();
+                        var ret = exporter.Process().Result;
+                        logger.LogInformation($"Export: {ret}");
+                        break;
+                }
+
+                logger.LogInformation($"Finishing task: {Args[0]} Exitting application");
+                lifeTime.StopApplication();
+
+                //throw new Exception("Exit");
             }
         }
     }

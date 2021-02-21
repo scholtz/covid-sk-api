@@ -2823,6 +2823,16 @@
             Returns true if time is valid
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Settings.ExportTaskConfiguration">
+            <summary>
+            Export task configuraion
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.ExportTaskConfiguration.Emails">
+            <summary>
+            Send to list of emails
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.GoSMSConfiguration">
             <summary>
             GoSMS configuration https://doc.gosms.cz/
@@ -7676,6 +7686,44 @@
               Looks up a localized string similar to You can remove only first item from the queue.
             </summary>
         </member>
+        <member name="T:CovidMassTesting.ScheduledTasks.ExportTask">
+            <summary>
+            Export task
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.ScheduledTasks.ExportTask.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.ScheduledTasks.ExportTask},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.ExportTaskConfiguration},CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Controllers.Email.IEmailSender)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="logger"></param>
+            <param name="configuration"></param>
+            <param name="options"></param>
+            <param name="visitorRepository"></param>
+            <param name="emailSender"></param>
+        </member>
+        <member name="M:CovidMassTesting.ScheduledTasks.ExportTask.Process">
+            <summary>
+            Process
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.ScheduledTasks.ExportTask.Process(System.DateTimeOffset)">
+            <summary>
+            Export data and send it to configured email
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.ScheduledTasks.IScheduledTask">
+            <summary>
+            Scheduler tasks
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.ScheduledTasks.IScheduledTask.Process">
+            <summary>
+            Process
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Startup">
             <summary>
             Startup class
@@ -7707,7 +7755,7 @@
             This method gets called by the runtime. Use this method to add services to the container.
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CovidMassTesting.Repository.Interface.IUserRepository,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Startup},CovidMassTesting.Repository.Interface.IVisitorRepository)">
+        <member name="M:CovidMassTesting.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IWebHostEnvironment,CovidMassTesting.Repository.Interface.IUserRepository,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Startup},CovidMassTesting.Repository.Interface.IVisitorRepository,System.IServiceProvider,Microsoft.Extensions.Hosting.IHostApplicationLifetime)">
             <summary>
             This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
             </summary>
@@ -7715,7 +7763,9 @@
             <param name="env"></param>
             <param name="userRepository"></param>
             <param name="logger"></param>
-            <param name="visitorRepository"></param>        
+            <param name="visitorRepository"></param>
+            <param name="serviceProvider"></param>
+            <param name="lifeTime"></param>        
         </member>
     </members>
 </doc>
