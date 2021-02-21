@@ -34,6 +34,10 @@ namespace CovidMassTesting
         /// Identifies specific run of the application
         /// </summary>
         public static readonly DateTimeOffset Started = DateTimeOffset.Now;
+        /// <summary>
+        /// Args for tasks processing
+        /// </summary>
+        public static string[] Args { get; internal set; }
 
         private static Task watcher = null;
         /// <summary>
@@ -136,7 +140,7 @@ namespace CovidMassTesting
                                         .AllowCredentials();
                 });
             });
-            ThreadPool.SetMinThreads(20, 20);
+            ThreadPool.SetMinThreads(50, 50);
             var redisConfiguration = new RedisConfiguration();
             try
             {

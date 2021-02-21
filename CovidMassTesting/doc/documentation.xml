@@ -7691,6 +7691,11 @@
             Identifies specific run of the application
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Startup.Args">
+            <summary>
+            Args for tasks processing
+            </summary>
+        </member>
         <member name="M:CovidMassTesting.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Constructor

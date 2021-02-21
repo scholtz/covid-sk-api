@@ -25,7 +25,8 @@ namespace CovidMassTesting
             var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
             try
             {
-                logger.Debug("init main function");
+                logger.Debug($"init main function {string.Join(';', args)}");
+                Startup.Args = args;
                 CreateHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
