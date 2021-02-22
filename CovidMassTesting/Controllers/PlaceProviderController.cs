@@ -123,10 +123,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(ret);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -220,10 +224,14 @@ namespace CovidMassTesting.Controllers
                 return Ok(await placeProviderRepository.SetPlaceProvider(toUpdate));
 
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -275,10 +283,14 @@ namespace CovidMassTesting.Controllers
                         Status = InvitationStatus.Invited,
                     }));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -298,10 +310,14 @@ namespace CovidMassTesting.Controllers
             {
                 return Ok(await placeProviderRepository.ListPublic());
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -321,10 +337,14 @@ namespace CovidMassTesting.Controllers
             {
                 return Ok(await placeProviderRepository.ListPrivate(User.GetEmail(), User.IsAdmin(userRepository)));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -394,10 +414,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception("Unknown input");
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -427,6 +451,11 @@ namespace CovidMassTesting.Controllers
                 if (registrations < 0) throw new Exception("Invalid registrations");
                 if (!User.IsAuthorizedToIssueInvoice(userRepository, placeProviderRepository, placeProviderId)) throw new Exception("You are not authorized to issue invoices for this company. Please contact administrator or accountant.");
                 return Ok(placeProviderRepository.IssueProformaInvoiceRegistrations(placeProviderId, registrations, currency));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -466,6 +495,11 @@ namespace CovidMassTesting.Controllers
                 if (registrations < 0) throw new Exception("Invalid registrations");
                 if (!User.IsAuthorizedToIssueInvoice(userRepository, placeProviderRepository, placeProviderId)) throw new Exception("You are not authorized to issue invoices for this company. Please contact administrator or accountant.");
                 return Ok(placeProviderRepository.IssueProformaInvoice(placeProviderId, slaLevel, registrations, currency, slaFrom, slaUntil));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -512,6 +546,11 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(ret);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
@@ -552,6 +591,11 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await placeProviderRepository.RemovePersonAllocation(allocationId, placeId));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
@@ -583,6 +627,11 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await placeProviderRepository.ListAllocations(placeId));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
@@ -609,10 +658,14 @@ namespace CovidMassTesting.Controllers
                 product.LastUpdate = product.CreatedOn;
                 return Ok(await placeProviderRepository.AddProduct(User.GetPlaceProvider(), product));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -635,10 +688,14 @@ namespace CovidMassTesting.Controllers
                 product.LastUpdate = DateTimeOffset.Now;
                 return Ok(await placeProviderRepository.SetProduct(User.GetPlaceProvider(), product));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -659,10 +716,14 @@ namespace CovidMassTesting.Controllers
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 return Ok(await placeProviderRepository.DeleteProduct(User.GetPlaceProvider(), product));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -681,10 +742,14 @@ namespace CovidMassTesting.Controllers
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 return Ok(await placeProviderRepository.ListProducts(User.GetPlaceProvider()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -711,10 +776,14 @@ namespace CovidMassTesting.Controllers
                 var places2 = IPlaceProviderRepository.ExtendByAllProducts(ret, pp, new string[] { placeId });
                 return Ok(places2.Select(ppr => ppr.ToExtendedModel(placeProviderRepository).Result));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -741,10 +810,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(IPlaceProviderRepository.ExtendByAllProducts(ret, pp, places.Where(pp => pp.PlaceProviderId == placeProviderId).Select(p => p.Id).ToArray()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -770,10 +843,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(places2.Select(ppr => ppr.ToExtendedModel(placeProviderRepository).Result));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -793,10 +870,14 @@ namespace CovidMassTesting.Controllers
             {
                 return Ok(await placeProviderRepository.ListPlaceProductByCategory(category));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }

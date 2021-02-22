@@ -51,10 +51,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -83,10 +87,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -118,10 +126,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }

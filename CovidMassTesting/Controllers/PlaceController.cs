@@ -151,10 +151,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(ret.OrderBy(p => p.Value.Name));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -282,10 +286,14 @@ namespace CovidMassTesting.Controllers
                 ///@TODO
                 return Ok(ret.ToDictionary(p => p.Id, p => p));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -313,10 +321,14 @@ namespace CovidMassTesting.Controllers
                 //if (isGlobalAdmin) return Ok(list.ToDictionary(p => p.Id, p => p));
                 return Ok(list.Where(p => p.PlaceProviderId == User.GetPlaceProvider()).OrderBy(p => p.Name).ToDictionary(p => p.Id, p => p));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -430,10 +442,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(ret);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -520,10 +536,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(ret.Values);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -623,10 +643,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(place);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -686,10 +710,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(place);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -735,10 +763,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(item);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -784,10 +816,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(place);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -871,10 +907,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(placeProduct);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -911,10 +951,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await placeRepository.DeletePlaceProduct(productPlace));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }

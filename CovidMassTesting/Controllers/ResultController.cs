@@ -96,10 +96,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code].Value);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -127,10 +131,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(await visitorRepository.GetVisitorByPersonalNumber(rc));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -173,10 +181,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -225,10 +237,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -279,10 +295,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -325,10 +345,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -378,10 +402,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -432,10 +460,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code].Value);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -477,6 +509,11 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_result_state].Value);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
@@ -502,6 +539,11 @@ namespace CovidMassTesting.Controllers
                 }
 
                 return Ok(await visitorRepository.GetNextTest());
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -536,6 +578,11 @@ namespace CovidMassTesting.Controllers
                 var ret = await visitorRepository.RemoveFromDocQueueAndSetTestStateAsTaken(code, isAdmin);
                 return Ok(ret);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
@@ -562,6 +609,11 @@ namespace CovidMassTesting.Controllers
 
                 var ret = await visitorRepository.GetResultVerification(id);
                 return Ok(ret);
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -606,6 +658,11 @@ namespace CovidMassTesting.Controllers
                 var ret = stream.ToArray();
                 logger.LogInformation($"Export size: {ret.Length}");
                 return File(ret, "text/csv", $"final-data-export-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -652,6 +709,11 @@ namespace CovidMassTesting.Controllers
                     name = $"all-tested-{day.Value.Ticks}-{from}-{count}.csv";
                 }
                 return File(ret, "text/csv", name);
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -712,6 +774,11 @@ namespace CovidMassTesting.Controllers
                 }
                 return File(ret, "text/csv", name);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
@@ -747,6 +814,11 @@ namespace CovidMassTesting.Controllers
                 var ret = stream.ToArray();
                 logger.LogInformation($"Export size: {ret.Length}");
                 return File(ret, "text/csv", $"final-data-export-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -784,6 +856,11 @@ namespace CovidMassTesting.Controllers
                     Value = t.ToString("o")
                 }));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
@@ -818,6 +895,11 @@ namespace CovidMassTesting.Controllers
                 var ret = stream.ToArray();
                 logger.LogInformation($"Export size: {ret.Length}");
                 return File(ret, "text/csv", $"not-processed-export-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -855,6 +937,11 @@ namespace CovidMassTesting.Controllers
                 var ret = stream.ToArray();
                 logger.LogInformation($"Export size: {ret.Length}");
                 return File(ret, "text/csv", $"not-visited-export-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
@@ -894,6 +981,11 @@ namespace CovidMassTesting.Controllers
                 var ret = stream.ToArray();
                 logger.LogInformation($"Export size: {ret.Length}");
                 return File(ret, "text/csv", $"all-visitors-export-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {

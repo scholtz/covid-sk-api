@@ -227,10 +227,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -354,10 +358,14 @@ namespace CovidMassTesting.Controllers
                 visitor.SelfRegistration = true;
                 return Ok(await visitorRepository.Register(visitor, ""));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -424,10 +432,14 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 return Ok(await visitorRepository.Register(visitor, User.GetEmail()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -469,10 +481,14 @@ namespace CovidMassTesting.Controllers
                 return Ok(await visitorRepository.GetVisitorByPersonalNumber(reg.RC));
 
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -523,10 +539,14 @@ namespace CovidMassTesting.Controllers
                 }
                 throw new Exception("Registračný kód vyzerá byť neplatný");
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -563,10 +583,14 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 return Ok(await visitorRepository.Register(visitor, User.GetEmail()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -585,10 +609,14 @@ namespace CovidMassTesting.Controllers
             {
                 return configuration["ECIES-Public"];
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -613,10 +641,14 @@ namespace CovidMassTesting.Controllers
 
                 return configuration["ECIES-Private"];
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -742,10 +774,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(ret);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }

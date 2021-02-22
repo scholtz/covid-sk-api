@@ -72,10 +72,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok((await userRepository.ListAll(User.GetPlaceProvider())).ToDictionary(p => p.Email, p => p.ToPublic()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -99,10 +103,14 @@ namespace CovidMassTesting.Controllers
                 }
                 return Ok(ret);
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -120,10 +128,14 @@ namespace CovidMassTesting.Controllers
             {
                 return Ok(await userRepository.ListInvitationsByEmail(User.GetEmail()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -146,10 +158,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await userRepository.ProcessInvitation(invitationId, accepted, User.GetEmail()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -172,10 +188,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await userRepository.ListInvitationsByPP(User.GetPlaceProvider()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -209,10 +229,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await userRepository.SetLocation(User.GetEmail(), placeId, User.GetPlaceProvider()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -237,10 +261,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await userRepository.Preauthenticate(email));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -273,10 +301,14 @@ namespace CovidMassTesting.Controllers
             {
                 return Ok(await userRepository.Authenticate(email, hash));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -301,10 +333,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await userRepository.ChangePassword(User.GetEmail(), oldHash, newHash, User.GetPlaceProvider()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -323,10 +359,14 @@ namespace CovidMassTesting.Controllers
             {
                 return Ok(await userRepository.SetPlaceProvider(User.GetEmail(), User.GetPlaceProvider()));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -349,10 +389,14 @@ namespace CovidMassTesting.Controllers
 
                 return Ok(await userRepository.SetPlaceProvider(User.GetEmail(), placeProviderId));
             }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
             catch (Exception exc)
             {
                 logger.LogError(exc, exc.Message);
-
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
@@ -386,6 +430,11 @@ namespace CovidMassTesting.Controllers
                 var ret = stream.ToArray();
                 logger.LogInformation($"CompanyRegistrationsExport: Export size: {ret.Length}");
                 return File(ret, "text/csv", $"company-registrations-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
             catch (Exception exc)
             {
