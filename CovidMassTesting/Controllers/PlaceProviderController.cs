@@ -235,7 +235,72 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Updates encrypted data for place provider
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("UpdateSensitiveData")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> UpdateSensitiveData([FromBody] PlaceProviderSensitiveData data)
+        {
+            try
+            {
+                if (data is null)
+                {
+                    throw new ArgumentNullException(nameof(data));
+                }
 
+                if (string.IsNullOrEmpty(data.PlaceProviderId))
+                {
+                    throw new Exception("Invalid data has been received");
+                }
+                if (User.GetPlaceProvider() != data.PlaceProviderId) throw new Exception("Please select place provider");
+                return Ok(await placeProviderRepository.SetPlaceProviderSensitiveData(data, false));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Updates encrypted data for place provider
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("GetSensitiveData")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<PlaceProviderSensitiveData>> GetSensitiveData()
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(User.GetPlaceProvider()))
+                {
+                    throw new ArgumentNullException("Please select place provider");
+                }
+
+                return Ok(await placeProviderRepository.GetPlaceProviderSensitiveData(User.GetPlaceProvider()));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 
         /// <summary>
         /// Administrator is allowed to invite other users and set their groups

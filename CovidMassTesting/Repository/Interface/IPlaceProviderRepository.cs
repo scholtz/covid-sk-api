@@ -178,6 +178,20 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="productId"></param>
         Task<Product> GetProduct(string placeProviderId, string productId);
 
+        /// <summary>
+        /// Set place provider highly sensitive data - store them encrypted in database
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        Task<bool> SetPlaceProviderSensitiveData(PlaceProviderSensitiveData data, bool mustBeNew);
+
+        /// <summary>
+        /// Load PP sensitive data
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        Task<PlaceProviderSensitiveData> GetPlaceProviderSensitiveData(string placeProviderId);
 
         /// <summary>
         /// Add to export the all products

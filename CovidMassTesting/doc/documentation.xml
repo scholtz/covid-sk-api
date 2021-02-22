@@ -355,6 +355,19 @@
             <param name="placeProvider"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.UpdateSensitiveData(CovidMassTesting.Model.PlaceProviderSensitiveData)">
+            <summary>
+            Updates encrypted data for place provider
+            </summary>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.GetSensitiveData">
+            <summary>
+            Updates encrypted data for place provider
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.InviteUserToPP(System.String,System.String,System.String,System.String)">
             <summary>
             Administrator is allowed to invite other users and set their groups
@@ -2579,6 +2592,26 @@
             Web
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.PlaceProviderSensitiveData">
+            <summary>
+            Place provider sensitive data.. for example credentials to government ehealth service
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderSensitiveData.PlaceProviderId">
+            <summary>
+            Id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderSensitiveData.EZdravieUser">
+            <summary>
+            eHealth username
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderSensitiveData.EZdraviePass">
+            <summary>
+            Password
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Product">
             <summary>
             Product or service served by the place provider at testing places
@@ -4593,6 +4626,21 @@
             <param name="placeProviderId"></param>
             <param name="productId"></param>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.SetPlaceProviderSensitiveData(CovidMassTesting.Model.PlaceProviderSensitiveData,System.Boolean)">
+            <summary>
+            Set place provider highly sensitive data - store them encrypted in database
+            </summary>
+            <param name="data"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.GetPlaceProviderSensitiveData(System.String)">
+            <summary>
+            Load PP sensitive data
+            </summary>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ExtendByAllProducts(System.Collections.Generic.List{CovidMassTesting.Model.PlaceProduct},CovidMassTesting.Model.PlaceProvider,System.String[])">
             <summary>
             Add to export the all products
@@ -5907,6 +5955,21 @@
             Set place
             </summary>
             <param name="place"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.SetPlaceProviderSensitiveData(CovidMassTesting.Model.PlaceProviderSensitiveData,System.Boolean)">
+            <summary>
+            Set place provider highly sensitive data - store them encrypted in database
+            </summary>
+            <param name="data"></param>
+            <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.GetPlaceProviderSensitiveData(System.String)">
+            <summary>
+            Load PP sensitive data
+            </summary>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository.Delete(CovidMassTesting.Model.PlaceProvider)">

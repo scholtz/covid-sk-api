@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CovidMassTesting.Helpers;
 
 namespace CovidMassTesting.Repository.MockRepository
 {
@@ -16,7 +17,9 @@ namespace CovidMassTesting.Repository.MockRepository
     /// </summary>
     public class PlaceProviderRepository : Repository.RedisRepository.PlaceProviderRepository
     {
+        private readonly IConfiguration configuration;
         private readonly ConcurrentDictionary<string, PlaceProvider> data = new ConcurrentDictionary<string, PlaceProvider>();
+        private readonly ConcurrentDictionary<string, string> dataEncoded = new ConcurrentDictionary<string, string>();
         /// <summary>
         /// Constructor
         /// </summary>
@@ -35,7 +38,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 redisCacheClient,
                 placeRepository)
         {
-
+            this.configuration = configuration;
         }
         /// <summary>
         /// set
@@ -116,6 +119,27 @@ namespace CovidMassTesting.Repository.MockRepository
             var ret = data.Count;
             data.Clear();
             return ret;
+        }
+
+        public async override Task<bool> SetPlaceProviderSensitiveData(PlaceProviderSensitiveData data, bool mustBeNew)
+        {
+            var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var encoded = aes.EncryptToBase64String(objectToEncode);
+            if (mustBeNew && dataEncoded.ContainsKey(data.PlaceProviderId))
+            {
+                throw new Exception("Error setting sensitive data");
+            }
+            dataEncoded[data.PlaceProviderId] = encoded;
+            return true;
+        }
+        public virtual async Task<PlaceProviderSensitiveData> GetPlaceProviderSensitiveData(string placeProviderId)
+        {
+            var encoded = dataEncoded[placeProviderId];
+            if (string.IsNullOrEmpty(encoded)) return null;
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var decoded = aes.DecryptFromBase64String(encoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<PlaceProviderSensitiveData>(decoded);
         }
     }
 }

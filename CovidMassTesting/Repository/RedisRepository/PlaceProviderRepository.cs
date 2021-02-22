@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CovidMassTesting.Helpers;
 
 namespace CovidMassTesting.Repository.RedisRepository
 {
@@ -21,6 +22,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly IPlaceRepository placeRepository;
         private readonly IConfiguration configuration;
         private readonly string REDIS_KEY_PLACES_OBJECTS = "PP";
+        private readonly string REDIS_KEY_PLACES_ENC_OBJECTS = "PP_ENC";
         private readonly string REDIS_KEY_PRO_INVOICES_OBJECTS = "PP_PRO_INVOICE";
         private readonly string REDIS_KEY_REAL_INVOICES_OBJECTS = "PP_REAL_INVOICE";
         private readonly string REDIS_KEY_LAST_PRO_INVOICE = "PP_LAST_PRO_INVOICE";
@@ -217,9 +219,43 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw;
             }
         }
+        /// <summary>
+        /// Set place provider highly sensitive data - store them encrypted in database
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="mustBeNew"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> SetPlaceProviderSensitiveData(PlaceProviderSensitiveData data, bool mustBeNew)
+        {
+            if (data is null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
 
-
-
+            var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(data);
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var encoded = aes.EncryptToBase64String(objectToEncode);
+            var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_ENC_OBJECTS}", data.PlaceProviderId, encoded, mustBeNew);
+            if (mustBeNew && !ret)
+            {
+                throw new Exception("Error setting sensitive data");
+            }
+            return true;
+        }
+        /// <summary>
+        /// Load PP sensitive data
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public virtual async Task<PlaceProviderSensitiveData> GetPlaceProviderSensitiveData(string placeProviderId)
+        {
+            logger.LogInformation($"PP sensitive data loaded from database: {placeProviderId}");
+            var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_ENC_OBJECTS}", placeProviderId);
+            if (string.IsNullOrEmpty(encoded)) return null;
+            using var aes = new Aes(configuration["key"], configuration["iv"]);
+            var decoded = aes.DecryptFromBase64String(encoded);
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<PlaceProviderSensitiveData>(decoded);
+        }
         /// <summary>
         /// Deletes place
         /// </summary>
