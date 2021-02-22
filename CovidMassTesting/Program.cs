@@ -32,7 +32,6 @@ namespace CovidMassTesting
             catch (Exception ex)
             {
                 logger.Error(ex, "Error in init");
-                throw;
             }
             finally
             {
