@@ -142,14 +142,8 @@ namespace CovidMassTesting.Controllers
 
                 return File(ManipulatePdf(configuration), "application/pdf", $"qr-{configuration.Prefix}-{configuration.OffsetIter}-{configuration.Count}.pdf");
             }
-            catch (ArgumentException exc)
-            {
-                logger.LogError(exc.Message);
-                return BadRequest(new ProblemDetails() { Detail = exc.Message });
-            }
             catch (Exception exc)
             {
-                logger.LogError(exc, exc.Message);
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
