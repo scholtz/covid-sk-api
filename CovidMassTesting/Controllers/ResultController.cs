@@ -890,6 +890,8 @@ namespace CovidMassTesting.Controllers
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 var data = await visitorRepository.ListVisitorsInProcess(day, from, count);
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                data = data.Where(p => places.Contains(p.ChosenPlaceId));
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -907,6 +909,7 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
 
         /// <summary>
         /// This method exports all visitors who did not come for the test
@@ -932,6 +935,8 @@ namespace CovidMassTesting.Controllers
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 var data = await visitorRepository.ListAllVisitorsWhoDidNotCome(day, from, count);
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                data = data.Where(p => places.Contains(p.ChosenPlaceId));
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -976,6 +981,8 @@ namespace CovidMassTesting.Controllers
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 var data = await visitorRepository.ListAllVisitors(day, from, count);
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                data = data.Where(p => places.Contains(p.ChosenPlaceId));
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -993,6 +1000,8 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+
         /// <summary>
         /// Format the visitor code
         /// </summary>
@@ -1000,12 +1009,7 @@ namespace CovidMassTesting.Controllers
         /// <returns></returns>
         public static string FormatBarCode(string code)
         {
-            return code
-                .ToUpper()
-                .Replace("‐", "")//utf slash?
-                .Replace("-", "")
-                .Replace(" ", "")
-                .Trim();
+            return code.FormatBarCode();
         }
     }
 }
