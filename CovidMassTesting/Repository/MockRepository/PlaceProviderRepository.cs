@@ -133,7 +133,7 @@ namespace CovidMassTesting.Repository.MockRepository
             dataEncoded[data.PlaceProviderId] = encoded;
             return true;
         }
-        public virtual async Task<PlaceProviderSensitiveData> GetPlaceProviderSensitiveData(string placeProviderId)
+        public override async Task<PlaceProviderSensitiveData> GetPlaceProviderSensitiveData(string placeProviderId)
         {
             var encoded = dataEncoded[placeProviderId];
             if (string.IsNullOrEmpty(encoded)) return null;
