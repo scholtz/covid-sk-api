@@ -108,6 +108,9 @@ namespace CovidMassTesting.Model
         /// Test result. Available options are in Model.TestResult
         /// </summary>
         public string Result => visitor.Result;
+        /// <summary>
+        /// Time when visitor has been notified by our notification methods
+        /// </summary>
         public DateTimeOffset? ResultNotifiedAt => visitor.ResultNotifiedAt?.ToOffset(TimeSpan.FromHours(1));
         /// <summary>
         /// Testing set identifier
@@ -158,6 +161,11 @@ namespace CovidMassTesting.Model
         /// </summary>
         public DateTimeOffset? TestResultTime => visitor.TestResultTime?.ToOffset(TimeSpan.FromHours(1));
         public DateTimeOffset? LastStatusCheck => visitor.LastStatusCheck?.ToOffset(TimeSpan.FromHours(1));
+
+        /// <summary>
+        /// Time when the result of the test was successfully sent to government system
+        /// </summary>
+        public DateTimeOffset? EHealthNotifiedAt => visitor.EHealthNotifiedAt?.ToOffset(TimeSpan.FromHours(1));
         /// <summary>
         /// Administration worker who has validated the person identity
         /// </summary>

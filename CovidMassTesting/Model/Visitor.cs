@@ -156,6 +156,10 @@ namespace CovidMassTesting.Model
         public DateTimeOffset? TestResultTime { get; set; }
         public DateTimeOffset? LastStatusCheck { get; set; }
         /// <summary>
+        /// Time when the result of the test was successfully sent to government system
+        /// </summary>
+        public DateTimeOffset? EHealthNotifiedAt { get; set; }
+        /// <summary>
         /// Administration worker who has validated the person identity
         /// </summary>
         public string VerifiedBy { get; set; }

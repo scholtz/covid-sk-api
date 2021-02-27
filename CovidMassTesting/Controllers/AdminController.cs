@@ -1,4 +1,5 @@
 ﻿//#define UseFixes
+using CovidMassTesting.Connectors;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
@@ -31,6 +32,7 @@ namespace CovidMassTesting.Controllers
         private readonly IConfiguration configuration;
         private readonly IVisitorRepository visitorRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
+        private readonly IMojeEZdravie mojeEZdravie;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -42,6 +44,7 @@ namespace CovidMassTesting.Controllers
         /// <param name="userRepository"></param>
         /// <param name="visitorRepository"></param>
         /// <param name="placeProviderRepository"></param>
+        /// <param name="mojeEZdravie"></param>
         public AdminController(
             IStringLocalizer<AdminController> localizer,
             IConfiguration configuration,
@@ -50,7 +53,8 @@ namespace CovidMassTesting.Controllers
             IPlaceRepository placeRepository,
             IUserRepository userRepository,
             IVisitorRepository visitorRepository,
-            IPlaceProviderRepository placeProviderRepository
+            IPlaceProviderRepository placeProviderRepository,
+            IMojeEZdravie mojeEZdravie
             )
         {
             this.localizer = localizer;
@@ -61,6 +65,7 @@ namespace CovidMassTesting.Controllers
             this.configuration = configuration;
             this.visitorRepository = visitorRepository;
             this.placeProviderRepository = placeProviderRepository;
+            this.mojeEZdravie = mojeEZdravie;
         }
         /// <summary>
         /// Shows available days per place
@@ -252,6 +257,46 @@ namespace CovidMassTesting.Controllers
             {
                 logger.LogError(exc, exc.Message);
 
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+
+        /// <summary>
+        /// This method exports all visitors who are in state in processing
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("SendResultToEHealth")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> SendResultToEHealth([FromForm] string visitorId)
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can use this method");
+                }
+                logger.LogInformation($"SendResultToEHealth: {User.Identity.Name} is sending to nczi {visitorId}");
+
+                var codeClear = visitorId.FormatBarCode();
+                if (codeClear.Length == 9 && int.TryParse(codeClear, out var codeInt))
+                {
+                    var visitor = await visitorRepository.GetVisitor(codeInt);
+                    if (visitor == null) throw new Exception("Visitor not found");
+                    return Ok(await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider()));
+                }
+                throw new Exception("Visitor not found");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }

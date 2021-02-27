@@ -2576,7 +2576,7 @@ namespace NUnitTestCovidApi
             var iVisitor = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
             var visitor1 = iVisitor.GetVisitor(registered[0].Id).Result;
             visitor1.TestingTime = DateTimeOffset.Now.AddMinutes(-16);
-            iVisitor.SetVisitor(visitor1, false);
+            await iVisitor.SetVisitor(visitor1, false);
 
             // TEST mark as sick
             request = SetResult(client, test1, TestResult.PositiveWaitingForCertificate);
@@ -2591,7 +2591,7 @@ namespace NUnitTestCovidApi
             }
 
             testResult.Time = DateTimeOffset.Now.AddMinutes(-15);
-            iVisitor.SetResultObject(testResult, false);
+            await iVisitor.SetResultObject(testResult, false);
             iVisitor.ProcessSingle().Wait();
             Assert.AreEqual(1, noEmailSender.Data.Count);
 
@@ -2609,7 +2609,7 @@ namespace NUnitTestCovidApi
 
             var visitor2 = iVisitor.GetVisitor(registered[1].Id).Result;
             visitor2.TestingTime = DateTimeOffset.Now.AddMinutes(-16);
-            iVisitor.SetVisitor(visitor2, false);
+            await iVisitor.SetVisitor(visitor2, false);
 
 
             // TEST mark as sick

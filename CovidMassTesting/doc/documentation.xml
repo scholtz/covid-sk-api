@@ -9,7 +9,7 @@
             Administration methods
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Connectors.IMojeEZdravie)">
             <summary>
             Constructor
             </summary>
@@ -21,6 +21,7 @@
             <param name="userRepository"></param>
             <param name="visitorRepository"></param>
             <param name="placeProviderRepository"></param>
+            <param name="mojeEZdravie"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.CheckSlots(System.String,System.Int32,System.Int32)">
             <summary>
@@ -57,6 +58,18 @@
             Administrator is allowed to invite other users and set their groups
             </summary>
             <param name="email"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.SendResultToEHealth(System.String)">
+            <summary>
+            This method exports all visitors who are in state in processing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FindVisitor(System.String)">
+            <summary>
+            This method exports all visitors who are in state in processing
+            </summary>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.UpdateVisitor(CovidMassTesting.Model.Visitor)">
@@ -1223,6 +1236,20 @@
             <param name="Text"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Helpers.Text.FormatBarCode(System.String)">
+            <summary>
+            Formats the code.. removes slashes and trims
+            </summary>
+            <param name="code"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.Text.FormatDocument(System.String)">
+            <summary>
+            Format passport, covid pass and other documents to the standardized form
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Helpers.Validators">
             <summary>
             Validator helpers
@@ -1679,6 +1706,81 @@
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.Name">
             <summary>
             Visitor name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vFirst_name">
+            <summary>
+            First name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vLast_name">
+            <summary>
+            Last name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vBirth_number">
+            <summary>
+            RC
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vEmail">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vPhone_number">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vMunicipality">
+            <summary>
+            City
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vStreet">
+            <summary>
+            Street
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vStreet_number">
+            <summary>
+            Street no
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vPostal_code">
+            <summary>
+            zip
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vHealth_insurance_company">
+            <summary>
+            Insurance company
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vEntered_by_first_name">
+            <summary>
+            User name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vEntered_by_last_name">
+            <summary>
+            User last name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vEntered_by_email">
+            <summary>
+            user email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.dBirth_date">
+            <summary>
+            Birthday yyyy-MM-dd
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vGender">
+            <summary>
+            Gender - M | F
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Groups">
@@ -2610,6 +2712,16 @@
         <member name="P:CovidMassTesting.Model.PlaceProviderSensitiveData.EZdraviePass">
             <summary>
             Password
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderSensitiveData.LoginPayload">
+            <summary>
+            EHealth latest login payload
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderSensitiveData.SessionValidity">
+            <summary>
+            Ehealth session validity
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Product">
@@ -4147,6 +4259,11 @@
             Time when test has been confirmed by lab
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.EHealthNotifiedAt">
+            <summary>
+            Time when the result of the test was successfully sent to government system
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.VerifiedBy">
             <summary>
             Administration worker who has validated the person identity
@@ -4276,6 +4393,11 @@
             Test result. Available options are in Model.TestResult
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.ResultNotifiedAt">
+            <summary>
+            Time when visitor has been notified by our notification methods
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.TestingSet">
             <summary>
             Testing set identifier
@@ -4334,6 +4456,11 @@
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.TestResultTime">
             <summary>
             Time when test has been confirmed by lab
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.EHealthNotifiedAt">
+            <summary>
+            Time when the result of the test was successfully sent to government system
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.VerifiedBy">
