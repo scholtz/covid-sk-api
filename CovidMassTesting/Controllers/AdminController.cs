@@ -260,10 +260,10 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize]
-        [HttpGet("FindVisitor")]
+        [HttpPost("FindVisitor")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult> FindVisitor([FromQuery] string query)
+        public async Task<ActionResult> FindVisitor([FromForm] string query)
         {
             try
             {
