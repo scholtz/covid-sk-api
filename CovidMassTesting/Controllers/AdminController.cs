@@ -1,4 +1,5 @@
 ﻿//#define UseFixes
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
@@ -255,6 +256,59 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// This method exports all visitors who are in state in processing
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("FindVisitor")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> FindVisitor([FromQuery] string query)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(query))
+                {
+                    throw new ArgumentException($"'{nameof(query)}' cannot be null or empty", nameof(query));
+                }
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can search for visitor");
+                }
+                logger.LogInformation($"UpdateVisitor: {User.Identity.Name} is fetching visitor {query.GetSHA256Hash()}");
+
+                var codeClear = query.FormatBarCode();
+                Visitor ret;
+                if (codeClear.Length == 9 && int.TryParse(codeClear, out var codeInt))
+                {
+                    ret = await visitorRepository.GetVisitor(codeInt);
+                    if (ret != null)
+                    {
+                        logger.LogInformation($"UpdateVisitor: {User.Identity.Name} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+                        return Ok(ret);
+                    }
+                }
+                var documentClear = query.FormatDocument();
+                ret = await visitorRepository.GetVisitorByPersonalNumber(documentClear);
+                if (ret != null)
+                {
+                    logger.LogInformation($"UpdateVisitor: {User.Identity.Name} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+                    return Ok(ret);
+                }
+                throw new Exception("Visitor not found");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// Global admin can fix visitor
         /// </summary>
         /// <param name="visitor"></param>
@@ -266,9 +320,9 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                if (!User.IsAdmin(userRepository))
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
                 {
-                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_remove_users].Value);
+                    throw new Exception("Only administrator can update visitor directly");
                 }
 
                 logger.LogInformation($"UpdateVisitor: {User.Identity.Name} is updating visitor {visitor.Id}");
