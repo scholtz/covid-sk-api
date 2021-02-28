@@ -57,10 +57,7 @@ namespace CovidMassTesting.Connectors
                 var rPlace = rPlaces.FirstOrDefault(p => p.EHealthId == place.Id);
                 if (rPlace == null) rPlace = rPlaces.FirstOrDefault();
 
-
-
-
-                var list = await this.PlaceDetail(token, day, place.Id);
+                var list = await PlaceDetail(token, day, place.Id);
                 foreach (var person in list.Payload)
                 {
                     if (!person.DesignatedDriveinScheduledAt.HasValue) continue;

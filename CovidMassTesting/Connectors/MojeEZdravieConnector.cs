@@ -75,7 +75,7 @@ namespace CovidMassTesting.Connectors
 
         public override async Task<PlaceDetailResponse> PlaceDetail(string token, DateTimeOffset date, string driveinId)
         {
-            var request = new RestSharp.RestRequest($"api/v1/ema/whiteboard/load_detail?date={date.ToString("yyyy-MM-dd")}", RestSharp.Method.GET, RestSharp.DataFormat.Json);
+            var request = new RestSharp.RestRequest($"api/v1/ema/whiteboard/load_detail?date={date.ToString("yyyy-MM-dd")}", RestSharp.Method.POST, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
             var body = Serialize(new DetailRequest() { DriveinId = driveinId });
             request.AddParameter("application/json", body, ParameterType.RequestBody);
