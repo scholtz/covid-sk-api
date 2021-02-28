@@ -168,6 +168,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public DateTimeOffset? EHealthNotifiedAt { get; set; }
         /// <summary>
+        /// Time when the user was downloaded from external system
+        /// </summary>
+        public DateTimeOffset? DownloadedAt { get; set; }
+        /// <summary>
         /// Administration worker who has validated the person identity
         /// </summary>
         public string VerifiedBy { get; set; }

@@ -89,6 +89,7 @@ namespace CovidMassTesting.Connectors
                         Phone = person.PrimaryPhone,
                         Language = "sk",
                         Result = TestResult.NotTaken,
+                        DownloadedAt = DateTimeOffset.UtcNow
                     };
                     var newRegistration = await visitorRepository.Register(visitor, managerEmail, false);
                     logger.LogInformation($"eHealth: Visitor downloaded {visitor.Id} {visitor.RC.GetSHA256Hash()}");

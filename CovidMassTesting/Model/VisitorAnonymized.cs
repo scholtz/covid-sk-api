@@ -175,6 +175,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public DateTimeOffset? EHealthNotifiedAt => visitor.EHealthNotifiedAt?.ToOffset(TimeSpan.FromHours(1));
         /// <summary>
+        /// Time when the user was downloaded from external system
+        /// </summary>
+        public DateTimeOffset? DownloadedAt => visitor.DownloadedAt?.ToOffset(TimeSpan.FromHours(1));
+        /// <summary>
         /// Administration worker who has validated the person identity
         /// </summary>
         public string VerifiedBy => $"{cohash}{visitor.VerifiedBy}".GetSHA256Hash().Substring(0, 10);
