@@ -348,21 +348,41 @@ namespace CovidMassTesting.Controllers
                 int ret = 0;
                 foreach (var visitor in visitors)
                 {
-                    if (visitor.EHealthNotifiedAt.HasValue) continue;
-                    if (string.IsNullOrEmpty(visitor.RC)) continue;
-                    var status = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository);
-                    if (status)
+                    try
                     {
-                        var toUpdate = await visitorRepository.GetVisitor(visitor.Id);
-                        toUpdate.EHealthNotifiedAt = DateTimeOffset.UtcNow;
-                        toUpdate.ResultNotifiedAt = toUpdate.EHealthNotifiedAt;
-                        await visitorRepository.SetVisitor(toUpdate, false);
-                        logger.LogInformation($"Visitor notified by eHealth {toUpdate.Id} {toUpdate.RC.GetSHA256Hash()}");
-                        ret++;
+                        if (visitor.EHealthNotifiedAt.HasValue) continue;
+                        if (string.IsNullOrEmpty(visitor.RC)) continue;
+
+                        switch (visitor.Result)
+                        {
+                            case TestResult.PositiveWaitingForCertificate:
+                            case TestResult.PositiveCertificateTaken:
+                            case TestResult.NegativeWaitingForCertificate:
+                            case TestResult.NegativeCertificateTaken:
+                                // ok
+                                break;
+                            default:
+                                continue;
+                        }
+
+                        var status = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository);
+                        if (status)
+                        {
+                            var toUpdate = await visitorRepository.GetVisitor(visitor.Id);
+                            toUpdate.EHealthNotifiedAt = DateTimeOffset.UtcNow;
+                            toUpdate.ResultNotifiedAt = toUpdate.EHealthNotifiedAt;
+                            await visitorRepository.SetVisitor(toUpdate, false);
+                            logger.LogInformation($"Visitor notified by eHealth {toUpdate.Id} {toUpdate.RC.GetSHA256Hash()}");
+                            ret++;
+                        }
+                        else
+                        {
+                            logger.LogError($"Visitor NOT notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}");
+                        }
                     }
-                    else
+                    catch (Exception exc)
                     {
-                        logger.LogError($"Visitor NOT notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}");
+                        logger.LogError(exc, "eHealth: Error while sending data to eHealth: " + exc.Message);
                     }
                 }
                 return Ok(ret);
