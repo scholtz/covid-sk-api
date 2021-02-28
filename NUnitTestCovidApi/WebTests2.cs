@@ -1,4 +1,7 @@
-﻿using CovidMassTesting.Helpers;
+﻿//#define DoTests
+
+#if DoTests
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -1189,3 +1192,4 @@ namespace NUnitTestCovidApi
 
     }
 }
+#endif

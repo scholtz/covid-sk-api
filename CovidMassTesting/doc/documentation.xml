@@ -183,6 +183,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.SendDayResultsToEHealth(System.DateTimeOffset)">
+            <summary>
+            This method imports all visitor to eHealth which has not yet been sent to eHealth 
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.DownloadEHealthVisitors(System.Nullable{System.DateTimeOffset})">
             <summary>
             This method exports all visitors who are in state in processing
@@ -4414,6 +4420,11 @@
             Time when the result of the test was successfully sent to government system
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.DownloadedAt">
+            <summary>
+            Time when the user was downloaded from external system
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.VerifiedBy">
             <summary>
             Administration worker who has validated the person identity
@@ -4621,6 +4632,11 @@
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.EHealthNotifiedAt">
             <summary>
             Time when the result of the test was successfully sent to government system
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.DownloadedAt">
+            <summary>
+            Time when the user was downloaded from external system
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.VerifiedBy">
