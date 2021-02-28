@@ -321,6 +321,64 @@ namespace CovidMassTesting.Controllers
 
 
         /// <summary>
+        /// This method imports all visitor to eHealth which has not yet been sent to eHealth 
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("SendDayResultsToEHealth")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> SendDayResultsToEHealth([FromForm] DateTimeOffset date)
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can use this method");
+                }
+                if (configuration["SendResultsToEHealth"] != "1" && configuration["SendResultsToEHealth"] != "0")
+                {
+                    throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
+                }
+                logger.LogInformation($"SendDayResultsToEHealth: {User.Identity.Name} is sending to nczi {date}");
+
+                var visitors = await visitorRepository.ListTestedVisitors(date);
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                visitors = visitors.Where(p => places.Contains(p.ChosenPlaceId));
+                int ret = 0;
+                foreach (var visitor in visitors)
+                {
+                    if (visitor.EHealthNotifiedAt.HasValue) continue;
+                    if (string.IsNullOrEmpty(visitor.RC)) continue;
+                    var status = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository);
+                    if (status)
+                    {
+                        var toUpdate = await visitorRepository.GetVisitor(visitor.Id);
+                        toUpdate.EHealthNotifiedAt = DateTimeOffset.UtcNow;
+                        toUpdate.ResultNotifiedAt = toUpdate.EHealthNotifiedAt;
+                        await visitorRepository.SetVisitor(toUpdate, false);
+                        logger.LogInformation($"Visitor notified by eHealth {toUpdate.Id} {toUpdate.RC.GetSHA256Hash()}");
+                        ret++;
+                    }
+                    else
+                    {
+                        logger.LogError($"Visitor NOT notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}");
+                    }
+                }
+                return Ok(ret);
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// This method exports all visitors who are in state in processing
         /// 
         /// If day is not filled in, use current day
