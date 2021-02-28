@@ -477,8 +477,12 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Zadajte platné osobné číslo zamestnanca");
                 }
-
-                return Ok(await visitorRepository.GetVisitorByPersonalNumber(reg.RC));
+                var ret = await visitorRepository.GetVisitorByPersonalNumber(reg.RC, true);
+                if (ret == null)
+                {
+                    throw new Exception("Zadajte platné osobné číslo zamestnanca");
+                }
+                return Ok(ret);
 
             }
             catch (ArgumentException exc)

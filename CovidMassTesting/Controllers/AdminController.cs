@@ -452,7 +452,7 @@ namespace CovidMassTesting.Controllers
                     }
                 }
                 var documentClear = query.FormatDocument();
-                ret = await visitorRepository.GetVisitorByPersonalNumber(documentClear);
+                ret = await visitorRepository.GetVisitorByPersonalNumber(documentClear, true);
                 if (ret != null)
                 {
                     logger.LogInformation($"UpdateVisitor: {User.Identity.Name} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
