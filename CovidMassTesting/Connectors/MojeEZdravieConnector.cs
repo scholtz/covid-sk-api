@@ -5,6 +5,7 @@ using CovidMassTesting.Model.EZdravie.Payload;
 using CovidMassTesting.Model.EZdravie.Request;
 using CovidMassTesting.Model.EZdravie.Response;
 using CovidMassTesting.Repository.Interface;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -21,8 +22,10 @@ namespace CovidMassTesting.Connectors
         #region Variables and costructor
         private RestSharp.RestClient client;
         private JsonSerializerSettings deserializeSettings;
-        public MojeEZdravieConnector()
+        private readonly ILogger<MojeEZdravieConnector> logger;
+        public MojeEZdravieConnector(ILogger<MojeEZdravieConnector> logger)
         {
+            this.logger = logger;
             client = new RestSharp.RestClient("https://mojeezdravie.nczisk.sk/");
             deserializeSettings = new JsonSerializerSettings
             {
@@ -40,6 +43,7 @@ namespace CovidMassTesting.Connectors
             request.AddHeader("Authorization", $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{pass}"))}");
             string ret = "";
             await Task.Delay(500);
+            logger.LogInformation($"eHealth: Authenticating using {user}");
             var response = await client.ExecuteAsync(request);
             ret = response.Content;
             if (!response.IsSuccessful) throw new Exception(response.Content);
@@ -54,6 +58,7 @@ namespace CovidMassTesting.Connectors
             var body = Serialize(extendSessionRequest);
             request.AddParameter("application/json", body, ParameterType.RequestBody);
             await Task.Delay(500);
+            logger.LogInformation($"eHealth: Extendsession");
             var response = await client.ExecuteAsync(request);
             if (!response.IsSuccessful) throw new Exception(response.Content);
             return JsonConvert.DeserializeObject<Model.EZdravie.ExtendSessionResponse>(response.Content, deserializeSettings);
@@ -76,6 +81,7 @@ namespace CovidMassTesting.Connectors
             request.AddParameter("application/json", body, ParameterType.RequestBody);
             //request.AddJsonBody(new DetailRequest() { DriveinId = driveinId });
             await Task.Delay(500);
+            logger.LogInformation($"eHealth: PlaceDetail {date} {driveinId}");
             var response = await client.ExecuteAsync(request);
             if (!response.IsSuccessful) throw new Exception(response.Content);
             return JsonConvert.DeserializeObject<Model.EZdravie.Response.PlaceDetailResponse>(response.Content, deserializeSettings);
@@ -87,6 +93,7 @@ namespace CovidMassTesting.Connectors
             request.AddHeader("Authorization", $"Bearer {token}");
             request.AddParameter("vSearch_string", vSearch_string);
             await Task.Delay(500);
+            logger.LogInformation($"eHealth: Checking person {vSearch_string.GetSHA256Hash()}");
             var response = await client.ExecuteAsync(request);
             if (!response.IsSuccessful) return null;
             var jArr = JArray.Parse(response.Content);
@@ -108,6 +115,7 @@ namespace CovidMassTesting.Connectors
             var body = Serialize(driveInRequest);
             request.AddParameter("application/json", body, ParameterType.RequestBody);
             await Task.Delay(500);
+            logger.LogInformation($"eHealth: AddPersonToTestingPlace {cfid}");
             var response = await client.ExecuteAsync(request);
             if (!response.IsSuccessful) throw new Exception(response.Content);
             return response.Content;
@@ -236,6 +244,7 @@ namespace CovidMassTesting.Connectors
             request.AddParameter("nIs_mom_user", registerPersonRequest.nIs_mom_user);
 
             await Task.Delay(500);
+            logger.LogInformation($"eHealth: Register person {registerPersonRequest.vBirth_number.GetSHA256Hash()}");
             var response = await client.ExecuteAsync(request);
             if (!response.IsSuccessful) throw new Exception(response.Content);
             return JsonConvert.DeserializeObject<Model.EZdravie.Payload.HttpStatus[][]>(response.Content, deserializeSettings);
@@ -284,6 +293,7 @@ namespace CovidMassTesting.Connectors
 
             await Task.Delay(500);
             var response = await client.ExecuteAsync(request);
+            logger.LogInformation($"eHealth: SetTestResultToPerson {setResultRequest.UserId}");
             if (!response.IsSuccessful) throw new Exception(response.Content);
             return JsonConvert.DeserializeObject<Model.EZdravie.Payload.HttpStatus[][]>(response.Content, deserializeSettings);
         }
