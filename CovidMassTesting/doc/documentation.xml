@@ -5693,6 +5693,15 @@
             <param name="count"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ExportResultSubmissions(System.Int32,System.Int32,System.Collections.Generic.HashSet{System.String})">
+            <summary>
+            ExportResultSubmissions
+            </summary>
+            <param name="from"></param>
+            <param name="count"></param>
+            <param name="places"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository

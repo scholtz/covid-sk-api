@@ -785,6 +785,48 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        [Authorize]
+        [HttpGet("ExportResultSubmissions")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> ExportResultSubmissions([FromQuery] DateTimeOffset? day = null, [FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        {
+            try
+            {
+                if (
+                    !User.IsDataExporter(userRepository, placeProviderRepository)
+                        &&
+                    !await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)
+                )
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
+
+                logger.LogInformation($"ExportResultSubmissions: {User.GetEmail()} is exporting");
+
+                using var stream = new MemoryStream();
+                using var writer = new StreamWriter(stream);
+                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                var data = await visitorRepository.ExportResultSubmissions(from, count, places);
+                csv.WriteRecords(data);
+                writer.Flush();
+                var ret = stream.ToArray();
+                logger.LogInformation($"Export size: {ret.Length}");
+                return File(ret, "text/csv", $"final-data-export-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// Proof of work.. Export for army or other institution with names of visitors
         /// </summary>

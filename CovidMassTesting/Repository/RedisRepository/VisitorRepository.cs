@@ -268,6 +268,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             return redisCacheClient.Db0.HashGetAsync<Result>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}", id);
         }
+        public virtual Task<Dictionary<string, Result>> GetAllResultObjects()
+        {
+            return redisCacheClient.Db0.HashGetAllAsync<Result>($"{configuration["db-prefix"]}{REDIS_KEY_RESULTS_NEW_OBJECTS}");
+        }
         public virtual async Task<Result> GetResultObjectByTestId(string testId)
         {
             var id = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_TEST2RESULTS_NEW_OBJECTS}", testId);
@@ -2483,6 +2487,22 @@ namespace CovidMassTesting.Repository.RedisRepository
             foreach (var regId in (await ListAllRegistrationKeys()).OrderBy(i => i).Skip(from).Take(count))
             {
                 ret.Add(await GetRegistration(regId));
+            }
+            logger.LogInformation($"ExportRegistrations {from} {count} END - {ret.Count}");
+            return ret;
+        }
+
+        public async Task<IEnumerable<Result>> ExportResultSubmissions(int from = 0, int count = 9999999, HashSet<string> places = null)
+        {
+            if (places == null) return Enumerable.Empty<Result>();
+
+            logger.LogInformation($"ExportResultSubmissions {from} {count}");
+            var results = await this.GetAllResultObjects();
+
+            var ret = new List<Result>();
+            foreach (var regId in results.Values.OrderBy(i => i.Time).Skip(from).Take(count))
+            {
+                ret.Add(regId);
             }
             logger.LogInformation($"ExportRegistrations {from} {count} END - {ret.Count}");
             return ret;
