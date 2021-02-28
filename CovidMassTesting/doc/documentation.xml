@@ -183,9 +183,11 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.DownloadEHealthVisitors(System.DateTimeOffset)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.DownloadEHealthVisitors(System.Nullable{System.DateTimeOffset})">
             <summary>
             This method exports all visitors who are in state in processing
+            
+            If day is not filled in, use current day
             </summary>
             <returns></returns>
         </member>

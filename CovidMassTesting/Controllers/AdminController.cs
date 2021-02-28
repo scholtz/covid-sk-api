@@ -312,13 +312,15 @@ namespace CovidMassTesting.Controllers
 
         /// <summary>
         /// This method exports all visitors who are in state in processing
+        /// 
+        /// If day is not filled in, use current day
         /// </summary>
         /// <returns></returns>
         [Authorize]
         [HttpPost("DownloadEHealthVisitors")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult> DownloadEHealthVisitors([FromForm] DateTimeOffset day)
+        public async Task<ActionResult> DownloadEHealthVisitors([FromForm] DateTimeOffset? day)
         {
             try
             {
@@ -330,10 +332,11 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
                 }
-                logger.LogInformation($"DownloadEHealthVisitors: {User.Identity.Name}");
+                if (!day.HasValue) day = DateTimeOffset.Now;
+                logger.LogInformation($"DownloadEHealthVisitors: {User.Identity.Name} {day}");
 
 
-                return Ok(await mojeEZdravie.DownloadEHealthVisitors(User.GetPlaceProvider(), User.GetEmail(), day, visitorRepository, placeRepository, placeProviderRepository, slotRepository, loggerFactory));
+                return Ok(await mojeEZdravie.DownloadEHealthVisitors(User.GetPlaceProvider(), User.GetEmail(), day.Value, visitorRepository, placeRepository, placeProviderRepository, slotRepository, loggerFactory));
             }
             catch (ArgumentException exc)
             {
