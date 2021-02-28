@@ -2301,7 +2301,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<IEnumerable<Visitor>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
-            logger.LogInformation($"ListTestedVisitors {from} {count}");
+            logger.LogInformation($"ListTestedVisitors {from} {count} {day}");
             var ret = new List<Visitor>();
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
