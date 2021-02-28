@@ -2320,6 +2320,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             if (visitor.TestingTime < day.Value || visitor.TestingTime > day.Value.AddDays(1))
                             {
+                                logger.LogInformation($"{visitor.TestingTime < day.Value} | {visitor.TestingTime > day.Value.AddDays(1)}");
                                 // export only visitors at specified day
                                 continue;
                             }
