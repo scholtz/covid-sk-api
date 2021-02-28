@@ -1,4 +1,5 @@
-﻿using CovidMassTesting.Controllers.Email;
+﻿using CovidMassTesting.Connectors;
+using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
@@ -52,6 +53,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <param name="slotRepository"></param>
         /// <param name="placeProviderRepository"></param>
         /// <param name="userRepository"></param>
+        /// <param name="eHealthConnector"></param>
         public VisitorRepository(
             IStringLocalizer<Repository.RedisRepository.VisitorRepository> localizer,
             IConfiguration configuration,
@@ -62,7 +64,8 @@ namespace CovidMassTesting.Repository.MockRepository
             IPlaceRepository placeRepository,
             ISlotRepository slotRepository,
             IPlaceProviderRepository placeProviderRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IMojeEZdravie eHealthConnector
             ) : base(
                 localizer,
                 configuration,
@@ -73,7 +76,8 @@ namespace CovidMassTesting.Repository.MockRepository
                 placeRepository,
                 slotRepository,
                 placeProviderRepository,
-                userRepository
+                userRepository,
+                eHealthConnector
                 )
         {
             logger = loggerFactory.CreateLogger<VisitorRepository>();

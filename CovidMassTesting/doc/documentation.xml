@@ -6034,7 +6034,7 @@
             Visitor mock repository
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Connectors.IMojeEZdravie)">
             <summary>
             Constructor
             </summary>
@@ -6048,6 +6048,7 @@
             <param name="slotRepository"></param>
             <param name="placeProviderRepository"></param>
             <param name="userRepository"></param>
+            <param name="eHealthConnector"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>
@@ -6970,7 +6971,7 @@
             Visitor repository holds data about visitors
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.VisitorRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Repository.RedisRepository.VisitorRepository},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Repository.RedisRepository.VisitorRepository},StackExchange.Redis.Extensions.Core.Abstractions.IRedisCacheClient,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Connectors.IMojeEZdravie)">
             <summary>
             Constructor
             </summary>
@@ -6984,6 +6985,7 @@
             <param name="slotRepository"></param>
             <param name="placeProviderRepository"></param>
             <param name="userRepository"></param>
+            <param name="eHealthConnector"></param>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Add(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>

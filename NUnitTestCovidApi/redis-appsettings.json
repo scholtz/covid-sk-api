@@ -63,6 +63,10 @@
     "Channel": 123
   },
   "DoNotUseObjCache": true,
+  "UseMockedEHealthConnection": "1",
+  "SendResultsThroughQueue": "1",
+  "minWaitTimeForResultMinutes": "0",
+  "SendResultsToEHealth": "1",
 
   "AllowedHosts": "*",
   "db-prefix": "DB1-",

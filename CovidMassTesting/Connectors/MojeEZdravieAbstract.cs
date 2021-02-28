@@ -101,7 +101,7 @@ namespace CovidMassTesting.Connectors
             }
             return ret;
         }
-
+        public abstract Task SendResultToEHealth(Visitor visitor);
         /// <summary>
         /// Send visitor registered in rychlejsie or downloaded from eHealth to eHealth system
         /// 
@@ -117,7 +117,7 @@ namespace CovidMassTesting.Connectors
             IPlaceProviderRepository placeProviderRepository
             )
         {
-
+            await SendResultToEHealth(visitor);
             var data = await MakeSurePlaceProviderIsAuthenticated(placeProviderId, placeProviderRepository);
             if (visitor.PersonType == "foreign")
             {

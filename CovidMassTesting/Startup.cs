@@ -219,8 +219,14 @@ namespace CovidMassTesting
             }
 
             services.AddSingleton<ScheduledTasks.ExportTask, ScheduledTasks.ExportTask>();
-            services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
-
+            if (Configuration["UseMockedEHealthConnection"] == "1" || Configuration["SendResultsToEHealth"] != "1")
+            {
+                services.AddSingleton<IMojeEZdravie, MojeEZdravieMock>();
+            }
+            else
+            {
+                services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
+            }
             var sendGridConfiguration = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
             var mailGunConfiguration = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
 

@@ -1,4 +1,5 @@
-﻿using CovidMassTesting.Controllers.Email;
+﻿using CovidMassTesting.Connectors;
+using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
@@ -33,6 +34,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly ISlotRepository slotRepository;
         private readonly IUserRepository userRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
+        private readonly IMojeEZdravie eHealthConnector;
         private readonly string REDIS_KEY_REGISTATION_OBJECTS = "REGISTRATION";
         private readonly string REDIS_KEY_ID2REGISTATION = "REDIS_KEY_ID2REGISTATION";
 
@@ -61,6 +63,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="slotRepository"></param>
         /// <param name="placeProviderRepository"></param>
         /// <param name="userRepository"></param>
+        /// <param name="eHealthConnector"></param>
         public VisitorRepository(
             IStringLocalizer<VisitorRepository> localizer,
             IConfiguration configuration,
@@ -71,7 +74,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             IPlaceRepository placeRepository,
             ISlotRepository slotRepository,
             IPlaceProviderRepository placeProviderRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IMojeEZdravie eHealthConnector
             )
         {
             this.localizer = localizer;
@@ -84,7 +88,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.slotRepository = slotRepository;
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
-
+            this.eHealthConnector = eHealthConnector;
         }
         /// <summary>
         /// Creates new visitor registration
@@ -878,33 +882,40 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     break;
                 case TestResult.TestIsBeingProcessing:
-                    oldCulture = CultureInfo.CurrentCulture;
-                    oldUICulture = CultureInfo.CurrentUICulture;
-                    specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                    CultureInfo.CurrentCulture = specifiedCulture;
-                    CultureInfo.CurrentUICulture = specifiedCulture;
 
-                    await emailSender.SendEmail(
-                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                        visitor.Email,
-                        $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorTestingInProcessEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
-                        {
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                        });
-
-                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    if (string.IsNullOrEmpty(visitor.PersonTrackingNumber))
                     {
-                        /*
-                         * send only by email..
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(
-                            Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_,
-                            $"{visitor.FirstName} {visitor.LastName}"
-                            )));
-                        */
+                        // notify only own persons
+
+                        oldCulture = CultureInfo.CurrentCulture;
+                        oldUICulture = CultureInfo.CurrentUICulture;
+                        specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                        CultureInfo.CurrentCulture = specifiedCulture;
+                        CultureInfo.CurrentUICulture = specifiedCulture;
+
+                        await emailSender.SendEmail(
+                            localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                            visitor.Email,
+                            $"{visitor.FirstName} {visitor.LastName}",
+                            new Model.Email.VisitorTestingInProcessEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                            {
+                                Name = $"{visitor.FirstName} {visitor.LastName}",
+                            });
+
+                        if (!string.IsNullOrEmpty(visitor.Phone))
+                        {
+                            /*
+                             * send only by email..
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(
+                                Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_,
+                                $"{visitor.FirstName} {visitor.LastName}"
+                                )));
+                            */
+                        }
+
+                        CultureInfo.CurrentCulture = oldCulture;
+                        CultureInfo.CurrentUICulture = oldUICulture;
                     }
-                    CultureInfo.CurrentCulture = oldCulture;
-                    CultureInfo.CurrentUICulture = oldUICulture;
                     break;
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
@@ -1136,9 +1147,50 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return true;
         }
+
+        private async Task<bool> NotifyByEHealth(Visitor visitor, string placeProviderId)
+        {
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.NegativeCertificateTaken:
+                case TestResult.PositiveWaitingForCertificate:
+                case TestResult.NegativeWaitingForCertificate:
+
+                    if (visitor.EHealthNotifiedAt.HasValue) return false;
+
+                    var result = await eHealthConnector.SendResultToEHealth(visitor, placeProviderId, placeProviderRepository);
+                    if (result)
+                    {
+                        visitor.EHealthNotifiedAt = DateTimeOffset.UtcNow;
+                        visitor.ResultNotifiedAt = visitor.EHealthNotifiedAt;
+                        await SetVisitor(visitor, false);
+                        logger.LogInformation($"Visitor notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}");
+                        return true;
+                    }
+                    else
+                    {
+                        logger.LogError($"Visitor NOT notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}. Seems down");
+                        return false;
+                    }
+                    break;
+            }
+            return false;
+        }
         private async Task SendResults(Visitor visitor)
         {
-
+            if (configuration["SendResultsToEHealth"] == "1")
+            {
+                try
+                {
+                    var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                    if (await NotifyByEHealth(visitor, place.PlaceProviderId)) return; // else notify by old way
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, "Unable to send eHealth notification: " + exc.Message);
+                }
+            }
 
             switch (visitor.Result)
             {

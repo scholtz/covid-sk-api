@@ -292,6 +292,11 @@ namespace CovidMassTesting.Connectors
             return JsonConvert.SerializeObject(item);
         }
 
+        public override async Task SendResultToEHealth(Visitor visitor)
+        {
+
+        }
+
         #endregion
     }
 }
