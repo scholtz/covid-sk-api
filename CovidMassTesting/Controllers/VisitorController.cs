@@ -225,7 +225,7 @@ namespace CovidMassTesting.Controllers
                     }
                 }
 
-                return Ok(await visitorRepository.Register(visitor, ""));
+                return Ok(await visitorRepository.Register(visitor, "", true));
             }
             catch (ArgumentException exc)
             {
@@ -356,7 +356,7 @@ namespace CovidMassTesting.Controllers
 
                 visitor.RegistrationTime = DateTimeOffset.UtcNow;
                 visitor.SelfRegistration = true;
-                return Ok(await visitorRepository.Register(visitor, ""));
+                return Ok(await visitorRepository.Register(visitor, "", true));
             }
             catch (ArgumentException exc)
             {
@@ -430,7 +430,7 @@ namespace CovidMassTesting.Controllers
 
                 visitor.RegistrationUpdatedByManager = User.GetEmail();
                 logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
-                return Ok(await visitorRepository.Register(visitor, User.GetEmail()));
+                return Ok(await visitorRepository.Register(visitor, User.GetEmail(), true));
             }
             catch (ArgumentException exc)
             {
@@ -581,7 +581,7 @@ namespace CovidMassTesting.Controllers
                 }
                 visitor.RegistrationUpdatedByManager = User.GetEmail();
                 logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
-                return Ok(await visitorRepository.Register(visitor, User.GetEmail()));
+                return Ok(await visitorRepository.Register(visitor, User.GetEmail(), true));
             }
             catch (ArgumentException exc)
             {

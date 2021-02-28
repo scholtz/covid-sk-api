@@ -14,8 +14,9 @@ namespace CovidMassTesting.Repository.Interface
         /// Creates new visitor
         /// </summary>
         /// <param name="visitor"></param>
+        /// <param name="notify">if notify is set to false, it will not send email or sms</param>
         /// <returns></returns>
-        public Task<Visitor> Add(Visitor visitor);
+        public Task<Visitor> Add(Visitor visitor, bool notify);
         /// <summary>
         /// Sets the visitor to the database
         /// </summary>
@@ -65,8 +66,9 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="visitor"></param>
         /// <param name="managerEmail"></param>
+        /// <param name="notify">If notify is set to false, it does not send email or sms</param>
         /// <returns></returns>
-        public Task<Visitor> Register(Visitor visitor, string managerEmail);
+        public Task<Visitor> Register(Visitor visitor, string managerEmail, bool notify);
 
         /// <summary>
         /// Set test result
@@ -80,8 +82,9 @@ namespace CovidMassTesting.Repository.Interface
         /// Get visitor by personal number
         /// </summary>
         /// <param name="personalNumber"></param>
+        /// <param name="nullOnMissing">If true returns null not found, if false throws exception</param>
         /// <returns></returns>
-        public Task<Visitor> GetVisitorByPersonalNumber(string personalNumber);
+        public Task<Visitor> GetVisitorByPersonalNumber(string personalNumber, bool nullOnMissing = false);
         /// <summary>
         /// Document manager can fetch one visitor from executed tests
         /// </summary>

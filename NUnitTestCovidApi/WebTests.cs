@@ -2828,7 +2828,7 @@ namespace NUnitTestCovidApi
                     Result = TestResult.NegativeWaitingForCertificate,
                     Email = "test@test.com",
                     Phone = "+421907723428"
-                }, "").Result;
+                }, "", true).Result;
                 Assert.Fail("Registration limit should be triggered");
             }
             catch
@@ -2994,7 +2994,7 @@ namespace NUnitTestCovidApi
                 Result = TestResult.NegativeWaitingForCertificate,
                 Email = "test@test.com",
                 Phone = "+421907723428"
-            }).Result;
+            }, true).Result;
 
             iVisitor.ConnectVisitorToTest(vis1.Id, "12345", "aa@bb.cc", "");
             iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate, true);
@@ -3014,7 +3014,7 @@ namespace NUnitTestCovidApi
                 Result = TestResult.NegativeWaitingForCertificate,
                 Email = "test@test.com",
                 Phone = "+421907723428"
-            }).Result;
+            }, true).Result;
             try
             {
                 var result = iVisitor.ConnectVisitorToTest(vis2.Id, "12345", "aa@bb.cc", "").Result;

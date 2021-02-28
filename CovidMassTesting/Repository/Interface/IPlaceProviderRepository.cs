@@ -220,6 +220,7 @@ namespace CovidMassTesting.Repository.Interface
                             CollectInsurance = product.CollectInsurance,
                             EmployeesOnly = product.EmployeesOnly,
                             EmployeesRegistration = product.EmployeesRegistration,
+                            EHealthDefault = product.EHealthDefault,
                             SchoolOnly = product.SchoolOnly
                         });
                     }

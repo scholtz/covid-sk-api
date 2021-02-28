@@ -562,11 +562,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Get current slot
         /// </summary>
         /// <param name="place"></param>
+        /// <param name="time"></param>
         /// <returns></returns>
-        public async Task<Slot5Min> GetCurrentSlot(string place)
+        public async Task<Slot5Min> GetCurrentSlot(string place, DateTimeOffset time)
         {
             var days = await ListDaySlotsByPlace(place);
-            var currentDay = days.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var currentDay = days.Where(d => d.SlotId < time.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
             if (currentDay == null)
             {
                 throw new Exception("Toto miesto dnes nie je otvorené");
@@ -578,14 +579,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception("Toto miesto dnes nie je otvorené");
             }
 
-            var currentHour = hours.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var currentHour = hours.Where(d => d.SlotId < time.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
             if (currentHour == null)
             {
                 currentHour = hours.Last();
             }
 
             var minutes = await ListMinuteSlotsByPlaceAndHourSlotId(place, currentHour.SlotId);
-            var ret = minutes.Where(d => d.SlotId < DateTimeOffset.Now.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var ret = minutes.Where(d => d.SlotId < time.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
             if (ret == null)
             {
                 return minutes.Last();

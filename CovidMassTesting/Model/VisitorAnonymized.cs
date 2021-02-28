@@ -17,6 +17,14 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Id => $"{cohash}{visitor.Id}".GetSHA256Hash().Substring(0, 10);
         /// <summary>
+        /// Covid pass
+        /// </summary>
+        public string PersonTrackingNumber => $"{cohash}{visitor.Id}".GetSHA256Hash().Substring(0, 10);
+        /// <summary>
+        /// Gender F | M
+        /// </summary>
+        public string Gender => $"{cohash}{visitor.Id}".GetSHA256Hash().Substring(0, 10);
+        /// <summary>
         /// Language in which we will communicate to the visitor
         /// 
         /// sk | en
@@ -63,11 +71,11 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// ZIP - Pernament address
         /// </summary>
-        public string ZIP => visitor.ZIP;
+        public string ZIP => $"{cohash}{visitor.ZIP}".GetSHA256Hash().Substring(0, 10);
         /// <summary>
         /// City - Pernament address
         /// </summary>
-        public string City => visitor.City;
+        public string City => $"{cohash}{visitor.City}".GetSHA256Hash().Substring(0, 10);
         /// <summary>
         /// Street - Pernament address
         /// </summary>

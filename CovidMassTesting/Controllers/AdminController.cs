@@ -25,6 +25,7 @@ namespace CovidMassTesting.Controllers
     public class AdminController : ControllerBase
     {
         private readonly IStringLocalizer<AdminController> localizer;
+        private readonly ILoggerFactory loggerFactory;
         private readonly ILogger<AdminController> logger;
         private readonly ISlotRepository slotRepository;
         private readonly IPlaceRepository placeRepository;
@@ -38,6 +39,7 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="localizer"></param>
         /// <param name="configuration"></param>
+        /// <param name="loggerFactory"></param>
         /// <param name="logger"></param>
         /// <param name="slotRepository"></param>
         /// <param name="placeRepository"></param>
@@ -48,6 +50,7 @@ namespace CovidMassTesting.Controllers
         public AdminController(
             IStringLocalizer<AdminController> localizer,
             IConfiguration configuration,
+            ILoggerFactory loggerFactory,
             ILogger<AdminController> logger,
             ISlotRepository slotRepository,
             IPlaceRepository placeRepository,
@@ -58,6 +61,7 @@ namespace CovidMassTesting.Controllers
             )
         {
             this.localizer = localizer;
+            this.loggerFactory = loggerFactory;
             this.logger = logger;
             this.slotRepository = slotRepository;
             this.placeRepository = placeRepository;
@@ -278,6 +282,10 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Only administrator can use this method");
                 }
+                if (configuration["SendResultsToEHealth"] != "0")
+                {
+                    throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
+                }
                 logger.LogInformation($"SendResultToEHealth: {User.Identity.Name} is sending to nczi {visitorId}");
 
                 var codeClear = visitorId.FormatBarCode();
@@ -285,7 +293,7 @@ namespace CovidMassTesting.Controllers
                 {
                     var visitor = await visitorRepository.GetVisitor(codeInt);
                     if (visitor == null) throw new Exception("Visitor not found");
-                    return Ok(await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider()));
+                    return Ok(await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository));
                 }
                 throw new Exception("Visitor not found");
             }
@@ -300,6 +308,45 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+
+        /// <summary>
+        /// This method exports all visitors who are in state in processing
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("DownloadEHealthVisitors")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> DownloadEHealthVisitors([FromForm] DateTimeOffset day)
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can use this method");
+                }
+                if (configuration["SendResultsToEHealth"] != "0")
+                {
+                    throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
+                }
+                logger.LogInformation($"DownloadEHealthVisitors: {User.Identity.Name}");
+
+
+                return Ok(await mojeEZdravie.DownloadEHealthVisitors(User.GetPlaceProvider(), User.GetEmail(), day, visitorRepository, placeRepository, placeProviderRepository, slotRepository, loggerFactory));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
         /// <summary>
         /// This method exports all visitors who are in state in processing
         /// </summary>

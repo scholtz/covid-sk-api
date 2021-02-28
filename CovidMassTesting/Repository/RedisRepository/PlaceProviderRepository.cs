@@ -242,6 +242,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return true;
         }
+
         /// <summary>
         /// Load PP sensitive data
         /// </summary>

@@ -118,9 +118,10 @@ namespace CovidMassTesting.Repository.Interface
         /// <summary>
         /// Get current slot
         /// </summary>
-        /// <param name="place"></param>
+        /// <param name="place">Place id</param>
+        /// <param name="time">Time when the registration should be done</param>
         /// <returns></returns>
-        public Task<Slot5Min> GetCurrentSlot(string place);
+        public Task<Slot5Min> GetCurrentSlot(string place, DateTimeOffset time);
         /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>

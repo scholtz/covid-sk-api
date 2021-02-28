@@ -36,6 +36,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? EmployeesRegistration { get; set; } = false;
         /// <summary>
+        /// Default for eHealth connection
+        /// </summary>
+        public bool? EHealthDefault { get; set; } = false;
+        /// <summary>
         /// Collect insurance organisation
         /// </summary>
         public bool? CollectInsurance { get; set; } = true;

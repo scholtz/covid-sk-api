@@ -60,6 +60,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? EmployeesOnly { get; set; } = false;
         /// <summary>
+        /// Default for eHealth connection
+        /// </summary>
+        public bool? EHealthDefault { get; set; } = false;
+        /// <summary>
         /// Corporations may check this on and only its employees can self register
         /// </summary>
         public bool? EmployeesRegistration { get; set; } = false;
@@ -85,6 +89,7 @@ namespace CovidMassTesting.Model
                 EmployeesOnly = EmployeesOnly,
                 EmployeesRegistration = EmployeesRegistration,
                 SchoolOnly = SchoolOnly,
+                EHealthDefault = EHealthDefault,
                 PlaceId = PlaceId,
                 PlaceProviderId = PlaceProviderId,
                 Price = Price,

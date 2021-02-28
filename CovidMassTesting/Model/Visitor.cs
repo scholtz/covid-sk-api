@@ -14,6 +14,14 @@ namespace CovidMassTesting.Model
         /// </summary>
         public int Id { get; set; }
         /// <summary>
+        /// Covid pass
+        /// </summary>
+        public string PersonTrackingNumber { get; set; }
+        /// <summary>
+        /// Gender F | M
+        /// </summary>
+        public string Gender { get; set; }
+        /// <summary>
         /// Language in which we will communicate to the visitor
         /// 
         /// sk | en

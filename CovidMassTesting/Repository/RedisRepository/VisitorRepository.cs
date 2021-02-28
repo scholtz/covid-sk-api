@@ -90,8 +90,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Creates new visitor registration
         /// </summary>
         /// <param name="visitor"></param>
+        /// <param name="notify">Send notification</param>
         /// <returns></returns>
-        public async Task<Visitor> Add(Visitor visitor)
+        public async Task<Visitor> Add(Visitor visitor, bool notify)
         {
             if (visitor is null)
             {
@@ -125,61 +126,64 @@ namespace CovidMassTesting.Repository.RedisRepository
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
             await MapDayToVisitorCode(slot.TestingDayId, visitor.Id);
-            var oldCulture = CultureInfo.CurrentCulture;
-            var oldUICulture = CultureInfo.CurrentUICulture;
-            var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-            CultureInfo.CurrentCulture = specifiedCulture;
-            CultureInfo.CurrentUICulture = specifiedCulture;
 
-
-            var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
-
-            try
+            if (notify)
             {
-                //var product = await placeRepository.GetPlaceProduct();
-                var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
-                var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+                var oldCulture = CultureInfo.CurrentCulture;
+                var oldUICulture = CultureInfo.CurrentUICulture;
+                var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                CultureInfo.CurrentCulture = specifiedCulture;
+                CultureInfo.CurrentUICulture = specifiedCulture;
 
-                var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product?.Name);
-                attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+
+                var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
+
+                try
                 {
-                    Content = Convert.ToBase64String(pdf),
-                    Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slot.TimeInCET.ToString("MMdd")}.pdf",
-                    Type = "application/pdf",
-                    Disposition = "attachment"
-                });
-            }
-            catch (Exception exc)
-            {
-                logger.LogError(exc, "Error generating file");
-            }
+                    //var product = await placeRepository.GetPlaceProduct();
+                    var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                    var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
-            await emailSender.SendEmail(
-                localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                visitor.Email,
-                $"{visitor.FirstName} {visitor.LastName}",
-                new Model.Email.VisitorRegistrationEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                    var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product?.Name);
+                    attachments.Add(new SendGrid.Helpers.Mail.Attachment()
+                    {
+                        Content = Convert.ToBase64String(pdf),
+                        Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slot.TimeInCET.ToString("MMdd")}.pdf",
+                        Type = "application/pdf",
+                        Disposition = "attachment"
+                    });
+                }
+                catch (Exception exc)
                 {
-                    Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
-                    Name = $"{visitor.FirstName} {visitor.LastName}",
-                    Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                    Place = place.Name,
-                    PlaceDescription = place.Description
-                }, attachments);
+                    logger.LogError(exc, "Error generating file");
+                }
+                await emailSender.SendEmail(
+                    localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                    visitor.Email,
+                    $"{visitor.FirstName} {visitor.LastName}",
+                    new Model.Email.VisitorRegistrationEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                    {
+                        Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                        Name = $"{visitor.FirstName} {visitor.LastName}",
+                        Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                        Place = place.Name,
+                        PlaceDescription = place.Description
+                    }, attachments);
 
-            if (!string.IsNullOrEmpty(visitor.Phone))
-            {
-                await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
-                    string.Format(
-                        Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_,
-                        $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
-                        $"{visitor.FirstName} {visitor.LastName}",
-                        $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                        place.Name
-                )));
+                if (!string.IsNullOrEmpty(visitor.Phone))
+                {
+                    await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                        string.Format(
+                            Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_,
+                            $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
+                            $"{visitor.FirstName} {visitor.LastName}",
+                            $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                            place.Name
+                    )));
+                }
+                CultureInfo.CurrentCulture = oldCulture;
+                CultureInfo.CurrentUICulture = oldUICulture;
             }
-            CultureInfo.CurrentCulture = oldCulture;
-            CultureInfo.CurrentUICulture = oldUICulture;
             return await SetVisitor(visitor, true);
         }
         /// <summary>
@@ -352,7 +356,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                 }
                 // fix month
-                if (!visitor.BirthDayMonth.HasValue)
+                if (!visitor.BirthDayMonth.HasValue || string.IsNullOrEmpty(visitor.Gender))
                 {
                     var month = visitor.RC.Substring(2, 2);
                     if (int.TryParse(month, out var monthInt))
@@ -360,6 +364,19 @@ namespace CovidMassTesting.Repository.RedisRepository
                         if (monthInt > 50)
                         {
                             monthInt -= 50;
+                            if (visitor.Gender != "F")
+                            {
+                                visitor.Gender = "F";
+                                updated = true;
+                            }
+                        }
+                        else
+                        {
+                            if (visitor.Gender != "M")
+                            {
+                                visitor.Gender = "M";
+                                updated = true;
+                            }
                         }
                         if (monthInt >= 1 && monthInt <= 12)
                         {
@@ -1491,12 +1508,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Returns visitor by personal number
         /// </summary>
         /// <param name="personalNumber"></param>
+        /// <param name="nullOnMissing"></param>
         /// <returns></returns>
-        public async Task<Visitor> GetVisitorByPersonalNumber(string personalNumber)
+        public async Task<Visitor> GetVisitorByPersonalNumber(string personalNumber, bool nullOnMissing = false)
         {
             var code = await GETVisitorCodeFromPersonalNumber(personalNumber);
             if (!code.HasValue)
             {
+                if (nullOnMissing) return null;
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Unknown_personal_number].Value);
             }
 
@@ -1713,8 +1732,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="visitor"></param>
         /// <param name="managerEmail"></param>
+        /// <param name="notify"></param>
         /// <returns></returns>
-        public async Task<Visitor> Register(Visitor visitor, string managerEmail)
+        public async Task<Visitor> Register(Visitor visitor, string managerEmail, bool notify)
         {
             if (visitor is null)
             {
@@ -1726,20 +1746,23 @@ namespace CovidMassTesting.Repository.RedisRepository
                 // register to manager place and nearest slot
 
                 var manager = await userRepository.GetPublicUser(managerEmail);
-
-                visitor.ChosenPlaceId = manager.Place;
-                if (string.IsNullOrEmpty(visitor.ChosenPlaceId))
+                if (manager == null) throw new Exception($"Manager not found by email {managerEmail}");
+                if (notify) // if not notify do not update place by manager nor update the slot
                 {
-                    throw new Exception("Vyberte si najskôr miesto kde sa nachádzate.");
-                }
+                    visitor.ChosenPlaceId = manager.Place;
+                    if (string.IsNullOrEmpty(visitor.ChosenPlaceId))
+                    {
+                        throw new Exception("Vyberte si najskôr miesto kde sa nachádzate.");
+                    }
 
-                var currentSlot = await slotRepository.GetCurrentSlot(manager.Place);
-                if (currentSlot == null)
-                {
-                    throw new Exception("Unable to select testing slot.");
-                }
+                    var currentSlot = await slotRepository.GetCurrentSlot(manager.Place, DateTimeOffset.UtcNow);
+                    if (currentSlot == null)
+                    {
+                        throw new Exception("Unable to select testing slot.");
+                    }
 
-                visitor.ChosenSlot = currentSlot.SlotId;
+                    visitor.ChosenSlot = currentSlot.SlotId;
+                }
             }
             visitor = await FixVisitor(visitor, false);
             try
@@ -1850,7 +1873,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 // new registration
                 logger.LogInformation($"New registration");
 
-                var ret = await Add(visitor);
+                var ret = await Add(visitor, notify);
 
                 await slotRepository.IncrementRegistration5MinSlot(slotM);
                 await slotRepository.IncrementRegistrationHourSlot(slotH);
@@ -1865,12 +1888,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 logger.LogInformation($"Update registration");
                 // update registration
-                visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
                 if (string.IsNullOrEmpty(managerEmail))
                 {
                     if (previous.TestingTime.HasValue)
                     {
-                        // visitor which was previously tested
+                        // self registration after has been tested
                         if (previous.Result == TestResult.PositiveCertificateTaken ||
                             previous.Result == TestResult.PositiveWaitingForCertificate
                             )
@@ -1887,7 +1909,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             // new registration
                             logger.LogInformation($"New updated registration");
 
-                            var ret2 = await Add(visitor);
+                            var ret2 = await Add(visitor, notify);
 
                             await slotRepository.IncrementRegistration5MinSlot(slotM);
                             await slotRepository.IncrementRegistrationHourSlot(slotH);
@@ -1899,9 +1921,63 @@ namespace CovidMassTesting.Repository.RedisRepository
                             return ret2;
                         }
                     }
+                    else
+                    {
+                        // self registration when has not yet been tested
+
+                        visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
+
+                        // Update registration
+                    }
+                }
+                else
+                {
+                    if (previous.TestingTime.HasValue)
+                    {
+                        // manager registration after has been tested
+                        if (previous.Result == TestResult.PositiveCertificateTaken ||
+                            previous.Result == TestResult.PositiveWaitingForCertificate
+                            )
+                        {
+
+                            if (previous.TestingTime.Value.AddDays(2) > DateTimeOffset.Now)
+                            {
+                                throw new Exception("POZOR !! Osoba je pozitívne testovaná v predchádzajúcich 2 dňoch");
+                            }
+                        }
+
+                        // new registration
+                        logger.LogInformation($"New updated registration");
+
+                        var ret2 = await Add(visitor, notify);
+
+                        await slotRepository.IncrementRegistration5MinSlot(slotM);
+                        await slotRepository.IncrementRegistrationHourSlot(slotH);
+                        await slotRepository.IncrementRegistrationDaySlot(slotD);
+                        await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+
+                        logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+
+                        return ret2;
+                    }
+                    else
+                    {
+                        // manager registration when has not yet been tested
+
+                        visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
+
+                        // Update registration
+                    }
                 }
                 var slot = slotM;
-                visitor.Language = CultureInfo.CurrentCulture.Name;
+                if (string.IsNullOrEmpty(managerEmail)) // do not update the manager language
+                {
+                    visitor.Language = CultureInfo.CurrentCulture.Name;
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(visitor.Language)) visitor.Language = CultureInfo.CurrentCulture.Name;
+                }
                 var ret = await SetVisitor(visitor, false);
                 if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {
@@ -1943,32 +2019,34 @@ namespace CovidMassTesting.Repository.RedisRepository
                         logger.LogError(exc, "Error generating file");
                     }
 
-
-                    await emailSender.SendEmail(
-                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                        visitor.Email,
-                        $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorChangeRegistrationEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
-                        {
-                            Code = codeFormatted,
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                            Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                            Place = place.Name,
-                            PlaceDescription = place.Description
-
-                        }, attachments);
-
-                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    if (notify)
                     {
-
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
-                            string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0___we_have_updated_your_registration__1___Time___2___Place___3_].Value,
+                        await emailSender.SendEmail(
+                            localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                            visitor.Email,
                             $"{visitor.FirstName} {visitor.LastName}",
-                            codeFormatted,
-                            $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                            place.Name
-                        )));
+                            new Model.Email.VisitorChangeRegistrationEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                            {
+                                Code = codeFormatted,
+                                Name = $"{visitor.FirstName} {visitor.LastName}",
+                                Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                                Place = place.Name,
+                                PlaceDescription = place.Description
 
+                            }, attachments);
+
+                        if (!string.IsNullOrEmpty(visitor.Phone))
+                        {
+
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                                string.Format(localizer[Repository_RedisRepository_VisitorRepository.Dear__0___we_have_updated_your_registration__1___Time___2___Place___3_].Value,
+                                $"{visitor.FirstName} {visitor.LastName}",
+                                codeFormatted,
+                                $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                                place.Name
+                            )));
+
+                        }
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
@@ -2218,8 +2296,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         continue;
                     }
-
-                    ret.Add(new VisitorAnonymized(visitor, configuration["key"]));
+                    string key = configuration["key"];
+                    if (!string.IsNullOrEmpty(configuration["AnonymizerKey"]))
+                    {
+                        key = configuration["AnonymizerKey"];
+                    }
+                    ret.Add(new VisitorAnonymized(visitor, key));
                 }
             }
             logger.LogInformation($"ListAnonymizedVisitors {from} {count} END - {ret.Count}");

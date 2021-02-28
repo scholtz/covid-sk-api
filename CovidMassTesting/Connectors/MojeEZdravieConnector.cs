@@ -1,4 +1,5 @@
-﻿using CovidMassTesting.Model;
+﻿using CovidMassTesting.Helpers;
+using CovidMassTesting.Model;
 using CovidMassTesting.Model.EZdravie;
 using CovidMassTesting.Model.EZdravie.Payload;
 using CovidMassTesting.Model.EZdravie.Request;
@@ -15,15 +16,13 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Connectors
 {
-    public class MojeEZdravieConnector : IMojeEZdravie
+    public class MojeEZdravieConnector : MojeEZdravieAbstract
     {
+        #region Variables and costructor
         private RestSharp.RestClient client;
         private JsonSerializerSettings deserializeSettings;
-        private readonly IPlaceProviderRepository placeProviderRepository;
-        public MojeEZdravieConnector(IPlaceProviderRepository placeProviderRepository)
+        public MojeEZdravieConnector()
         {
-            this.placeProviderRepository = placeProviderRepository;
-
             client = new RestSharp.RestClient("https://mojeezdravie.nczisk.sk/");
             deserializeSettings = new JsonSerializerSettings
             {
@@ -33,133 +32,9 @@ namespace CovidMassTesting.Connectors
                 },
             };
         }
-
-        public async Task<bool> SendResultToEHealth(Visitor visitor, string placeProviderId)
-        {
-            var data = await placeProviderRepository.GetPlaceProviderSensitiveData(placeProviderId);
-            if (data.SessionValidity == null || data.SessionValidity.ValidThru.AddMinutes(10) < DateTimeOffset.Now)
-            {
-                // session is going to expire
-                if (data.SessionValidity == null || data.SessionValidity.ValidThru.AddMinutes(10) < DateTimeOffset.Now)
-                {
-                    if (data.SessionValidity == null || data.SessionValidity.ValidThru.AddMinutes(1) < DateTimeOffset.Now)
-                    {
-                        // expired .. login again
-                        data.LoginPayload = (await Authenticate(data.EZdravieUser, data.EZdraviePass))?.Payload;
-                        if (string.IsNullOrEmpty(data.LoginPayload.User.Login))
-                        {
-                            throw new Exception("Unable to authenticate to ehealth");
-                        }
-                    }
-
-                    // extend session
-                    var extendSessionRequest = new ExtendSessionRequest()
-                    {
-                        AccessId = data.LoginPayload.Session.SessionId,
-                        UserId = data.LoginPayload.User.Id
-                    };
-                    data.SessionValidity = await Extendsession(data.LoginPayload.Session.Token, extendSessionRequest);
-                    if (data.SessionValidity == null)
-                    {
-                        data.SessionValidity = new ExtendSessionResponse()
-                        {
-                            ValidThru = data.LoginPayload.Session.ValidThru
-                        };
-                    }
-                    if (data.SessionValidity.ValidThru.AddMinutes(1) < DateTimeOffset.Now)
-                    {
-                        throw new Exception("Unable to prolong the session");
-                    }
-
-                    await placeProviderRepository.SetPlaceProviderSensitiveData(data, false);
-                }
-
-                if (visitor.PersonType == "foreign")
-                {
-                    throw new Exception("Only residents supported right now");
-                }
-            }
-
-            // session is valid
-
-            if (string.IsNullOrEmpty(visitor.RC))
-            {
-                throw new Exception("Error - invalid personal number");
-            }
-
-            var check = await this.CheckPerson(data.LoginPayload.Session.Token, visitor.RC);
-            if (check?.CfdId > 0)
-            {
-                // ok
-            }
-            else
-            {
-                var personData = await RegisterPerson(data.LoginPayload.Session.Token, RegisterPersonRequest.FromVisitor(visitor, data.LoginPayload));
-                check = await this.CheckPerson(data.LoginPayload.Session.Token, visitor.RC);
-                if (check?.CfdId > 0)
-                {
-                    // ok
-                }
-                else
-                {
-                    throw new Exception("Unable to process visitor in ehealth - not found in search");
-                }
-            }
-
-            var driveIn = await DriveInQueue(data.LoginPayload.Session.Token, DateTimeOffset.Now);
-            var place = driveIn.Payload.OrderByDescending(p => p.DailyCapacity).FirstOrDefault();
-
-            var t = DateTimeOffset.Now.ToString("yyyy-MM-dd HH:mm:ss");
-            var input = new DriveInRequest()
-            {
-                DesignatedDriveinCity = place.City,
-                DesignatedDriveinId = place.Id,
-                DesignatedDriveinLatitude = place.Latitude,
-                DesignatedDriveinLongitude = place.Longitude,
-                DesignatedDriveinScheduledAt = t,
-                DesignatedDriveinStreetName = place.StreetName,
-                DesignatedDriveinStreetNumber = place.StreetNumber,
-                DesignatedDriveinTitle = place.Title,
-                DesignatedDriveinZipCode = place.ZipCode,
-                MedicalAssessedAt = t,
-                State = "SD",
-                Triage = "2",
-            };
-            var addPersonToPlace = await AddPersonToTestingPlace(data.LoginPayload.Session.Token, check.CfdId, input);
-            if (addPersonToPlace != "1") throw new Exception("Unexpected error returned while adding person to place");
-
-            string result;
-            switch (visitor.Result)
-            {
-                case TestResult.PositiveWaitingForCertificate:
-                case TestResult.PositiveCertificateTaken:
-                    result = "POSITIVE";
-                    break;
-
-                case TestResult.NegativeWaitingForCertificate:
-                case TestResult.NegativeCertificateTaken:
-                    result = "NEGATIVE";
-                    break;
-                default:
-                    throw new Exception($"Unable to determine state: {visitor.Result}");
-            }
-
-            var setResultRequest = new CovidMassTesting.Model.EZdravie.Request.SetResultRequest()
-            {
-                Id = 0,
-                UserId = data.LoginPayload.User.Id,
-                CovidFormDataId = check.CfdId,
-                FinalResult = result,
-                SpecimenId = visitor.TestingSet,
-                SpecimenCollectedAt = visitor.TestingTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
-                ScreeningEndedAt = visitor.TestResultTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? visitor.TestingTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
-            };
-            var setResult = await SetTestResultToPerson(data.LoginPayload.Session.Token, setResultRequest);
-            return setResult[0][0].HttpStatusCode == 200;
-        }
-
-
-        public async Task<Model.EZdravie.LoginResponse> Authenticate(string user, string pass)
+        #endregion
+        #region Core methods
+        public override async Task<Model.EZdravie.LoginResponse> Authenticate(string user, string pass)
         {
             var request = new RestSharp.RestRequest("api/v1/login", RestSharp.Method.POST, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Basic {Convert.ToBase64String(Encoding.UTF8.GetBytes($"{user}:{pass}"))}");
@@ -171,7 +46,7 @@ namespace CovidMassTesting.Connectors
             return JsonConvert.DeserializeObject<Model.EZdravie.LoginResponse>(ret, deserializeSettings);
         }
 
-        public async Task<ExtendSessionResponse> Extendsession(string token, ExtendSessionRequest extendSessionRequest)
+        public override async Task<ExtendSessionResponse> Extendsession(string token, ExtendSessionRequest extendSessionRequest)
         {
             var request = new RestSharp.RestRequest($"api/v1/extendsession", RestSharp.Method.POST, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
@@ -183,7 +58,7 @@ namespace CovidMassTesting.Connectors
             if (!response.IsSuccessful) throw new Exception(response.Content);
             return JsonConvert.DeserializeObject<Model.EZdravie.ExtendSessionResponse>(response.Content, deserializeSettings);
         }
-        public async Task<Model.EZdravie.DriveInQueueResponse> DriveInQueue(string token, DateTimeOffset date)
+        public override async Task<Model.EZdravie.DriveInQueueResponse> DriveInQueue(string token, DateTimeOffset date)
         {
             var request = new RestSharp.RestRequest($"api/v1/ema/whiteboard/drivein-queue?date={date.ToString("yyyy-MM-dd")}", RestSharp.Method.GET, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
@@ -193,7 +68,7 @@ namespace CovidMassTesting.Connectors
             return JsonConvert.DeserializeObject<Model.EZdravie.DriveInQueueResponse>(response.Content, deserializeSettings);
         }
 
-        public async Task<PlaceDetailResponse> PlaceDetail(string token, DateTimeOffset date, string driveinId)
+        public override async Task<PlaceDetailResponse> PlaceDetail(string token, DateTimeOffset date, string driveinId)
         {
             var request = new RestSharp.RestRequest($"api/v1/ema/whiteboard/load_detail?date={date.ToString("yyyy-MM-dd")}", RestSharp.Method.GET, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
@@ -206,7 +81,7 @@ namespace CovidMassTesting.Connectors
             return JsonConvert.DeserializeObject<Model.EZdravie.Response.PlaceDetailResponse>(response.Content, deserializeSettings);
         }
 
-        public async Task<CheckResult> CheckPerson(string token, string vSearch_string)
+        public override async Task<CheckResult> CheckPerson(string token, string vSearch_string)
         {
             var request = new RestSharp.RestRequest($"api/sp_v0/sp_covid_gp_check_person", RestSharp.Method.POST, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
@@ -225,7 +100,7 @@ namespace CovidMassTesting.Connectors
         }
 
 
-        public async Task<string> AddPersonToTestingPlace(string token, int cfid, DriveInRequest driveInRequest)
+        public override async Task<string> AddPersonToTestingPlace(string token, int cfid, DriveInRequest driveInRequest)
         {
             var request = new RestSharp.RestRequest($"api/covid_form_data/{cfid}", RestSharp.Method.PUT, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
@@ -238,7 +113,7 @@ namespace CovidMassTesting.Connectors
             return response.Content;
         }
 
-        public async Task<object> RegisterPerson(string token, RegisterPersonRequest registerPersonRequest)
+        public override async Task<HttpStatus[][]> RegisterPerson(string token, RegisterPersonRequest registerPersonRequest)
         {
             var request = new RestSharp.RestRequest($"api/sp_v0/sp_covid_form_cc_iu", RestSharp.Method.POST, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
@@ -366,7 +241,7 @@ namespace CovidMassTesting.Connectors
             return JsonConvert.DeserializeObject<Model.EZdravie.Payload.HttpStatus[][]>(response.Content, deserializeSettings);
         }
 
-        public async Task<HttpStatus[][]> SetTestResultToPerson(string token, SetResultRequest setResultRequest)
+        public override async Task<HttpStatus[][]> SetTestResultToPerson(string token, SetResultRequest setResultRequest)
         {
             var request = new RestSharp.RestRequest($"api/sp_v0/sp_covid_form_lab_order_and_result_iu", RestSharp.Method.POST, RestSharp.DataFormat.Json);
             request.AddHeader("Authorization", $"Bearer {token}");
@@ -416,5 +291,7 @@ namespace CovidMassTesting.Connectors
         {
             return JsonConvert.SerializeObject(item);
         }
+
+        #endregion
     }
 }

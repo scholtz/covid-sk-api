@@ -4,17 +4,134 @@
         <name>CovidMassTesting</name>
     </assembly>
     <members>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.Authenticate(System.String,System.String)">
+            <summary>
+            Authenticase to eHealth
+            </summary>
+            <param name="user">username - You can obtain this from the eHealth support</param>
+            <param name="pass">password</param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.CheckPerson(System.String,System.String)">
+            <summary>
+            Check person. Returns null if person is not in eHealth
+            </summary>
+            <param name="token"></param>
+            <param name="vSearch_string"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.Extendsession(System.String,CovidMassTesting.Model.EZdravie.Request.ExtendSessionRequest)">
+            <summary>
+            Extends session validity
+            </summary>
+            <param name="token"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.DriveInQueue(System.String,System.DateTimeOffset)">
+            <summary>
+            Get testing place information
+            </summary>
+            <param name="token"></param>
+            <param name="date"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.PlaceDetail(System.String,System.DateTimeOffset,System.String)">
+            <summary>
+            List registered users at specified place and date
+            </summary>
+            <param name="token"></param>
+            <param name="date"></param>
+            <param name="driveinId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.AddPersonToTestingPlace(System.String,System.Int32,CovidMassTesting.Model.EZdravie.Request.DriveInRequest)">
+            <summary>
+            Allocate person for testing at the testing place
+            </summary>
+            <param name="token"></param>
+            <param name="cfid"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.SetTestResultToPerson(System.String,CovidMassTesting.Model.EZdravie.Request.SetResultRequest)">
+            <summary>
+            Set the test result
+            </summary>
+            <param name="token"></param>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.SendResultToEHealth(CovidMassTesting.Model.Visitor,System.String,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+            <summary>
+            Send visitor registered in rychlejsie or downloaded from eHealth to eHealth system
+            
+            Returns true if successful, False or Exception if not successful
+            </summary>
+            <param name="visitor"></param>
+            <param name="placeProviderId"></param>
+            <param name="placeProviderRepository"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.RegisterPerson(System.String,CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest)">
+            <summary>
+            Registers person to eHealth
+            </summary>
+            <param name="token"></param>
+            <param name="registerPersonRequest"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.DownloadEHealthVisitors(System.String,System.String,System.DateTimeOffset,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.ISlotRepository,Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            Downloads all visitors from all eHealth user locations to rychlejsie
+            
+            Returns number of new visitors
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="managerEmail"></param>
+            <param name="day"></param>
+            <param name="visitorRepository"></param>
+            <param name="placeRepository"></param>
+            <param name="slotRepository"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.MojeEZdravieAbstract.DownloadEHealthVisitors(System.String,System.String,System.DateTimeOffset,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.ISlotRepository,Microsoft.Extensions.Logging.ILoggerFactory)">
+            <summary>
+            Downloads the visitors from eHealth
+            </summary>
+            <param name="placeProviderId"></param>
+            <param name="managerEmail"></param>
+            <param name="day"></param>
+            <param name="visitorRepository"></param>
+            <param name="placeRepository"></param>
+            <param name="placeProviderRepository"></param>
+            <param name="slotRepository"></param>
+            <param name="loggerFactory"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Connectors.MojeEZdravieAbstract.SendResultToEHealth(CovidMassTesting.Model.Visitor,System.String,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+            <summary>
+            Send visitor registered in rychlejsie or downloaded from eHealth to eHealth system
+            
+            Returns true if successful, False or Exception if not successful
+            </summary>
+            <param name="visitor"></param>
+            <param name="placeProviderId"></param>
+            <param name="placeProviderRepository"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.AdminController">
             <summary>
             Administration methods
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Connectors.IMojeEZdravie)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Connectors.IMojeEZdravie)">
             <summary>
             Constructor
             </summary>
             <param name="localizer"></param>
             <param name="configuration"></param>
+            <param name="loggerFactory"></param>
             <param name="logger"></param>
             <param name="slotRepository"></param>
             <param name="placeRepository"></param>
@@ -61,6 +178,12 @@
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.SendResultToEHealth(System.String)">
+            <summary>
+            This method exports all visitors who are in state in processing
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.DownloadEHealthVisitors(System.DateTimeOffset)">
             <summary>
             This method exports all visitors who are in state in processing
             </summary>
@@ -2446,6 +2569,11 @@
             AvailableSlotsToday
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.EHealthId">
+            <summary>
+            eHealth Id
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Place.OtherLimitations">
             <summary>
             Limitations
@@ -2519,6 +2647,11 @@
         <member name="P:CovidMassTesting.Model.PlaceProduct.EmployeesOnly">
             <summary>
             Corporations may check this on and only its employees are eligible for the testing
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.EHealthDefault">
+            <summary>
+            Default for eHealth connection
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.PlaceProduct.EmployeesRegistration">
@@ -2762,6 +2895,11 @@
         <member name="P:CovidMassTesting.Model.Product.EmployeesRegistration">
             <summary>
             Corporations may check this on and only its employees can self register
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.EHealthDefault">
+            <summary>
+            Default for eHealth connection
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Product.CollectInsurance">
@@ -4085,6 +4223,16 @@
             Registration code. 9-digit, formatted 000-000-000 for visitors
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.PersonTrackingNumber">
+            <summary>
+            Covid pass
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Gender">
+            <summary>
+            Gender F | M
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.Language">
             <summary>
             Language in which we will communicate to the visitor
@@ -4277,6 +4425,16 @@
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.Id">
             <summary>
             Registration code. 9-digit, formatted 000-000-000 for visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.PersonTrackingNumber">
+            <summary>
+            Covid pass
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Gender">
+            <summary>
+            Gender F | M
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.Language">
@@ -5003,11 +5161,12 @@
             <param name="openingHoursTemplate"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.GetCurrentSlot(System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.GetCurrentSlot(System.String,System.DateTimeOffset)">
             <summary>
             Get current slot
             </summary>
-            <param name="place"></param>
+            <param name="place">Place id</param>
+            <param name="time">Time when the registration should be done</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DropAllData">
@@ -5157,11 +5316,12 @@
             Visitor repository interface for dependency injection
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Add(CovidMassTesting.Model.Visitor)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Add(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>
             Creates new visitor
             </summary>
             <param name="visitor"></param>
+            <param name="notify">if notify is set to false, it will not send email or sms</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetVisitor(CovidMassTesting.Model.Visitor,System.Boolean)">
@@ -5214,12 +5374,13 @@
             <param name="fixOnLoad"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String,System.Boolean)">
             <summary>
             Public registration
             </summary>
             <param name="visitor"></param>
             <param name="managerEmail"></param>
+            <param name="notify">If notify is set to false, it does not send email or sms</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetTestResult(System.String,System.String,System.Boolean)">
@@ -5231,11 +5392,12 @@
             <param name="isAdmin"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitorByPersonalNumber(System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitorByPersonalNumber(System.String,System.Boolean)">
             <summary>
             Get visitor by personal number
             </summary>
             <param name="personalNumber"></param>
+            <param name="nullOnMissing">If true returns null not found, if false throws exception</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetNextTest">
@@ -6600,11 +6762,12 @@
             <param name="hourSlotId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetCurrentSlot(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetCurrentSlot(System.String,System.DateTimeOffset)">
             <summary>
             Get current slot
             </summary>
             <param name="place"></param>
+            <param name="time"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DropAllData">
@@ -6822,11 +6985,12 @@
             <param name="placeProviderRepository"></param>
             <param name="userRepository"></param>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Add(CovidMassTesting.Model.Visitor)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Add(CovidMassTesting.Model.Visitor,System.Boolean)">
             <summary>
             Creates new visitor registration
             </summary>
             <param name="visitor"></param>
+            <param name="notify">Send notification</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Remove(System.Int32)">
@@ -7070,11 +7234,12 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitorByPersonalNumber(System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitorByPersonalNumber(System.String,System.Boolean)">
             <summary>
             Returns visitor by personal number
             </summary>
             <param name="personalNumber"></param>
+            <param name="nullOnMissing"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetTestResult(System.String,System.String,System.Boolean)">
@@ -7126,12 +7291,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String,System.Boolean)">
             <summary>
             Public registration
             </summary>
             <param name="visitor"></param>
             <param name="managerEmail"></param>
+            <param name="notify"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.FormatPhone(System.String)">

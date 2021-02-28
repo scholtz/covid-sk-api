@@ -19,7 +19,7 @@ namespace CovidMassTesting.Model.EZdravie.Payload
         public string DesignatedLatitude { get; set; }
         public string DesignatedLongitude { get; set; }
         [JsonConverter(typeof(Helpers.CustomDateTimeConverter))]
-        public DateTimeOffset DesignatedScheduled_at { get; set; }
+        public DateTimeOffset? DesignatedDriveinScheduledAt { get; set; }
         public string DesignatedDriveinStreetName { get; set; }
         public string DesignatedDriveinStreetNumber { get; set; }
         public string DesignatedDriveinZipCode { get; set; }
