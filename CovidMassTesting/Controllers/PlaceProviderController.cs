@@ -288,7 +288,10 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentNullException("Please select place provider");
                 }
                 var ret = await placeProviderRepository.GetPlaceProviderSensitiveData(User.GetPlaceProvider());
-                ret.EZdraviePass = "";
+                if (ret != null)
+                {
+                    ret.EZdraviePass = "";
+                }
                 return Ok(ret);
             }
             catch (ArgumentException exc)
