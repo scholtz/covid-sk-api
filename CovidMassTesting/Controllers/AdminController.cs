@@ -282,7 +282,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Only administrator can use this method");
                 }
-                if (configuration["SendResultsToEHealth"] != "0")
+                if (configuration["SendResultsToEHealth"] != "1")
                 {
                     throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
                 }
@@ -326,7 +326,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Only administrator can use this method");
                 }
-                if (configuration["SendResultsToEHealth"] != "0")
+                if (configuration["SendResultsToEHealth"] != "1")
                 {
                     throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
                 }
