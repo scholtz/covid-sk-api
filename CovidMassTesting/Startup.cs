@@ -220,6 +220,7 @@ namespace CovidMassTesting
 
             services.AddSingleton<ScheduledTasks.ExportTask, ScheduledTasks.ExportTask>();
 #if DEBUG
+            /*
             if (Configuration["UseMockedEHealthConnection"] == "1" || Configuration["SendResultsToEHealth"] != "1")
             {
                 services.AddSingleton<IMojeEZdravie, MojeEZdravieMock>();
@@ -227,7 +228,8 @@ namespace CovidMassTesting
             else
             {
                 services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
-            }
+            }/**/
+            services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
 #else
                 services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
 #endif
