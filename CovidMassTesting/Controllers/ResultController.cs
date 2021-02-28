@@ -810,6 +810,12 @@ namespace CovidMassTesting.Controllers
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
                 var data = await visitorRepository.ExportResultSubmissions(from, count, places);
+
+                if (day.HasValue)
+                {
+                    data = data.Where(d => d.Time >= day.Value.Date && d.Time < day.Value.Date.AddDays(1));
+                }
+
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
