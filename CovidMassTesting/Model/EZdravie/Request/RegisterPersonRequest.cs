@@ -25,7 +25,7 @@ namespace CovidMassTesting.Model.EZdravie.Request
                 vEntered_by_first_name = loginPayload.User.FirstName,
                 vEntered_by_last_name = loginPayload.User.LastName,
                 vEntered_by_email = loginPayload.User.PrimaryEmail,
-
+                nIs_mom_user = "1",
             };
         }
 
