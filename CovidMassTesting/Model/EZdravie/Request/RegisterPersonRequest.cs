@@ -24,7 +24,8 @@ namespace CovidMassTesting.Model.EZdravie.Request
                 dBirth_date = $"{visitor.BirthDayYear}-{visitor.BirthDayMonth:D2}-{visitor.BirthDayDay:D2}",
                 vEntered_by_first_name = loginPayload.User.FirstName,
                 vEntered_by_last_name = loginPayload.User.LastName,
-                vEntered_by_email = loginPayload.User.PrimaryEmail
+                vEntered_by_email = loginPayload.User.PrimaryEmail,
+
             };
         }
 

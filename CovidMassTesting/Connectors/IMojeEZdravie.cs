@@ -2,6 +2,7 @@
 using CovidMassTesting.Model.EZdravie.Payload;
 using CovidMassTesting.Model.EZdravie.Request;
 using CovidMassTesting.Repository.Interface;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
@@ -69,8 +70,14 @@ namespace CovidMassTesting.Connectors
         /// <param name="visitor"></param>
         /// <param name="placeProviderId"></param>
         /// <param name="placeProviderRepository"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
-        public Task<bool> SendResultToEHealth(Visitor visitor, string placeProviderId, IPlaceProviderRepository placeProviderRepository);
+        public Task<bool> SendResultToEHealth(
+            Visitor visitor,
+            string placeProviderId,
+            IPlaceProviderRepository placeProviderRepository,
+            IConfiguration configuration
+            );
         /// <summary>
         /// Registers person to eHealth
         /// </summary>

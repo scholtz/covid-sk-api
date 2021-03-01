@@ -294,7 +294,7 @@ namespace CovidMassTesting.Controllers
                     var visitor = await visitorRepository.GetVisitor(codeInt);
                     if (visitor == null) throw new Exception("Visitor not found");
 
-                    var ret = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository);
+                    var ret = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository, configuration);
                     if (ret)
                     {
                         visitor = await visitorRepository.GetVisitor(codeInt);
@@ -365,7 +365,7 @@ namespace CovidMassTesting.Controllers
                                 continue;
                         }
 
-                        var status = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository);
+                        var status = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository, configuration);
                         if (status)
                         {
                             var toUpdate = await visitorRepository.GetVisitor(visitor.Id);

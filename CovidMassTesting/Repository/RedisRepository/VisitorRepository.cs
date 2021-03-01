@@ -1163,7 +1163,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     if (visitor.EHealthNotifiedAt.HasValue) return false;
 
-                    var result = await eHealthConnector.SendResultToEHealth(visitor, placeProviderId, placeProviderRepository);
+                    var result = await eHealthConnector.SendResultToEHealth(visitor, placeProviderId, placeProviderRepository, configuration);
                     if (result)
                     {
                         visitor.EHealthNotifiedAt = DateTimeOffset.UtcNow;

@@ -62,7 +62,7 @@
             <param name="request"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.SendResultToEHealth(CovidMassTesting.Model.Visitor,System.String,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+        <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.SendResultToEHealth(CovidMassTesting.Model.Visitor,System.String,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Send visitor registered in rychlejsie or downloaded from eHealth to eHealth system
             
@@ -71,6 +71,7 @@
             <param name="visitor"></param>
             <param name="placeProviderId"></param>
             <param name="placeProviderRepository"></param>
+            <param name="configuration"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Connectors.IMojeEZdravie.RegisterPerson(System.String,CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest)">
@@ -109,7 +110,7 @@
             <param name="loggerFactory"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Connectors.MojeEZdravieAbstract.SendResultToEHealth(CovidMassTesting.Model.Visitor,System.String,CovidMassTesting.Repository.Interface.IPlaceProviderRepository)">
+        <member name="M:CovidMassTesting.Connectors.MojeEZdravieAbstract.SendResultToEHealth(CovidMassTesting.Model.Visitor,System.String,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Send visitor registered in rychlejsie or downloaded from eHealth to eHealth system
             
@@ -118,6 +119,7 @@
             <param name="visitor"></param>
             <param name="placeProviderId"></param>
             <param name="placeProviderRepository"></param>
+            <param name="configuration"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Controllers.AdminController">

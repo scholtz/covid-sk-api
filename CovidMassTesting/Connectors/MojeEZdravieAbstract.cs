@@ -5,6 +5,7 @@ using CovidMassTesting.Model.EZdravie.Payload;
 using CovidMassTesting.Model.EZdravie.Request;
 using CovidMassTesting.Model.EZdravie.Response;
 using CovidMassTesting.Repository.Interface;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -108,11 +109,13 @@ namespace CovidMassTesting.Connectors
         /// <param name="visitor"></param>
         /// <param name="placeProviderId"></param>
         /// <param name="placeProviderRepository"></param>
+        /// <param name="configuration"></param>
         /// <returns></returns>
         public async Task<bool> SendResultToEHealth(
             Visitor visitor,
             string placeProviderId,
-            IPlaceProviderRepository placeProviderRepository
+            IPlaceProviderRepository placeProviderRepository,
+            IConfiguration configuration
             )
         {
             await SendResultToEHealth(visitor);
@@ -135,6 +138,10 @@ namespace CovidMassTesting.Connectors
             }
             else
             {
+                if (configuration["AllowEHealthRegistration"] != "1")
+                {
+                    return false;
+                }
                 var personData = await RegisterPerson(data.LoginPayload.Session.Token, RegisterPersonRequest.FromVisitor(visitor, data.LoginPayload));
                 check = await this.CheckPerson(data.LoginPayload.Session.Token, visitor.RC);
                 if (check?.CfdId > 0)
