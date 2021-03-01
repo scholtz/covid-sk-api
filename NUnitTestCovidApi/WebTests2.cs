@@ -1,4 +1,4 @@
-﻿//#define DoTests
+﻿#define DoTests
 
 #if DoTests
 using CovidMassTesting.Helpers;
