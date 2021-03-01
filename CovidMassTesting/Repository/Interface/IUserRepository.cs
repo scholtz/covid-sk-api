@@ -15,8 +15,9 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="user"></param>
         /// <param name="inviterName"></param>
         /// <param name="companyName"></param>
+        /// <param name="allowUpdate"></param>
         /// <returns></returns>
-        public Task<bool> Add(User user, string inviterName, string companyName);
+        public Task<bool> Add(User user, string inviterName, string companyName, bool allowUpdate);
         /// <summary>
         /// List all users
         /// </summary>

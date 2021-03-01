@@ -483,7 +483,6 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Zadajte platné osobné číslo zamestnanca");
                 }
                 return Ok(ret);
-
             }
             catch (ArgumentException exc)
             {

@@ -1,7 +1,9 @@
 ﻿//#define UseFixes
 using CovidMassTesting.Connectors;
+using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
+using CovidMassTesting.Model.Email;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +36,7 @@ namespace CovidMassTesting.Controllers
         private readonly IVisitorRepository visitorRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly IMojeEZdravie mojeEZdravie;
+        private readonly IEmailSender emailSender;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -57,7 +60,8 @@ namespace CovidMassTesting.Controllers
             IUserRepository userRepository,
             IVisitorRepository visitorRepository,
             IPlaceProviderRepository placeProviderRepository,
-            IMojeEZdravie mojeEZdravie
+            IMojeEZdravie mojeEZdravie,
+            IEmailSender emailSender
             )
         {
             this.localizer = localizer;
@@ -70,6 +74,7 @@ namespace CovidMassTesting.Controllers
             this.visitorRepository = visitorRepository;
             this.placeProviderRepository = placeProviderRepository;
             this.mojeEZdravie = mojeEZdravie;
+            this.emailSender = emailSender;
         }
         /// <summary>
         /// Shows available days per place
@@ -129,7 +134,7 @@ namespace CovidMassTesting.Controllers
                     Email = email,
                     Name = name,
                     Roles = roles.ToList()
-                }, User.GetName(), ""));
+                }, User.GetName(), "", true));
             }
             catch (Exception exc)
             {
@@ -793,6 +798,116 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// Send generic email
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("SendEmail")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> SendEmail(
+            [FromForm] string sendTo,
+            [FromForm] DateTimeOffset? from,
+            [FromForm] DateTimeOffset? until,
+            [FromForm] string subjectSK,
+            [FromForm] string subjectCS,
+            [FromForm] string subjectEN,
+            [FromForm] string textSK,
+            [FromForm] string textCS,
+            [FromForm] string textEN
+            )
+        {
+            try
+            {
+                int ret = 0;
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+                if (string.IsNullOrEmpty(textEN))
+                {
+                    textEN = textSK;
+                }
+                if (string.IsNullOrEmpty(textSK))
+                {
+                    textSK = textEN;
+                }
+                if (string.IsNullOrEmpty(textCS))
+                {
+                    textCS = textSK;
+                }
+                var subject = subjectSK;
+                if (CultureInfo.CurrentCulture.Name.StartsWith("en"))
+                {
+                    subject = subjectEN;
+                }
+                if (CultureInfo.CurrentCulture.Name.StartsWith("cs"))
+                {
+                    subject = subjectCS;
+                }
+                var email = new GenericEmail(CultureInfo.CurrentCulture.Name, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                {
+                    TextSK = textSK,
+                    TextCS = textCS,
+                    TextEN = textEN
+                };
+
+                if (sendTo == "test")
+                {
+                    await emailSender.SendEmail(subject, "ludovit@scholtz.sk", "Scholtz", email);
+                    ret++;
+                }
+
+                if (sendTo == "eHealth")
+                {
+                    var oldCulture = CultureInfo.CurrentCulture;
+                    var oldUICulture = CultureInfo.CurrentUICulture;
+                    foreach (var visitor in await visitorRepository.ListTestedVisitors())
+                    {
+                        if (string.IsNullOrEmpty(visitor.Email)) continue;
+                        if (from.HasValue && visitor.TestingTime < from.Value) continue;
+                        if (until.HasValue && visitor.TestingTime > until.Value) continue;
+
+                        // >>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                        if (!visitor.EHealthNotifiedAt.HasValue) continue;
+
+                        var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                        CultureInfo.CurrentCulture = specifiedCulture;
+                        CultureInfo.CurrentUICulture = specifiedCulture;
+
+                        subject = subjectSK;
+                        if (CultureInfo.CurrentCulture.Name.StartsWith("en"))
+                        {
+                            subject = subjectEN;
+                        }
+                        if (CultureInfo.CurrentCulture.Name.StartsWith("cs"))
+                        {
+                            subject = subjectCS;
+                        }
+
+                        await emailSender.SendEmail(subject, visitor.Email, $"{visitor.FirstName} {visitor.LastName}", email);
+                        logger.LogInformation($"SendEmailGeneric: Sent to {visitor.Id}");
+                        ret++;
+                    }
+                    CultureInfo.CurrentCulture = oldCulture;
+                    CultureInfo.CurrentUICulture = oldUICulture;
+                }
+                return ret;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+
+
+
+
+
 #if UseFixes
         [HttpPost("Fix01")]
         [ProducesResponseType(200)]

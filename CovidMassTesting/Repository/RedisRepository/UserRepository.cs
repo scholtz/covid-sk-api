@@ -74,8 +74,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="user"></param>
         /// <param name="inviterName"></param>
         /// <param name="companyName"></param>
+        /// <param name="allowUpdate"></param>
         /// <returns></returns>
-        public async Task<bool> Add(User user, string inviterName, string companyName)
+        public async Task<bool> Add(User user, string inviterName, string companyName, bool allowUpdate)
         {
             if (user is null)
             {
@@ -87,29 +88,40 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(inviterName));
             }
 
-            (string pass, string hash, string cohash) = GeneratePassword();
-            user.PswHash = hash;
-            user.CoHash = cohash;
-            var ret = await SetUser(user, true);
-
-            await emailSender.SendEmail(
-                localizer[Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place],
-                user.Email,
-                user.Name,
-                new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
-                {
-                    Name = user.Name,
-                    Password = pass,
-                    Roles = user.Roles?.ToArray(),
-                    InviterName = inviterName,
-                    CompanyName = companyName,
-                    WebPath = configuration["FrontedURL"]
-                });
-            if (!string.IsNullOrEmpty(user.Phone))
+            var existing = await GetUser(user.Email, null);
+            if (existing?.Email == user.Email)
             {
-                await smsSender.SendSMS(user.Phone, new Message(string.Format(localizer[Repository_RedisRepository_UserRepository.Dear__0___we_have_registered_you_into_mass_covid_testing_system__Please_check_your_email_].Value, user.Name)));
+                // update roles
+
+                existing.Roles = user.Roles;
+                return await SetUser(existing, false);
             }
-            return ret;
+            else
+            {
+                (string pass, string hash, string cohash) = GeneratePassword();
+                user.PswHash = hash;
+                user.CoHash = cohash;
+                var ret = await SetUser(user, true);
+
+                await emailSender.SendEmail(
+                    localizer[Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place],
+                    user.Email,
+                    user.Name,
+                    new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                    {
+                        Name = user.Name,
+                        Password = pass,
+                        Roles = user.Roles?.ToArray(),
+                        InviterName = inviterName,
+                        CompanyName = companyName,
+                        WebPath = configuration["FrontedURL"]
+                    });
+                if (!string.IsNullOrEmpty(user.Phone))
+                {
+                    await smsSender.SendSMS(user.Phone, new Message(string.Format(localizer[Repository_RedisRepository_UserRepository.Dear__0___we_have_registered_you_into_mass_covid_testing_system__Please_check_your_email_].Value, user.Name)));
+                }
+                return ret;
+            }
         }
         private (string pass, string hash, string cohash) GeneratePassword()
         {
@@ -402,7 +414,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 Phone = usr.Phone,
                                 Roles = usr.Roles == null ? new List<string>() { "Admin" } : usr.Roles.ToList(),
                                 Name = usr.Name
-                            }, "System", "Global admin");
+                            }, "System", "Global admin", true);
                         }
                         else
                         {
@@ -677,7 +689,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                         Name = invitation.Name,
                     },
                     invitation.InviterName,
-                    pp.CompanyName
+                    pp.CompanyName,
+                    false
                 );
             }
             else
