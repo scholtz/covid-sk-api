@@ -861,8 +861,7 @@ namespace CovidMassTesting.Controllers
                     await emailSender.SendEmail(subject, "ludovit@scholtz.sk", "Scholtz", email);
                     ret++;
                 }
-
-                if (sendTo == "eHealth")
+                else if (sendTo == "eHealth")
                 {
                     var oldCulture = CultureInfo.CurrentCulture;
                     var oldUICulture = CultureInfo.CurrentUICulture;
@@ -895,6 +894,11 @@ namespace CovidMassTesting.Controllers
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
+                }
+                else
+                {
+                    await emailSender.SendEmail(subject, sendTo, "Scholtz", email);
+                    ret++;
                 }
                 return ret;
             }
