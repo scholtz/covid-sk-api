@@ -105,6 +105,7 @@ namespace CovidMassTesting.Controllers.Email
                     System.Console.WriteLine($"Template not found: {data.TemplateId}: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
                     return false;
                 }
+
                 var msg = new SendGridMessage()
                 {
                     TemplateId = Name2Id[data.TemplateId],
@@ -116,6 +117,12 @@ namespace CovidMassTesting.Controllers.Email
                     }
                 }
                 };
+
+                if (!string.IsNullOrEmpty(subject))
+                {
+                    msg.Subject = subject;
+                }
+
                 msg.AddTo(new EmailAddress(toEmail, toName));
 
                 msg.From = new EmailAddress(fromEmail, fromName);
