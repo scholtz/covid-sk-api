@@ -850,7 +850,10 @@ namespace CovidMassTesting.Controllers
                 {
                     TextSK = textSK,
                     TextCS = textCS,
-                    TextEN = textEN
+                    TextEN = textEN,
+                    SubjectCS = subjectCS,
+                    SubjectEN = subjectEN,
+                    SubjectSK = subjectSK
                 };
 
                 if (sendTo == "test")

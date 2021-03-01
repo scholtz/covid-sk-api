@@ -35,5 +35,17 @@
         /// Text in English language
         /// </summary>
         public string TextEN { get; set; }
+        /// <summary>
+        /// Text in Slovak language
+        /// </summary>
+        public string SubjectSK { get; set; }
+        /// <summary>
+        /// Text in Czech language
+        /// </summary>
+        public string SubjectCS { get; set; }
+        /// <summary>
+        /// Text in English language
+        /// </summary>
+        public string SubjectEN { get; set; }
     }
 }
