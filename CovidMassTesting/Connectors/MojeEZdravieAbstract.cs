@@ -198,6 +198,7 @@ namespace CovidMassTesting.Connectors
                 UserId = data.LoginPayload.User.Id,
                 CovidFormDataId = check.CfdId,
                 FinalResult = result,
+                ScreeningFinalResult = result,
                 SpecimenId = visitor.TestingSet,
                 SpecimenCollectedAt = visitor.TestingTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
                 ScreeningEndedAt = visitor.TestResultTime?.ToString("yyyy-MM-dd HH:mm:ss") ?? visitor.TestingTime.Value.ToString("yyyy-MM-dd HH:mm:ss"),
