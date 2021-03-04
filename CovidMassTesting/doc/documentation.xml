@@ -127,7 +127,7 @@
             Administration methods
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Connectors.IMojeEZdravie)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Connectors.IMojeEZdravie,CovidMassTesting.Controllers.Email.IEmailSender)">
             <summary>
             Constructor
             </summary>
@@ -258,6 +258,12 @@
         <member name="M:CovidMassTesting.Controllers.AdminController.GetVisitorCodeFromTestCode(System.String)">
             <summary>
             Fix verification data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.SendEmail(System.String,System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset},System.String,System.String,System.String,System.String,System.String,System.String)">
+            <summary>
+            Send generic email
             </summary>
             <returns></returns>
         </member>
@@ -964,6 +970,27 @@
             <param name="data"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.SMS.RabbitMQSMSSender">
+            <summary>
+            https://doc.gosms.cz/#dokumentace-gosms-api
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.RabbitMQSMSSender.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.SMS.GoSMSQueueSender},Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.SMS.GoSMSQueueSender})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="settings"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.SMS.RabbitMQSMSSender.SendSMS(System.String,CovidMassTesting.Model.SMS.ISMS)">
+            <summary>
+            Act as sms was sent. Log event to console
+            </summary>
+            <param name="toPhone"></param>
+            <param name="data"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.UserController">
             <summary>
             Controller that manages user requests
@@ -1501,6 +1528,55 @@
         <member name="P:CovidMassTesting.Model.DayTimeManagement.Count">
             <summary>
             Number of places accounted
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Email.GenericEmail">
+            <summary>
+            User with permissions to invite other people can invite them and 
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Email.GenericEmail.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="language">Current language</param>
+            <param name="url">Web of the system</param>
+            <param name="supportEmail">Email Support</param>
+            <param name="supportPhone">Phone Support</param>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.GenericEmail.TemplateId">
+            <summary>
+            Template identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.GenericEmail.TextSK">
+            <summary>
+            Text in Slovak language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.GenericEmail.TextCS">
+            <summary>
+            Text in Czech language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.GenericEmail.TextEN">
+            <summary>
+            Text in English language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.GenericEmail.SubjectSK">
+            <summary>
+            Text in Slovak language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.GenericEmail.SubjectCS">
+            <summary>
+            Text in Czech language
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.GenericEmail.SubjectEN">
+            <summary>
+            Text in English language
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Email.IEmail">
@@ -5200,13 +5276,14 @@
             User repository interface for dependency injection
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Add(CovidMassTesting.Model.User,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.Add(CovidMassTesting.Model.User,System.String,System.String,System.Boolean)">
             <summary>
             Create user
             </summary>
             <param name="user"></param>
             <param name="inviterName"></param>
             <param name="companyName"></param>
+            <param name="allowUpdate"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ListAll(System.String)">
@@ -6824,13 +6901,14 @@
             <param name="placeRepository"></param>
             <param name="placeProviderRepository"></param>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Add(CovidMassTesting.Model.User,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.Add(CovidMassTesting.Model.User,System.String,System.String,System.Boolean)">
             <summary>
             Inserts new user
             </summary>
             <param name="user"></param>
             <param name="inviterName"></param>
             <param name="companyName"></param>
+            <param name="allowUpdate"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.GenerateRandomPassword(Microsoft.AspNetCore.Identity.PasswordOptions)">
@@ -8124,6 +8202,11 @@
         <member name="F:CovidMassTesting.Startup.Started">
             <summary>
             Identifies specific run of the application
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Startup.AppExitCancellationTokenSource">
+            <summary>
+            App exit catch event
             </summary>
         </member>
         <member name="P:CovidMassTesting.Startup.Args">

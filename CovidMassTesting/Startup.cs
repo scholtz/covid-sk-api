@@ -36,6 +36,10 @@ namespace CovidMassTesting
         /// </summary>
         public static readonly DateTimeOffset Started = DateTimeOffset.Now;
         /// <summary>
+        /// App exit catch event
+        /// </summary>
+        public static readonly CancellationTokenSource AppExitCancellationTokenSource = new CancellationTokenSource();
+        /// <summary>
         /// Args for tasks processing
         /// </summary>
         public static string[] Args { get; internal set; }
@@ -379,6 +383,17 @@ namespace CovidMassTesting
 
                 //throw new Exception("Exit");
             }
+
+
+
+            AppDomain.CurrentDomain.ProcessExit += (s, e) =>
+            {
+                logger.LogInformation("ProcessExit!");
+                AppExitCancellationTokenSource.Cancel();
+                Task.Delay(1000).Wait();
+                lifeTime.StopApplication();
+            };
+
         }
     }
 }
