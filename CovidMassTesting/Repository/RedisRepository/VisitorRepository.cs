@@ -740,9 +740,9 @@ namespace CovidMassTesting.Repository.RedisRepository
 #if SaveASAP
             visitor.Result = state;
             visitor.LastUpdate = DateTimeOffset.Now;
+#endif
             visitor.TestResultTime = visitor.LastUpdate;
             await SetVisitor(visitor, false);
-#endif
             return true;
         }
         /// <summary>
