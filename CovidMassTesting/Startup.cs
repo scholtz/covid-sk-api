@@ -185,34 +185,17 @@ namespace CovidMassTesting
 
             services.AddHttpClient<GoogleReCaptcha.V3.Interface.ICaptchaValidator, GoogleReCaptcha.V3.GoogleReCaptchaValidator>();
 
-
-
-            var goSMSConfiguration = new Model.Settings.GoSMSConfiguration();
-            try
-            {
-                Configuration.GetSection("GoSMS")?.Bind(goSMSConfiguration);
-            }
-            catch (Exception exc)
-            {
-                Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
-            }
-
-            var goSMSQueueConfiguration = new Model.Settings.GoSMSQueueConfiguration();
-            try
-            {
-                Configuration.GetSection("GoSMSQueue")?.Bind(goSMSQueueConfiguration);
-            }
-            catch (Exception exc)
-            {
-                Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
-            }
-
-            if (!string.IsNullOrEmpty(goSMSQueueConfiguration.QueueURL))
+            if (Configuration.GetSection("GoSMSQueue").Exists())
             {
                 services.Configure<Model.Settings.GoSMSQueueConfiguration>(Configuration.GetSection("GoSMSQueue"));
                 services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSQueueSender>();
             }
-            else if (!string.IsNullOrEmpty(goSMSConfiguration.ClientId))
+            else if (Configuration.GetSection("RabbitMQSMS").Exists())
+            {
+                services.Configure<Model.Settings.RabbitMQSMSQueueConfiguration>(Configuration.GetSection("RabbitMQSMS"));
+                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.RabbitMQSMSSender>();
+            }
+            else if (Configuration.GetSection("GoSMS").Exists())
             {
                 services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
                 services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();
