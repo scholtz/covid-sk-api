@@ -1183,18 +1183,57 @@ namespace CovidMassTesting.Repository.RedisRepository
         }
         private async Task SendResults(Visitor visitor)
         {
+            var notifiedByEHealth = false;
             if (configuration["SendResultsToEHealth"] == "1")
             {
                 try
                 {
                     var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
-                    if (await NotifyByEHealth(visitor, place.PlaceProviderId)) return; // else notify by old way
+                    if (await NotifyByEHealth(visitor, place.PlaceProviderId))
+                    {
+                        notifiedByEHealth = true;
+                        if (configuration["AfterEHealthNotifyByEmail"] != "1" && configuration["AfterEHealthNotifyBySMS"] != "1")
+                        {
+                            return; // do not notify by old way
+                        }
+                    }
                 }
                 catch (Exception exc)
                 {
                     logger.LogError(exc, "Unable to send eHealth notification: " + exc.Message);
                 }
             }
+            else
+            {
+
+                if (configuration["SendResultsToEHealthOnlySick"] == "1")
+                {
+                    switch (visitor.Result)
+                    {
+                        case TestResult.PositiveCertificateTaken:
+                        case TestResult.PositiveWaitingForCertificate:
+                            try
+                            {
+                                var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                                if (await NotifyByEHealth(visitor, place.PlaceProviderId))
+                                {
+                                    notifiedByEHealth = true;
+                                    if (configuration["AfterEHealthNotifyByEmail"] != "1" && configuration["AfterEHealthNotifyBySMS"] != "1")
+                                    {
+                                        return; // do not notify by old way
+                                    }
+                                }
+                            }
+                            catch (Exception exc)
+                            {
+                                logger.LogError(exc, "Unable to send eHealth notification: " + exc.Message);
+                            }
+                            break;
+                    }
+                }
+            }
+
+
 
             switch (visitor.Result)
             {
@@ -1297,45 +1336,49 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         logger.LogError(exc, "Error generating file");
                     }
-
-                    await emailSender.SendEmail(
-                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                        visitor.Email,
-                        $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorTestingResultEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
-                        {
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                            IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
-                        },
-                        attachments
-                        );
+                    if (!notifiedByEHealth || configuration["AfterEHealthNotifyByEmail"] == "1")
+                    {
+                        await emailSender.SendEmail(
+                            localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                            visitor.Email,
+                            $"{visitor.FirstName} {visitor.LastName}",
+                            new Model.Email.VisitorTestingResultEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                            {
+                                Name = $"{visitor.FirstName} {visitor.LastName}",
+                                IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
+                            },
+                            attachments
+                            );
+                    }
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
-
-                        var resultLocalized = "";
-                        switch (visitor.Result)
+                        if (!notifiedByEHealth || configuration["AfterEHealthNotifyBySMS"] == "1")
                         {
-                            case TestResult.PositiveWaitingForCertificate:
-                            case TestResult.PositiveCertificateTaken:
-                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.POSITIVE];
-                                break;
-                            case TestResult.NegativeWaitingForCertificate:
-                            case TestResult.NegativeCertificateTaken:
-                                resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.NEGATIVE];
-                                break;
-                        }
-                        if (!string.IsNullOrEmpty(resultLocalized))
-                        {
-                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
-                                string.Format(
-                                    //{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}
-                                    Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_,
-                                    $"{visitor.FirstName} {visitor.LastName}",
-                                    visitor.BirthDayYear,
-                                    visitor.TestingTime?.ToString("dd.MM.yyyy"),
-                                    resultLocalized,
-                                    configuration["FrontedURL"]
-                                    )));
+                            var resultLocalized = "";
+                            switch (visitor.Result)
+                            {
+                                case TestResult.PositiveWaitingForCertificate:
+                                case TestResult.PositiveCertificateTaken:
+                                    resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.POSITIVE];
+                                    break;
+                                case TestResult.NegativeWaitingForCertificate:
+                                case TestResult.NegativeCertificateTaken:
+                                    resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.NEGATIVE];
+                                    break;
+                            }
+                            if (!string.IsNullOrEmpty(resultLocalized))
+                            {
+                                await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                                    string.Format(
+                                        //{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}
+                                        Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_,
+                                        $"{visitor.FirstName} {visitor.LastName}",
+                                        visitor.BirthDayYear,
+                                        visitor.TestingTime?.ToString("dd.MM.yyyy"),
+                                        resultLocalized,
+                                        configuration["FrontedURL"]
+                                        )));
+                            }
                         }
                     }
                     CultureInfo.CurrentCulture = oldCulture;
