@@ -345,6 +345,7 @@ namespace CovidMassTesting
                             Task.Delay(randDelay).Wait();
                             if (AppExitCancellationTokenSource.IsCancellationRequested)
                             {
+                                logger.LogInformation("Exitting task processing");
                                 Task.Delay(1000).Wait();
                                 lifeTime.StopApplication();
                             }
@@ -354,6 +355,8 @@ namespace CovidMassTesting
                             logger.LogError(exc, "Error in main sending loop");
                         }
                     }
+                    logger.LogInformation("Task processing exitted");
+
                 }, TaskCreationOptions.LongRunning);
             }
 
