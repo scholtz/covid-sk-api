@@ -334,7 +334,7 @@ namespace CovidMassTesting
                 watcher = Task.Factory.StartNew(() =>
                 {
                     logger.LogInformation("SendResults acivated");
-                    while (true)
+                    while (!AppExitCancellationTokenSource.IsCancellationRequested)
                     {
                         try
                         {
@@ -343,6 +343,11 @@ namespace CovidMassTesting
                             var random = new Random();
                             var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 2000));
                             Task.Delay(randDelay).Wait();
+                            if (AppExitCancellationTokenSource.IsCancellationRequested)
+                            {
+                                Task.Delay(1000).Wait();
+                                lifeTime.StopApplication();
+                            }
                         }
                         catch (Exception exc)
                         {
