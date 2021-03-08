@@ -184,26 +184,43 @@ namespace CovidMassTesting
             }
 
             services.AddHttpClient<GoogleReCaptcha.V3.Interface.ICaptchaValidator, GoogleReCaptcha.V3.GoogleReCaptchaValidator>();
-
+            var smsConfigured = false;
             if (Configuration.GetSection("GoSMSQueue").Exists())
             {
-                services.Configure<Model.Settings.GoSMSQueueConfiguration>(Configuration.GetSection("GoSMSQueue"));
-                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSQueueSender>();
+                var config = Configuration.GetSection("GoSMSQueue")?.Get<Model.Settings.GoSMSQueueConfiguration>();
+                if (!string.IsNullOrEmpty(config.QueueURL))
+                {
+                    smsConfigured = true;
+                    services.Configure<Model.Settings.GoSMSQueueConfiguration>(Configuration.GetSection("GoSMSQueue"));
+                    services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSQueueSender>();
+                }
             }
-            else if (Configuration.GetSection("RabbitMQSMS").Exists())
+            if (!smsConfigured && Configuration.GetSection("RabbitMQSMS").Exists())
             {
-                services.Configure<Model.Settings.RabbitMQSMSQueueConfiguration>(Configuration.GetSection("RabbitMQSMS"));
-                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.RabbitMQSMSSender>();
+                var config = Configuration.GetSection("RabbitMQSMS")?.Get<Model.Settings.RabbitMQSMSQueueConfiguration>();
+                if (!string.IsNullOrEmpty(config.HostName))
+                {
+                    smsConfigured = true;
+                    services.Configure<Model.Settings.RabbitMQSMSQueueConfiguration>(Configuration.GetSection("RabbitMQSMS"));
+                    services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.RabbitMQSMSSender>();
+                }
             }
-            else if (Configuration.GetSection("GoSMS").Exists())
+            else if (!smsConfigured && Configuration.GetSection("GoSMS").Exists())
             {
-                services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
-                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();
+                var config = Configuration.GetSection("GoSMS")?.Get<Model.Settings.GoSMSConfiguration>();
+                if (!string.IsNullOrEmpty(config.Endpoint))
+                {
+                    smsConfigured = true;
+                    services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
+                    services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();
+                }
             }
-            else
+
+            if (!smsConfigured)
             {
                 services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.MockSMSSender>();
             }
+
 
             services.AddSingleton<ScheduledTasks.ExportTask, ScheduledTasks.ExportTask>();
 #if DEBUG

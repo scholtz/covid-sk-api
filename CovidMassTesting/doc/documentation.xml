@@ -127,7 +127,7 @@
             Administration methods
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Connectors.IMojeEZdravie,CovidMassTesting.Controllers.Email.IEmailSender)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.AdminController},Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Logging.ILoggerFactory,Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.AdminController},CovidMassTesting.Repository.Interface.ISlotRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository,CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Connectors.IMojeEZdravie,CovidMassTesting.Controllers.Email.IEmailSender,CovidMassTesting.Controllers.SMS.ISMSSender)">
             <summary>
             Constructor
             </summary>
@@ -141,6 +141,8 @@
             <param name="visitorRepository"></param>
             <param name="placeProviderRepository"></param>
             <param name="mojeEZdravie"></param>
+            <param name="emailSender"></param>
+            <param name="smsSender"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.CheckSlots(System.String,System.Int32,System.Int32)">
             <summary>
@@ -210,6 +212,13 @@
             Global admin can fix visitor
             </summary>
             <param name="visitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.SendSMS(System.String)">
+            <summary>
+            Test sms
+            </summary>
+            <param name="phone"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.DropDatabase(System.String)">

@@ -1,9 +1,11 @@
 ﻿//#define UseFixes
 using CovidMassTesting.Connectors;
 using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Model.Email;
+using CovidMassTesting.Model.SMS;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.AspNetCore.Authorization;
@@ -37,6 +39,7 @@ namespace CovidMassTesting.Controllers
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly IMojeEZdravie mojeEZdravie;
         private readonly IEmailSender emailSender;
+        private readonly ISMSSender smsSender;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -50,6 +53,8 @@ namespace CovidMassTesting.Controllers
         /// <param name="visitorRepository"></param>
         /// <param name="placeProviderRepository"></param>
         /// <param name="mojeEZdravie"></param>
+        /// <param name="emailSender"></param>
+        /// <param name="smsSender"></param>
         public AdminController(
             IStringLocalizer<AdminController> localizer,
             IConfiguration configuration,
@@ -61,7 +66,8 @@ namespace CovidMassTesting.Controllers
             IVisitorRepository visitorRepository,
             IPlaceProviderRepository placeProviderRepository,
             IMojeEZdravie mojeEZdravie,
-            IEmailSender emailSender
+            IEmailSender emailSender,
+            ISMSSender smsSender
             )
         {
             this.localizer = localizer;
@@ -524,6 +530,34 @@ namespace CovidMassTesting.Controllers
             }
         }
 
+        /// <summary>
+        /// Test sms
+        /// </summary>
+        /// <param name="phone"></param>
+        /// <returns></returns>
+        [HttpPost("SendSMS")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> SendSMS([FromQuery] string phone)
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can update visitor directly");
+                }
+
+                logger.LogInformation($"SendSMS: {User.Identity.Name} is sending test sms to {phone}");
+
+                return Ok(await smsSender.SendSMS(phone, new Message($"Test sms: {DateTimeOffset.Now.ToString("o")}")));
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>
