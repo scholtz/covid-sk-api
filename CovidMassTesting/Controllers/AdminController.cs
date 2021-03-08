@@ -81,6 +81,7 @@ namespace CovidMassTesting.Controllers
             this.placeProviderRepository = placeProviderRepository;
             this.mojeEZdravie = mojeEZdravie;
             this.emailSender = emailSender;
+            this.smsSender = smsSender;
         }
         /// <summary>
         /// Shows available days per place
