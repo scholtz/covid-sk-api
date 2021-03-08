@@ -18,7 +18,6 @@ namespace CovidMassTesting.Controllers.SMS
     /// </summary>
     public class RabbitMQSMSSender : ISMSSender
     {
-        private IModel client;
         private readonly ILogger<GoSMSQueueSender> logger;
         private readonly IOptions<Model.Settings.RabbitMQSMSQueueConfiguration> settings;
         /// <summary>
@@ -39,35 +38,8 @@ namespace CovidMassTesting.Controllers.SMS
             }
             this.settings = settings;
             this.logger = logger;
-            Task.Run(() => Start());
         }
 
-        private async Task Start()
-        {
-            var factory = new ConnectionFactory()
-            {
-                HostName = settings.Value.HostName,
-                UserName = settings.Value.RabbitUserName,
-                Password = settings.Value.RabbitPassword,
-                VirtualHost = settings.Value.VirtualHost
-            };
-            logger.LogInformation($"Connecting to rabbitmq {settings.Value.HostName} {settings.Value.RabbitUserName} {settings.Value.VirtualHost}");
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
-            channel.QueueDeclare(queue: settings.Value.QueueName,
-                                 durable: true,
-                                 exclusive: false,
-                                 autoDelete: false,
-                                 arguments: null);
-            client = channel;
-            logger.LogInformation($"Connected to rabbitmq {settings.Value.HostName} {settings.Value.RabbitUserName} {settings.Value.VirtualHost}");
-            var token = Startup.AppExitCancellationTokenSource.Token;
-            while (!token.IsCancellationRequested)
-            {
-                await Task.Delay(1000, token);
-            }
-            logger.LogInformation($"Closing rabbitmq connection {settings.Value.HostName} {settings.Value.RabbitUserName} {settings.Value.VirtualHost}");
-        }
 
         /// <summary>
         /// Act as sms was sent. Log event to console
@@ -99,8 +71,18 @@ namespace CovidMassTesting.Controllers.SMS
                         User = settings.Value.GatewayUser
                     };
                     var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
-                    if (client == null) throw new Exception("Unable to send message because sender has not been initiated");
-                    client.BasicPublish(exchange: settings.Value.Exchange,
+
+
+                    var factory = new ConnectionFactory()
+                    {
+                        HostName = settings.Value.HostName,
+                        UserName = settings.Value.RabbitUserName,
+                        Password = settings.Value.RabbitPassword,
+                        VirtualHost = settings.Value.VirtualHost
+                    };
+                    using var connection = factory.CreateConnection();
+                    using var channel = connection.CreateModel();
+                    channel.BasicPublish(exchange: settings.Value.Exchange,
                                          routingKey: settings.Value.QueueName,
                                          body: body);
                     logger.LogInformation($"Sent SMS to {settings.Value.HostName}/{settings.Value.VirtualHost}/{settings.Value.QueueName} {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toPhone)}");
