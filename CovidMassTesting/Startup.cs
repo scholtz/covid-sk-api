@@ -208,7 +208,7 @@ namespace CovidMassTesting
             else if (!smsConfigured && Configuration.GetSection("GoSMS").Exists())
             {
                 var config = Configuration.GetSection("GoSMS")?.Get<Model.Settings.GoSMSConfiguration>();
-                if (!string.IsNullOrEmpty(config.Endpoint))
+                if (!string.IsNullOrEmpty(config.ClientId))
                 {
                     smsConfigured = true;
                     services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));

@@ -37,7 +37,8 @@ namespace CovidMassTesting.Controllers.SMS
             {
                 throw new ArgumentNullException(nameof(localizer));
             }
-
+            this.settings = settings;
+            this.logger = logger;
             Task.Run(() => Start());
         }
 
@@ -58,7 +59,7 @@ namespace CovidMassTesting.Controllers.SMS
                                  exclusive: false,
                                  autoDelete: false,
                                  arguments: null);
-
+            client = channel;
             logger.LogInformation($"Connected to rabbitmq {settings.Value.HostName} {settings.Value.RabbitUserName} {settings.Value.VirtualHost}");
             var token = Startup.AppExitCancellationTokenSource.Token;
             while (!token.IsCancellationRequested)
