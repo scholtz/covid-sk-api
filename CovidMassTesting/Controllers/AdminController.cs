@@ -298,7 +298,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
                 }
-                logger.LogInformation($"SendResultToEHealth: {User.Identity.Name} is sending to nczi {visitorId}");
+                logger.LogInformation($"SendResultToEHealth: {User.GetEmail()} is sending to nczi {visitorId}");
 
                 var codeClear = visitorId.FormatBarCode();
                 if (codeClear.Length == 9 && int.TryParse(codeClear, out var codeInt))
@@ -352,7 +352,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
                 }
-                logger.LogInformation($"SendDayResultsToEHealth: {User.Identity.Name} is sending to nczi {date}");
+                logger.LogInformation($"SendDayResultsToEHealth: {User.GetEmail()} is sending to nczi {date}");
 
                 var visitors = await visitorRepository.ListTestedVisitors(date);
                 var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
@@ -433,7 +433,7 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Systém nie je nastavený na odosielanie správ do moje eZdravie");
                 }
                 if (!day.HasValue) day = DateTimeOffset.Now;
-                logger.LogInformation($"DownloadEHealthVisitors: {User.Identity.Name} {day}");
+                logger.LogInformation($"DownloadEHealthVisitors: {User.GetEmail()} {day}");
 
 
                 return Ok(await mojeEZdravie.DownloadEHealthVisitors(User.GetPlaceProvider(), User.GetEmail(), day.Value, visitorRepository, placeRepository, placeProviderRepository, slotRepository, loggerFactory));
@@ -470,7 +470,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Only administrator can search for visitor");
                 }
-                logger.LogInformation($"UpdateVisitor: {User.Identity.Name} is fetching visitor {query.GetSHA256Hash()}");
+                logger.LogInformation($"UpdateVisitor: {User.GetEmail()} is fetching visitor {query.GetSHA256Hash()}");
 
                 var codeClear = query.FormatBarCode();
                 Visitor ret;
@@ -479,7 +479,7 @@ namespace CovidMassTesting.Controllers
                     ret = await visitorRepository.GetVisitor(codeInt);
                     if (ret != null)
                     {
-                        logger.LogInformation($"UpdateVisitor: {User.Identity.Name} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+                        logger.LogInformation($"UpdateVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
                         return Ok(ret);
                     }
                 }
@@ -487,7 +487,7 @@ namespace CovidMassTesting.Controllers
                 ret = await visitorRepository.GetVisitorByPersonalNumber(documentClear, true);
                 if (ret != null)
                 {
-                    logger.LogInformation($"UpdateVisitor: {User.Identity.Name} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+                    logger.LogInformation($"UpdateVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
                     return Ok(ret);
                 }
                 throw new Exception("Visitor not found");
@@ -520,7 +520,7 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Only administrator can update visitor directly");
                 }
 
-                logger.LogInformation($"UpdateVisitor: {User.Identity.Name} is updating visitor {visitor.Id}");
+                logger.LogInformation($"UpdateVisitor: {User.GetEmail()} is updating visitor {visitor.Id}");
                 return Ok(await visitorRepository.SetVisitor(visitor, false));
             }
             catch (Exception exc)
@@ -548,7 +548,7 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Only administrator can update visitor directly");
                 }
 
-                logger.LogInformation($"SendSMS: {User.Identity.Name} is sending test sms to {phone}");
+                logger.LogInformation($"SendSMS: {User.GetEmail()} is sending test sms to {phone}");
 
                 return Ok(await smsSender.SendSMS(phone, new Message($"Test sms: {DateTimeOffset.Now.ToString("o")}")));
             }
