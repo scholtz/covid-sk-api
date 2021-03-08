@@ -14,5 +14,6 @@ namespace CovidMassTesting.Model.Settings
         public string QueueName { get; set; }
         public string Exchange { get; set; }
         public string GatewayUser { get; set; }
+        public string CoHash { get; set; }
     }
 }

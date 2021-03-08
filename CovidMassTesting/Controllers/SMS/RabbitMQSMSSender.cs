@@ -99,9 +99,11 @@ namespace CovidMassTesting.Controllers.SMS
                         User = settings.Value.GatewayUser
                     };
                     var body = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(msg));
-                    client?.BasicPublish(exchange: settings.Value.Exchange,
+                    if (client == null) throw new Exception("Unable to send message because sender has not been initiated");
+                    client.BasicPublish(exchange: settings.Value.Exchange,
                                          routingKey: settings.Value.QueueName,
                                          body: body);
+                    logger.LogInformation($"Sent SMS to {settings.Value.HostName}/{settings.Value.VirtualHost}/{settings.Value.QueueName} {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toPhone)}");
 
                     return true;
                 }

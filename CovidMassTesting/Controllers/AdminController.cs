@@ -550,7 +550,7 @@ namespace CovidMassTesting.Controllers
 
                 logger.LogInformation($"SendSMS: {User.GetEmail()} is sending test sms to {phone}");
 
-                return Ok(await smsSender.SendSMS(phone, new Message($"Test sms: {DateTimeOffset.Now.ToString("o")}")));
+                return Ok(await smsSender.SendSMS(phone, new Message($"Test sms: {DateTimeOffset.Now.ToString("f")}")));
             }
             catch (Exception exc)
             {
