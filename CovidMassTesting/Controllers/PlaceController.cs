@@ -319,7 +319,7 @@ namespace CovidMassTesting.Controllers
 
                 var list = (await placeRepository.ListAll());
                 //if (isGlobalAdmin) return Ok(list.ToDictionary(p => p.Id, p => p));
-                return Ok(list.Where(p => p.PlaceProviderId == User.GetPlaceProvider()).OrderBy(p => p.Name).ToDictionary(p => p.Id, p => p));
+                return Ok(list.Where(p => p.PlaceProviderId == User.GetPlaceProvider() || string.IsNullOrEmpty(p.PlaceProviderId)).OrderBy(p => p.Name).ToDictionary(p => p.Id, p => p));
             }
             catch (ArgumentException exc)
             {
