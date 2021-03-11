@@ -2670,6 +2670,11 @@
             Old testing places will not be visible
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.IsVisibleOnlyForAuthorized">
+            <summary>
+            Only for authorized - Do not show in public map, but show in private list
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Place.Queue">
             <summary>
             Queue in minutes

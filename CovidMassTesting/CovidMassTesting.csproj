@@ -97,13 +97,25 @@
     <EmbeddedResource Update="Resources\Controllers.UserController.sk.resx">
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.UserController.cs.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Controllers.ResultController.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.ResultController.cs.resx">
       <Generator></Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Controllers.PlaceController.sk.resx">
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.PlaceController.cs.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Controllers.AdminController.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Controllers.AdminController.cs.resx">
       <Generator></Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Controllers.AdminController.resx">
@@ -125,10 +137,19 @@
     <EmbeddedResource Update="Resources\Repository.RedisRepository.VisitorRepository.sk.resx">
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.VisitorRepository.cs.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Repository.RedisRepository.UserRepository.sk.resx">
       <Generator></Generator>
     </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.UserRepository.cs.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\Repository.RedisRepository.SlotRepository.sk.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Resources\Repository.RedisRepository.SlotRepository.cs.resx">
       <Generator></Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Resources\Repository.RedisRepository.SlotRepository.resx">
