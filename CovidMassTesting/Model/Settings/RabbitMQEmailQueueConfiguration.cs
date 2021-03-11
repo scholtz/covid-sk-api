@@ -5,10 +5,7 @@ using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model.Settings
 {
-    /// <summary>
-    /// SMS Gateway through rabbit mq
-    /// </summary>
-    public class RabbitMQSMSQueueConfiguration
+    public class RabbitMQEmailQueueConfiguration
     {
         /// <summary>
         /// Hostname
@@ -35,12 +32,12 @@ namespace CovidMassTesting.Model.Settings
         /// </summary>
         public string Exchange { get; set; }
         /// <summary>
-        /// User for gateway
-        /// </summary>
-        public string GatewayUser { get; set; }
-        /// <summary>
         /// Cohash for loging purposes
         /// </summary>
         public string CoHash { get; set; }
+        public string FromEmail { get; internal set; }
+        public string FromName { get; internal set; }
+        public string ReplyToEmail { get; internal set; }
+        public string ReplyToName { get; internal set; }
     }
 }

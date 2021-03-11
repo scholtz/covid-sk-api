@@ -338,6 +338,30 @@
             <param name="attachments"></param>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Controllers.Email.RabbitMQEmailSender">
+            <summary>
+            https://doc.gosms.cz/#dokumentace-gosms-api
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.RabbitMQEmailSender.#ctor(Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.Email.RabbitMQEmailSender},Microsoft.Extensions.Options.IOptions{CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.Email.RabbitMQEmailSender})">
+            <summary>
+            Constructor
+            </summary>
+            <param name="localizer"></param>
+            <param name="settings"></param>
+            <param name="logger"></param>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.Email.RabbitMQEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail,System.Collections.Generic.IEnumerable{SendGrid.Helpers.Mail.Attachment})">
+            <summary>
+            Act as sms was sent. Log event to console
+            </summary>
+            <param name="subject"></param>
+            <param name="toEmail"></param>
+            <param name="toName"></param>
+            <param name="data"></param>
+            <param name="attachments"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Controllers.Email.SendGridController">
             <summary>
             Sendgrid email sender
@@ -3326,6 +3350,86 @@
             Settings for pdf generation
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.HostName">
+            <summary>
+            Hostname
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.RabbitUserName">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.RabbitPassword">
+            <summary>
+            Password
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.VirtualHost">
+            <summary>
+            Virtual host
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.QueueName">
+            <summary>
+            Queue name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.Exchange">
+            <summary>
+            Exchange
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.CoHash">
+            <summary>
+            Cohash for loging purposes
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration">
+            <summary>
+            SMS Gateway through rabbit mq
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.HostName">
+            <summary>
+            Hostname
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.RabbitUserName">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.RabbitPassword">
+            <summary>
+            Password
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.VirtualHost">
+            <summary>
+            Virtual host
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.QueueName">
+            <summary>
+            Queue name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.Exchange">
+            <summary>
+            Exchange
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.GatewayUser">
+            <summary>
+            User for gateway
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration.CoHash">
+            <summary>
+            Cohash for loging purposes
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.SendGridConfiguration">
             <summary>
             configuration for mailing through sendgrid
@@ -4442,6 +4546,11 @@
             Test result. Available options are in Model.TestResult
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.ResultNotifiedAt">
+            <summary>
+            Time when visitor has been notified with his status
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.TestingSet">
             <summary>
             Testing set identifier
@@ -4500,6 +4609,11 @@
         <member name="P:CovidMassTesting.Model.Visitor.TestResultTime">
             <summary>
             Time when test has been confirmed by lab
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Visitor.LastStatusCheck">
+            <summary>
+            Time when user has checked his status last time
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Visitor.EHealthNotifiedAt">
@@ -5766,6 +5880,14 @@
             </summary>
             <param name="companyId"></param>
             <param name="employeeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.IncrementNotifiedStats(CovidMassTesting.Model.Visitor,System.String)">
+            <summary>
+            Increment stats
+            </summary>
+            <param name="visitor"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetRegistrationIdFromHashedId(System.String)">
@@ -7308,6 +7430,14 @@
             </summary>
             <param name="code"></param>
             <param name="user"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.IncrementNotifiedStats(CovidMassTesting.Model.Visitor,System.String)">
+            <summary>
+            Increment stats
+            </summary>
+            <param name="visitor"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Enqueued(System.Int32,System.String)">
