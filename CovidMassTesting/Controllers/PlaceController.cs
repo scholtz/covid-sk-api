@@ -96,6 +96,7 @@ namespace CovidMassTesting.Controllers
                 CacheTime = DateTimeOffset.Now;
                 list = Cache;
             }
+            list = list.Where(place => place.IsVisibleOnlyForAuthorized != true);
             return list;
         }
 

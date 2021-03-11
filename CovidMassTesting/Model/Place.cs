@@ -111,6 +111,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? IsVisible { get; set; } = true;
         /// <summary>
+        /// Only for authorized - Do not show in public map, but show in private list
+        /// </summary>
+        public bool? IsVisibleOnlyForAuthorized { get; set; }
+        /// <summary>
         /// Queue in minutes
         /// </summary>
         public TimeSpan? Queue { get; set; }
