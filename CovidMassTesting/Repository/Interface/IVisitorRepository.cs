@@ -323,6 +323,22 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public string MakeCompanyPeronalNumberHash(string companyId, string employeeId);
         /// <summary>
+        /// Increment stats
+        /// </summary>
+        /// <param name="statsType"></param>
+        /// <param name="placeId"></param>
+        /// <param name="placeProviderId"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public Task<long> IncrementStats(string statsType, string placeId, string placeProviderId, DateTimeOffset time);
+        /// <summary>
+        /// Get the place provider stats
+        /// </summary>
+        /// <param name="statsType"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public Task<Dictionary<DateTimeOffset, long>> GetPPStats(string statsType, string placeProviderId);
+        /// <summary>
         /// RegistrationId From Hashed Id
         /// </summary>
         /// <param name="hashedId"></param>

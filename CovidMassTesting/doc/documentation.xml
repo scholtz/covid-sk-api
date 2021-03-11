@@ -353,7 +353,7 @@
         </member>
         <member name="M:CovidMassTesting.Controllers.Email.RabbitMQEmailSender.SendEmail(System.String,System.String,System.String,CovidMassTesting.Model.Email.IEmail,System.Collections.Generic.IEnumerable{SendGrid.Helpers.Mail.Attachment})">
             <summary>
-            Act as sms was sent. Log event to console
+            Rabbit MQ Email sender
             </summary>
             <param name="subject"></param>
             <param name="toEmail"></param>
@@ -514,7 +514,7 @@
             Manages place provider companies
             </summary>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceProviderController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceProviderController},CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository)">
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.#ctor(Microsoft.Extensions.Configuration.IConfiguration,Microsoft.Extensions.Localization.IStringLocalizer{CovidMassTesting.Controllers.PlaceProviderController},Microsoft.Extensions.Logging.ILogger{CovidMassTesting.Controllers.PlaceProviderController},CovidMassTesting.Repository.Interface.IPlaceProviderRepository,CovidMassTesting.Repository.Interface.IPlaceRepository,CovidMassTesting.Repository.Interface.IUserRepository,CovidMassTesting.Repository.Interface.IVisitorRepository)">
             <summary>
             Constructor
             </summary>
@@ -524,6 +524,7 @@
             <param name="placeProviderRepository"></param>
             <param name="placeRepository"></param>
             <param name="userRepository"></param>
+            <param name="visitorRepository"></param>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.Register(CovidMassTesting.Model.PlaceProvider)">
             <summary>
@@ -664,6 +665,12 @@
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListProducts">
+            <summary>
+            Administrator is allowed to list pp products
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.StatsTestedVisitors">
             <summary>
             Administrator is allowed to list pp products
             </summary>
@@ -5882,11 +5889,21 @@
             <param name="employeeId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.IncrementNotifiedStats(CovidMassTesting.Model.Visitor,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.IncrementStats(System.String,System.String,System.String,System.DateTimeOffset)">
             <summary>
             Increment stats
             </summary>
-            <param name="visitor"></param>
+            <param name="statsType"></param>
+            <param name="placeId"></param>
+            <param name="placeProviderId"></param>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetPPStats(System.String,System.String)">
+            <summary>
+            Get the place provider stats
+            </summary>
+            <param name="statsType"></param>
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
@@ -7432,11 +7449,21 @@
             <param name="user"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.IncrementNotifiedStats(CovidMassTesting.Model.Visitor,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.IncrementStats(System.String,System.String,System.String,System.DateTimeOffset)">
             <summary>
             Increment stats
             </summary>
-            <param name="visitor"></param>
+            <param name="statsType">Model.StatsType.*</param>
+            <param name="placeProviderId"></param>
+            <param name="time"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetPPStats(System.String,System.String)">
+            <summary>
+            Increment stats
+            </summary>
+            <param name="statsType">Model.StatsType.*</param>
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>

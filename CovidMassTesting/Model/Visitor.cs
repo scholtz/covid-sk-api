@@ -113,6 +113,9 @@ namespace CovidMassTesting.Model
         /// Test result. Available options are in Model.TestResult
         /// </summary>
         public string Result { get; set; } = TestResult.NotTaken;
+        /// <summary>
+        /// Time when visitor has been notified with his status
+        /// </summary>
         public DateTimeOffset? ResultNotifiedAt { get; set; } = null;
         /// <summary>
         /// Testing set identifier
@@ -162,6 +165,9 @@ namespace CovidMassTesting.Model
         /// Time when test has been confirmed by lab
         /// </summary>
         public DateTimeOffset? TestResultTime { get; set; }
+        /// <summary>
+        /// Time when user has checked his status last time
+        /// </summary>
         public DateTimeOffset? LastStatusCheck { get; set; }
         /// <summary>
         /// Time when the result of the test was successfully sent to government system

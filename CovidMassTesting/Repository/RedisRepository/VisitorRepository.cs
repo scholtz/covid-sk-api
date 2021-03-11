@@ -48,6 +48,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_OPENDAYS = "OPENDAYS";
         private readonly string REDIS_KEY_DOCUMENT_QUEUE = "DOCUMENT_QUEUE";
         private readonly string REDIS_KEY_RESULT_QUEUE = "RESULT_QUEUE";
+        private readonly string REDIS_KEY_DAILY_COUNT = "REDIS_KEY_DAILY_COUNT";
         private readonly IEmailSender emailSender;
         private readonly ISMSSender smsSender;
         /// <summary>
@@ -795,6 +796,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 case TestResult.TestMustBeRepeated:
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
+                    var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                     break;
                 case TestResult.TestIsBeingProcessing:
                     visitor.TestingTime = DateTimeOffset.UtcNow;
@@ -1168,6 +1171,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         visitor.EHealthNotifiedAt = DateTimeOffset.UtcNow;
                         visitor.ResultNotifiedAt = visitor.EHealthNotifiedAt;
+                        await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, placeProviderId, visitor.ResultNotifiedAt.Value);
                         await SetVisitor(visitor, false);
                         logger.LogInformation($"Visitor notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}");
                         return true;
@@ -1181,14 +1185,63 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return false;
         }
+        /// <summary>
+        /// Increment stats
+        /// </summary>
+        /// <param name="statsType">Model.StatsType.*</param>
+        /// <param name="placeProviderId"></param>
+        /// <param name="time"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public virtual async Task<long> IncrementStats(string statsType, string placeId, string placeProviderId, DateTimeOffset time)
+        {
+            var keyPlace = $"{statsType}-place-{placeProviderId}-{placeId}-{time.Date.Ticks}";
+
+            var ret = await redisCacheClient.Db0.HashIncerementByAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}",
+                keyPlace,
+                1);
+            var keyPP = $"{statsType}-pp-{placeProviderId}-{time.Date.Ticks}";
+
+            ret = await redisCacheClient.Db0.HashIncerementByAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}",
+                keyPP,
+                1);
+            return ret;
+        }
+        /// <summary>
+        /// Increment stats
+        /// </summary>
+        /// <param name="statsType">Model.StatsType.*</param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public virtual async Task<Dictionary<DateTimeOffset, long>> GetPPStats(string statsType, string placeProviderId)
+        {
+            var keys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
+            var ret = new Dictionary<DateTimeOffset, long>();
+            var search = $"{statsType}-pp-{placeProviderId}";
+            foreach (var item in keys.Where(k => k.StartsWith(search)))
+            {
+                var k = item.Split("-");
+                if (k.Length == 4)
+                {
+                    if (long.TryParse(k[3], out var time))
+                    {
+                        ret[new DateTimeOffset(time, TimeSpan.Zero)] = await redisCacheClient.Db0.HashGetAsync<long>($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}", item);
+                    }
+                }
+            }
+            return ret;
+        }
+
         private async Task SendResults(Visitor visitor)
         {
             var notifiedByEHealth = false;
+            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             if (configuration["SendResultsToEHealth"] == "1")
             {
                 try
                 {
-                    var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
                     if (await NotifyByEHealth(visitor, place.PlaceProviderId))
                     {
                         notifiedByEHealth = true;
@@ -1214,7 +1267,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                         case TestResult.PositiveWaitingForCertificate:
                             try
                             {
-                                var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
                                 if (await NotifyByEHealth(visitor, place.PlaceProviderId))
                                 {
                                     notifiedByEHealth = true;
@@ -1249,7 +1301,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                     var attachments = new List<SendGrid.Helpers.Mail.Attachment>();
                     try
                     {
-                        var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
                         //var product = await placeRepository.GetPlaceProduct();
                         var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
                         var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
@@ -1385,6 +1436,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     CultureInfo.CurrentUICulture = oldUICulture;
 
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
+                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                     await SetVisitor(visitor, false);
                     break;
             }
@@ -2288,6 +2340,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             ret += (int)await redisCacheClient.Db0.SetRemoveAllAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}");
             var bool1 = await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}");
             var bool2 = await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}");
+            var bool3 = await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
+
             // REDIS_KEY_RESULTS_OBJECTS are intended to stay even if all data has been removed
 
             return ret;

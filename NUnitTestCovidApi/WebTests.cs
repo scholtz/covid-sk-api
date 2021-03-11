@@ -1134,6 +1134,15 @@ namespace NUnitTestCovidApi
             result = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.TestIsBeingProcessing, result.State);
 
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+            request = StatsTestedVisitors(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var stats = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<DateTimeOffset, long>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(1, stats.Count);
+            var time = new DateTimeOffset(DateTimeOffset.Now.Date.Ticks, TimeSpan.Zero);
+            Assert.AreEqual(1, stats[time]);
         }
 
 

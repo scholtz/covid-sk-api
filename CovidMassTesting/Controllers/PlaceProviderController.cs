@@ -29,6 +29,7 @@ namespace CovidMassTesting.Controllers
         private readonly IPlaceRepository placeRepository;
         private readonly IPlaceProviderRepository placeProviderRepository;
         private readonly IUserRepository userRepository;
+        private readonly IVisitorRepository visitorRepository;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -38,13 +39,15 @@ namespace CovidMassTesting.Controllers
         /// <param name="placeProviderRepository"></param>
         /// <param name="placeRepository"></param>
         /// <param name="userRepository"></param>
+        /// <param name="visitorRepository"></param>
         public PlaceProviderController(
             IConfiguration configuration,
             IStringLocalizer<PlaceProviderController> localizer,
             ILogger<PlaceProviderController> logger,
             IPlaceProviderRepository placeProviderRepository,
             IPlaceRepository placeRepository,
-            IUserRepository userRepository
+            IUserRepository userRepository,
+            IVisitorRepository visitorRepository
             )
         {
             this.configuration = configuration;
@@ -53,6 +56,7 @@ namespace CovidMassTesting.Controllers
             this.placeRepository = placeRepository;
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
+            this.visitorRepository = visitorRepository;
         }
         /// <summary>
         /// List places
@@ -810,6 +814,32 @@ namespace CovidMassTesting.Controllers
             {
                 if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 return Ok(await placeProviderRepository.ListProducts(User.GetPlaceProvider()));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Administrator is allowed to list pp products
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("StatsTestedVisitors")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<Dictionary<DateTimeOffset, long>>>> StatsTestedVisitors()
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                return Ok(await visitorRepository.GetPPStats(StatsType.Notification, User.GetPlaceProvider()));
             }
             catch (ArgumentException exc)
             {

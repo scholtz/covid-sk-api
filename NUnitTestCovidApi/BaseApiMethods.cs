@@ -20,7 +20,8 @@ namespace NUnitTestCovidApi
         protected HttpResponseMessage AuthenticateUser(HttpClient client, string email, string password)
         {
             var request = Preauthenticate(client, email);
-            var data = JsonConvert.DeserializeObject<AuthData>(request.Content.ReadAsStringAsync().Result);
+            var content = request.Content.ReadAsStringAsync().Result;
+            var data = JsonConvert.DeserializeObject<AuthData>(content);
             var cohash = data.CoHash;
             var rand = data.CoData;
             /// Authenticate
@@ -59,6 +60,7 @@ namespace NUnitTestCovidApi
                     })
                     ).Result;
         }
+
         protected HttpResponseMessage DropDatabase(HttpClient client, string hash)
         {
             return client.PostAsync("Admin/DropDatabase",
@@ -231,6 +233,10 @@ namespace NUnitTestCovidApi
 
 
 
+        protected HttpResponseMessage StatsTestedVisitors(HttpClient client)
+        {
+            return client.GetAsync("PlaceProvider/StatsTestedVisitors").Result;
+        }
         protected HttpResponseMessage AllocatePersonsToPlace(HttpClient client, PersonAllocation[] allocations, string place)
         {
             var body = Newtonsoft.Json.JsonConvert.SerializeObject(allocations);

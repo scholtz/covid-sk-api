@@ -30,6 +30,7 @@ namespace CovidMassTesting.Repository.MockRepository
 
         private readonly ConcurrentDictionary<string, string> registrations = new ConcurrentDictionary<string, string>();
         private readonly ConcurrentDictionary<string, string> id2registration = new ConcurrentDictionary<string, string>();
+        private readonly ConcurrentDictionary<string, long> Stats = new ConcurrentDictionary<string, long>();
 
 
         private readonly ConcurrentDictionary<long, ConcurrentDictionary<int, int>> day2visitor = new ConcurrentDictionary<long, ConcurrentDictionary<int, int>>();
@@ -537,6 +538,49 @@ namespace CovidMassTesting.Repository.MockRepository
         public async override Task<IEnumerable<DateTimeOffset>> ListExportableDays()
         {
             return days.Values.Select(t => new DateTimeOffset(t, TimeSpan.Zero));
+        }
+        public override async Task<long> IncrementStats(string statsType, string placeId, string placeProviderId, DateTimeOffset time)
+        {
+
+            var keyPlace = $"{statsType}-place-{placeProviderId}-{placeId}-{time.Date.Ticks}";
+            if (Stats.ContainsKey(keyPlace))
+            {
+                Stats[keyPlace]++;
+            }
+            else
+            {
+                Stats[keyPlace] = 1;
+            }
+
+            var keyPP = $"{statsType}-pp-{placeProviderId}-{time.Date.Ticks}";
+            if (Stats.ContainsKey(keyPP))
+            {
+                Stats[keyPP]++;
+            }
+            else
+            {
+                Stats[keyPP] = 1;
+            }
+            return Stats[keyPP];
+        }
+        public override async Task<Dictionary<DateTimeOffset, long>> GetPPStats(string statsType, string placeProviderId)
+        {
+            var keys = Stats.Keys;
+            var ret = new Dictionary<DateTimeOffset, long>();
+            var search = $"{statsType}-pp-{placeProviderId}";
+            foreach (var item in keys.Where(k => k.StartsWith(search)))
+            {
+                var k = item.Split("-");
+                if (k.Length == 4)
+                {
+                    if (long.TryParse(k[3], out var time))
+                    {
+                        ret[new DateTimeOffset(time, TimeSpan.Zero)] = Stats[item];
+                    }
+                }
+            }
+            return ret;
+
         }
     }
 }
