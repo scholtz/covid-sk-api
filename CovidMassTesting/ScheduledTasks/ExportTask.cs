@@ -92,9 +92,12 @@ namespace CovidMassTesting.ScheduledTasks
                     $"Report {dayTimeStamp.ToString("yyyy-MM-dd")}",
                     email,
                     "",
-                    new Model.Email.VisitorTestingResultEmail("sk-SK", configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"]
-                )
-                    { Name = email }, attachments);
+                    new Model.Email.GenericEmail("sk-SK", configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                    {
+                        TextSK = $"<h1>Denný anonymizovaný report</h1><p>{configuration["EmailSupport"]}</p>"
+                    },
+                    attachments
+                );
             }
 
             return true;
