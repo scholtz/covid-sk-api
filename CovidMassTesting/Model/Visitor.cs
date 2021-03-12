@@ -22,6 +22,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Gender { get; set; }
         /// <summary>
+        /// Nationality
+        /// </summary>
+        public string Nationality { get; set; }
+        /// <summary>
         /// Language in which we will communicate to the visitor
         /// 
         /// sk | en

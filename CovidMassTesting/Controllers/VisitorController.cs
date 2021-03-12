@@ -337,6 +337,7 @@ namespace CovidMassTesting.Controllers
                 visitor.StreetNo = reg.StreetNo;
                 visitor.Insurance = reg.InsuranceCompany;
                 visitor.Gender = reg.Gender;
+                visitor.Nationality = reg.Nationality;
                 visitor.ZIP = reg.ZIP;
                 visitor.Email = reg.Email;
                 visitor.Phone = reg.Phone;
@@ -430,6 +431,7 @@ namespace CovidMassTesting.Controllers
                 visitor.RegistrationTime = DateTimeOffset.UtcNow;
                 visitor.SelfRegistration = false;
                 visitor.Gender = reg.Gender;
+                visitor.Nationality = reg.Nationality;
                 visitor.Insurance = reg.InsuranceCompany;
 
                 visitor.RegistrationUpdatedByManager = User.GetEmail();
@@ -770,7 +772,11 @@ namespace CovidMassTesting.Controllers
                     }
                     if (n2k.ContainsKey("department"))
                     {
-                        reg.Deparment = fields[n2k["department"]];
+                        reg.Department = fields[n2k["department"]];
+                    }
+                    if (n2k.ContainsKey("nationality"))
+                    {
+                        reg.Nationality = fields[n2k["nationality"]];
                     }
 
                     if (DateTimeOffset.TryParse(fields[n2k["datum-narodenia"]], out var date))
