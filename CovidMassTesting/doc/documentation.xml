@@ -1570,6 +1570,21 @@
             Number of places accounted
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Email.EmailNameTuple">
+            <summary>
+            Email with name configuration option
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.EmailNameTuple.Name">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Email.EmailNameTuple.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Email.GenericEmail">
             <summary>
             User with permissions to invite other people can invite them and 
@@ -3355,6 +3370,16 @@
         <member name="P:CovidMassTesting.Model.Settings.MailGunConfiguration.ReplyToName">
             <summary>
             Reply to name
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Settings.NotifyWhenSickConfiguration">
+            <summary>
+            Configuration for notification when someone is sick
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.NotifyWhenSickConfiguration.Emails">
+            <summary>
+            Send to listed emails
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Settings.PDFQRConfiguration">

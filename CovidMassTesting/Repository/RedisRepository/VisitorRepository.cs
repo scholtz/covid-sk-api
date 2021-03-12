@@ -3,6 +3,7 @@ using CovidMassTesting.Controllers.Email;
 using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
+using CovidMassTesting.Model.Settings;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.Extensions.Configuration;
@@ -51,6 +52,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         private readonly string REDIS_KEY_DAILY_COUNT = "REDIS_KEY_DAILY_COUNT";
         private readonly IEmailSender emailSender;
         private readonly ISMSSender smsSender;
+        private readonly NotifyWhenSickConfiguration notifyWhenSickConfiguration;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -90,6 +92,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.userRepository = userRepository;
             this.placeProviderRepository = placeProviderRepository;
             this.eHealthConnector = eHealthConnector;
+
+            notifyWhenSickConfiguration = configuration.GetSection("NotifyWhenSick")?.Get<Model.Settings.NotifyWhenSickConfiguration>();
+
         }
         /// <summary>
         /// Creates new visitor registration
@@ -1236,6 +1241,28 @@ namespace CovidMassTesting.Repository.RedisRepository
 
         private async Task SendResults(Visitor visitor)
         {
+
+            if (notifyWhenSickConfiguration?.Emails?.Count > 0)
+            {
+                try
+                {
+                    foreach (var email in notifyWhenSickConfiguration.Emails)
+                    {
+                        await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
+                            new Model.Email.GenericEmail(email.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                            {
+                                TextSK = string.Format("Bola identifikovaná pozitívna osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
+                                TextEN = string.Format("Positive person has been identified: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
+                                TextCS = string.Format("Byla identifikována pozitivní osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email)
+                            });
+                    }
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc, exc.Message);
+                }
+            }
+
             var notifiedByEHealth = false;
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             if (configuration["SendResultsToEHealth"] == "1")

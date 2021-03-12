@@ -24,7 +24,7 @@
   <ItemGroup>
     <PackageReference Include="AWSSDK.Core" Version="3.5.2.7" />
     <PackageReference Include="AWSSDK.SQS" Version="3.5.1.16" />
-    <PackageReference Include="BarcodeLib" Version="2.2.10" />
+    <PackageReference Include="BarcodeLib" Version="2.3.0" />
     <PackageReference Include="ChoETL" Version="1.2.1.5" />
     <PackageReference Include="CsvHelper" Version="22.1.2" />
     <PackageReference Include="GoogleReCaptcha.V3" Version="1.3.0" />
@@ -34,6 +34,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
     <PackageReference Include="Microsoft.DotNet.PlatformAbstractions" Version="3.1.6" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="5.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="5.0.4" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.9" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog" Version="4.7.7" />

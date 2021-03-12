@@ -2602,7 +2602,7 @@ namespace NUnitTestCovidApi
             testResult.Time = DateTimeOffset.Now.AddMinutes(-15);
             await iVisitor.SetResultObject(testResult, false);
             iVisitor.ProcessSingle().Wait();
-            Assert.AreEqual(1, noEmailSender.Data.Count);
+            Assert.AreEqual(2, noEmailSender.Data.Count);
 
             var tuple = noEmailSender.Data.Values.First();
             Assert.AreEqual(1, tuple.attachments.Count());
@@ -2622,13 +2622,21 @@ namespace NUnitTestCovidApi
 
 
             // TEST mark as sick
+
+            noEmailSender.Data.Clear();
+
             request = SetResult(client, test2, TestResult.NegativeWaitingForCertificate);
+
+            if (configuration["SendResultsThroughQueue"] != "1")
+            {
+                Assert.AreEqual(2, noEmailSender.Data.Count);
+            }
+
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(TestResult.NegativeWaitingForCertificate, testResult.State);
             client.DefaultRequestHeaders.Clear();
             var idWithSlashes = registered[0].Id.ToString();
-
             request = PublicGetTestResult(client, idWithSlashes.Substring(0, 3) + "‐" + idWithSlashes.Substring(3, 3) + " " + idWithSlashes.Substring(6), registered[0].RC.Substring(6, 4));
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             testResult = Newtonsoft.Json.JsonConvert.DeserializeObject<Result>(request.Content.ReadAsStringAsync().Result);

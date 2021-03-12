@@ -153,6 +153,12 @@
   <data name="POSITIVE" xml:space="preserve">
     <value>POSITIVE</value>
   </data>
+  <data name="Positive case" xml:space="preserve">
+    <value>Pozitívny nález</value>
+  </data>
+  <data name="Positive case found" xml:space="preserve">
+    <value>Positive case found: {0} {1} {2} {3}</value>
+  </data>
   <data name="Test does not exists" xml:space="preserve">
     <value>Test does not exists</value>
   </data>

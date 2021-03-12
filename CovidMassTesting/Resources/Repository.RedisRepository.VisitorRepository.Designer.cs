@@ -177,6 +177,24 @@ namespace CovidMassTesting.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pozitívny nález.
+        /// </summary>
+        internal static string Positive_case {
+            get {
+                return ResourceManager.GetString("Positive case", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Positive case found: {0} {1} {2} {3}.
+        /// </summary>
+        internal static string Positive_case_found {
+            get {
+                return ResourceManager.GetString("Positive case found", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Test does not exists.
         /// </summary>
         internal static string Test_does_not_exists {

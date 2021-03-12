@@ -293,7 +293,7 @@ namespace CovidMassTesting
                 throw new ArgumentNullException(nameof(userRepository));
             }
 
-            var supportedCultures = new[] { "en", "sk" };
+            var supportedCultures = new[] { "en", "sk", "cs" };
             var localizationOptions = new RequestLocalizationOptions().SetDefaultCulture(supportedCultures[0])
                 .AddSupportedCultures(supportedCultures)
                 .AddSupportedUICultures(supportedCultures);

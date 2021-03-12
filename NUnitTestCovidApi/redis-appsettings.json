@@ -57,6 +57,14 @@
       "Roles": [ "DataExporter", "PasswordProtected" ]
     }
   ],
+  "NotifyWhenSick": {
+    "Emails": [
+      {
+        "name": "Scholtz",
+        "email": "ludovit@scholtz.sk"
+      }
+    ]
+  },
   "DoNotUseObjCache": true,
   "FrontedURL": "https://www.rychlejsie.sk/",
   "SignaturePicture": "testSign.png",
