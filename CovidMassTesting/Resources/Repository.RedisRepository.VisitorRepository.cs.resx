@@ -118,75 +118,75 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Covid test" xml:space="preserve">
-    <value>Testovanie covidu</value>
+    <value>Testování Covidu</value>
   </data>
   <data name="Dear {0}, there were some technical issues with your test. Please visit the sampling place again and repeat the test procedure. You can use the same registration as before." xml:space="preserve">
-    <value>{0}, zial Vas test nebolo mozne vyhodnotit. Prosim dostavte sa kedykolvek na opatovny test. Nemusite sa znovu registrovat.</value>
+    <value>{0}, Váš test nebylo možné vyhodnotit. Prosím dostavte se kdykoliv opětovně na test. Nemusíte se znovu registrovat.</value>
   </data>
   <data name="Dear {0}, we have updated your registration {1}. Time: {2}, Place: {3}" xml:space="preserve">
-    <value>{0}, aktualizovali sme vašu registráciu {1}. Čas: {2}, Miesto: {3}</value>
+    <value>{0}, aktualizovali jsme Vaší registraci {1}. Čas: {2}, Místo: {3}</value>
   </data>
   <data name="Dear {0}, your test is in processing. Please wait for further instructions in next sms message." xml:space="preserve">
-    <value>{0}, Váš test sa spracováva. Počkajte na ďalšie inštrukcie ktoré dostanete v ďalšej SMS správe.</value>
+    <value>{0}, Váš test se zpracovává. Počkejte na další instrukce které dostanete v další SMS zprávě.</value>
   </data>
   <data name="Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate." xml:space="preserve">
-    <value>{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}</value>
+    <value>{0}, {1}, AG test ze dne {2} je {3}. PDF Certifikát získáte na: {4}</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
-    <value>{1}, {0} je Váš registračný kód. Ukážte tento kód pri odbere vzorky na mieste {3} dňa {2}</value>
+    <value>{1}, {0} je Váš registračný kód. Předložte tento kód při odběru vzorků na místě {3} dňa {2}</value>
   </data>
   <data name="Dear {0},We have removed your personal data from the database. Thank you for taking the covid test" xml:space="preserve">
-    <value>{0}, vymazali sme Vašu registráciu aj Vaše osobné údaje zo systému.</value>
+    <value>{0}, vymazali jsme Vaší registraci i Vaše osobní údaje ze systému.</value>
   </data>
   <data name="Invalid code" xml:space="preserve">
     <value>Neplatný kód</value>
   </data>
   <data name="Last 4 digits of personal number or declared passport for foreigner at registration must not be empty" xml:space="preserve">
-    <value>Posledné 4 číslice rodného čísla alebo pre cudzincov posledné 4 znaky zadaného cestovného dokladu musia byť zadané</value>
+    <value>Poslední 4 číslice rodného čísla nebo pro cizince poslední 4 znaky zadaného cestovného dokladu musí být zadané</value>
   </data>
   <data name="NEGATIVE" xml:space="preserve">
-    <value>NEGATIVNY</value>
+    <value>NEGATIVNÍ</value>
   </data>
   <data name="Personal data may be deleted only after the test has proven negative result and person receives the certificate." xml:space="preserve">
-    <value>Osobné údaje môžu byť vymazané iba ak Vám nebol detekovaný covid a prevzali ste si certifikát.</value>
+    <value>Osobní údaje mohou být vymazané jen pokud Vám nebyl detekovaný covid a převzali jste si certifikát.</value>
   </data>
   <data name="POSITIVE" xml:space="preserve">
-    <value>POZITIVNY</value>
+    <value>POZITIVNÍ</value>
   </data>
   <data name="Positive case" xml:space="preserve">
-    <value>Pozitívny nález</value>
+    <value>Pozitívní nález</value>
   </data>
   <data name="Positive case found" xml:space="preserve">
-    <value>Bola identifikovaná pozitívna osoba: {0} {1} {2} {3}</value>
+    <value>Byla identifikovaná pozitivní osoba: {0} {1} {2} {3}</value>
   </data>
   <data name="Test does not exists" xml:space="preserve">
     <value>Test neexistuje</value>
   </data>
   <data name="This 1 hour time slot has reached the capacity." xml:space="preserve">
-    <value>Tento hodinový časový úsek má už bohužiaľ kapacitu zaplnenú ({0}).</value>
+    <value>Tento hodinový časový úsek má už bohužel kapacitu zaplněnou ({0}).</value>
   </data>
   <data name="This 5 minute time slot has reached the capacity." xml:space="preserve">
-    <value>Tento 5-minútový časový úsek má už bohužiaľ kapacitu zaplnenú ({0}).</value>
+    <value>Tento 5-minutový časový úsek má už bohužel kapacitu zaplněnou ({0}).</value>
   </data>
   <data name="Unable to find visitor code from test code. Are you sure test code is correct?" xml:space="preserve">
-    <value>Nepodarilo sa nájsť návštevníka podľa testovacej sady. Ste si istý, že kód testu je správny?</value>
+    <value>Nepodařilo sa najít návštěvníka podle testovací sady. Jste si jistý, že kód testu je správný?</value>
   </data>
   <data name="Unknown personal number" xml:space="preserve">
-    <value>Neznáme rodné číslo</value>
+    <value>Neznámé rodné číslo</value>
   </data>
   <data name="Visitor with code {0} not found" xml:space="preserve">
-    <value>Návštevník s kódom {0} nebol nájdený</value>
+    <value>Návštevník s kódem {0} nebyl nalezený</value>
   </data>
   <data name="We are not able to find chosen 5 min. slot" xml:space="preserve">
-    <value>Nepodarilo sa nájsť minútový testovací slot</value>
+    <value>Nepodařilo se najít 5-minutový testovací úsek</value>
   </data>
   <data name="We are not able to find chosen hour slot" xml:space="preserve">
-    <value>Nepodarilo sa nájsť hodinový testovací slot</value>
+    <value>Nepodařilo se najít hodinový testovací úsek</value>
   </data>
   <data name="We are not able to find chosen testing place" xml:space="preserve">
-    <value>Nepodarilo sa nájsť miesto testovania</value>
+    <value>Nepodařilo se najít místo testování</value>
   </data>
   <data name="You can remove only first item from the queue" xml:space="preserve">
-    <value>Môžete vymazať iba prvú položku z fronty</value>
+    <value>Můžete vymazat pouze první položku z fronty</value>
   </data>
 </root>
