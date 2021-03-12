@@ -118,45 +118,45 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Code of the test set must not be empty" xml:space="preserve">
-    <value>Kód testovacej sady nemôže byť prázdny</value>
+    <value>Kód testovací sady nemůže byť prázdny</value>
   </data>
   <data name="Invalid result state" xml:space="preserve">
     <value>Neplatný kód stavu testu</value>
   </data>
   <data name="Invalid visitor code" xml:space="preserve">
-    <value>Neplatný kód registrácie</value>
+    <value>Neplatný kód registrace</value>
   </data>
   <data name="Last 4 digits of personal number or declared passport for foreigner at registration must not be empty" xml:space="preserve">
-    <value>Posledné 4 číslice rodného čísla alebo pre cudzincov posledné 4 znaky zadaného cestovného dokladu</value>
+    <value>Poslední 4 číslice rodného čísla nebo pro cizince poslední 4 znaky zadaného cestovního dokladu</value>
   </data>
   <data name="Only user with Data Exporter role is allowed to fetch all sick visitors" xml:space="preserve">
-    <value>Iba užívateľ s rolou Data Exporter môže vytvoriť zoznam chorých návštevníkov</value>
+    <value>Jen uživatel s rolí Data Exporter může vytvořit záznam nemocných návštěvníků</value>
   </data>
   <data name="Only user with Document Manager role is allowed to fetch visitor data" xml:space="preserve">
-    <value>Iba užívateľ s rolou Správca Dokladov môže načítať dáta užívateľa</value>
+    <value>Jen uživatel s rolí Správce Dokladů může načítat data uživatelů</value>
   </data>
   <data name="Only user with Document Manager role is allowed to move the queue forward" xml:space="preserve">
-    <value>Iba užívateľ s rolou Správca Dokladov môže posunúť frontu dokumentov ďalej</value>
+    <value>Jen uživatel s rolí Správce Dokladů může posunout frontu dokumentů dál</value>
   </data>
   <data name="Only user with Medic Lab role is allowed to set results of tests" xml:space="preserve">
-    <value>Iba užívateľ s rolou Medik v Laboratóriu môže nastaviť výsledky testov</value>
+    <value>Jen uživatel s rolí Lékář v Laboratoři může nastavit výsledky testů</value>
   </data>
   <data name="Only user with Registration Manager role or Medic Tester role is allowed to fetch data of visitors" xml:space="preserve">
-    <value>Iba užívateľ s rolou Registračný manager alebo Medik tester môže načítať údaje o návštevníkovi</value>
+    <value>Jen uživatel s rolí Registrační manager nebo Testující lékař může načítat údaje o návštevníkovi</value>
   </data>
   <data name="Personal number must not be empty" xml:space="preserve">
     <value>Rodné číslo musí byť zadané</value>
   </data>
   <data name="Result of the test must not be empty" xml:space="preserve">
-    <value>Stav testu musí mať platnú hodnotu</value>
+    <value>Stav testu musí mať platnou hodnotu</value>
   </data>
   <data name="Test code must not be empty" xml:space="preserve">
-    <value>Kód testovacej sady musí byť zadaný</value>
+    <value>Testovací kód sady nesmí být prázdný</value>
   </data>
   <data name="Test id must not be empty" xml:space="preserve">
-    <value>Kód testovacej sady musí byť zadaný</value>
+    <value>Testovací ID nesmí být prázdný</value>
   </data>
   <data name="Visitor code must not be empty" xml:space="preserve">
-    <value>Registračný kód návštevníka musí byť zadaný</value>
+    <value>Registračný kód návštěvníka nesmí být prázdný</value>
   </data>
 </root>
