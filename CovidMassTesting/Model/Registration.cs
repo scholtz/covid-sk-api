@@ -74,6 +74,18 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Phone { get; set; }
         /// <summary>
+        /// InsuranceCompany
+        /// </summary>
+        public string InsuranceCompany { get; set; }
+        /// <summary>
+        /// Gender
+        /// </summary>
+        public string Gender { get; set; }
+        /// <summary>
+        /// Department
+        /// </summary>
+        public string Department { get; set; }
+        /// <summary>
         /// Identifier within the company
         /// </summary>
         public List<CompanyIdentifier> CompanyIdentifiers { get; set; } = new List<CompanyIdentifier>();

@@ -335,6 +335,8 @@ namespace CovidMassTesting.Controllers
                 visitor.City = reg.City;
                 visitor.Street = reg.Street;
                 visitor.StreetNo = reg.StreetNo;
+                visitor.Insurance = reg.InsuranceCompany;
+                visitor.Gender = reg.Gender;
                 visitor.ZIP = reg.ZIP;
                 visitor.Email = reg.Email;
                 visitor.Phone = reg.Phone;
@@ -427,6 +429,8 @@ namespace CovidMassTesting.Controllers
                 visitor.Product = product;
                 visitor.RegistrationTime = DateTimeOffset.UtcNow;
                 visitor.SelfRegistration = false;
+                visitor.Gender = reg.Gender;
+                visitor.Insurance = reg.InsuranceCompany;
 
                 visitor.RegistrationUpdatedByManager = User.GetEmail();
                 logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
@@ -733,7 +737,6 @@ namespace CovidMassTesting.Controllers
                         City = fields[n2k["miesto"]],
                         Phone = fields[n2k["telefonne-cislo"]],
                         RC = fields[n2k["idc"]],
-                        StreetNo = fields[n2k["supisne-cislo"]] + "/" + fields[n2k["supisne-cislo"]],
                         Street = fields[n2k["ulica-a-cislo-domu"]],
                         Email = fields[n2k["email"]],
                         ZIP = fields[n2k["psc"]],
@@ -747,6 +750,28 @@ namespace CovidMassTesting.Controllers
                             }
                         }
                     };
+                    if (n2k.ContainsKey("insurance"))
+                    {
+                        reg.InsuranceCompany = fields[n2k["insurance"]];
+                    }
+
+                    if (string.IsNullOrEmpty(fields[n2k["supisne-cislo"]]))
+                    {
+                        reg.StreetNo = fields[n2k["orientacne-cislo"]];
+                    }
+                    else
+                    {
+                        reg.StreetNo = fields[n2k["supisne-cislo"]] + "/" + fields[n2k["orientacne-cislo"]];
+                    }
+
+                    if (n2k.ContainsKey("gender"))
+                    {
+                        reg.Gender = fields[n2k["gender"]];
+                    }
+                    if (n2k.ContainsKey("department"))
+                    {
+                        reg.Deparment = fields[n2k["department"]];
+                    }
 
                     if (DateTimeOffset.TryParse(fields[n2k["datum-narodenia"]], out var date))
                     {
