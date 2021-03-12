@@ -118,12 +118,12 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Old place not found" xml:space="preserve">
-    <value>Staré miesto nebolo nájdené</value>
+    <value>Staré místo nebylo nalezené</value>
   </data>
   <data name="Only admin is allowed to manage testing places" xml:space="preserve">
-    <value>Iba administrátor môže spravovať miesta testovania</value>
+    <value>Jen administrátor může zpravovat místa testování</value>
   </data>
   <data name="Place not found" xml:space="preserve">
-    <value>Miesto nebolo nájdené</value>
+    <value>Místo nebylo nalezené</value>
   </data>
 </root>
