@@ -118,24 +118,24 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Invalid user or password" xml:space="preserve">
-    <value>Neplatný email alebo heslo</value>
+    <value>Neplatný email nebo heslo</value>
   </data>
   <data name="Only admin is allowed to drop database" xml:space="preserve">
-    <value>Iba administrátor môže vymazať databázu</value>
+    <value>Jen administrátor může vymazat databázi</value>
   </data>
   <data name="Only admin is allowed to invite other users" xml:space="preserve">
-    <value>Iba administrátor môže pozvať ďalšie osoby do systému</value>
+    <value>Jen administrátor může pozvat další osoby do systému</value>
   </data>
   <data name="Only admin is allowed to manage time" xml:space="preserve">
-    <value>Iba administrátor môže spravovať časy testovania</value>
+    <value>Jen administrátor může spravovat časy testováni</value>
   </data>
   <data name="Only admin is allowed to remove users" xml:space="preserve">
-    <value>Iba administrátor môže vymazať užívateľov</value>
+    <value>Jen administrátor může vymazat uživatele</value>
   </data>
   <data name="This user is protected by the configuration" xml:space="preserve">
-    <value>Tento užívateľ je chránený konfiguráciou</value>
+    <value>Tento uživatel je chráněn konfigurací</value>
   </data>
   <data name="You cannot remove yourself" xml:space="preserve">
-    <value>Nemôžete vymazať sami seba</value>
+    <value>Nemůžete vymazat sami sebe</value>
   </data>
 </root>
