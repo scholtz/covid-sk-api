@@ -118,18 +118,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Email must not be empty" xml:space="preserve">
-    <value>Email musí byť vyplnený</value>
+    <value>Email musí být vyplněný</value>
   </data>
   <data name="Only user with Admin role can list users" xml:space="preserve">
-    <value>Iba užívateľ s rolou Administrátor môže auditovať užívateľov</value>
+    <value>Jen uživatel s rolí Administrátor může auditovat uživatele</value>
   </data>
   <data name="Only user with Registration Manager role can select his own place." xml:space="preserve">
-    <value>Iba užívateľ s rolou Registračný manager môže nastaviť svoje miesto</value>
+    <value>Jen uživatel s rolí Registrační Manager může nastavit svoje vlastní místo</value>
   </data>
   <data name="Place must not be empty" xml:space="preserve">
-    <value>Miesto musí byť zadané</value>
+    <value>Místo musí být zadané</value>
   </data>
   <data name="This special user cannot change the password." xml:space="preserve">
-    <value>Pre tohto špeciálneho užívateľa nie je možné zmeniť heslo</value>
+    <value>Pro daného speciálního uživatele není možné změnit heslo</value>
   </data>
 </root>
