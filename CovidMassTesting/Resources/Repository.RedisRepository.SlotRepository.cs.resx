@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Error adding the slot for day" xml:space="preserve">
-    <value>Nastala chyba pri pridaní času testovania</value>
+    <value>Nastala chyba při přidávání času testování</value>
   </data>
   <data name="Error creating day slot" xml:space="preserve">
-    <value>Nastala chyba pri pridaní dňa testovania</value>
+    <value>Nastala chyba při přidávání dnu testování</value>
   </data>
   <data name="Error creating hour slot" xml:space="preserve">
-    <value>Nastala chyba pri pridaní hodiny testovania</value>
+    <value>Nastala chyba při přidávání hodiny testování</value>
   </data>
   <data name="Error creating minute slot" xml:space="preserve">
-    <value>Nastala chyba pri pridaní minúty testovania</value>
+    <value>Nastala chyba při přidávání minuty testování</value>
   </data>
 </root>
