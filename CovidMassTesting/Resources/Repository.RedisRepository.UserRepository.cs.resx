@@ -118,33 +118,33 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Dear {0}, we have registered you into mass covid testing system. Please check your email." xml:space="preserve">
-    <value>{0}, zaregistrovali sme vás do systému hromadného testovania obyvateľov. Na email sme Vám poslali heslo.</value>
+    <value>{0}, Zaregistrovali jsme vás do systému hromadného testování obyvatel. Na email jsme Vám poslali heslo.</value>
   </data>
   <data name="Email must not be empty" xml:space="preserve">
-    <value>Email musí byť zadaný</value>
+    <value>Email musí být zadaný</value>
   </data>
   <data name="Error creating record in the database" xml:space="preserve">
-    <value>Nastala chyba pri ukladaní záznamu do databázy</value>
+    <value>Nastala chyba při ukládaní záznamu do databáze</value>
   </data>
   <data name="Hash must not be empty" xml:space="preserve">
-    <value>Hash musí byť zadaný</value>
+    <value>Hash musí být zadaný</value>
   </data>
   <data name="Invalid old password" xml:space="preserve">
     <value>Neplatné staré heslo</value>
   </data>
   <data name="Invalid place provided" xml:space="preserve">
-    <value>Bolo zadané neplatné miesto</value>
+    <value>Bylo zadáno neplatné místo</value>
   </data>
   <data name="Invalid user or password" xml:space="preserve">
-    <value>Neplatný email alebo heslo</value>
+    <value>Neplatný email nebo heslo</value>
   </data>
   <data name="Invalid user or password or attempt to login too fast after failed attempt" xml:space="preserve">
-    <value>Neplatný email alebo heslo, alebo pokus o prihlásenie príliš rýchlo po zadaní neplatných údajov</value>
+    <value>Neplatný email nebo heslo, nebo pokus o přihlášení příliš rychle po zadaní neplatných údajů</value>
   </data>
   <data name="Invitation to covid testing place" xml:space="preserve">
-    <value>Pozvánka do systému na hromadné testeovanie proti covidu</value>
+    <value>Pozvánka do systému na hromadné testování proti Covidu</value>
   </data>
   <data name="User not found by email" xml:space="preserve">
-    <value>Užívateľ s daným emailom nebol nájdený</value>
+    <value>Uživatel se zadaným emailem nebyl nalezený</value>
   </data>
 </root>
