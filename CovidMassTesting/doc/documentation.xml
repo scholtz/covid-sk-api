@@ -1585,6 +1585,11 @@
             Email
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Email.EmailNameTuple.Language">
+            <summary>
+            Language
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Email.GenericEmail">
             <summary>
             User with permissions to invite other people can invite them and 
@@ -8243,6 +8248,16 @@
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.POSITIVE">
             <summary>
               Looks up a localized string similar to POSITIVE.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Positive_case">
+            <summary>
+              Looks up a localized string similar to Pozitívny nález.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Positive_case_found">
+            <summary>
+              Looks up a localized string similar to Positive case found: {0} {1} {2} {3}.
             </summary>
         </member>
         <member name="P:CovidMassTesting.Resources.Repository_RedisRepository_VisitorRepository.Test_does_not_exists">
