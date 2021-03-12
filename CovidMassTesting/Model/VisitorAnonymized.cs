@@ -23,7 +23,11 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Gender F | M
         /// </summary>
-        public string Gender => $"{cohash}{visitor.Id}".GetSHA256Hash().Substring(0, 10);
+        public string Gender => $"{cohash}{visitor.Gender}".GetSHA256Hash().Substring(0, 10);
+        /// <summary>
+        /// Nationality
+        /// </summary>
+        public string Nationality => $"{cohash}{visitor.Nationality}".GetSHA256Hash().Substring(0, 10);
         /// <summary>
         /// Language in which we will communicate to the visitor
         /// 
