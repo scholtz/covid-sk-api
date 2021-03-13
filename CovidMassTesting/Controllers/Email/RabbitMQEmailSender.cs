@@ -6,11 +6,13 @@ using CovidMassTesting.Model.SMS;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using MimeKit;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,44 +63,28 @@ namespace CovidMassTesting.Controllers.Email
             {
                 try
                 {
+                    var mailMessage = new MimeMessage();
+                    mailMessage.From.Add(new MailboxAddress(settings.Value.FromName, settings.Value.FromEmail));
+                    mailMessage.To.Add(new MailboxAddress(toName, toEmail));
+                    mailMessage.ReplyTo.Add(new MailboxAddress(settings.Value.ReplyToName, settings.Value.ReplyToEmail));
+                    mailMessage.Subject = subject;
+                    var bodyBuilder = new BodyBuilder();
+                    bodyBuilder.TextBody = data.TemplateId;
+                    bodyBuilder.HtmlBody = JsonConvert.SerializeObject(data);
 
-                    var msg = new SendGridMessage()
-                    {
-                        TemplateId = data.TemplateId,
-                        Personalizations = new List<Personalization>()
-                        {
-                            new Personalization()
-                            {
-                                TemplateData = data
-                            }
-                        }
-                    };
-
-                    if (!string.IsNullOrEmpty(subject))
-                    {
-                        msg.Subject = subject;
-                    }
-
-                    msg.AddTo(new EmailAddress(toEmail, toName));
-
-                    msg.From = new EmailAddress(settings.Value.FromEmail, settings.Value.FromName);
-                    if (!string.IsNullOrEmpty(settings.Value.ReplyToEmail))
-                    {
-                        if (!string.IsNullOrEmpty(settings.Value.ReplyToName))
-                        {
-                            msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail, settings.Value.ReplyToName);
-                        }
-                        else
-                        {
-                            msg.ReplyTo = new EmailAddress(settings.Value.ReplyToEmail);
-                        }
-                    }
                     if (attachments.Any())
                     {
-                        msg.AddAttachments(attachments);
+                        foreach (var attachment in attachments)
+                        {
+                            bodyBuilder.Attachments.Add(attachment.Filename, Convert.FromBase64String(attachment.Content));
+                        }
                     }
-                    var serialize = Encoding.UTF8.GetBytes(msg.Serialize());
 
+
+                    mailMessage.Body = bodyBuilder.ToMessageBody();
+                    using var memoryStream = new MemoryStream();
+                    mailMessage.WriteTo(memoryStream);
+                    ;
                     var factory = new ConnectionFactory()
                     {
                         HostName = settings.Value.HostName,
@@ -110,7 +96,7 @@ namespace CovidMassTesting.Controllers.Email
                     using var channel = connection.CreateModel();
                     channel.BasicPublish(exchange: settings.Value.Exchange,
                                          routingKey: settings.Value.QueueName,
-                                         body: serialize);
+                                         body: memoryStream.ToArray());
                     logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
 
                     return true;
