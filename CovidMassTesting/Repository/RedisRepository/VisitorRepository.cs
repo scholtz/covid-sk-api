@@ -2866,7 +2866,17 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.QRVerificationURL = Convert.ToBase64String(pngBytes).Replace("\n", "");
 
             var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
-            var ret = stubble.Render(Resources.Repository_RedisRepository_VisitorRepository.TestResult, data);
+            var template = Resources.Repository_RedisRepository_VisitorRepository.TestResult;
+            if (File.Exists($"TestResult-{visitor.Language}.html"))
+            {
+                template = File.ReadAllText($"TestResult-{visitor.Language}.html");
+            }
+            else if (File.Exists($"TestResult.html"))
+            {
+                template = File.ReadAllText($"TestResult.html");
+            }
+
+            var ret = stubble.Render(template, data);
 
             CultureInfo.CurrentCulture = oldCulture;
             CultureInfo.CurrentUICulture = oldUICulture;
@@ -2942,7 +2952,19 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.QRCode = Convert.ToBase64String(qrBytes).Replace("\n", "");
 
             var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
-            var ret = stubble.Render(Resources.Repository_RedisRepository_VisitorRepository.TestRegistration, data);
+
+            var template = Resources.Repository_RedisRepository_VisitorRepository.TestRegistration;
+            if (File.Exists($"TestResult-{visitor.Language}.html"))
+            {
+                template = File.ReadAllText($"TestResult-{visitor.Language}.html");
+            }
+            else if (File.Exists($"TestResult.html"))
+            {
+                template = File.ReadAllText($"TestResult.html");
+            }
+
+
+            var ret = stubble.Render(template, data);
 
             CultureInfo.CurrentCulture = oldCulture;
             CultureInfo.CurrentUICulture = oldUICulture;
