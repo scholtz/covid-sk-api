@@ -2954,13 +2954,13 @@ namespace CovidMassTesting.Repository.RedisRepository
             var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
 
             var template = Resources.Repository_RedisRepository_VisitorRepository.TestRegistration;
-            if (File.Exists($"TestResult-{visitor.Language}.html"))
+            if (File.Exists($"TestRegistration-{visitor.Language}.html"))
             {
-                template = File.ReadAllText($"TestResult-{visitor.Language}.html");
+                template = File.ReadAllText($"TestRegistration-{visitor.Language}.html");
             }
-            else if (File.Exists($"TestResult.html"))
+            else if (File.Exists($"TestRegistration.html"))
             {
-                template = File.ReadAllText($"TestResult.html");
+                template = File.ReadAllText($"TestRegistration.html");
             }
 
 
