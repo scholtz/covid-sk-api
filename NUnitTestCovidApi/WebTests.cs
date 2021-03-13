@@ -2603,7 +2603,7 @@ namespace NUnitTestCovidApi
             await iVisitor.SetResultObject(testResult, false);
             iVisitor.ProcessSingle().Wait();
             Assert.AreEqual(2, noEmailSender.Data.Count);
-
+            await Task.Delay(1000);
             var tuple = noEmailSender.Data.Values.First();
             Assert.AreEqual(1, tuple.attachments.Count());
 
