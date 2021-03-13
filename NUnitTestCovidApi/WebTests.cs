@@ -2605,7 +2605,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(2, noEmailSender.Data.Count);
             await Task.Delay(1000);
             var tuple = noEmailSender.Data.Values.First();
-            Assert.AreEqual(1, tuple.attachments.Count());
+            Assert.AreEqual(1, noEmailSender.Data.Values.SelectMany(v => v.attachments).Count());
 
 #if DEBUG
             var file = tuple.attachments.First();
