@@ -3172,6 +3172,26 @@
             Phone
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Registration.InsuranceCompany">
+            <summary>
+            InsuranceCompany
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Gender">
+            <summary>
+            Gender
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Department">
+            <summary>
+            Department
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.Nationality">
+            <summary>
+            Nationality
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Registration.CompanyIdentifiers">
             <summary>
             Identifier within the company
@@ -4474,6 +4494,11 @@
             Gender F | M
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.Nationality">
+            <summary>
+            Nationality
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.Language">
             <summary>
             Language in which we will communicate to the visitor
@@ -4691,6 +4716,11 @@
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.Gender">
             <summary>
             Gender F | M
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorAnonymized.Nationality">
+            <summary>
+            Nationality
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.Language">
