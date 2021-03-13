@@ -1246,15 +1246,23 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    foreach (var email in notifyWhenSickConfiguration.Emails)
+                    switch (visitor.Result)
                     {
-                        await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
-                            new Model.Email.GenericEmail(email.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                        case TestResult.PositiveWaitingForCertificate:
+                        case TestResult.PositiveCertificateTaken:
+                            foreach (var email in notifyWhenSickConfiguration.Emails)
                             {
-                                TextSK = string.Format("Bola identifikovaná pozitívna osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
-                                TextEN = string.Format("Positive person has been identified: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
-                                TextCS = string.Format("Byla identifikována pozitivní osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email)
-                            });
+
+
+                                await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
+                                    new Model.Email.GenericEmail(email.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                                    {
+                                        TextSK = string.Format("Bola identifikovaná pozitívna osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
+                                        TextEN = string.Format("Positive person has been identified: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
+                                        TextCS = string.Format("Byla identifikována pozitivní osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email)
+                                    });
+                            }
+                            break;
                     }
                 }
                 catch (Exception exc)
