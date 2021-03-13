@@ -2630,7 +2630,7 @@ namespace NUnitTestCovidApi
             await Task.Delay(1000);
             if (configuration["SendResultsThroughQueue"] != "1")
             {
-                Assert.AreEqual(2, noEmailSender.Data.Count);
+                Assert.AreEqual(1, noEmailSender.Data.Count);
             }
 
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
