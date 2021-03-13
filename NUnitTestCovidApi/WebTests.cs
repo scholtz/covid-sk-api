@@ -2627,6 +2627,7 @@ namespace NUnitTestCovidApi
 
             request = SetResult(client, test2, TestResult.NegativeWaitingForCertificate);
 
+            await Task.Delay(1000);
             if (configuration["SendResultsThroughQueue"] != "1")
             {
                 Assert.AreEqual(2, noEmailSender.Data.Count);
