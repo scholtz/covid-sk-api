@@ -2601,7 +2601,7 @@ namespace NUnitTestCovidApi
 
             testResult.Time = DateTimeOffset.Now.AddMinutes(-15);
             await iVisitor.SetResultObject(testResult, false);
-            iVisitor.ProcessSingle().Wait();
+            await iVisitor.ProcessSingle();
             Assert.AreEqual(2, noEmailSender.Data.Count);
             await Task.Delay(1000);
             var tuple = noEmailSender.Data.Values.First();
