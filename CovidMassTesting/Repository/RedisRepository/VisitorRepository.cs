@@ -1252,8 +1252,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                         case TestResult.PositiveCertificateTaken:
                             foreach (var email in notifyWhenSickConfiguration.Emails)
                             {
-
-
                                 await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
                                     new Model.Email.GenericEmail(email.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                                     {
