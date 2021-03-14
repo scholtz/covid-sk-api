@@ -251,6 +251,7 @@ namespace CovidMassTesting
                 if (!string.IsNullOrEmpty(config.ApiKey))
                 {
                     logger.Info("MailGun configured");
+                    Console.WriteLine("MailGun configured");
                     emailConfigured = true;
                     services.Configure<Model.Settings.MailGunConfiguration>(Configuration.GetSection("MailGun"));
                     services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
@@ -263,6 +264,7 @@ namespace CovidMassTesting
                 if (!string.IsNullOrEmpty(config.MailerApiKey))
                 {
                     logger.Info("SendGridEmail configured");
+                    Console.WriteLine("SendGridEmail configured");
 
                     emailConfigured = true;
                     services.Configure<Model.Settings.SendGridConfiguration>(Configuration.GetSection("SendGrid"));
@@ -276,6 +278,8 @@ namespace CovidMassTesting
                 if (!string.IsNullOrEmpty(config.HostName))
                 {
                     logger.Info("RabbitMQEmail configured " + JsonConvert.SerializeObject(config));
+                    Console.WriteLine("RabbitMQEmail configured " + JsonConvert.SerializeObject(config));
+
                     emailConfigured = true;
                     services.Configure<Model.Settings.RabbitMQEmailQueueConfiguration>(Configuration.GetSection("RabbitMQEmail"));
                     services.AddSingleton<IEmailSender, Controllers.Email.RabbitMQEmailSender>();
@@ -285,6 +289,7 @@ namespace CovidMassTesting
             if (!emailConfigured)
             {
                 logger.Info("NoEmailSender configured");
+                Console.WriteLine("NoEmailSender configured");
                 services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
             }
 
