@@ -35,9 +35,21 @@ namespace CovidMassTesting.Model.Settings
         /// Cohash for loging purposes
         /// </summary>
         public string CoHash { get; set; }
-        public string FromEmail { get; internal set; }
-        public string FromName { get; internal set; }
-        public string ReplyToEmail { get; internal set; }
-        public string ReplyToName { get; internal set; }
+        /// <summary>
+        /// Send emails from email 
+        /// </summary>
+        public string FromEmail { get; set; }
+        /// <summary>
+        /// Name of the person who seems to send the emails
+        /// </summary>
+        public string FromName { get; set; }
+        /// <summary>
+        /// When person clicks on reply to, the email
+        /// </summary>
+        public string ReplyToEmail { get; set; }
+        /// <summary>
+        /// When person clicks on reply to, the name who will reply to
+        /// </summary>
+        public string ReplyToName { get; set; }
     }
 }

@@ -3447,6 +3447,26 @@
             Cohash for loging purposes
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.FromEmail">
+            <summary>
+            Send emails from email 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.FromName">
+            <summary>
+            Name of the person who seems to send the emails
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.ReplyToEmail">
+            <summary>
+            When person clicks on reply to, the email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Settings.RabbitMQEmailQueueConfiguration.ReplyToName">
+            <summary>
+            When person clicks on reply to, the name who will reply to
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.RabbitMQSMSQueueConfiguration">
             <summary>
             SMS Gateway through rabbit mq
