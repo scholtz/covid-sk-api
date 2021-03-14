@@ -314,7 +314,7 @@ namespace CovidMassTesting
             {
                 c.SwaggerEndpoint("v1/swagger.json", "API V1");
             });
-            app.UserRedisInformation();
+            app.UseRedisInformation();
             app.UseRouting();
 
             app.UseAuthentication();
