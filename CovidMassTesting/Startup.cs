@@ -237,20 +237,42 @@ namespace CovidMassTesting
 #else
                 services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
 #endif
-            var sendGridConfiguration = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
-            var mailGunConfiguration = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
 
-            if (!string.IsNullOrEmpty(sendGridConfiguration?.MailerApiKey))
+            var emailConfigured = false;
+            if (Configuration.GetSection("MailGun").Exists())
             {
-                services.Configure<Model.Settings.SendGridConfiguration>(Configuration.GetSection("SendGrid"));
-                services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
+                var config = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
+                if (!string.IsNullOrEmpty(config.ApiKey))
+                {
+                    emailConfigured = true;
+                    services.Configure<Model.Settings.MailGunConfiguration>(Configuration.GetSection("MailGun"));
+                    services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
+                }
             }
-            else if (!string.IsNullOrEmpty(mailGunConfiguration?.ApiKey))
+
+            if (!emailConfigured && Configuration.GetSection("SendGrid").Exists())
             {
-                services.Configure<Model.Settings.MailGunConfiguration>(Configuration.GetSection("MailGun"));
-                services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
+                var config = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
+                if (!string.IsNullOrEmpty(config.MailerApiKey))
+                {
+                    emailConfigured = true;
+                    services.Configure<Model.Settings.SendGridConfiguration>(Configuration.GetSection("SendGrid"));
+                    services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
+                }
             }
-            else
+
+            if (!emailConfigured && Configuration.GetSection("RabbitMQEmail").Exists())
+            {
+                var config = Configuration.GetSection("RabbitMQEmail")?.Get<Model.Settings.RabbitMQEmailQueueConfiguration>();
+                if (!string.IsNullOrEmpty(config.HostName))
+                {
+                    emailConfigured = true;
+                    services.Configure<Model.Settings.RabbitMQEmailQueueConfiguration>(Configuration.GetSection("RabbitMQEmail"));
+                    services.AddSingleton<IEmailSender, Controllers.Email.RabbitMQEmailSender>();
+                }
+            }
+
+            if (!emailConfigured)
             {
                 services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
             }
