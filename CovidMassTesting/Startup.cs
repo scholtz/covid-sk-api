@@ -11,6 +11,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using StackExchange.Redis.Extensions.Core.Configuration;
 using StackExchange.Redis.Extensions.Newtonsoft;
 using System;
@@ -60,6 +61,8 @@ namespace CovidMassTesting
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
+            var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+
             services.AddLocalization(options => options.ResourcesPath = "Resources");
 
             services.AddControllers(options =>
@@ -190,6 +193,7 @@ namespace CovidMassTesting
                 var config = Configuration.GetSection("GoSMSQueue")?.Get<Model.Settings.GoSMSQueueConfiguration>();
                 if (!string.IsNullOrEmpty(config.QueueURL))
                 {
+                    logger.Info("GoSMSQueue configured");
                     smsConfigured = true;
                     services.Configure<Model.Settings.GoSMSQueueConfiguration>(Configuration.GetSection("GoSMSQueue"));
                     services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSQueueSender>();
@@ -200,6 +204,7 @@ namespace CovidMassTesting
                 var config = Configuration.GetSection("RabbitMQSMS")?.Get<Model.Settings.RabbitMQSMSQueueConfiguration>();
                 if (!string.IsNullOrEmpty(config.HostName))
                 {
+                    logger.Info("RabbitMQSMS configured");
                     smsConfigured = true;
                     services.Configure<Model.Settings.RabbitMQSMSQueueConfiguration>(Configuration.GetSection("RabbitMQSMS"));
                     services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.RabbitMQSMSSender>();
@@ -210,6 +215,7 @@ namespace CovidMassTesting
                 var config = Configuration.GetSection("GoSMS")?.Get<Model.Settings.GoSMSConfiguration>();
                 if (!string.IsNullOrEmpty(config.ClientId))
                 {
+                    logger.Info("GoSMS configured");
                     smsConfigured = true;
                     services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
                     services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();
@@ -244,6 +250,7 @@ namespace CovidMassTesting
                 var config = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
                 if (!string.IsNullOrEmpty(config.ApiKey))
                 {
+                    logger.Info("MailGun configured");
                     emailConfigured = true;
                     services.Configure<Model.Settings.MailGunConfiguration>(Configuration.GetSection("MailGun"));
                     services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
@@ -255,6 +262,8 @@ namespace CovidMassTesting
                 var config = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
                 if (!string.IsNullOrEmpty(config.MailerApiKey))
                 {
+                    logger.Info("SendGridEmail configured");
+
                     emailConfigured = true;
                     services.Configure<Model.Settings.SendGridConfiguration>(Configuration.GetSection("SendGrid"));
                     services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
@@ -266,6 +275,7 @@ namespace CovidMassTesting
                 var config = Configuration.GetSection("RabbitMQEmail")?.Get<Model.Settings.RabbitMQEmailQueueConfiguration>();
                 if (!string.IsNullOrEmpty(config.HostName))
                 {
+                    logger.Info("RabbitMQEmail configured " + JsonConvert.SerializeObject(config));
                     emailConfigured = true;
                     services.Configure<Model.Settings.RabbitMQEmailQueueConfiguration>(Configuration.GetSection("RabbitMQEmail"));
                     services.AddSingleton<IEmailSender, Controllers.Email.RabbitMQEmailSender>();
@@ -274,6 +284,7 @@ namespace CovidMassTesting
 
             if (!emailConfigured)
             {
+                logger.Info("NoEmailSender configured");
                 services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
             }
 
