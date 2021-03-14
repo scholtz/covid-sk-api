@@ -70,9 +70,17 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Email { get; set; }
         /// <summary>
+        /// Email modified by person. If not empty this must be used for communication.
+        /// </summary>
+        public string CustomEmail { get; set; }
+        /// <summary>
         /// Phone
         /// </summary>
         public string Phone { get; set; }
+        /// <summary>
+        /// Phone modified by person. If not empty this must be used for communication.
+        /// </summary>
+        public string CustomPhone { get; set; }
         /// <summary>
         /// InsuranceCompany
         /// </summary>
@@ -101,5 +109,9 @@ namespace CovidMassTesting.Model
         /// Time when registration has been last updated
         /// </summary>
         public DateTimeOffset LastUpdate { get; set; }
+        /// <summary>
+        /// Place Provider scope
+        /// </summary>
+        public string PlaceProviderId { get; internal set; }
     }
 }

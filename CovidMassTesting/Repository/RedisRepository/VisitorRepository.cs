@@ -2610,14 +2610,17 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="from"></param>
         /// <param name="count"></param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Registration>> ExportRegistrations(int from = 0, int count = 9999999)
+        public async Task<IEnumerable<Registration>> ExportRegistrations(int from = 0, int count = 9999999, string placeProviderId = "")
         {
             logger.LogInformation($"ExportRegistrations {from} {count}");
             var ret = new List<Registration>();
             foreach (var regId in (await ListAllRegistrationKeys()).OrderBy(i => i).Skip(from).Take(count))
             {
-                ret.Add(await GetRegistration(regId));
+                var reg = await GetRegistration(regId);
+                if (!string.IsNullOrEmpty(reg.PlaceProviderId) && reg.PlaceProviderId != placeProviderId) continue;
+                ret.Add(reg);
             }
             logger.LogInformation($"ExportRegistrations {from} {count} END - {ret.Count}");
             return ret;

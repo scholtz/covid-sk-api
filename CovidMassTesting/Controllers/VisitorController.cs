@@ -339,8 +339,8 @@ namespace CovidMassTesting.Controllers
                 visitor.Gender = reg.Gender;
                 visitor.Nationality = reg.Nationality;
                 visitor.ZIP = reg.ZIP;
-                visitor.Email = reg.Email;
-                visitor.Phone = reg.Phone;
+                visitor.Email = reg.CustomEmail ?? reg.Email;
+                visitor.Phone = reg.CustomPhone ?? reg.Phone;
                 visitor.PersonType = reg.PersonType;
                 visitor.Passport = reg.Passport;
                 visitor.RC = reg.RC;
@@ -422,8 +422,8 @@ namespace CovidMassTesting.Controllers
                 visitor.Street = reg.Street;
                 visitor.StreetNo = reg.StreetNo;
                 visitor.ZIP = reg.ZIP;
-                visitor.Email = reg.Email;
-                visitor.Phone = reg.Phone;
+                visitor.Email = reg.CustomEmail ?? reg.Email;
+                visitor.Phone = reg.CustomPhone ?? reg.Phone;
                 visitor.PersonType = reg.PersonType;
                 visitor.Passport = reg.Passport;
                 visitor.RC = reg.RC;
@@ -489,6 +489,52 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Zadajte platné osobné číslo zamestnanca");
                 }
                 return Ok(ret);
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Load Employee information by documenter
+        /// </summary>
+        /// <param name="employeeNumber"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("LoadEmployeeByEmployeeNumber")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [RequestSizeLimit(2000)]
+        public async Task<ActionResult<Registration>> LoadEmployeeByEmployeeNumber(
+            [FromForm] string employeeNumber
+        )
+        {
+            try
+            {
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only user with Document Manager role is allowed to fetch registration data");
+                }
+
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                if (pp == null)
+                {
+                    throw new Exception("Place provider missing");
+                }
+
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeNumber));
+                var reg = await visitorRepository.GetRegistration(regId);
+                if (reg == null)
+                {
+                    throw new Exception("Zadajte platné osobné číslo zamestnanca");
+                }
+                return Ok(reg);
             }
             catch (ArgumentException exc)
             {
@@ -733,6 +779,7 @@ namespace CovidMassTesting.Controllers
 
                     var reg = new Registration()
                     {
+                        PlaceProviderId = User.GetPlaceProvider(),
                         PersonType = "idcard",
                         FirstName = fields[n2k["meno"]],
                         LastName = fields[n2k["priezvisko"]],

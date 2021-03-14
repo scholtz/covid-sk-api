@@ -361,8 +361,9 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="from"></param>
         /// <param name="count"></param>
+        /// <param name="placeProviderId">PP Scope</param>
         /// <returns></returns>
-        public Task<IEnumerable<Registration>> ExportRegistrations(int from = 0, int count = 9999999);
+        public Task<IEnumerable<Registration>> ExportRegistrations(int from = 0, int count = 9999999, string placeProviderId = "");
 
         /// <summary>
         /// ExportResultSubmissions
