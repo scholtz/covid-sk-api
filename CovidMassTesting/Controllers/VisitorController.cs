@@ -848,7 +848,6 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Tester is allowed to fetch the private key for the encrypted QR code with sensitive data to be decrypted
         /// </summary>
-        /// <param name="visitor"></param>
         /// <returns></returns>
         [Authorize]
         [HttpGet("GetPrivateKey")]
