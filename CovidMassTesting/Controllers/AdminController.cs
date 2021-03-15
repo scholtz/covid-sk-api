@@ -200,6 +200,58 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Fix advanced stats
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FixAdvancedStats")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> FixAdvancedStats()
+        {
+            try
+            {
+                int i = 0;
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                logger.LogInformation("FixAdvancedStats");
+                await visitorRepository.DropAllStats();
+
+                var visitors = await visitorRepository.ListAllVisitors();
+                var places = await placeRepository.ListAll();
+                foreach (var visitor in visitors)
+                {
+                    var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
+                    if (place == null) continue;
+                    var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
+                    if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
+                    await visitorRepository.IncrementStats(StatsType.Registered, visitor.ChosenPlaceId, pp, visitor.RegistrationTime ?? visitor.ChosenSlotTime);
+                    i++;
+                    if (visitor.TestingTime.HasValue)
+                    {
+                        await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                    }
+                    if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
+                    {
+                        await visitorRepository.IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                    }
+                    if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
+                    {
+                        await visitorRepository.IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                    }
+                }
+                logger.LogInformation($"FixAdvancedStats done {i}");
+                return Ok(true);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 
         /// <summary>
         /// Fix corrupted stats

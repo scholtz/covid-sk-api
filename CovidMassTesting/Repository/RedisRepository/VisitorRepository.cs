@@ -457,7 +457,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             visitor = await FixVisitor(visitor, false);
             visitor.LastUpdate = DateTimeOffset.Now;
-
+            if (!visitor.RegistrationTime.HasValue)
+            {
+                visitor.RegistrationTime = DateTimeOffset.UtcNow;
+            }
             var objectToEncode = Newtonsoft.Json.JsonConvert.SerializeObject(visitor);
             logger.LogInformation($"Setting object {visitor.Id.GetHashCode()}");
             using var aes = new Aes(configuration["key"], configuration["iv"]);
@@ -470,6 +473,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (!string.IsNullOrEmpty(visitor.TestingSet))
             {
                 await MapTestingSetToVisitorCode(visitor.Id, visitor.TestingSet);
+            }
+            if (mustBeNew)
+            {
+                await IncrementStats(StatsType.Registered, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.RegistrationTime.Value);
             }
             return visitor;
         }
@@ -1217,6 +1224,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
         /// <summary>
+        /// Drop all stats
+        /// </summary>
+        /// <returns></returns>
+        public virtual Task<bool> DropAllStats()
+        {
+            return redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
+        }
+        /// <summary>
         /// Increment stats
         /// </summary>
         /// <param name="statsType">Model.StatsType.*</param>
@@ -1324,7 +1339,17 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
 
-
+            switch (visitor.Result)
+            {
+                case TestResult.PositiveCertificateTaken:
+                case TestResult.PositiveWaitingForCertificate:
+                    await IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime.Value);
+                    break;
+                case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeWaitingForCertificate:
+                    await IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime.Value);
+                    break;
+            }
 
             switch (visitor.Result)
             {

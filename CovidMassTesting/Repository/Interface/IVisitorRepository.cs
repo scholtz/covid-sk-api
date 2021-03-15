@@ -373,5 +373,10 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="places"></param>
         /// <returns></returns>
         public Task<IEnumerable<Result>> ExportResultSubmissions(int from = 0, int count = 9999999, HashSet<string> places = null);
+        /// <summary>
+        /// Reset the stats
+        /// </summary>
+        /// <returns></returns>
+        public Task<bool> DropAllStats();
     }
 }
