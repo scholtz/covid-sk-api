@@ -28,6 +28,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? SchoolOnly { get; set; } = false;
         /// <summary>
+        /// Only for external tests - Self tests or the bookkeeping of the testing records of employees
+        /// </summary>
+        public bool? ExternalOnly { get; set; } = false;
+        /// <summary>
         /// Corporations may check this on and only its employees are eligible for the testing
         /// </summary>
         public bool? EmployeesOnly { get; set; } = false;

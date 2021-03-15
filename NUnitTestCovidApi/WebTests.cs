@@ -3179,9 +3179,7 @@ namespace NUnitTestCovidApi
 
             request = RegisterEmployeeByDocumenter(client, "100", "ludovit@scholtz.sk", "+421907000000", DateTimeOffset.Now.AddDays(-1), product.Id, TestResult.PositiveWaitingForCertificate);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-
             Assert.AreEqual(1, noSMSSender.Data.Count);
-
         }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
