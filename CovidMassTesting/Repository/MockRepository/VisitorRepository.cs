@@ -589,6 +589,7 @@ namespace CovidMassTesting.Repository.MockRepository
         public override async Task<bool> DropAllStats()
         {
             Stats.Clear();
+            return true;
         }
     }
 }

@@ -476,7 +476,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             if (mustBeNew)
             {
-                await IncrementStats(StatsType.Registered, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.RegistrationTime.Value);
+                await IncrementStats(StatsType.RegisteredTo, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ChosenSlotTime);
+                await IncrementStats(StatsType.RegisteredOn, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.RegistrationTime.Value);
             }
             return visitor;
         }
@@ -901,6 +902,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
 
+                    await IncrementStats(StatsType.Repeat, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime.Value);
+
                     break;
                 case TestResult.TestIsBeingProcessing:
 
@@ -1186,6 +1189,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         visitor.EHealthNotifiedAt = DateTimeOffset.UtcNow;
                         visitor.ResultNotifiedAt = visitor.EHealthNotifiedAt;
                         await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, placeProviderId, visitor.ResultNotifiedAt.Value);
+                        await IncrementStats(StatsType.EHealthNotification, visitor.ChosenPlaceId, placeProviderId, visitor.ResultNotifiedAt.Value);
                         await SetVisitor(visitor, false);
                         logger.LogInformation($"Visitor notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}");
                         return true;
@@ -1195,7 +1199,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                         logger.LogError($"Visitor NOT notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}. Seems down");
                         return false;
                     }
-                    break;
             }
             return false;
         }

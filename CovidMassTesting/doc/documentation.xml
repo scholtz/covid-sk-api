@@ -168,6 +168,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixAdvancedStats">
+            <summary>
+            Fix advanced stats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.FixPersonPlace(System.String,System.String,System.String)">
             <summary>
             Fix corrupted stats
@@ -3060,6 +3066,11 @@
         <member name="P:CovidMassTesting.Model.Product.SchoolOnly">
             <summary>
             Only for parents who need the test for the school verification
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.ExternalOnly">
+            <summary>
+            Only for external tests - Self tests or the bookkeeping of the testing records of employees
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Product.EmployeesOnly">
@@ -6075,6 +6086,12 @@
             <param name="places"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllStats">
+            <summary>
+            Reset the stats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -6551,6 +6568,12 @@
             </summary>
             <param name="verificationData"></param>
             <param name="mustBeNew"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.DropAllStats">
+            <summary>
+            Reset stats
+            </summary>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.RedisRepository.PlaceProviderRepository">
@@ -7587,6 +7610,12 @@
             <param name="placeProviderId"></param>
             <param name="time"></param>
             <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.DropAllStats">
+            <summary>
+            Drop all stats
+            </summary>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetPPStats(System.String,System.String)">

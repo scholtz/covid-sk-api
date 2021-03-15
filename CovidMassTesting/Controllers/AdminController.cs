@@ -226,8 +226,13 @@ namespace CovidMassTesting.Controllers
                     var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
                     if (place == null) continue;
                     var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
+                    if (visitor.EHealthNotifiedAt.HasValue)
+                    {
+                        await visitorRepository.IncrementStats(StatsType.EHealthNotification, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
+                    }
                     if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
-                    await visitorRepository.IncrementStats(StatsType.Registered, visitor.ChosenPlaceId, pp, visitor.RegistrationTime ?? visitor.ChosenSlotTime);
+                    await visitorRepository.IncrementStats(StatsType.RegisteredTo, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
+                    await visitorRepository.IncrementStats(StatsType.RegisteredOn, visitor.ChosenPlaceId, pp, visitor.RegistrationTime ?? visitor.ChosenSlotTime);
                     i++;
                     if (visitor.TestingTime.HasValue)
                     {
