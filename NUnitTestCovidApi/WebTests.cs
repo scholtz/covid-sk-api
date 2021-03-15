@@ -84,6 +84,30 @@ namespace NUnitTestCovidApi
                 ).Result;
 
         }
+        private HttpResponseMessage RegisterEmployeeByDocumenter(
+            HttpClient client,
+            string employeeId,
+            string email,
+            string phone,
+            DateTimeOffset time,
+            string productId,
+            string result)
+        {
+
+            var timeFormatted = time.ToString("o");
+
+            return client.PostAsync("Visitor/RegisterEmployeeByDocumenter",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>() {
+                        new KeyValuePair<string, string>("employeeId",employeeId),
+                        new KeyValuePair<string, string>("email",email),
+                        new KeyValuePair<string, string>("phone",phone),
+                        new KeyValuePair<string, string>("time",timeFormatted),
+                        new KeyValuePair<string, string>("productId",productId),
+                        new KeyValuePair<string, string>("result",result),
+                    })
+                ).Result;
+        }
+
         protected List<Visitor> RegisterTestVisitors(HttpClient client, string placeId, long slotId, string productId)
         {
             var Registered = new List<Visitor>();
@@ -2528,7 +2552,7 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
 
             request = FinalDataExport(client, 0, 100);
-            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             handler = new JwtSecurityTokenHandler();
             tokenS = handler.ReadToken(medicLabPersonToken) as JwtSecurityToken;
@@ -2579,7 +2603,7 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {medicLabPersonToken}");
 
             request = FinalDataExport(client, 0, 100);
-            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             noEmailSender.Data.Clear();
 
             var iVisitor = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
@@ -3066,6 +3090,8 @@ namespace NUnitTestCovidApi
 
             var request = PlaceProviderRegistration(client, obj);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
 
 
             request = AuthenticateUser(client, admin.Email, admin.Password);
@@ -3125,13 +3151,37 @@ namespace NUnitTestCovidApi
 
             request = RegisterWithCompanyRegistration(client, minute.SlotId, place.Id, "100", "0009", pr1.Id, "");
 
-            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
             var visitor = JsonConvert.DeserializeObject<Visitor>(request.Content.ReadAsStringAsync().Result);
             Assert.IsNotNull(visitor);
             Assert.AreEqual(place.Id, visitor.ChosenPlaceId);
             Assert.AreEqual(minute.SlotId, visitor.ChosenSlot);
             Assert.AreEqual("0001010009", visitor.RC);
+
+            var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
+            var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
+            noSMSSender?.Data.Clear();
+
+            var placeProviderRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IPlaceProviderRepository>();
+            var product = await placeProviderRepository.AddProduct(pp.PlaceProviderId, new Product()
+            {
+                Id = Guid.NewGuid().ToString(),
+                All = false,
+                Category = "ant",
+                CollectInsurance = false,
+                Name = "Product - selftest"
+            });
+
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            request = RegisterEmployeeByDocumenter(client, "100", "ludovit@scholtz.sk", "+421907000000", DateTimeOffset.Now.AddDays(-1), product.Id, TestResult.PositiveWaitingForCertificate);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            Assert.AreEqual(1, noSMSSender.Data.Count);
+
         }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {

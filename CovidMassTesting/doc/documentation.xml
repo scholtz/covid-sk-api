@@ -1204,6 +1204,13 @@
             <param name="employeeNumber"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.LoadEmployeeByEmployeeNumber(System.String)">
+            <summary>
+            Load Employee information by documenter
+            </summary>
+            <param name="employeeNumber"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.Enqueued(System.String,System.String,System.String)">
             <summary>
             When person comes to the queue he can mark him as in the queue
@@ -1220,6 +1227,18 @@
             Registration manager can register visitor
             </summary>
             <param name="visitor"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.VisitorController.RegisterEmployeeByDocumenter(System.String,System.String,System.String,System.DateTimeOffset,System.String,System.String)">
+            <summary>
+            Register employee by the documenter
+            </summary>
+            <param name="employeeId"></param>
+            <param name="email"></param>
+            <param name="phone"></param>
+            <param name="time"></param>
+            <param name="productId"></param>
+            <param name="result"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.GetPublicKey">
@@ -1975,6 +1994,11 @@
         <member name="P:CovidMassTesting.Model.Email.VisitorTestingToBeRepeatedEmail.Name">
             <summary>
             Visitor name
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.EmployeeRegistration">
+            <summary>
+            Registration obje
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vFirst_name">
@@ -3167,9 +3191,19 @@
             Email
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Registration.CustomEmail">
+            <summary>
+            Email modified by person. If not empty this must be used for communication.
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Registration.Phone">
             <summary>
             Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.CustomPhone">
+            <summary>
+            Phone modified by person. If not empty this must be used for communication.
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Registration.InsuranceCompany">
@@ -3205,6 +3239,11 @@
         <member name="P:CovidMassTesting.Model.Registration.LastUpdate">
             <summary>
             Time when registration has been last updated
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Registration.PlaceProviderId">
+            <summary>
+            Place Provider scope
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.Result">
@@ -4628,6 +4667,11 @@
             Chosen place
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.PlaceProviderId">
+            <summary>
+            ID of place provider
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.Result">
             <summary>
             Test result. Available options are in Model.TestResult
@@ -6013,12 +6057,13 @@
             <param name="testCodeClear"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ExportRegistrations(System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ExportRegistrations(System.Int32,System.Int32,System.String)">
             <summary>
             Company registrations export
             </summary>
             <param name="from"></param>
             <param name="count"></param>
+            <param name="placeProviderId">PP Scope</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ExportResultSubmissions(System.Int32,System.Int32,System.Collections.Generic.HashSet{System.String})">
@@ -7725,12 +7770,13 @@
             <param name="filterPlaces"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ExportRegistrations(System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ExportRegistrations(System.Int32,System.Int32,System.String)">
             <summary>
             Export company registrations
             </summary>
             <param name="from"></param>
             <param name="count"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListVisitorsInProcess(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">

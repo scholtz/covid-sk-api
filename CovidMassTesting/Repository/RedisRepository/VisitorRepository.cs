@@ -835,10 +835,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                     switch (state)
                     {
                         case TestResult.PositiveWaitingForCertificate:
-                            await placeRepository.IncrementPlaceSick(visitor.ChosenPlaceId);
+                            if (!string.IsNullOrEmpty(visitor.ChosenPlaceId))
+                                await placeRepository.IncrementPlaceSick(visitor.ChosenPlaceId);
                             break;
                         case TestResult.NegativeWaitingForCertificate:
-                            await placeRepository.IncrementPlaceHealthy(visitor.ChosenPlaceId);
+                            if (!string.IsNullOrEmpty(visitor.ChosenPlaceId))
+                                await placeRepository.IncrementPlaceHealthy(visitor.ChosenPlaceId);
                             break;
                     }
                 }
@@ -1270,7 +1272,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var notifiedByEHealth = false;
-            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            Place place = null;
+            if (!string.IsNullOrEmpty(visitor.ChosenPlaceId))
+            {
+                place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            }
             if (configuration["SendResultsToEHealth"] == "1")
             {
                 try
@@ -1335,7 +1341,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     try
                     {
                         //var product = await placeRepository.GetPlaceProduct();
-                        var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+                        var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId ?? place?.PlaceProviderId);
                         var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
                         if (!string.IsNullOrEmpty(visitor.VerificationId))
@@ -1404,8 +1410,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                             }, true);
                             visitor.VerificationId = result.Id;
                             await SetVisitor(visitor, false);
-                            var oversight = GetOversight(place, visitor.TestingTime);
-
+                            var oversight = "";
+                            if (place != null)
+                            {
+                                oversight = GetOversight(place, visitor.TestingTime);
+                            }
                             var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id, true, oversight);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
@@ -1469,7 +1478,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     CultureInfo.CurrentUICulture = oldUICulture;
 
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                    var placeProviderId = visitor.PlaceProviderId ?? place?.PlaceProviderId;
+                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, placeProviderId, visitor.ResultNotifiedAt.Value);
                     await SetVisitor(visitor, false);
                     break;
             }
@@ -1964,14 +1974,27 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 visitor.Phone = "";
             }
-
-            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
-            if (place == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_testing_place].Value); }
-            var slotM = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
-            if (slotM == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_5_min__slot].Value); }
-            var slotH = await slotRepository.GetHourSlot(visitor.ChosenPlaceId, slotM.HourSlotId);
-            if (slotH == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_hour_slot].Value); }
-            var slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
+            Place place = null;
+            if (visitor.ChosenPlaceId != null)
+            {
+                place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            }
+            Slot5Min slotM = null;
+            Slot1Hour slotH = null;
+            Slot1Day slotD = null;
+            if (place == null && !string.IsNullOrEmpty(managerEmail))
+            {
+                // manager can register person without place (external tests)
+            }
+            else
+            {
+                if (place == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_testing_place].Value); }
+                slotM = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
+                if (slotM == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_5_min__slot].Value); }
+                slotH = await slotRepository.GetHourSlot(visitor.ChosenPlaceId, slotM.HourSlotId);
+                if (slotH == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_hour_slot].Value); }
+                slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
+            }
             if (string.IsNullOrEmpty(managerEmail))
             {
                 // manager is not affected by limits
@@ -2058,14 +2081,15 @@ namespace CovidMassTesting.Repository.RedisRepository
                 logger.LogInformation($"New registration");
 
                 var ret = await Add(visitor, notify);
+                if (slotM != null)
+                {
+                    await slotRepository.IncrementRegistration5MinSlot(slotM);
+                    await slotRepository.IncrementRegistrationHourSlot(slotH);
+                    await slotRepository.IncrementRegistrationDaySlot(slotD);
+                    await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
 
-                await slotRepository.IncrementRegistration5MinSlot(slotM);
-                await slotRepository.IncrementRegistrationHourSlot(slotH);
-                await slotRepository.IncrementRegistrationDaySlot(slotD);
-                await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
-
-                logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
-
+                    logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+                }
                 return ret;
             }
             else
@@ -2094,14 +2118,15 @@ namespace CovidMassTesting.Repository.RedisRepository
                             logger.LogInformation($"New updated registration");
 
                             var ret2 = await Add(visitor, notify);
+                            if (slotM != null)
+                            {
+                                await slotRepository.IncrementRegistration5MinSlot(slotM);
+                                await slotRepository.IncrementRegistrationHourSlot(slotH);
+                                await slotRepository.IncrementRegistrationDaySlot(slotD);
+                                await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
 
-                            await slotRepository.IncrementRegistration5MinSlot(slotM);
-                            await slotRepository.IncrementRegistrationHourSlot(slotH);
-                            await slotRepository.IncrementRegistrationDaySlot(slotD);
-                            await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
-
-                            logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
-
+                                logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+                            }
                             return ret2;
                         }
                     }
@@ -2134,14 +2159,15 @@ namespace CovidMassTesting.Repository.RedisRepository
                         logger.LogInformation($"New updated registration");
 
                         var ret2 = await Add(visitor, notify);
+                        if (slotM != null)
+                        {
+                            await slotRepository.IncrementRegistration5MinSlot(slotM);
+                            await slotRepository.IncrementRegistrationHourSlot(slotH);
+                            await slotRepository.IncrementRegistrationDaySlot(slotD);
+                            await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
 
-                        await slotRepository.IncrementRegistration5MinSlot(slotM);
-                        await slotRepository.IncrementRegistrationHourSlot(slotH);
-                        await slotRepository.IncrementRegistrationDaySlot(slotD);
-                        await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
-
-                        logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
-
+                            logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+                        }
                         return ret2;
                     }
                     else
@@ -2165,8 +2191,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var ret = await SetVisitor(visitor, false);
                 if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
                 {
-                    await placeRepository.DecrementPlaceRegistrations(previous.ChosenPlaceId);
-                    await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+                    if (previous.ChosenPlaceId != null && visitor.ChosenPlaceId != null)
+                    {
+                        await placeRepository.DecrementPlaceRegistrations(previous.ChosenPlaceId);
+                        await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+                    }
                 }
                 var code = visitor.Id.ToString();
                 var codeFormatted = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}";
@@ -2214,8 +2243,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 Code = codeFormatted,
                                 Name = $"{visitor.FirstName} {visitor.LastName}",
                                 Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                                Place = place.Name,
-                                PlaceDescription = place.Description
+                                Place = place?.Name,
+                                PlaceDescription = place?.Description
 
                             }, attachments);
 
@@ -2227,7 +2256,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 $"{visitor.FirstName} {visitor.LastName}",
                                 codeFormatted,
                                 $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                                place.Name
+                                place?.Name
                             )));
 
                         }
@@ -2278,12 +2307,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         logger.LogError(exc, exc.Message);
                     }
-                    await slotRepository.IncrementRegistration5MinSlot(slotM);
-                    await slotRepository.IncrementRegistrationHourSlot(slotH);
-                    await slotRepository.IncrementRegistrationDaySlot(slotD);
-                    await MapDayToVisitorCode(slotD.SlotId, visitor.Id);
-
-                    logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+                    if (slotM != null)
+                    {
+                        await slotRepository.IncrementRegistration5MinSlot(slotM);
+                        await slotRepository.IncrementRegistrationHourSlot(slotH);
+                        await slotRepository.IncrementRegistrationDaySlot(slotD);
+                        await MapDayToVisitorCode(slotD.SlotId, visitor.Id);
+                        logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
+                    }
                 }
 
                 return ret;

@@ -114,6 +114,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string ChosenPlaceId { get; set; }
         /// <summary>
+        /// ID of place provider
+        /// </summary>
+        public string PlaceProviderId { get; set; }
+        /// <summary>
         /// Test result. Available options are in Model.TestResult
         /// </summary>
         public string Result { get; set; } = TestResult.NotTaken;

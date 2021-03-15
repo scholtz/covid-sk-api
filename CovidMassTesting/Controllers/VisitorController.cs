@@ -1,4 +1,5 @@
-﻿using CovidMassTesting.Model;
+﻿using CovidMassTesting.Helpers;
+using CovidMassTesting.Model;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -166,7 +167,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Vybrané miesto nebolo nájdené");
                 }
-
+                visitor.PlaceProviderId = place.PlaceProviderId;
                 PlaceProduct placeProduct = null;
                 try
                 {
@@ -224,7 +225,6 @@ namespace CovidMassTesting.Controllers
                         throw new Exception("Časť poskytnutého rodného čísla od zamestnávateľa vyzerá byť rozdielna od čísla zadaného v registračnom formulári");
                     }
                 }
-
                 return Ok(await visitorRepository.Register(visitor, "", true));
             }
             catch (ArgumentException exc)
@@ -345,7 +345,7 @@ namespace CovidMassTesting.Controllers
                 visitor.Passport = reg.Passport;
                 visitor.RC = reg.RC;
                 visitor.Product = product;
-
+                visitor.PlaceProviderId = pp.PlaceProviderId;
 
                 var time = new DateTimeOffset(visitor.ChosenSlot, TimeSpan.Zero);
                 if (time.AddMinutes(10) < DateTimeOffset.Now)
@@ -423,7 +423,9 @@ namespace CovidMassTesting.Controllers
                 visitor.StreetNo = reg.StreetNo;
                 visitor.ZIP = reg.ZIP;
                 visitor.Email = reg.CustomEmail ?? reg.Email;
+
                 visitor.Phone = reg.CustomPhone ?? reg.Phone;
+
                 visitor.PersonType = reg.PersonType;
                 visitor.Passport = reg.Passport;
                 visitor.RC = reg.RC;
@@ -433,9 +435,10 @@ namespace CovidMassTesting.Controllers
                 visitor.Gender = reg.Gender;
                 visitor.Nationality = reg.Nationality;
                 visitor.Insurance = reg.InsuranceCompany;
+                visitor.PlaceProviderId = User.GetPlaceProvider();
 
                 visitor.RegistrationUpdatedByManager = User.GetEmail();
-                logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
+                logger.LogInformation($"RegisterEmployeeByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 return Ok(await visitorRepository.Register(visitor, User.GetEmail(), true));
             }
             catch (ArgumentException exc)
@@ -635,6 +638,7 @@ namespace CovidMassTesting.Controllers
                     visitor.SelfRegistration = false;
                 }
                 visitor.RegistrationUpdatedByManager = User.GetEmail();
+                visitor.PlaceProviderId = User.GetPlaceProvider();
                 logger.LogInformation($"RegisterByManager: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 return Ok(await visitorRepository.Register(visitor, User.GetEmail(), true));
             }
@@ -649,6 +653,172 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        /// <summary>
+        /// Register employee by the documenter
+        /// </summary>
+        /// <param name="employeeId"></param>
+        /// <param name="email"></param>
+        /// <param name="phone"></param>
+        /// <param name="time"></param>
+        /// <param name="productId"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("RegisterEmployeeByDocumenter")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        [RequestSizeLimit(2000)]
+        public async Task<ActionResult<Visitor>> RegisterEmployeeByDocumenter(
+            [FromForm] string employeeId,
+            [FromForm] string email,
+            [FromForm] string phone,
+            [FromForm] DateTimeOffset time,
+            [FromForm] string productId,
+            [FromForm] string result
+            )
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(employeeId))
+                {
+                    throw new ArgumentException($"'{nameof(employeeId)}' cannot be null or empty", nameof(employeeId));
+                }
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    throw new ArgumentException($"'{nameof(email)}' cannot be null or empty", nameof(email));
+                }
+
+                if (string.IsNullOrEmpty(phone))
+                {
+                    throw new ArgumentException($"'{nameof(phone)}' cannot be null or empty", nameof(phone));
+                }
+
+                if (string.IsNullOrEmpty(productId))
+                {
+                    throw new ArgumentException($"'{nameof(productId)}' cannot be null or empty", nameof(productId));
+                }
+
+                if (result != TestResult.PositiveWaitingForCertificate && result != TestResult.NegativeWaitingForCertificate)
+                {
+                    throw new ArgumentException($"'{nameof(result)}' must be positive or negative", nameof(result));
+                }
+
+                if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
+                    && !User.IsMedicTester(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
+                }
+
+
+
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                if (pp == null)
+                {
+                    throw new Exception("Miesto má nastavené chybnú spoločnosť. Prosím kontaktujte podporu s chybou 0x027561");
+                }
+                var hash = visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeId);
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(hash);
+
+                var reg = await visitorRepository.GetRegistration(regId);
+                if (reg == null)
+                {
+                    throw new ArgumentException($"Neplatné osobné číslo zamestnanca");
+                }
+                var phoneFormatted = phone.FormatPhone();
+                var regUpdated = false;
+                if (phoneFormatted.IsValidPhoneNumber())
+                {
+                    if (string.IsNullOrEmpty(reg.CustomPhone))
+                    {
+                        if (reg.Phone != phoneFormatted)
+                        {
+                            reg.CustomPhone = phoneFormatted;
+                            regUpdated = true;
+                        }
+                    }
+                    else
+                    {
+                        if (reg.CustomPhone != phoneFormatted)
+                        {
+                            reg.CustomPhone = phoneFormatted;
+                            regUpdated = true;
+                        }
+                    }
+                }
+
+                if (email.IsValidEmail())
+                {
+                    if (string.IsNullOrEmpty(reg.CustomEmail))
+                    {
+                        if (reg.Email != email)
+                        {
+                            reg.CustomEmail = email;
+                            regUpdated = true;
+                        }
+                    }
+                    else
+                    {
+                        if (reg.CustomEmail != email)
+                        {
+                            reg.CustomEmail = email;
+                            regUpdated = true;
+                        }
+                    }
+                }
+
+                if (regUpdated)
+                {
+                    await visitorRepository.SetRegistration(reg, false);
+                }
+                var visitor = new Visitor()
+                {
+                };
+                visitor.Result = TestResult.TestIsBeingProcessing;
+                visitor.PersonType = string.IsNullOrEmpty(reg.PersonType) ? "idcard" : reg.PersonType;
+                visitor.FirstName = reg.FirstName;
+                visitor.LastName = reg.LastName;
+                visitor.BirthDayDay = reg.BirthDayDay;
+                visitor.BirthDayMonth = reg.BirthDayMonth;
+                visitor.BirthDayYear = reg.BirthDayYear;
+                visitor.City = reg.City;
+                visitor.Street = reg.Street;
+                visitor.StreetNo = reg.StreetNo;
+                visitor.Insurance = reg.InsuranceCompany;
+                visitor.Gender = reg.Gender;
+                visitor.Nationality = reg.Nationality;
+                visitor.ZIP = reg.ZIP;
+                visitor.Email = reg.CustomEmail ?? reg.Email;
+                visitor.Phone = reg.CustomPhone ?? reg.Phone;
+                visitor.PersonType = reg.PersonType;
+                visitor.Passport = reg.Passport;
+                visitor.RC = reg.RC;
+                visitor.Product = productId;
+                visitor.RegistrationTime = DateTimeOffset.UtcNow;
+                visitor.SelfRegistration = false;
+                visitor.RegistrationUpdatedByManager = User.GetEmail();
+                visitor.TestingTime = time;
+                visitor.PlaceProviderId = User.GetPlaceProvider();
+
+                logger.LogInformation($"RegisterEmployeeByDocumenter: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
+                var saved = await visitorRepository.Register(visitor, User.GetEmail(), false);
+                var id = Guid.NewGuid().ToString().FormatDocument();
+                await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), HttpContext.GetIPAddress());
+                return Ok(await visitorRepository.SetTestResult(id, result, true));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
         /// <summary>
         /// Returns ECIES public key for private data encryption
         /// </summary>
