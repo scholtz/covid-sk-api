@@ -223,7 +223,7 @@ namespace CovidMassTesting.Controllers
                 var neg = await visitorRepository.GetPPStats(StatsType.Negative, User.GetPlaceProvider());
                 var tested = await visitorRepository.GetPPStats(StatsType.Tested, User.GetPlaceProvider());
 
-                var stats = new Dictionary<DateTimeOffset, Dictionary<string, long>>();
+                var stats = new SortedDictionary<DateTimeOffset, Dictionary<string, long>>();
                 foreach (var item in enot)
                 {
                     if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
@@ -310,7 +310,7 @@ namespace CovidMassTesting.Controllers
                 ret.Series.Add(new Model.Charts.ChartSeries()
                 {
                     Name = "positive",
-                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    Data = stats.Select(v =>
                     {
                         if (v.Value.ContainsKey("positive"))
                         {
@@ -325,7 +325,7 @@ namespace CovidMassTesting.Controllers
                 ret.Series.Add(new Model.Charts.ChartSeries()
                 {
                     Name = "negative",
-                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    Data = stats.Select(v =>
                     {
                         if (v.Value.ContainsKey("negative"))
                         {
@@ -340,7 +340,7 @@ namespace CovidMassTesting.Controllers
                 ret.Series.Add(new Model.Charts.ChartSeries()
                 {
                     Name = "tested",
-                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    Data = stats.Select(v =>
                     {
                         if (v.Value.ContainsKey("tested"))
                         {
