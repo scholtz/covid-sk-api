@@ -143,8 +143,10 @@ namespace CovidMassTesting.Repository.MockRepository
         /// loads visitor by code
         /// </summary>
         /// <param name="codeInt"></param>
+        /// <param name="fixOnLoad"></param>
+        /// <param name="silent"></param>
         /// <returns></returns>
-        public override async Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true)
+        public override async Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true, bool silent = true)
         {
             if (!data.ContainsKey(codeInt))
             {
