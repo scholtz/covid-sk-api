@@ -827,6 +827,33 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// List extenral products for all authenticated users
+        /// </summary>
+        /// <returns></returns>
+        [Authorize]
+        [HttpGet("ListExternalProducts")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<Product>>> ListExternalProducts()
+        {
+            try
+            {
+                var products = await placeProviderRepository.ListProducts(User.GetPlaceProvider());
+                return Ok(products.Where(p => p.ExternalOnly == true));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+        /// <summary>
         /// Administrator is allowed to list pp products
         /// </summary>
         /// <returns></returns>
