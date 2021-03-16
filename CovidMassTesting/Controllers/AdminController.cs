@@ -218,33 +218,41 @@ namespace CovidMassTesting.Controllers
                 }
                 logger.LogInformation("FixAdvancedStats");
                 await visitorRepository.DropAllStats();
-
-                var visitors = await visitorRepository.ListAllVisitors();
                 var places = await placeRepository.ListAll();
+                var visitors = await visitorRepository.ListAllVisitors();
+
                 foreach (var visitor in visitors)
                 {
-                    var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
-                    if (place == null) continue;
-                    var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
-                    if (visitor.EHealthNotifiedAt.HasValue)
+                    try
                     {
-                        await visitorRepository.IncrementStats(StatsType.EHealthNotification, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
+                        var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
+                        if (place == null) continue;
+                        var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
+                        if (visitor.EHealthNotifiedAt.HasValue)
+                        {
+                            await visitorRepository.IncrementStats(StatsType.EHealthNotification, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
+                        }
+                        if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
+                        await visitorRepository.IncrementStats(StatsType.RegisteredTo, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
+                        await visitorRepository.IncrementStats(StatsType.RegisteredOn, visitor.ChosenPlaceId, pp, visitor.RegistrationTime ?? visitor.ChosenSlotTime);
+                        i++;
+                        if (visitor.TestingTime.HasValue)
+                        {
+                            await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                            await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                        }
+                        if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
+                        {
+                            await visitorRepository.IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                        }
+                        if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
+                        {
+                            await visitorRepository.IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                        }
                     }
-                    if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
-                    await visitorRepository.IncrementStats(StatsType.RegisteredTo, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
-                    await visitorRepository.IncrementStats(StatsType.RegisteredOn, visitor.ChosenPlaceId, pp, visitor.RegistrationTime ?? visitor.ChosenSlotTime);
-                    i++;
-                    if (visitor.TestingTime.HasValue)
+                    catch (Exception exc)
                     {
-                        await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
-                    }
-                    if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
-                    {
-                        await visitorRepository.IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
-                    }
-                    if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
-                    {
-                        await visitorRepository.IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                        logger.LogError(exc, $"FixAdvancedStats error {exc.Message}");
                     }
                 }
                 logger.LogInformation($"FixAdvancedStats done {i}");
@@ -368,6 +376,10 @@ namespace CovidMassTesting.Controllers
                     {
                         visitor = await visitorRepository.GetVisitor(codeInt);
                         visitor.EHealthNotifiedAt = DateTimeOffset.UtcNow;
+                        if (!visitor.ResultNotifiedAt.HasValue)
+                        {
+                            await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                        }
                         visitor.ResultNotifiedAt = visitor.EHealthNotifiedAt;
                         await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                         await visitorRepository.SetVisitor(visitor, false);
@@ -440,8 +452,12 @@ namespace CovidMassTesting.Controllers
                         {
                             var toUpdate = await visitorRepository.GetVisitor(visitor.Id);
                             toUpdate.EHealthNotifiedAt = DateTimeOffset.UtcNow;
-                            toUpdate.ResultNotifiedAt = toUpdate.EHealthNotifiedAt;
                             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                            if (!visitor.ResultNotifiedAt.HasValue)
+                            {
+                                await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                            }
+                            toUpdate.ResultNotifiedAt = toUpdate.EHealthNotifiedAt;
                             await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, toUpdate.ResultNotifiedAt.Value);
                             await visitorRepository.SetVisitor(toUpdate, false);
                             logger.LogInformation($"Visitor notified by eHealth {toUpdate.Id} {toUpdate.RC.GetSHA256Hash()}");

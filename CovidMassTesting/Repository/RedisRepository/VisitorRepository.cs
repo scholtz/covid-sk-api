@@ -225,10 +225,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Decode visitor data from database
         /// </summary>
         /// <param name="codeInt"></param>
+        /// <param name="fixOnLoad">Fixes the visitor object</param>
+        /// <param name="silent">Do not log the event - mass processing logs the batch</param>
         /// <returns></returns>
-        public virtual async Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true)
+        public virtual async Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true, bool silent = false)
         {
-            logger.LogInformation($"Visitor loaded from database: {codeInt.GetHashCode()}");
+            if (!silent)
+            {
+                logger.LogInformation($"Visitor loaded from database: {codeInt.GetHashCode()}");
+            }
             var encoded = await redisCacheClient.Db0.HashGetAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}", codeInt.ToString());
             if (string.IsNullOrEmpty(encoded))
             {
@@ -808,8 +813,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             switch (state)
             {
                 case TestResult.TestMustBeRepeated:
-                    visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
                     var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                    if (!visitor.ResultNotifiedAt.HasValue)
+                    {
+                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                    }
+
+                    visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
+
                     await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                     break;
                 case TestResult.TestIsBeingProcessing:
@@ -1504,7 +1515,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
-
+                    if (!visitor.ResultNotifiedAt.HasValue)
+                    {
+                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                    }
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
                     var placeProviderId = visitor.PlaceProviderId ?? place?.PlaceProviderId;
                     await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, placeProviderId, visitor.ResultNotifiedAt.Value);
@@ -2784,7 +2798,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     try
                     {
-                        var visitor = await GetVisitor(visitorIdInt);
+                        var visitor = await GetVisitor(visitorIdInt, false, true);
                         if (visitor == null)
                         {
                             continue;

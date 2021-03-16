@@ -59,8 +59,9 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="codeInt"></param>
         /// <param name="fixOnLoad"></param>
+        /// <param name="silent">If silent, do not log .. must log batch in parent call</param>
         /// <returns></returns>
-        public Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true);
+        public Task<Visitor> GetVisitor(int codeInt, bool fixOnLoad = true, bool silent = false);
         /// <summary>
         /// Public registration
         /// </summary>

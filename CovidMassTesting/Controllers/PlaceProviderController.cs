@@ -830,16 +830,24 @@ namespace CovidMassTesting.Controllers
         /// Administrator is allowed to list pp products
         /// </summary>
         /// <returns></returns>
-        [Authorize]
-        [HttpGet("StatsTestedVisitors")]
+
+        [HttpGet("GetStats")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<IEnumerable<Dictionary<DateTimeOffset, long>>>> StatsTestedVisitors()
+        public async Task<ActionResult<IEnumerable<Dictionary<DateTimeOffset, long>>>> GetStats(string statsType, string placeProviderId)
         {
             try
             {
-                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository)) throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
-                return Ok(await visitorRepository.GetPPStats(StatsType.Notification, User.GetPlaceProvider()));
+                if (string.IsNullOrEmpty(statsType))
+                {
+                    throw new ArgumentException($"'{nameof(statsType)}' cannot be null or empty.", nameof(statsType));
+                }
+                if (string.IsNullOrEmpty(placeProviderId))
+                {
+                    throw new ArgumentException($"'{nameof(placeProviderId)}' cannot be null or empty.", nameof(placeProviderId));
+                }
+
+                return Ok(await visitorRepository.GetPPStats(statsType, placeProviderId));
             }
             catch (ArgumentException exc)
             {

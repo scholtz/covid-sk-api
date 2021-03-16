@@ -11,6 +11,10 @@ namespace CovidMassTesting.Model
     public class StatsType
     {
         /// <summary>
+        /// Number of tested persons
+        /// </summary>
+        public const string Tested = "tested";
+        /// <summary>
         /// EHealth notifications
         /// </summary>
         public const string EHealthNotification = "ehealth-notification";
