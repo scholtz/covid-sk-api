@@ -248,7 +248,7 @@ namespace CovidMassTesting.Controllers
                     }
                 }
                 logger.LogInformation($"FixAdvancedStats done {i}");
-                return Ok(true);
+                return Ok(i);
             }
             catch (Exception exc)
             {
