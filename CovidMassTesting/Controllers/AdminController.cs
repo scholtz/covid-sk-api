@@ -257,7 +257,7 @@ namespace CovidMassTesting.Controllers
 
                 var ret = new Model.Charts.Dashboard()
                 {
-                    Labels = stats.Keys.Select(k => k.ToString("dd.MM.")).ToArray(),
+                    Labels = stats.Keys.Select(k => k.ToString("yyyy-MM-dd")).ToArray(),
                 };
                 ret.Series.Add(new Model.Charts.ChartSeries()
                 {
