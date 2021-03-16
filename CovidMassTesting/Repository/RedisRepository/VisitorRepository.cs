@@ -2782,13 +2782,19 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
-                    if (visitor == null)
+                    try
                     {
-                        continue;
+                        var visitor = await GetVisitor(visitorIdInt);
+                        if (visitor == null)
+                        {
+                            continue;
+                        }
+                        ret.Add(visitor);
                     }
-
-                    ret.Add(visitor);
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, $"ListAllVisitors: Unable to get visitor {visitorId}");
+                    }
                 }
             }
             logger.LogInformation($"ListAllVisitors {from} {count} END - {ret.Count}");
