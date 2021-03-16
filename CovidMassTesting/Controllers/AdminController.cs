@@ -242,12 +242,12 @@ namespace CovidMassTesting.Controllers
                 foreach (var item in pos)
                 {
                     if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
-                    stats[item.Key.Date]["pos"] = item.Value;
+                    stats[item.Key.Date]["positive"] = item.Value;
                 }
                 foreach (var item in neg)
                 {
                     if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
-                    stats[item.Key.Date]["neg"] = item.Value;
+                    stats[item.Key.Date]["negative"] = item.Value;
                 }
                 foreach (var item in tested)
                 {
@@ -259,6 +259,7 @@ namespace CovidMassTesting.Controllers
                 {
                     Labels = stats.Keys.Select(k => k.ToString("yyyy-MM-dd")).ToArray(),
                 };
+                /*
                 ret.Series.Add(new Model.Charts.ChartSeries()
                 {
                     Name = "enot",
@@ -305,14 +306,15 @@ namespace CovidMassTesting.Controllers
                         }
                     }).ToArray()
                 });
+                /**/
                 ret.Series.Add(new Model.Charts.ChartSeries()
                 {
-                    Name = "pos",
+                    Name = "positive",
                     Data = stats.OrderBy(k => k.Key).Select(v =>
                     {
-                        if (v.Value.ContainsKey("pos"))
+                        if (v.Value.ContainsKey("positive"))
                         {
-                            return v.Value["pos"];
+                            return v.Value["positive"];
                         }
                         else
                         {
@@ -322,12 +324,12 @@ namespace CovidMassTesting.Controllers
                 });
                 ret.Series.Add(new Model.Charts.ChartSeries()
                 {
-                    Name = "neg",
+                    Name = "negative",
                     Data = stats.OrderBy(k => k.Key).Select(v =>
                     {
-                        if (v.Value.ContainsKey("neg"))
+                        if (v.Value.ContainsKey("negative"))
                         {
-                            return v.Value["neg"];
+                            return v.Value["negative"];
                         }
                         else
                         {
