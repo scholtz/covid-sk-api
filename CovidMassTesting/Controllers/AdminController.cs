@@ -14,6 +14,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -192,6 +193,164 @@ namespace CovidMassTesting.Controllers
                     default: throw new Exception("Wrong type");
                 }
                 return Ok(true);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// DashboardStats
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("DashboardStats")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Model.Charts.Dashboard>> DashboardStats()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                var enot = await visitorRepository.GetPPStats(StatsType.EHealthNotification, User.GetPlaceProvider());
+                var rTo = await visitorRepository.GetPPStats(StatsType.RegisteredOn, User.GetPlaceProvider());
+                var rOn = await visitorRepository.GetPPStats(StatsType.RegisteredOn, User.GetPlaceProvider());
+                var pos = await visitorRepository.GetPPStats(StatsType.Positive, User.GetPlaceProvider());
+                var neg = await visitorRepository.GetPPStats(StatsType.Negative, User.GetPlaceProvider());
+                var tested = await visitorRepository.GetPPStats(StatsType.Tested, User.GetPlaceProvider());
+
+                var stats = new Dictionary<DateTimeOffset, Dictionary<string, long>>();
+                foreach (var item in enot)
+                {
+                    if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
+                    stats[item.Key.Date]["enot"] = item.Value;
+                }
+                foreach (var item in rTo)
+                {
+                    if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
+                    stats[item.Key.Date]["rTo"] = item.Value;
+                }
+                foreach (var item in rOn)
+                {
+                    if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
+                    stats[item.Key.Date]["rOn"] = item.Value;
+                }
+                foreach (var item in pos)
+                {
+                    if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
+                    stats[item.Key.Date]["pos"] = item.Value;
+                }
+                foreach (var item in neg)
+                {
+                    if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
+                    stats[item.Key.Date]["neg"] = item.Value;
+                }
+                foreach (var item in tested)
+                {
+                    if (!stats.ContainsKey(item.Key.Date)) stats[item.Key.Date] = new Dictionary<string, long>();
+                    stats[item.Key.Date]["tested"] = item.Value;
+                }
+
+                var ret = new Model.Charts.Dashboard()
+                {
+                    Labels = stats.Keys.Select(k => k.ToString("dd.MM.")).ToArray(),
+                };
+                ret.Series.Add(new Model.Charts.ChartSeries()
+                {
+                    Name = "enot",
+                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    {
+                        if (v.Value.ContainsKey("enot"))
+                        {
+                            return v.Value["enot"];
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray()
+                });
+
+                ret.Series.Add(new Model.Charts.ChartSeries()
+                {
+                    Name = "rTo",
+                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    {
+                        if (v.Value.ContainsKey("rTo"))
+                        {
+                            return v.Value["rTo"];
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray()
+                });
+                ret.Series.Add(new Model.Charts.ChartSeries()
+                {
+                    Name = "rOn",
+                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    {
+                        if (v.Value.ContainsKey("rOn"))
+                        {
+                            return v.Value["rOn"];
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray()
+                });
+                ret.Series.Add(new Model.Charts.ChartSeries()
+                {
+                    Name = "pos",
+                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    {
+                        if (v.Value.ContainsKey("pos"))
+                        {
+                            return v.Value["pos"];
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray()
+                });
+                ret.Series.Add(new Model.Charts.ChartSeries()
+                {
+                    Name = "neg",
+                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    {
+                        if (v.Value.ContainsKey("neg"))
+                        {
+                            return v.Value["neg"];
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray()
+                });
+                ret.Series.Add(new Model.Charts.ChartSeries()
+                {
+                    Name = "tested",
+                    Data = stats.OrderBy(k => k.Key).Select(v =>
+                    {
+                        if (v.Value.ContainsKey("tested"))
+                        {
+                            return v.Value["tested"];
+                        }
+                        else
+                        {
+                            return 0;
+                        }
+                    }).ToArray()
+                });
+                return Ok(ret);
             }
             catch (Exception exc)
             {

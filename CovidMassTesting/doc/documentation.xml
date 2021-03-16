@@ -168,6 +168,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.DashboardStats">
+            <summary>
+            DashboardStats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.FixAdvancedStats">
             <summary>
             Fix advanced stats
@@ -673,6 +679,12 @@
         <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListProducts">
             <summary>
             Administrator is allowed to list pp products
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.ListExternalProducts">
+            <summary>
+            List extenral products for all authenticated users
             </summary>
             <returns></returns>
         </member>
