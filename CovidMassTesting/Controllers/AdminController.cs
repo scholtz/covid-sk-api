@@ -205,7 +205,7 @@ namespace CovidMassTesting.Controllers
         /// DashboardStats
         /// </summary>
         /// <returns></returns>
-        [HttpPost("DashboardStats")]
+        [HttpGet("DashboardStats")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult<Model.Charts.Dashboard>> DashboardStats()
