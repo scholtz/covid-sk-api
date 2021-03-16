@@ -233,9 +233,9 @@ namespace NUnitTestCovidApi
 
 
 
-        protected HttpResponseMessage StatsTestedVisitors(HttpClient client)
+        protected HttpResponseMessage StatsTestedVisitors(HttpClient client, string statsType, string placeProviderId)
         {
-            return client.GetAsync("PlaceProvider/StatsTestedVisitors").Result;
+            return client.GetAsync($"PlaceProvider/GetStats?statsType={statsType}&placeProviderId={placeProviderId}").Result;
         }
         protected HttpResponseMessage AllocatePersonsToPlace(HttpClient client, PersonAllocation[] allocations, string place)
         {

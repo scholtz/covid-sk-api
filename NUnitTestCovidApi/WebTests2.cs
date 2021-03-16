@@ -1193,7 +1193,7 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken1}");
 
 
-            response = StatsTestedVisitors(client);
+            response = StatsTestedVisitors(client, StatsType.Tested, pp1.PlaceProviderId);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
             var stats = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<DateTimeOffset, long>>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, stats.Count);

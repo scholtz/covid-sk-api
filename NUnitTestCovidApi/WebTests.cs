@@ -881,7 +881,8 @@ namespace NUnitTestCovidApi
 
             var request = PlaceProviderRegistration(client, obj);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-
+            var data = request.Content.ReadAsStringAsync().Result;
+            var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
             request = AuthenticateUser(client, admin.Email, admin.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var adminToken = request.Content.ReadAsStringAsync().Result;
@@ -1016,7 +1017,8 @@ namespace NUnitTestCovidApi
 
             var request = PlaceProviderRegistration(client, obj);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-
+            var data = request.Content.ReadAsStringAsync().Result;
+            var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
             request = AuthenticateUser(client, admin.Email, admin.Password);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var adminToken = request.Content.ReadAsStringAsync().Result;
@@ -1161,7 +1163,7 @@ namespace NUnitTestCovidApi
 
             client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
-            request = StatsTestedVisitors(client);
+            request = StatsTestedVisitors(client, StatsType.Tested, pp.PlaceProviderId);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var stats = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<DateTimeOffset, long>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, stats.Count);

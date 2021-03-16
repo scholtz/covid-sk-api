@@ -676,7 +676,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.StatsTestedVisitors">
+        <member name="M:CovidMassTesting.Controllers.PlaceProviderController.GetStats(System.String,System.String)">
             <summary>
             Administrator is allowed to list pp products
             </summary>
@@ -1258,7 +1258,6 @@
             <summary>
             Tester is allowed to fetch the private key for the encrypted QR code with sensitive data to be decrypted
             </summary>
-            <param name="visitor"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.UploadEmployees">
@@ -4064,6 +4063,51 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:CovidMassTesting.Model.StatsType">
+            <summary>
+            Stats types
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Tested">
+            <summary>
+            Number of tested persons
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.EHealthNotification">
+            <summary>
+            EHealth notifications
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Notification">
+            <summary>
+            Number of notifications sent
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Repeat">
+            <summary>
+            Number of test results to be repeated
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Positive">
+            <summary>
+            Number of positive test results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Negative">
+            <summary>
+            Number of negative test results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.RegisteredTo">
+            <summary>
+            Day for which new registrations were registered
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.RegisteredOn">
+            <summary>
+            Day when person was registered
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.TestingDay">
             <summary>
             Registration day
@@ -5733,12 +5777,13 @@
             <param name="ipAddress"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitor(System.Int32,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitor(System.Int32,System.Boolean,System.Boolean)">
             <summary>
             Load visitor
             </summary>
             <param name="codeInt"></param>
             <param name="fixOnLoad"></param>
+            <param name="silent">If silent, do not log .. must log batch in parent call</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.Register(CovidMassTesting.Model.Visitor,System.String,System.Boolean)">
@@ -6479,11 +6524,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetVisitor(System.Int32,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.GetVisitor(System.Int32,System.Boolean,System.Boolean)">
             <summary>
             loads visitor by code
             </summary>
             <param name="codeInt"></param>
+            <param name="fixOnLoad"></param>
+            <param name="silent"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.ListAllKeys(System.Nullable{System.DateTimeOffset})">
@@ -7417,11 +7464,13 @@
             <param name="id"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitor(System.Int32,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetVisitor(System.Int32,System.Boolean,System.Boolean)">
             <summary>
             Decode visitor data from database
             </summary>
             <param name="codeInt"></param>
+            <param name="fixOnLoad">Fixes the visitor object</param>
+            <param name="silent">Do not log the event - mass processing logs the batch</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetRegistration(System.String)">

@@ -1515,12 +1515,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
+                    var placeProviderId = visitor.PlaceProviderId ?? place?.PlaceProviderId;
                     if (!visitor.ResultNotifiedAt.HasValue)
                     {
-                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, placeProviderId, DateTimeOffset.UtcNow);
                     }
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-                    var placeProviderId = visitor.PlaceProviderId ?? place?.PlaceProviderId;
                     await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, placeProviderId, visitor.ResultNotifiedAt.Value);
                     await SetVisitor(visitor, false);
                     break;
