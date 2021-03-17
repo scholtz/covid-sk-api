@@ -827,7 +827,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.TestMustBeRepeated:
                     if (!visitor.ResultNotifiedAt.HasValue)
                     {
-                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, DateTimeOffset.UtcNow);
                     }
 
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
@@ -923,7 +923,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
 
-                    await IncrementStats(StatsType.Repeat, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime.Value);
+                    await IncrementStats(StatsType.Repeat, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime ?? DateTimeOffset.UtcNow);
 
                     break;
                 case TestResult.TestIsBeingProcessing:
@@ -1367,11 +1367,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.PositiveWaitingForCertificate:
-                    await IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime.Value);
+                    await IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime ?? DateTimeOffset.UtcNow);
                     break;
                 case TestResult.NegativeCertificateTaken:
                 case TestResult.NegativeWaitingForCertificate:
-                    await IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime.Value);
+                    await IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime ?? DateTimeOffset.UtcNow);
                     break;
             }
 
