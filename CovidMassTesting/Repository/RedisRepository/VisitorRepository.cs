@@ -810,18 +810,28 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             visitor.Result = state;
+            if (!string.IsNullOrEmpty(visitor.ChosenPlaceId))
+            {
+                if (string.IsNullOrEmpty(visitor.PlaceProviderId))
+                {
+                    var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                    if (place != null)
+                    {
+                        logger.LogInformation("Fixing visitor setting pp");
+                        visitor.PlaceProviderId = place.PlaceProviderId;
+                    }
+                }
+            }
             switch (state)
             {
                 case TestResult.TestMustBeRepeated:
-                    var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
-                    var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
                     if (!visitor.ResultNotifiedAt.HasValue)
                     {
-                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, pp, visitor.ResultNotifiedAt.Value);
+                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                     }
 
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.ResultNotifiedAt.Value);
+                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                     break;
                 case TestResult.TestIsBeingProcessing:
                     visitor.TestingTime = DateTimeOffset.UtcNow;
@@ -1515,13 +1525,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
-                    var placeProviderId = visitor.PlaceProviderId ?? place?.PlaceProviderId;
                     if (!visitor.ResultNotifiedAt.HasValue)
                     {
-                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, placeProviderId, DateTimeOffset.UtcNow);
+                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, DateTimeOffset.UtcNow);
                     }
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, placeProviderId, visitor.ResultNotifiedAt.Value);
+                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                     await SetVisitor(visitor, false);
                     break;
             }
