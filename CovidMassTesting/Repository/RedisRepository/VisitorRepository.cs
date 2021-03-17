@@ -814,14 +814,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 case TestResult.TestMustBeRepeated:
                     var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                    var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
                     if (!visitor.ResultNotifiedAt.HasValue)
                     {
-                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                        await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, pp, visitor.ResultNotifiedAt.Value);
                     }
 
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-
-                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.ResultNotifiedAt.Value);
                     break;
                 case TestResult.TestIsBeingProcessing:
                     visitor.TestingTime = DateTimeOffset.UtcNow;
