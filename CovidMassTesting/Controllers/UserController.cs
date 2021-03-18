@@ -405,7 +405,7 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize]
-        [HttpGet("CompanyRegistrationsExport")]
+        [HttpPost("CompanyRegistrationsExport")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
         public async Task<ActionResult> CompanyRegistrationsExport([FromQuery] int from = 0, [FromQuery] int count = 9999999)
