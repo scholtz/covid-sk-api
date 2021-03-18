@@ -68,7 +68,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// BirthDay - day
         /// </summary>
-        public int? BirthDayDay => null;
+        public int? BirthDayDay => visitor.BirthDayDay;
         /// <summary>
         /// BirthDay - month
         /// </summary>
