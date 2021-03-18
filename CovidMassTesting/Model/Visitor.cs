@@ -204,11 +204,11 @@ namespace CovidMassTesting.Model
 
         internal void Extend(Dictionary<string, Place> places, Dictionary<string, Product> products)
         {
-            if (this.ChosenPlaceId != null && places.ContainsKey(this.ChosenPlaceId))
+            if (!string.IsNullOrEmpty(this.ChosenPlaceId) && places?.ContainsKey(this.ChosenPlaceId) == true)
             {
                 this.PlaceName = places[this.ChosenPlaceId].Name;
             }
-            if (this.Product != null && products.ContainsKey(this.Product))
+            if (!string.IsNullOrEmpty(this.Product) && products?.ContainsKey(this.Product) == true)
             {
                 this.ProductName = products[this.Product].Name;
             }
