@@ -2518,10 +2518,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null)
         {
-            logger.LogInformation($"ListTestedVisitors {from} {count} {day} {placeProviderId}");
             var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
             var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
-
+            logger.LogInformation($"ListTestedVisitors {from} {count} {day} {placeProviderId} {places.Count} {products.Count}");
+            StringBuilder output = new StringBuilder();
             var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
             var ret = new List<VisitorTimezoned>();
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
@@ -2531,11 +2531,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                     var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
+                        output.Append("X");
                         continue;
                     }
                     if (!string.IsNullOrEmpty(placeProviderId))
                     {
-                        if (visitor.PlaceProviderId != placeProviderId) continue;
+                        if (visitor.PlaceProviderId != placeProviderId)
+                        {
+                            output.Append("1");
+                            continue;
+                        }
                     }
                     if (!string.IsNullOrEmpty(visitor.TestingSet))
                     {
@@ -2546,16 +2551,19 @@ namespace CovidMassTesting.Repository.RedisRepository
                             {
                                 logger.LogInformation($"{visitor.TestingTime < day.Value} | {visitor.TestingTime > day.Value.AddDays(1)}");
                                 // export only visitors at specified day
+
+                                output.Append("2");
                                 continue;
                             }
                         }
 
+                        output.Append("O");
                         visitor.Extend(places, products);
                         ret.Add(new VisitorTimezoned(visitor, offset));
                     }
                 }
             }
-            logger.LogInformation($"ListTestedVisitors {from} {count} END - {ret.Count}");
+            logger.LogInformation($"ListTestedVisitors {from} {count} END - {ret.Count} {output.ToString()}");
             return ret;
         }
         /// <summary>
