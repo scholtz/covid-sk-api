@@ -107,12 +107,12 @@ namespace CovidMassTesting.Repository.Interface
         /// Lists all sick visitors
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        public Task<IEnumerable<VisitorTimezoned>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
         /// Lists all tested visitors
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        public Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
         /// ListAnonymizedVisitors
         /// </summary>
@@ -122,12 +122,12 @@ namespace CovidMassTesting.Repository.Interface
         /// This method exports all visitors who are in state in processing
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListVisitorsInProcess(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        public Task<IEnumerable<VisitorTimezoned>> ListVisitorsInProcess(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
         /// This method exports all visitors who are in state in processing
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        public Task<IEnumerable<VisitorTimezoned>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
         /// List all
         /// </summary>
@@ -135,7 +135,7 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListAllVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        public Task<IEnumerable<VisitorTimezoned>> ListAllVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
         /// <summary>
         /// List all at place
         /// </summary>
@@ -145,7 +145,7 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public Task<IEnumerable<Visitor>> ListAllVisitorsAtPlace(
+        public Task<IEnumerable<VisitorTimezoned>> ListAllVisitorsAtPlace(
             string placeId,
             DateTimeOffset fromRegTime,
             DateTimeOffset untilRegTime,

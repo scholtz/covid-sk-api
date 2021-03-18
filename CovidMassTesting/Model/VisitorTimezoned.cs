@@ -1,33 +1,46 @@
-﻿using CovidMassTesting.Helpers;
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CovidMassTesting.Model
 {
-    public class VisitorAnonymized
+    /// <summary>
+    /// Visitor in specified timezone
+    /// </summary>
+    public class VisitorTimezoned
     {
-        private readonly Visitor visitor;
-        private readonly string cohash = "";
-        public VisitorAnonymized(Visitor visitor, string cohash)
+        /// <summary>
+        /// Parent visitor entity
+        /// </summary>
+        public readonly Visitor visitor;
+        private readonly TimeSpan timezone;
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <param name="timezone"></param>
+        public VisitorTimezoned(Visitor visitor, TimeSpan timezone)
         {
             this.visitor = visitor;
-            this.cohash = cohash;
+            this.timezone = timezone;
         }
         /// <summary>
         /// Registration code. 9-digit, formatted 000-000-000 for visitors
         /// </summary>
-        public string Id => $"{cohash}{visitor.Id}".GetSHA256Hash().Substring(0, 10);
+        public int Id => visitor.Id;
         /// <summary>
         /// Covid pass
         /// </summary>
-        public string PersonTrackingNumber => $"{cohash}{visitor.PersonTrackingNumber}".GetSHA256Hash().Substring(0, 10);
+        public string PersonTrackingNumber => visitor.PersonTrackingNumber;
         /// <summary>
         /// Gender F | M
         /// </summary>
-        public string Gender => $"{cohash}{visitor.Gender}".GetSHA256Hash().Substring(0, 10);
+        public string Gender => visitor.Gender;
         /// <summary>
         /// Nationality
         /// </summary>
-        public string Nationality => $"{cohash}{visitor.Nationality}".GetSHA256Hash().Substring(0, 10);
+        public string Nationality => visitor.Nationality;
         /// <summary>
         /// Language in which we will communicate to the visitor
         /// 
@@ -43,15 +56,15 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Passport number if person type is foreigner
         /// </summary>
-        public string Passport => $"{cohash}{visitor.Passport}".GetSHA256Hash().Substring(0, 10);
+        public string Passport => visitor.Passport;
         /// <summary>
         /// Personal number if person type is idcard or child
         /// </summary>
-        public string RC => $"{cohash}{visitor.RC}".GetSHA256Hash().Substring(0, 10);
+        public string RC => visitor.RC;
         /// <summary>
         /// Employee id if applicable
         /// </summary>
-        public string EmployeeId => $"{cohash}{visitor.EmployeeId}".GetSHA256Hash().Substring(0, 10);
+        public string EmployeeId => visitor.EmployeeId;
         /// <summary>
         /// BirthDay - day
         /// </summary>
@@ -67,39 +80,39 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Name
         /// </summary>
-        public string FirstName => $"{cohash}{visitor.FirstName}".GetSHA256Hash().Substring(0, 10);
+        public string FirstName => visitor.FirstName;
         /// <summary>
         /// Last name
         /// </summary>
-        public string LastName => $"{cohash}{visitor.LastName}".GetSHA256Hash().Substring(0, 10);
+        public string LastName => visitor.LastName;
         /// <summary>
         /// ZIP - Pernament address
         /// </summary>
-        public string ZIP => $"{cohash}{visitor.ZIP}".GetSHA256Hash().Substring(0, 10);
+        public string ZIP => visitor.ZIP;
         /// <summary>
         /// City - Pernament address
         /// </summary>
-        public string City => $"{cohash}{visitor.City}".GetSHA256Hash().Substring(0, 10);
+        public string City => visitor.City;
         /// <summary>
         /// Street - Pernament address
         /// </summary>
-        public string Street => $"{cohash}{visitor.Street}".GetSHA256Hash().Substring(0, 10);
+        public string Street => visitor.Street;
         /// <summary>
         /// StreetNo - Pernament address
         /// </summary>
-        public string StreetNo => $"{cohash}{visitor.StreetNo}".GetSHA256Hash().Substring(0, 10);
+        public string StreetNo => visitor.StreetNo;
         /// <summary>
         /// Address - Pernament address
         /// </summary>
-        public string Address => $"{cohash}{visitor.Address}".GetSHA256Hash().Substring(0, 10);
+        public string Address => visitor.Address;
         /// <summary>
         /// Email
         /// </summary>
-        public string Email => $"{cohash}{visitor.Email}".GetSHA256Hash().Substring(0, 10);
+        public string Email => visitor.Email;
         /// <summary>
         /// Phone
         /// </summary>
-        public string Phone => $"{cohash}{visitor.Phone}".GetSHA256Hash().Substring(0, 10);
+        public string Phone => visitor.Phone;
         /// <summary>
         /// Insurance
         /// </summary>
@@ -111,11 +124,20 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// ChosenSlotTime
         /// </summary>
-        public DateTimeOffset ChosenSlotTime => (new DateTimeOffset(ChosenSlot, TimeSpan.Zero)).ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset ChosenSlotTime => (new DateTimeOffset(ChosenSlot, TimeSpan.Zero)).ToOffset(timezone);
         /// <summary>
         /// Chosen place
         /// </summary>
         public string ChosenPlaceId => visitor.ChosenPlaceId;
+
+        /// <summary>
+        /// Place name
+        /// </summary>
+        public string PlaceName => visitor.PlaceName;
+        /// <summary>
+        /// PlaceProviderId
+        /// </summary>
+        public string PlaceProviderId => visitor.PlaceProviderId;
         /// <summary>
         /// Test result. Available options are in Model.TestResult
         /// </summary>
@@ -123,15 +145,15 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Time when visitor has been notified by our notification methods
         /// </summary>
-        public DateTimeOffset? ResultNotifiedAt => visitor.ResultNotifiedAt?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? ResultNotifiedAt => visitor.ResultNotifiedAt?.ToOffset(timezone);
         /// <summary>
         /// Testing set identifier
         /// </summary>
-        public string TestingSet => $"{cohash}{visitor.TestingSet}".GetSHA256Hash().Substring(0, 10);
+        public string TestingSet => visitor.TestingSet;
         /// <summary>
         /// Last change
         /// </summary>
-        public DateTimeOffset LastUpdate => visitor.LastUpdate.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset LastUpdate => visitor.LastUpdate.ToOffset(timezone);
         /// <summary>
         /// Last change
         /// </summary>
@@ -143,52 +165,59 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// If administration worker changes the data we store this information
         /// </summary>
-        public string RegistrationUpdatedByManager => $"{cohash}{visitor.RegistrationUpdatedByManager}".GetSHA256Hash().Substring(0, 10);
+        public string RegistrationUpdatedByManager => visitor.RegistrationUpdatedByManager;
         /// <summary>
         /// Registration time
         /// </summary>
-        public DateTimeOffset? RegistrationTime => visitor.RegistrationTime?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? RegistrationTime => visitor.RegistrationTime?.ToOffset(timezone);
         /// <summary>
         /// Real time when the test has been taken
         /// </summary>
-        public DateTimeOffset? TestingTime => visitor.TestingTime?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? TestingTime => visitor.TestingTime?.ToOffset(timezone);
         /// <summary>
         /// Time, when visitor has clicked that he is in the queue
         /// </summary>
-        public DateTimeOffset? Enqueued => visitor.Enqueued?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? Enqueued => visitor.Enqueued?.ToOffset(timezone);
         /// <summary>
         /// Product id
         /// </summary>
         public string Product => visitor.Product;
         /// <summary>
+        /// Product name
+        /// </summary>
+        public string ProductName => visitor.ProductName;
+        /// <summary>
         /// Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
         /// </summary>
-        public string VerificationId => $"{cohash}{visitor.VerificationId}".GetSHA256Hash().Substring(0, 10);
+        public string VerificationId => visitor.VerificationId;
         /// <summary>
         /// Captcha token. After it is used it is removed
         /// </summary>
-        public string Token => $"{cohash}{visitor.Token}".GetSHA256Hash().Substring(0, 10);
+        public string Token => visitor.Token;
         /// <summary>
         /// Time when test has been confirmed by lab
         /// </summary>
-        public DateTimeOffset? TestResultTime => visitor.TestResultTime?.ToOffset(TimeSpan.FromHours(1));
-        public DateTimeOffset? LastStatusCheck => visitor.LastStatusCheck?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? TestResultTime => visitor.TestResultTime?.ToOffset(timezone);
+        /// <summary>
+        /// Last status
+        /// </summary>
+        public DateTimeOffset? LastStatusCheck => visitor.LastStatusCheck?.ToOffset(timezone);
 
         /// <summary>
         /// Time when the result of the test was successfully sent to government system
         /// </summary>
-        public DateTimeOffset? EHealthNotifiedAt => visitor.EHealthNotifiedAt?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? EHealthNotifiedAt => visitor.EHealthNotifiedAt?.ToOffset(timezone);
         /// <summary>
         /// Time when the user was downloaded from external system
         /// </summary>
-        public DateTimeOffset? DownloadedAt => visitor.DownloadedAt?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? DownloadedAt => visitor.DownloadedAt?.ToOffset(timezone);
         /// <summary>
         /// Administration worker who has validated the person identity
         /// </summary>
-        public string VerifiedBy => $"{cohash}{visitor.VerifiedBy}".GetSHA256Hash().Substring(0, 10);
+        public string VerifiedBy => visitor.VerifiedBy;
         /// <summary>
         /// Administration worker IP adddress
         /// </summary>
-        public string VerifiedFromIP => $"{cohash}{visitor.VerifiedFromIP}".GetSHA256Hash().Substring(0, 10);
+        public string VerifiedFromIP => visitor.VerifiedFromIP;
     }
 }

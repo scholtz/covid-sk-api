@@ -608,7 +608,7 @@ namespace CovidMassTesting.Controllers
                                 continue;
                         }
 
-                        var status = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository, configuration);
+                        var status = await mojeEZdravie.SendResultToEHealth(visitor.visitor, User.GetPlaceProvider(), placeProviderRepository, configuration);
                         if (status)
                         {
                             var toUpdate = await visitorRepository.GetVisitor(visitor.Id);

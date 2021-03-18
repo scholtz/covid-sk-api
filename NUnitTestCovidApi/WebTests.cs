@@ -2634,7 +2634,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(1, noEmailSender.Data.Values.SelectMany(v => v.attachments).Count());
 
 #if DEBUG
-            var file = tuple.attachments.First();
+            var file = noEmailSender.Data.Values.SelectMany(v => v.attachments).First();
             File.WriteAllBytes($"d:/covid/{file.Filename}", Convert.FromBase64String(file.Content));
 #endif
 

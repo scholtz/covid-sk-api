@@ -4734,6 +4734,11 @@
             Chosen place
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.PlaceName">
+            <summary>
+            Name of the place
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.PlaceProviderId">
             <summary>
             ID of place provider
@@ -4794,6 +4799,7 @@
             Product id
             </summary>
         </member>
+        <!-- Badly formed XML comment ignored for member "P:CovidMassTesting.Model.Visitor.ProductName" -->
         <member name="P:CovidMassTesting.Model.Visitor.VerificationId">
             <summary>
             Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
@@ -5123,6 +5129,262 @@
             Miesto vysetrenia
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.VisitorTimezoned">
+            <summary>
+            Visitor in specified timezone
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.VisitorTimezoned.visitor">
+            <summary>
+            Parent visitor entity
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.VisitorTimezoned.#ctor(CovidMassTesting.Model.Visitor,System.TimeSpan)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="visitor"></param>
+            <param name="timezone"></param>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Id">
+            <summary>
+            Registration code. 9-digit, formatted 000-000-000 for visitors
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.PersonTrackingNumber">
+            <summary>
+            Covid pass
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Gender">
+            <summary>
+            Gender F | M
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Nationality">
+            <summary>
+            Nationality
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Language">
+            <summary>
+            Language in which we will communicate to the visitor
+            
+            sk | en
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.PersonType">
+            <summary>
+            Type of person
+            
+            idcard|child|foreign
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Passport">
+            <summary>
+            Passport number if person type is foreigner
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.RC">
+            <summary>
+            Personal number if person type is idcard or child
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.EmployeeId">
+            <summary>
+            Employee id if applicable
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.BirthDayDay">
+            <summary>
+            BirthDay - day
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.BirthDayMonth">
+            <summary>
+            BirthDay - month
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.BirthDayYear">
+            <summary>
+            BirthDay - year
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.FirstName">
+            <summary>
+            Name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.LastName">
+            <summary>
+            Last name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.ZIP">
+            <summary>
+            ZIP - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.City">
+            <summary>
+            City - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Street">
+            <summary>
+            Street - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.StreetNo">
+            <summary>
+            StreetNo - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Address">
+            <summary>
+            Address - Pernament address
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Email">
+            <summary>
+            Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Phone">
+            <summary>
+            Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Insurance">
+            <summary>
+            Insurance
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.ChosenSlot">
+            <summary>
+            Chosen time slot
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.ChosenSlotTime">
+            <summary>
+            ChosenSlotTime
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.ChosenPlaceId">
+            <summary>
+            Chosen place
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.PlaceName">
+            <summary>
+            Place name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.PlaceProviderId">
+            <summary>
+            PlaceProviderId
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Result">
+            <summary>
+            Test result. Available options are in Model.TestResult
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.ResultNotifiedAt">
+            <summary>
+            Time when visitor has been notified by our notification methods
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.TestingSet">
+            <summary>
+            Testing set identifier
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.LastUpdate">
+            <summary>
+            Last change
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.ResultNotifiedCount">
+            <summary>
+            Last change
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.SelfRegistration">
+            <summary>
+            Visitor has registered by himself
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.RegistrationUpdatedByManager">
+            <summary>
+            If administration worker changes the data we store this information
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.RegistrationTime">
+            <summary>
+            Registration time
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.TestingTime">
+            <summary>
+            Real time when the test has been taken
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Enqueued">
+            <summary>
+            Time, when visitor has clicked that he is in the queue
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Product">
+            <summary>
+            Product id
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.ProductName">
+            <summary>
+            Product name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.VerificationId">
+            <summary>
+            Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.Token">
+            <summary>
+            Captcha token. After it is used it is removed
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.TestResultTime">
+            <summary>
+            Time when test has been confirmed by lab
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.LastStatusCheck">
+            <summary>
+            Last status
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.EHealthNotifiedAt">
+            <summary>
+            Time when the result of the test was successfully sent to government system
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.DownloadedAt">
+            <summary>
+            Time when the user was downloaded from external system
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.VerifiedBy">
+            <summary>
+            Administration worker who has validated the person identity
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.VisitorTimezoned.VerifiedFromIP">
+            <summary>
+            Administration worker IP adddress
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Program">
             <summary>
             App
@@ -5346,6 +5608,12 @@
             Load PP sensitive data
             </summary>
             <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ListAll">
+            <summary>
+            List all place providers
+            </summary>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IPlaceProviderRepository.ExtendByAllProducts(System.Collections.Generic.List{CovidMassTesting.Model.PlaceProduct},CovidMassTesting.Model.PlaceProvider,System.String[])">

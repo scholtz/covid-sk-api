@@ -2468,10 +2468,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListSickVisitors {from} {count}");
-            var ret = new List<Visitor>();
+            var ret = new List<VisitorTimezoned>(); 
+            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
@@ -2497,7 +2501,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             continue;
                         }
-                        ret.Add(visitor);
+                        visitor.Extend(places, products);
+                        ret.Add(new VisitorTimezoned(visitor, offset));
                     }
                 }
             }
@@ -2511,10 +2516,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListTestedVisitors {from} {count} {day}");
-            var ret = new List<Visitor>();
+            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+            var ret = new List<VisitorTimezoned>();
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
@@ -2538,7 +2547,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                             }
                         }
 
-                        ret.Add(visitor);
+                        visitor.Extend(places, products);
+                        ret.Add(new VisitorTimezoned(visitor, offset));
                     }
                 }
             }
@@ -2730,11 +2740,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListVisitorsInProcess(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListVisitorsInProcess(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListVisitorsInProcess {from} {count}");
 
-            var ret = new List<Visitor>();
+            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+
+            var ret = new List<VisitorTimezoned>();
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
@@ -2747,7 +2762,8 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     if (visitor.Result == TestResult.TestIsBeingProcessing)
                     {
-                        ret.Add(visitor);
+                        visitor.Extend(places, products);
+                        ret.Add(new VisitorTimezoned(visitor, offset));
                     }
                 }
             }
@@ -2762,11 +2778,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListAllVisitorsWhoDidNotCome {from} {count}");
 
-            var ret = new List<Visitor>();
+            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+
+            var ret = new List<VisitorTimezoned>();
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
@@ -2781,7 +2802,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                         //&& visitor.ChosenSlot < DateTimeOffset.UtcNow.Ticks
                         )
                     {
-                        ret.Add(visitor);
+                        visitor.Extend(places, products);
+                        ret.Add(new VisitorTimezoned(visitor, offset));
                     }
                 }
             }
@@ -2796,11 +2818,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListAllVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListAllVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListAllVisitors {from} {count}");
 
-            var ret = new List<Visitor>();
+            var ret = new List<VisitorTimezoned>();
+            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
@@ -2812,7 +2837,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             continue;
                         }
-                        ret.Add(visitor);
+                        visitor.Extend(places, products);
+                        ret.Add(new VisitorTimezoned(visitor, offset));
                     }
                     catch (Exception exc)
                     {
@@ -2833,7 +2859,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<Visitor>> ListAllVisitorsAtPlace(
+        public async Task<IEnumerable<VisitorTimezoned>> ListAllVisitorsAtPlace(
             string placeId,
             DateTimeOffset fromRegTime,
             DateTimeOffset untilRegTime,
@@ -2842,8 +2868,11 @@ namespace CovidMassTesting.Repository.RedisRepository
             )
         {
             logger.LogInformation($"ListAllVisitorsAtPlace {from} {count} {placeId} {fromRegTime.ToString("R")} {untilRegTime.ToString("R")}");
+            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
 
-            var ret = new List<Visitor>();
+            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+            var ret = new List<VisitorTimezoned>();
             foreach (var visitorId in (await ListAllKeys()).OrderBy(i => i).Skip(from).Take(count))
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
@@ -2859,7 +2888,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                         && visitor.ChosenSlot < untilRegTime.ToUniversalTime().Ticks
                         )
                     {
-                        ret.Add(visitor);
+
+                        visitor.Extend(places, products);
+                        ret.Add(new VisitorTimezoned(visitor, offset));
                     }
                 }
             }

@@ -192,7 +192,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="placeProviderId"></param>
         /// <returns></returns>
         Task<PlaceProviderSensitiveData> GetPlaceProviderSensitiveData(string placeProviderId);
-
+        /// <summary>
+        /// List all place providers
+        /// </summary>
+        /// <returns></returns>
+        Task<IEnumerable<PlaceProvider>> ListAll();
         /// <summary>
         /// Add to export the all products
         /// </summary>
@@ -228,5 +232,6 @@ namespace CovidMassTesting.Repository.Interface
             }
             return ret;
         }
+
     }
 }

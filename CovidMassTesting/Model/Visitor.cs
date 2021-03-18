@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CovidMassTesting.Model
 {
@@ -114,6 +115,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string ChosenPlaceId { get; set; }
         /// <summary>
+        /// Name of the place
+        /// </summary>
+        public string PlaceName { get; set; }
+        /// <summary>
         /// ID of place provider
         /// </summary>
         public string PlaceProviderId { get; set; }
@@ -161,6 +166,9 @@ namespace CovidMassTesting.Model
         /// Product id
         /// </summary>
         public string Product { get; set; }
+        /// Name of the place
+        /// </summary>
+        public string ProductName { get; set; }
         /// <summary>
         /// Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
         /// </summary>
@@ -193,5 +201,17 @@ namespace CovidMassTesting.Model
         /// Administration worker IP adddress
         /// </summary>
         public string VerifiedFromIP { get; set; }
+
+        internal void Extend(Dictionary<string, Place> places, Dictionary<string, Product> products)
+        {
+            if (places.ContainsKey(this.ChosenPlaceId))
+            {
+                this.PlaceName = places[this.ChosenPlaceId].Name;
+            }
+            if (products.ContainsKey(this.Product))
+            {
+                this.ProductName = products[this.Product].Name;
+            }
+        }
     }
 }
