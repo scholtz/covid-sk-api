@@ -112,7 +112,7 @@ namespace CovidMassTesting.Repository.Interface
         /// Lists all tested visitors
         /// </summary>
         /// <returns></returns>
-        public Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999);
+        public Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null);
         /// <summary>
         /// ListAnonymizedVisitors
         /// </summary>

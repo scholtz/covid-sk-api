@@ -873,7 +873,67 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        [Authorize]
+        [HttpGet("CustomExport")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult> CustomExport(string exportType, [FromQuery] DateTimeOffset? day = null, [FromQuery] int from = 0, [FromQuery] int count = 9999999)
+        {
+            try
+            {
+                if (!User.IsDataExporter(userRepository, placeProviderRepository))
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Data_Exporter_role_is_allowed_to_fetch_all_sick_visitors].Value);
+                }
 
+                logger.LogInformation($"CustomExport: User {User.GetEmail()} is exporting CustomExport {exportType}");
+
+                using var stream = new MemoryStream();
+                using var writer = new StreamWriter(stream);
+                using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
+                var data = await visitorRepository.ListTestedVisitors(day, from, count, User.GetPlaceProvider());
+
+                switch (exportType)
+                {
+                    case "aures-1":
+                        var customdata = data.Select(x =>
+                            new
+                            {
+                                Prijmeni = x.LastName,
+                                Jmeno = x.FirstName,
+                                DatumNarozeni = $"{x.BirthDayDay}.{x.BirthDayMonth}.{x.BirthDayYear}",
+                                CisloPijistence = x.RC,
+                                StatPrislusnost = x.Nationality,
+                                ZdravotniPojistovna = x.Insurance,
+                                Mesto = x.City,
+                                PSC = x.ZIP,
+                                Telefon = x.Phone,
+                                Vysledek = x.Result,
+                                Poznaka = "rychlejsie.sk"
+                            });
+                        csv.WriteRecords(data);
+                        break;
+                    default:
+                        csv.WriteRecords(data);
+                        break;
+                }
+
+                writer.Flush();
+                var ret = stream.ToArray();
+                logger.LogInformation($"CustomExport: done {ret.Length}");
+                return File(ret, "text/csv", $"final-data-export-{from}-{count}.csv");
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// ListExportableDays
         /// </summary>
