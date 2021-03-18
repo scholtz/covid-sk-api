@@ -911,7 +911,7 @@ namespace CovidMassTesting.Controllers
                                 Vysledek = x.Result,
                                 Poznaka = "rychlejsie.sk"
                             });
-                        csv.WriteRecords(data);
+                        csv.WriteRecords(customdata);
                         break;
                     default:
                         csv.WriteRecords(data);
