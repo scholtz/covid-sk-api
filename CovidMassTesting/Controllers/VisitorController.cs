@@ -10,6 +10,7 @@ using SlugGenerator;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
@@ -326,6 +327,7 @@ namespace CovidMassTesting.Controllers
                         throw new Exception("Zadajte platné osobné číslo zamestnanca aj posledné štyri číslice z rodného čísla");
                     }
                 }
+                visitor.EmployeeId = reg.CompanyIdentifiers?.Where(c => !string.IsNullOrEmpty(c.EmployeeId))?.FirstOrDefault()?.EmployeeId;
                 visitor.PersonType = string.IsNullOrEmpty(reg.PersonType) ? "idcard" : reg.PersonType;
                 visitor.FirstName = reg.FirstName;
                 visitor.LastName = reg.LastName;
@@ -413,6 +415,7 @@ namespace CovidMassTesting.Controllers
                     throw new Exception("Zadajte platné osobné číslo zamestnanca");
                 }
 
+                visitor.EmployeeId = reg.CompanyIdentifiers?.Where(c => !string.IsNullOrEmpty(c.EmployeeId))?.FirstOrDefault()?.EmployeeId;
                 visitor.FirstName = reg.FirstName;
                 visitor.LastName = reg.LastName;
                 visitor.BirthDayDay = reg.BirthDayDay;
@@ -775,6 +778,7 @@ namespace CovidMassTesting.Controllers
                 var visitor = new Visitor()
                 {
                 };
+                visitor.EmployeeId = reg.CompanyIdentifiers?.Where(c => !string.IsNullOrEmpty(c.EmployeeId))?.FirstOrDefault()?.EmployeeId;
                 visitor.Result = TestResult.TestIsBeingProcessing;
                 visitor.PersonType = string.IsNullOrEmpty(reg.PersonType) ? "idcard" : reg.PersonType;
                 visitor.FirstName = reg.FirstName;
