@@ -990,6 +990,65 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+
+        [HttpPost("FixConnectVisitorsWithEmployeeId")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> FixConnectVisitorsWithEmployeeId()
+        {
+            try
+            {
+                var ret = 0;
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
+                logger.LogInformation($"FixConnectVisitorsWithEmployeeId");
+
+                var registrations = await visitorRepository.ExportRegistrations(placeProviderId: User.GetPlaceProvider());
+                var visitors = await visitorRepository.ListAllVisitorsOrig();
+                foreach (var visitor in visitors)
+                {
+                    var updated = false;
+                    var employee = registrations.FirstOrDefault(r => r.RC == visitor.RC);
+                    if (employee == null) continue;
+                    if (string.IsNullOrEmpty(visitor.Nationality))
+                    {
+                        if (!string.IsNullOrEmpty(employee.Nationality))
+                        {
+                            visitor.Nationality = employee.Nationality;
+                            updated = true;
+                        }
+                    }
+                    var employeeId = employee.CompanyIdentifiers?.Select(r => r.EmployeeId)?.FirstOrDefault();
+                    if (string.IsNullOrEmpty(visitor.EmployeeId))
+                    {
+                        if (!string.IsNullOrEmpty(employeeId))
+                        {
+                            visitor.EmployeeId = employeeId;
+                            updated = true;
+                        }
+                    }
+
+                    if (updated)
+                    {
+                        logger.LogInformation($"Fixing user {visitor.Id}");
+                        await visitorRepository.SetVisitor(visitor, false);
+                        ret++;
+                    }
+                }
+                logger.LogInformation($"FixConnectVisitorsWithEmployeeId done {ret}");
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
         /// <summary>
         /// Fix verification data
         /// </summary>

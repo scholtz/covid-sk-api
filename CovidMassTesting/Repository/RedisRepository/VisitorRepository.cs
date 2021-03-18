@@ -2862,6 +2862,34 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+        public async Task<IEnumerable<Visitor>> ListAllVisitorsOrig(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        {
+            logger.LogInformation($"ListAllVisitors {from} {count}");
+
+            var ret = new List<Visitor>();
+            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    try
+                    {
+                        var visitor = await GetVisitor(visitorIdInt, false, true);
+                        if (visitor == null)
+                        {
+                            continue;
+                        }
+                        ret.Add(visitor);
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, $"ListAllVisitors: Unable to get visitor {visitorId}");
+                    }
+                }
+            }
+            logger.LogInformation($"ListAllVisitors {from} {count} END - {ret.Count}");
+
+            return ret;
+        }
         /// <summary>
         /// Visitors at place
         /// </summary>
