@@ -892,7 +892,7 @@ namespace CovidMassTesting.Controllers
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
                 var data = await visitorRepository.ListTestedVisitors(day, from, count, User.GetPlaceProvider());
-
+                logger.LogInformation($"Found: {data.Count()} records");
                 switch (exportType)
                 {
                     case "aures-1":

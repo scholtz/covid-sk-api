@@ -100,7 +100,7 @@ namespace CovidMassTesting.Controllers.Email
                     return false;
                 }
                 logger.LogInformation($"Sending {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
-                if (!Name2Id.ContainsKey(data.TemplateId))
+                if (string.IsNullOrEmpty(data.TemplateId) || !Name2Id.ContainsKey(data.TemplateId))
                 {
                     System.Console.WriteLine($"Template not found: {data.TemplateId}: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
                     return false;
