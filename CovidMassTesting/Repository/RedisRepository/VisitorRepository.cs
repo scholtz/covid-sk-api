@@ -2471,7 +2471,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<IEnumerable<VisitorTimezoned>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListSickVisitors {from} {count}");
-            var ret = new List<VisitorTimezoned>(); 
+            var ret = new List<VisitorTimezoned>();
             var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
             var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
 
@@ -2612,13 +2612,14 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
+        /// <param name="placeProviderId"></param>
         /// <param name="filterPlaces"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999, HashSet<string> filterPlaces = null)
+        public async Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null)
         {
-            if (filterPlaces is null)
+            if (placeProviderId is null)
             {
-                throw new ArgumentNullException(nameof(filterPlaces));
+                throw new ArgumentNullException(nameof(placeProviderId));
             }
 
             logger.LogInformation($"ProofOfWorkExport {from} {count}");
@@ -2633,7 +2634,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         continue;
                     }
 
-                    if (!filterPlaces.Contains(visitor.ChosenPlaceId))
+                    if (visitor.PlaceProviderId != placeProviderId)
                     {
                         continue;
                     }

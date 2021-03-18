@@ -159,9 +159,9 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
-        /// <param name="filterPlaces"></param>
+        /// <param name="placeProviderId"></param>
         /// <returns></returns>
-        public Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999, HashSet<string> filterPlaces = null);
+        public Task<IEnumerable<VisitorSimplified>> ProofOfWorkExport(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null);
 
         /// <summary>
         /// ListExportableDays

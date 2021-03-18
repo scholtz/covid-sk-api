@@ -855,8 +855,7 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
-                var data = await visitorRepository.ProofOfWorkExport(day, from, count, places);
+                var data = await visitorRepository.ProofOfWorkExport(day, from, count, User.GetPlaceProvider());
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
