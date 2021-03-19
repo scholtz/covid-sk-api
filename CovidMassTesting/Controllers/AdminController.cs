@@ -1050,6 +1050,34 @@ namespace CovidMassTesting.Controllers
         }
 
         /// <summary>
+        /// Global admin method to reset all registrations
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("DeleteAllRegistrations")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> DeleteAllRegistrations()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
+                logger.LogInformation($"DeleteAllRegistrations by {User.GetEmail()}");
+                var ret = await visitorRepository.DropAllRegistrations();
+                logger.LogInformation($"DeleteAllRegistrations done {ret}");
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// Fix verification data
         /// </summary>
         /// <returns></returns>

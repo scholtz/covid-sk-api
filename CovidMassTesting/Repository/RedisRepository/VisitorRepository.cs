@@ -1256,6 +1256,20 @@ namespace CovidMassTesting.Repository.RedisRepository
             return redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
         }
         /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public async virtual Task<int> DropAllRegistrations()
+        {
+            var ret = 0;
+            foreach (var item in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}"))
+            {
+                await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_REGISTATION_OBJECTS}", item);
+                ret++;
+            }
+            return ret;
+        }
+        /// <summary>
         /// Increment stats
         /// </summary>
         /// <param name="statsType">Model.StatsType.*</param>
