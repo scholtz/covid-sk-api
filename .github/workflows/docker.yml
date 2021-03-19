@@ -10,6 +10,10 @@ jobs:
         name: Checkout
         uses: actions/checkout@v2
       -
+        uses: actions/set-timezone-action@v1.1
+        with:
+          timezoneLinux: "Europe/Bratislava"        
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       -
