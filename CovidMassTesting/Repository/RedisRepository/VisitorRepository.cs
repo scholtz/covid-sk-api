@@ -134,11 +134,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+            if (place == null)
+            {
+                logger.LogInformation("Place is null");
+            }
             var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
             await MapDayToVisitorCode(slot.TestingDayId, visitor.Id);
 
             if (notify)
             {
+                logger.LogInformation("notifying..");
                 var oldCulture = CultureInfo.CurrentCulture;
                 var oldUICulture = CultureInfo.CurrentUICulture;
                 var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
@@ -176,7 +181,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                         Name = $"{visitor.FirstName} {visitor.LastName}",
                         Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                        Place = place.Name,
+                        Place = place?.Name,
                         PlaceDescription = place.Description
                     }, attachments);
 
@@ -188,7 +193,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                             $"{visitor.FirstName} {visitor.LastName}",
                             $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
-                            place.Name
+                            place?.Name
                     )));
                 }
                 CultureInfo.CurrentCulture = oldCulture;
