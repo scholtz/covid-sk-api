@@ -173,6 +173,7 @@ namespace CovidMassTesting.Controllers
                 }
 
                 var place = await placeRepository.GetPlace(placeId);
+                if (place == null) throw new Exception("Place must not be null");
                 switch (type)
                 {
                     case "Registrations":
@@ -531,7 +532,6 @@ namespace CovidMassTesting.Controllers
                 {
                     var visitor = await visitorRepository.GetVisitor(codeInt);
                     if (visitor == null) throw new Exception("Visitor not found");
-                    var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
                     var ret = await mojeEZdravie.SendResultToEHealth(visitor, User.GetPlaceProvider(), placeProviderRepository, configuration);
                     if (ret)
                     {
@@ -539,10 +539,10 @@ namespace CovidMassTesting.Controllers
                         visitor.EHealthNotifiedAt = DateTimeOffset.UtcNow;
                         if (!visitor.ResultNotifiedAt.HasValue)
                         {
-                            await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                            await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                         }
                         visitor.ResultNotifiedAt = visitor.EHealthNotifiedAt;
-                        await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                        await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                         await visitorRepository.SetVisitor(visitor, false);
                         logger.LogInformation($"Visitor notified by eHealth {visitor.Id} {visitor.RC.GetSHA256Hash()}");
                     }
@@ -613,13 +613,12 @@ namespace CovidMassTesting.Controllers
                         {
                             var toUpdate = await visitorRepository.GetVisitor(visitor.Id);
                             toUpdate.EHealthNotifiedAt = DateTimeOffset.UtcNow;
-                            var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
                             if (!visitor.ResultNotifiedAt.HasValue)
                             {
-                                await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, place.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                                await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
                             }
                             toUpdate.ResultNotifiedAt = toUpdate.EHealthNotifiedAt;
-                            await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, place.PlaceProviderId, toUpdate.ResultNotifiedAt.Value);
+                            await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, toUpdate.ResultNotifiedAt.Value);
                             await visitorRepository.SetVisitor(toUpdate, false);
                             logger.LogInformation($"Visitor notified by eHealth {toUpdate.Id} {toUpdate.RC.GetSHA256Hash()}");
                             ret++;

@@ -1085,7 +1085,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             //var product = await placeRepository.GetPlaceProduct();
-            var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+            var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId ?? place.PlaceProviderId);
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
             var oversight = GetOversight(place, visitor.TestingTime);
             return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, true, oversight);
@@ -1133,7 +1133,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
             //var product = await placeRepository.GetPlaceProduct();
-            var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
+            var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId ?? place?.PlaceProviderId);
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
             var oversight = GetOversight(place, visitor.TestingTime);
 
@@ -3984,6 +3984,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         }
 
                         var place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                        if (place == null) continue;
                         var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
 
                         var oldCulture = CultureInfo.CurrentCulture;
