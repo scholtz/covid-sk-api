@@ -1064,7 +1064,7 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(registered.Count >= 2);
             var sms = noSMSSender.Data.Values.First();
             var text = sms.data.GetText();
-            Assert.IsTrue(text.Contains(minute.Description));
+            Assert.IsTrue(text.Contains(minute.Description), $"{text} does not contain {minute.Description}");
 
             var registrationManager = users.First(u => u.Name == "MedicTester");
             request = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
