@@ -1019,7 +1019,10 @@ namespace CovidMassTesting.Controllers
                     }
                     else
                     {
+                        reg.Id = old.Id;
                         reg.Created = old.Created;
+                        reg.CustomEmail = old.CustomEmail;
+                        reg.CustomPhone = old.CustomPhone;
                     }
 
                     reg = await visitorRepository.SetRegistration(reg, false);
