@@ -1013,18 +1013,18 @@ namespace CovidMassTesting.Controllers
                     var updated = false;
                     var employee = registrations.FirstOrDefault(r => r.RC == visitor.RC);
                     if (employee == null) continue;
-                    if (string.IsNullOrEmpty(visitor.Nationality))
+                    if (!string.IsNullOrEmpty(employee.Nationality))
                     {
-                        if (!string.IsNullOrEmpty(employee.Nationality))
+                        if (visitor.Nationality != employee.Nationality)
                         {
                             visitor.Nationality = employee.Nationality;
                             updated = true;
                         }
                     }
                     var employeeId = employee.CompanyIdentifiers?.Select(r => r.EmployeeId)?.FirstOrDefault();
-                    if (string.IsNullOrEmpty(visitor.EmployeeId))
+                    if (!string.IsNullOrEmpty(employeeId))
                     {
-                        if (!string.IsNullOrEmpty(employeeId))
+                        if (visitor.EmployeeId != employeeId)
                         {
                             visitor.EmployeeId = employeeId;
                             updated = true;
