@@ -138,8 +138,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 logger.LogInformation("Place is null");
             }
-            var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
-            await MapDayToVisitorCode(slot.TestingDayId, visitor.Id);
+            //var slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
+            await MapDayToVisitorCode(visitor.ChosenSlotTime.RoundDay(), visitor.Id);
 
             if (notify)
             {
@@ -163,7 +163,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                     {
                         Content = Convert.ToBase64String(pdf),
-                        Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{slot.TimeInCET.ToString("MMdd")}.pdf",
+                        Filename = $"reg-{visitor.LastName}{visitor.FirstName}-{visitor.ChosenSlotTime.ToLocalOffset().ToString("MMdd")}.pdf",
                         Type = "application/pdf",
                         Disposition = "attachment"
                     });
@@ -180,7 +180,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                         Name = $"{visitor.FirstName} {visitor.LastName}",
-                        Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                        Date = $"{visitor.ChosenSlotTime.ToLocalOffset().ToString("dd.MM.yyyy")} {visitor.ChosenSlotTime.ToLocalOffset()} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalOffset()}",
                         Place = place?.Name,
                         PlaceDescription = place.Description
                     }, attachments);
@@ -192,7 +192,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_,
                             $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                             $"{visitor.FirstName} {visitor.LastName}",
-                            $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}",
+                            $"{visitor.ChosenSlotTime.ToLocalOffset().ToString("dd.MM.yyyy")} {visitor.ChosenSlotTime.ToLocalOffset()} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalOffset()}",
                             place?.Name
                     )));
                 }

@@ -415,7 +415,7 @@ namespace CovidMassTesting.Controllers
                         }
 
                         var hours = "";
-                        var dayTicks = DateTimeOffset.Parse(action.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
+                        var dayTicks = action.Date.RoundDay();// DateTimeOffset.Parse(action.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
                         if (action.Type == "set")
                         {
                             if (action.OpeningHoursTemplateId == 1)
