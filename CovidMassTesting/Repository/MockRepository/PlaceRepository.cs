@@ -55,7 +55,7 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             if (string.IsNullOrEmpty(placeId))
             {
-                throw new ArgumentException($"'{nameof(placeId)}' cannot be null or empty", nameof(placeId));
+                return null;
             }
 
             return data[placeId];

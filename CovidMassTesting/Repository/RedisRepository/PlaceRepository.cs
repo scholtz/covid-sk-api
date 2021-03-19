@@ -112,9 +112,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="placeId"></param>
         /// <returns></returns>
-        public virtual Task<Place> GetPlace(string placeId)
+        public virtual async Task<Place> GetPlace(string placeId)
         {
-            return redisCacheClient.Db0.HashGetAsync<Place>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", placeId);
+            if (string.IsNullOrEmpty(placeId)) return null;
+            return await redisCacheClient.Db0.HashGetAsync<Place>($"{configuration["db-prefix"]}{REDIS_KEY_PLACES_OBJECTS}", placeId);
         }
         /// <summary>
         /// List all
