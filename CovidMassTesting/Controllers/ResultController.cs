@@ -909,7 +909,7 @@ namespace CovidMassTesting.Controllers
                                 PSC = x.ZIP,
                                 Telefon = x.Phone,
                                 Vysledek = x.Result,
-                                Poznaka = "rychlejsie.sk"
+                                Poznaka = $"{x.EmployeeId}|{x.PlaceName}|{x.ProductName}|rychlejsie.sk"
                             });
                         csv.WriteRecords(customdata);
                         break;
