@@ -264,6 +264,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.DeleteAllRegistrations">
+            <summary>
+            Global admin method to reset all registrations
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.FixSendRegistrationSMS">
             <summary>
             Fix verification data
@@ -1484,6 +1490,25 @@
             Format passport, covid pass and other documents to the standardized form
             </summary>
             <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Helpers.TimeHelper">
+            <summary>
+            Time helpers 
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.TimeHelper.RoundDay(System.DateTimeOffset)">
+            <summary>
+            Rounds to day
+            </summary>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.TimeHelper.ToLocalOffset(System.DateTimeOffset)">
+            <summary>
+            Set time to local offset
+            </summary>
+            <param name="time"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Helpers.Validators">
@@ -6118,7 +6143,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String)">
             <summary>
             Lists all tested visitors
             </summary>
@@ -6151,6 +6176,15 @@
             <param name="count"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListAllVisitorsOrig(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+            <summary>
+            ListAllVisitorsOrig
+            </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListAllVisitorsAtPlace(System.String,System.DateTimeOffset,System.DateTimeOffset,System.Int32,System.Int32)">
             <summary>
             List all at place
@@ -6162,14 +6196,14 @@
             <param name="count"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.Collections.Generic.HashSet{System.String})">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String)">
             <summary>
             ProofOfWorkExport
             </summary>
             <param name="day"></param>
             <param name="from"></param>
             <param name="count"></param>
-            <param name="filterPlaces"></param>
+            <param name="placeProviderId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListExportableDays">
@@ -6414,6 +6448,12 @@
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllStats">
             <summary>
             Reset the stats
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllRegistrations">
+            <summary>
+            Global admin task to reset registrations
             </summary>
             <returns></returns>
         </member>
@@ -6900,6 +6940,12 @@
         <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.DropAllStats">
             <summary>
             Reset stats
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.DropAllRegistrations">
+            <summary>
+            Drop all registrations
             </summary>
             <returns></returns>
         </member>
@@ -7947,6 +7993,12 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.DropAllRegistrations">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetPPStats(System.String,System.String)">
             <summary>
             Increment stats
@@ -8094,7 +8146,7 @@
             <param name="count"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String)">
             <summary>
             List visitors who has passed the test
             </summary>
@@ -8118,13 +8170,14 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.Collections.Generic.HashSet{System.String})">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ProofOfWorkExport(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String)">
             <summary>
             Export for institution that pays for the tests
             </summary>
             <param name="day"></param>
             <param name="from"></param>
             <param name="count"></param>
+            <param name="placeProviderId"></param>
             <param name="filterPlaces"></param>
             <returns></returns>
         </member>

@@ -180,7 +180,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         Code = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                         Name = $"{visitor.FirstName} {visitor.LastName}",
-                        Date = $"{visitor.ChosenSlotTime.ToLocalOffset().ToString("dd.MM.yyyy")} {visitor.ChosenSlotTime.ToLocalOffset()} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalOffset()}",
+                        Date = $"{visitor.ChosenSlotTime.ToLocalOffset().ToString("dd.MM.yyyy")} {visitor.ChosenSlotTime.ToLocalOffset().ToString("HH:mm")} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalOffset().ToString("HH:mm")}",
                         Place = place?.Name,
                         PlaceDescription = place.Description
                     }, attachments);
@@ -192,7 +192,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Repository_RedisRepository_VisitorRepository.Dear__0____1__is_your_registration_code__Show_this_code_at_the_covid_sampling_place__3__on__2_,
                             $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}",
                             $"{visitor.FirstName} {visitor.LastName}",
-                            $"{visitor.ChosenSlotTime.ToLocalOffset().ToString("dd.MM.yyyy")} {visitor.ChosenSlotTime.ToLocalOffset()} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalOffset()}",
+                            $"{visitor.ChosenSlotTime.ToLocalOffset().ToString("dd.MM.yyyy")} {visitor.ChosenSlotTime.ToLocalOffset().ToString("HH:mm")} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalOffset().ToString("HH:mm")}",
                             place?.Name
                     )));
                 }
