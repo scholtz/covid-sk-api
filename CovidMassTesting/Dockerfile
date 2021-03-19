@@ -11,6 +11,8 @@ COPY . .
 RUN apt-get update && apt dist-upgrade -y && apt-get install -y libgdiplus
 RUN dotnet restore "CovidMassTesting.sln"
 RUN dotnet build "CovidMassTesting.sln" -c Release -o /app/build
+ENV TZ=Europe/Bratislava
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN dotnet test "CovidMassTesting.sln" -c Release 
 
 FROM build AS publish
