@@ -2166,16 +2166,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (previous.TestingTime.HasValue)
                     {
                         // self registration after has been tested
-                        if (previous.Result == TestResult.PositiveCertificateTaken ||
+                        if ((previous.Result == TestResult.PositiveCertificateTaken ||
                             previous.Result == TestResult.PositiveWaitingForCertificate
-                            )
+                            ) &&
+                            previous.TestingTime.Value.AddDays(3) > DateTimeOffset.Now)
                         {
-                            throw new Exception("Prosím, zostaňte doma. Váš predchádzajúci test preukázal prítomnosť covidu.");
-                        }
-
-                        if (previous.TestingTime.Value.AddDays(2) > DateTimeOffset.Now)
-                        {
-                            throw new Exception("Na test sa môžete zaregistrovať najskôr za 2 dni");
+                            throw new Exception("Ako pozitívny sa môžete zaregistrovať najskôr za 3 dni");
                         }
                         else
                         {
