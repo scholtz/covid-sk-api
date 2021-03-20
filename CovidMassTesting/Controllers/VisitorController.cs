@@ -708,12 +708,10 @@ namespace CovidMassTesting.Controllers
                     throw new ArgumentException($"'{nameof(result)}' must be positive or negative", nameof(result));
                 }
 
-                if (!User.IsRegistrationManager(userRepository, placeProviderRepository)
-                    && !User.IsMedicTester(userRepository, placeProviderRepository))
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository))
                 {
-                    throw new Exception("Only user with Registration Manager role or Medic Tester role is allowed to register user at the place");
+                    throw new Exception("Only user with Document Manager role is allowed to register self tests and external tests");
                 }
-
 
 
                 var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
