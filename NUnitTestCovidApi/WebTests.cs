@@ -3182,6 +3182,43 @@ namespace NUnitTestCovidApi
             request = RegisterEmployeeByDocumenter(client, "100", "ludovit@scholtz.sk", "+421907000000", DateTimeOffset.Now.AddDays(-1), product.Id, TestResult.PositiveWaitingForCertificate);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, noSMSSender.Data.Count);
+
+
+            stream1 = new MemoryStream(Encoding.UTF8.GetBytes("Meno;Priezvisko;Dátum narodenia;Rodné číslo;Ulica a číslo domu;Súpisné číslo;Orientačné číslo;Miesto;Pošt.smer.č./miesto;e-mail;Telefónne číslo;Osobné číslo\n" +
+                "Meno2;Priezvisko2;01/01/2000;0001010009;Ulica;1;2;Poprad;058 01;test@rychlejsie.sk;0903000000;100"
+            ));
+            using var formData2 = new MultipartFormDataContent();
+            using var content2 = new StreamContent(stream1);
+            formData2.Add(content2, "files", "upload.csv");
+            response = await client.PostAsync("Visitor/UploadEmployees", formData2);
+            response.EnsureSuccessStatusCode();
+            responseString = await response.Content.ReadAsStringAsync();
+
+            Assert.AreEqual(responseString, "1");
+
+
+
+
+            var dataexporter = users.First(u => u.Name == "DataExporter");
+            response = InviteUserToPP(client, dataexporter.Email, "Person 2", "+421 907 000 000", "MyMessage");
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
+
+            response = AuthenticateUser(client, dataexporter.Email, dataexporter.Password);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
+            var dataExporterToken = response.Content.ReadAsStringAsync().Result;
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {dataExporterToken}");
+
+            request = CompanyRegistrationsExport(client, 0, 100);
+            var stream = new MemoryStream();
+            request.Content.CopyToAsync(stream).Wait();
+            var resultExport = Encoding.UTF8.GetString(stream.ToArray());
+            Assert.IsNotNull(resultExport);
+            Assert.IsTrue(resultExport.Contains("Meno2"));
+            Assert.IsTrue(resultExport.Contains("Priezvisko2"));
+            Assert.IsTrue(resultExport.Contains("100"));
+
         }
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {

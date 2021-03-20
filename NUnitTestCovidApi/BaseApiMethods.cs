@@ -454,6 +454,13 @@ namespace NUnitTestCovidApi
             client.DefaultRequestHeaders.Accept.Clear();
             return ret;
         }
+        protected HttpResponseMessage CompanyRegistrationsExport(HttpClient client, int from, int count)
+        {
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/csv"));
+            var ret = client.GetAsync($"User/CompanyRegistrationsExport?from={from}&count={count}").Result;
+            client.DefaultRequestHeaders.Accept.Clear();
+            return ret;
+        }
         protected HttpResponseMessage ProofOfWorkExport(HttpClient client, int from, int count)
         {
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("text/csv"));
