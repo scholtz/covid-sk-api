@@ -1160,7 +1160,9 @@ namespace CovidMassTesting.Controllers
                 {
                     if (!string.IsNullOrEmpty(result.TestingSetId) && visitors.ContainsKey(result.TestingSetId))
                     {
-                        if (visitors[result.TestingSetId].Result == TestResult.TestIsBeingProcessing)
+                        if (visitors[result.TestingSetId].Result == TestResult.TestIsBeingProcessing
+                            || !visitors[result.TestingSetId].ResultNotifiedAt.HasValue
+                            )
                         {
                             await visitorRepository.AddToResultQueue(result.Id);
                             ret++;
