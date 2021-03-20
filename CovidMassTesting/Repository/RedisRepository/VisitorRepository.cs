@@ -2530,8 +2530,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
+        /// <param name="placeProviderId"></param>
+        /// <param name="silent"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null)
+        public async Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null, bool silent = false)
         {
             var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
             var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
@@ -2543,7 +2545,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt, false, true);
+                    var visitor = await GetVisitor(visitorIdInt, false, silent);
                     if (visitor == null)
                     {
                         output.Append("X");

@@ -1131,6 +1131,55 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// List all result submissions, if visitor is still in not processed state, add the result submission to the queue
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("RequeeUnprocessedVisitors")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<int>> RequeeUnprocessedVisitors()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
+                }
+
+                logger.LogInformation($"RequeeUnprocessedVisitors");
+                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
+                var results = await visitorRepository.ExportResultSubmissions(places: places);
+                var tested = await visitorRepository.ListTestedVisitors(DateTimeOffset.Now, placeProviderId: User.GetPlaceProvider(), silent: true);
+                var visitors = new Dictionary<string, VisitorTimezoned>();
+                foreach (var visitor in tested.OrderBy(t => t.LastUpdate))
+                {
+                    visitors[visitor.TestingSet] = visitor;
+                }
+                var ret = 0;
+                foreach (var result in results)
+                {
+                    if (!string.IsNullOrEmpty(result.TestingSetId) && visitors.ContainsKey(result.TestingSetId))
+                    {
+                        if (visitors[result.TestingSetId].Result == TestResult.TestIsBeingProcessing)
+                        {
+                            await visitorRepository.AddToResultQueue(result.Id);
+                            ret++;
+                        }
+                    }
+                }
+                logger.LogInformation($"RequeeUnprocessedVisitors done {ret}");
+
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
+        /// <summary>
         /// Fix verification data
         /// </summary>
         /// <returns></returns>

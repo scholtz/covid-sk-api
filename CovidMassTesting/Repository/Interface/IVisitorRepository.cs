@@ -111,8 +111,13 @@ namespace CovidMassTesting.Repository.Interface
         /// <summary>
         /// Lists all tested visitors
         /// </summary>
+        /// <param name="day"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <param name="placeProviderId"></param>
+        /// <param name="silent"></param>
         /// <returns></returns>
-        public Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null);
+        public Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null, bool silent = false);
         /// <summary>
         /// ListAnonymizedVisitors
         /// </summary>
@@ -392,5 +397,11 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<int> DropAllRegistrations();
+        /// <summary>
+        /// AddToResultQueue
+        /// </summary>
+        /// <param name="resultId"></param>
+        /// <returns></returns>
+        public Task<bool> AddToResultQueue(string resultId);
     }
 }
