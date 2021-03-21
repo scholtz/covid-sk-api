@@ -26,6 +26,8 @@ jobs:
         with:
           username: scholtz2
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Set current date as env variable
+        run: echo "NOW::$(date +'%Y-%m-%d')" >> $GITHUB_ENV
       -
         name: Build and push
         uses: docker/build-push-action@v2
@@ -35,4 +37,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            scholtz2/mass-covid-testing-api:latest scholtz2/mass-covid-testing-api:$(date +'%Y-%m-%d') scholtz2/mass-covid-testing-api:$(date +'%Y-%m-%d-%H')
+            scholtz2/mass-covid-testing-api:latest scholtz2/mass-covid-testing-api:${{ env.NOW }}
