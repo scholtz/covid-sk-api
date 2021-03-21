@@ -282,6 +282,18 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.DeleteOldVisitors(System.Nullable{System.Int32})">
+            <summary>
+            Fix verification data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.RequeeUnprocessedVisitors">
+            <summary>
+            List all result submissions, if visitor is still in not processed state, add the result submission to the queue
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.GetVisitorCodeFromTestCode(System.String)">
             <summary>
             Fix verification data
@@ -6143,10 +6155,15 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String,System.Boolean)">
             <summary>
             Lists all tested visitors
             </summary>
+            <param name="day"></param>
+            <param name="from"></param>
+            <param name="count"></param>
+            <param name="placeProviderId"></param>
+            <param name="silent"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ListAnonymizedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
@@ -6455,6 +6472,20 @@
             <summary>
             Global admin task to reset registrations
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.AddToResultQueue(System.String)">
+            <summary>
+            AddToResultQueue
+            </summary>
+            <param name="resultId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DeleteOldVisitors(System.Int32)">
+            <summary>
+            Delete visitors older then N days
+            </summary>
+            <param name="daysToKeep"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
@@ -8146,13 +8177,15 @@
             <param name="count"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListTestedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32,System.String,System.Boolean)">
             <summary>
             List visitors who has passed the test
             </summary>
             <param name="day"></param>
             <param name="from"></param>
             <param name="count"></param>
+            <param name="placeProviderId"></param>
+            <param name="silent"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ListAnonymizedVisitors(System.Nullable{System.DateTimeOffset},System.Int32,System.Int32)">
@@ -8368,6 +8401,13 @@
             
             tries to match visitors by name with the test results list 
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.DeleteOldVisitors(System.Int32)">
+            <summary>
+            Removes old tests from the system
+            </summary>
+            <param name="daysToKeep"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Resources.Controllers_AdminController">
@@ -8868,6 +8908,31 @@
             <summary>
               Looks up a localized string similar to You can remove only first item from the queue.
             </summary>
+        </member>
+        <member name="T:CovidMassTesting.ScheduledTasks.DeleteOldVisitors">
+            <summary>
+            Export task
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.ScheduledTasks.DeleteOldVisitors.#ctor(Microsoft.Extensions.Logging.ILogger{CovidMassTesting.ScheduledTasks.ExportTask},Microsoft.Extensions.Configuration.IConfiguration,CovidMassTesting.Repository.Interface.IVisitorRepository)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="logger"></param>
+            <param name="configuration"></param>
+            <param name="visitorRepository"></param>
+        </member>
+        <member name="M:CovidMassTesting.ScheduledTasks.DeleteOldVisitors.Process">
+            <summary>
+            Process
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.ScheduledTasks.DeleteOldVisitors.Process(System.Int32)">
+            <summary>
+            Export data and send it to configured email
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.ScheduledTasks.ExportTask">
             <summary>

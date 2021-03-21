@@ -4077,5 +4077,50 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return true;
         }
+        /// <summary>
+        /// Removes old tests from the system
+        /// </summary>
+        /// <param name="daysToKeep"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteOldVisitors(int daysToKeep)
+        {
+            logger.LogInformation($"DeleteOldVisitors {daysToKeep}");
+
+            int ret = 0;
+            foreach (var visitorId in await ListAllKeys())
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    try
+                    {
+                        var visitor = await GetVisitor(visitorIdInt, false, true);
+                        if (visitor == null)
+                        {
+                            continue;
+                        }
+
+                        var decisionTime = DateTimeOffset.Now.AddDays(-1 * Math.Abs(daysToKeep));
+
+                        if (visitor.LastUpdate < decisionTime ||
+                           (visitor.TestingTime.HasValue && visitor.TestingTime.Value < decisionTime)
+                            )
+                        {
+                            // delete visitor
+                            logger.LogInformation($"Removing visitor {visitorId}");
+                            await Remove(visitor.Id);
+                            ret++;
+                        }
+
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, $"ListAllVisitors: Unable to get visitor {visitorId}");
+                    }
+                }
+            }
+            logger.LogInformation($"DeleteOldVisitors done {ret}");
+
+            return ret;
+        }
     }
 }

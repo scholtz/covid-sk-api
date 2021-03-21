@@ -3220,6 +3220,36 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(resultExport.Contains("100"));
 
         }
+
+        [Test]
+        public async Task TestDeleteVisitors()
+        {
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var visitorRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IVisitorRepository>();
+            await visitorRepository.SetVisitor(new Visitor()
+            {
+                Id = 123,
+                FirstName = "A",
+                TestingTime = DateTimeOffset.Now.AddDays(-15)
+            }, false);
+
+            await visitorRepository.SetVisitor(new Visitor()
+            {
+                Id = 124,
+                FirstName = "B",
+                TestingTime = DateTimeOffset.Now.AddDays(-13)
+            }, false);
+
+            var ret = await visitorRepository.DeleteOldVisitors(14);
+            Assert.AreEqual(1, ret);
+
+            var all = await visitorRepository.ListAllVisitors();
+            Assert.AreEqual(1, all.Count());
+            Assert.AreEqual(124, all.FirstOrDefault().Id);
+            Assert.AreEqual("B", all.FirstOrDefault().FirstName);
+        }
+
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;
