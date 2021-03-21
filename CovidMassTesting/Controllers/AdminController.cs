@@ -1131,34 +1131,6 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
-        /// Fix verification data
-        /// </summary>
-        /// <returns></returns>
-        [HttpPost("DeleteOldVisitors")]
-        [ProducesResponseType(200)]
-        [ProducesResponseType(400)]
-        public async Task<ActionResult<int>> DeleteOldVisitors([FromForm] int? days = 14)
-        {
-            try
-            {
-                if (!User.IsAdmin(userRepository))
-                {
-                    throw new Exception(localizer[Controllers_AdminController.Only_admin_is_allowed_to_manage_time].Value);
-                }
-                if (!days.HasValue) days = 14;
-                logger.LogInformation($"DeleteOldVisitors {User.GetEmail()} {days} {DateTimeOffset.Now.AddDays(-1 * days.Value)}");
-
-                return Ok(await visitorRepository.DeleteOldVisitors(days.Value));
-            }
-            catch (Exception exc)
-            {
-                logger.LogError(exc, exc.Message);
-
-                return BadRequest(new ProblemDetails() { Detail = exc.Message });
-            }
-        }
-
-        /// <summary>
         /// List all result submissions, if visitor is still in not processed state, add the result submission to the queue
         /// </summary>
         /// <returns></returns>
