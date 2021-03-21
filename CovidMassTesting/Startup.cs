@@ -1,5 +1,6 @@
 using CovidMassTesting.Connectors;
 using CovidMassTesting.Controllers.Email;
+using CovidMassTesting.Helpers;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -379,7 +380,7 @@ namespace CovidMassTesting
                         {
                             visitorRepository.ProcessSingle().Wait();
 
-                            var random = new Random();
+                            var random = new RandomGenerator();
                             var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 2000));
                             Task.Delay(randDelay).Wait();
                             if (AppExitCancellationTokenSource.IsCancellationRequested)
