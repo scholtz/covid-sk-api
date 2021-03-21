@@ -41,4 +41,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            scholtz2/mass-covid-testing-api:latest,scholtz2/mass-covid-testing-api:${{ steps.date.outputs.date }},scholtz2/mass-covid-testing-api:${{ steps.date.outputs.datehour }}
+            scholtz2/mass-covid-testing-api:latest,scholtz2/mass-covid-testing-api:${{ steps.date.outputs.date }},scholtz2/mass-covid-testing-api:${{ steps.datehour.outputs.datehour }}
