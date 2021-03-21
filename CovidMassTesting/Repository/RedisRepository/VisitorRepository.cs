@@ -182,7 +182,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         Name = $"{visitor.FirstName} {visitor.LastName}",
                         Date = $"{visitor.ChosenSlotTime.ToLocalOffset().ToString("dd.MM.yyyy")} {visitor.ChosenSlotTime.ToLocalOffset().ToString("HH:mm")} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalOffset().ToString("HH:mm")}",
                         Place = place?.Name,
-                        PlaceDescription = place.Description
+                        PlaceDescription = place?.Description
                     }, attachments);
 
                 if (!string.IsNullOrEmpty(visitor.Phone))
@@ -1885,7 +1885,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var delay = obj.Time.AddMinutes(waitInt) - DateTimeOffset.Now;
 
 
-                var random = new Random();
+                using var random = new RandomGenerator();
                 var randDelay = TimeSpan.FromMilliseconds(random.Next(100, 1000));
                 await Task.Delay(randDelay);
 
@@ -4076,6 +4076,51 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"Fix03 Done");
 
             return true;
+        }
+        /// <summary>
+        /// Removes old tests from the system
+        /// </summary>
+        /// <param name="daysToKeep"></param>
+        /// <returns></returns>
+        public async Task<int> DeleteOldVisitors(int daysToKeep)
+        {
+            logger.LogInformation($"DeleteOldVisitors {daysToKeep}");
+
+            int ret = 0;
+            foreach (var visitorId in await ListAllKeys())
+            {
+                if (int.TryParse(visitorId, out var visitorIdInt))
+                {
+                    try
+                    {
+                        var visitor = await GetVisitor(visitorIdInt, false, true);
+                        if (visitor == null)
+                        {
+                            continue;
+                        }
+
+                        var decisionTime = DateTimeOffset.Now.AddDays(-1 * Math.Abs(daysToKeep));
+
+                        if (visitor.LastUpdate < decisionTime ||
+                           (visitor.TestingTime.HasValue && visitor.TestingTime.Value < decisionTime)
+                            )
+                        {
+                            // delete visitor
+                            logger.LogInformation($"Removing visitor {visitorId}");
+                            await Remove(visitor.Id);
+                            ret++;
+                        }
+
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, $"ListAllVisitors: Unable to get visitor {visitorId}");
+                    }
+                }
+            }
+            logger.LogInformation($"DeleteOldVisitors done {ret}");
+
+            return ret;
         }
     }
 }

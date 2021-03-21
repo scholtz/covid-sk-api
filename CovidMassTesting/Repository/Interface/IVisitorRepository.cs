@@ -403,5 +403,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="resultId"></param>
         /// <returns></returns>
         public Task<bool> AddToResultQueue(string resultId);
+        /// <summary>
+        /// Delete visitors older then N days
+        /// </summary>
+        /// <param name="daysToKeep"></param>
+        /// <returns></returns>
+        public Task<int> DeleteOldVisitors(int daysToKeep);
     }
 }
