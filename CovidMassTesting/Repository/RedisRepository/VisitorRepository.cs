@@ -727,7 +727,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
             await MapTestingSetToVisitorCode(codeInt, testCodeClear);
-            await UpdateTestingState(codeInt, TestResult.TestIsBeingProcessing, testCodeClear, true, adminWorker, ipAddress);
+            await UpdateTestingStateFull(codeInt, TestResult.TestIsBeingProcessing, testCodeClear, true, adminWorker, ipAddress);
             return testCodeClear;
         }
         /// <summary>
@@ -738,7 +738,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public Task<bool> UpdateTestingState(int code, string state)
         {
-            return UpdateTestingState(code, state, "", true, "", "");
+            return UpdateTestingStateFull(code, state, "", true, "", "");
         }
         /// <summary>
         /// Updates the visitor test result
@@ -779,7 +779,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="adminWorker"></param>
         /// <param name="ipAddress"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateTestingState(int code, string state, string testingSet = "", bool updateStats = true, string adminWorker = "", string ipAddress = "")
+        public async Task<bool> UpdateTestingStateFull(int code, string state, string testingSet = "", bool updateStats = true, string adminWorker = "", string ipAddress = "")
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await GetVisitor(code);
@@ -3626,7 +3626,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         var state = visitor.Result;
                         visitor.Result = TestResult.TestMustBeRepeated;
                         await SetVisitor(visitor, false);// save visitor state
-                        await UpdateTestingState(visitor.Id, state, "", false, "", "");
+                        await UpdateTestingStateFull(visitor.Id, state, "", false, "", "");
                         ret++;
                     }
                 }

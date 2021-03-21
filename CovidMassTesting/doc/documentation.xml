@@ -7972,7 +7972,7 @@
             <param name="isAdmin"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.String,System.Boolean,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingStateFull(System.Int32,System.String,System.String,System.Boolean,System.String,System.String)">
             <summary>
             Updates testing state
             </summary>

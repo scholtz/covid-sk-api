@@ -31,7 +31,7 @@ namespace CovidMassTesting
             }
             catch (Exception ex)
             {
-                logger.Error(ex, "Error in init");
+                logger.Error(ex, "Error in init: " + ex.Message + ex.InnerException?.Message);
             }
             finally
             {
