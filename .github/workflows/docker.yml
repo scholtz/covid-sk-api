@@ -35,4 +35,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            scholtz2/mass-covid-testing-api:latest scholtz2/mass-covid-testing-api:$(date +'%Y-%m-%d')
+            scholtz2/mass-covid-testing-api:latest scholtz2/mass-covid-testing-api:$(date +'%Y-%m-%d') scholtz2/mass-covid-testing-api:$(date +'%Y-%m-%d-%H')
