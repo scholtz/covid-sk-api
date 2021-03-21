@@ -229,6 +229,7 @@ namespace CovidMassTesting
 
 
             services.AddSingleton<ScheduledTasks.ExportTask, ScheduledTasks.ExportTask>();
+            services.AddSingleton<ScheduledTasks.DeleteOldVisitors, ScheduledTasks.DeleteOldVisitors>();
 #if DEBUG
             /*
             if (Configuration["UseMockedEHealthConnection"] == "1" || Configuration["SendResultsToEHealth"] != "1")
@@ -417,10 +418,14 @@ namespace CovidMassTesting
                 switch (Args[0])
                 {
                     case "export":
-
                         var exporter = serviceProvider.GetService<ScheduledTasks.ExportTask>();
                         var ret = exporter.Process().Result;
                         logger.LogInformation($"Export: {ret}");
+                        break;
+                    case "delete-14":
+                        var task = serviceProvider.GetService<ScheduledTasks.DeleteOldVisitors>();
+                        ret = task.Process().Result;
+                        logger.LogInformation($"DeleteOldVisitors: {ret}");
                         break;
                 }
 

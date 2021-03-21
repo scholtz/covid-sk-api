@@ -69,7 +69,7 @@ namespace CovidMassTesting.Controllers
 
             if (string.IsNullOrEmpty(configuration["DoNotUseObjCache"]))
             {
-                var rand = new Random();
+                using var rand = new RandomGenerator();
                 var limit = rand.Next(1, 5);
                 if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
                 {

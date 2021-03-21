@@ -89,10 +89,9 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var existing = await GetUser(user.Email, null);
-            if (existing?.Email == user.Email)
+            if (existing != null && existing.Email == user.Email)
             {
                 // update roles
-
                 existing.Roles = user.Roles;
                 return await SetUser(existing, false);
             }

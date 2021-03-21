@@ -380,7 +380,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             if (string.IsNullOrEmpty(configuration["DoNotUseObjCache"]))
             {
-                var rand = new Random();
+                using var rand = new RandomGenerator();
                 var limit = rand.Next(1, 5);
                 if (CacheTime.HasValue && CacheTime.Value.AddMinutes(limit) > DateTimeOffset.Now)
                 {
@@ -713,22 +713,20 @@ namespace CovidMassTesting.Repository.RedisRepository
                         }
                     }
                 }
-            }
-
-            foreach (var group in role)
-            {
-                if (place.Group2Emails != null)
+                foreach (var group in role)
                 {
-                    if (place.Group2Emails.ContainsKey(group))
+                    if (place.Group2Emails != null)
                     {
-                        if (place.Group2Emails[group].Contains(email))
+                        if (place.Group2Emails.ContainsKey(group))
                         {
-                            return true;
+                            if (place.Group2Emails[group].Contains(email))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }
             }
-
             return false;
         }
 
