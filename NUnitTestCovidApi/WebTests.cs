@@ -3059,6 +3059,7 @@ namespace NUnitTestCovidApi
                 Email = "test@test.com",
                 Phone = "+421907723428"
             }, true).Result;
+
             try
             {
                 var result = iVisitor.ConnectVisitorToTest(vis2.Id, "12345", "aa@bb.cc", "", "").Result;

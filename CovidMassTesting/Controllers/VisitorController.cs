@@ -712,7 +712,10 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Only user with Document Manager role is allowed to register self tests and external tests");
                 }
-
+                if (time > DateTimeOffset.Now.AddMinutes(5))
+                {
+                    throw new Exception("Uskutočnený čas testu musí byť v minulosti");
+                }
 
                 var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
                 if (pp == null)
