@@ -742,6 +742,28 @@ namespace CovidMassTesting.Controllers
 
                     return Ok(ret);
                 }
+
+
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                if (pp == null)
+                {
+                    throw new Exception("Place provider missing");
+                }
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, query));
+                var reg = await visitorRepository.GetRegistration(regId);
+                if (reg == null)
+                {
+                    throw new Exception("Zadajte platné osobné číslo zamestnanca");
+                }
+                ret = await visitorRepository.GetVisitorByPersonalNumber(reg.RC, true);
+                if (ret != null)
+                {
+                    var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                    var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+                    ret.Extend(places, products);
+                    return Ok(ret);
+                }
+
                 throw new Exception("Visitor not found");
             }
             catch (ArgumentException exc)
