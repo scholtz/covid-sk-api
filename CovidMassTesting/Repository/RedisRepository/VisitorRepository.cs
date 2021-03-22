@@ -1797,7 +1797,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
                 var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
                 visitor.Extend(places, products);
-                logger.LogInformation($"visitor extended: {visitor.Id} {visitor.ProductName}");
+                //logger.LogInformation($"visitor extended: {visitor.Id} {visitor.ProductName}");
             }
             catch (Exception exc)
             {

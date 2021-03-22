@@ -706,7 +706,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception("Only administrator can search for visitor");
                 }
-                logger.LogInformation($"UpdateVisitor: {User.GetEmail()} is fetching visitor {query.GetSHA256Hash()}");
+                logger.LogInformation($"FindVisitor: {User.GetEmail()} is fetching visitor {query.GetSHA256Hash()}");
 
                 var codeClear = query.FormatBarCode();
                 Visitor ret;
@@ -715,7 +715,21 @@ namespace CovidMassTesting.Controllers
                     ret = await visitorRepository.GetVisitor(codeInt);
                     if (ret != null)
                     {
-                        logger.LogInformation($"UpdateVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+                        logger.LogInformation($"FindVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+
+                        try
+                        {
+                            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+                            ret.Extend(places, products);
+                            logger.LogInformation($"visitor extended: {ret.Id} {ret.ProductName}");
+                        }
+                        catch (Exception exc)
+                        {
+                            logger.LogError(exc, $"Error in visitor: {exc.Message}");
+                        }
+
+
                         return Ok(ret);
                     }
                 }
@@ -724,7 +738,7 @@ namespace CovidMassTesting.Controllers
 
                 if (ret != null)
                 {
-                    logger.LogInformation($"UpdateVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+                    logger.LogInformation($"FindVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
 
                     return Ok(ret);
                 }
