@@ -1020,6 +1020,14 @@ namespace CovidMassTesting.Controllers
                             updated = true;
                         }
                     }
+                    if (!string.IsNullOrEmpty(employee.LastName))
+                    {
+                        if (visitor.LastName != employee.LastName)
+                        {
+                            visitor.LastName = employee.LastName;
+                            updated = true;
+                        }
+                    }
                     var employeeId = employee.CompanyIdentifiers?.Select(r => r.EmployeeId)?.FirstOrDefault();
                     if (!string.IsNullOrEmpty(employeeId))
                     {
