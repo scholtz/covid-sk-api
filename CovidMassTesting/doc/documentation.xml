@@ -230,7 +230,7 @@
             <summary>
             Reset password 
             </summary>
-            <param name="visitor"></param>
+            <param name="email"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.SendSMS(System.String)">
@@ -2810,6 +2810,21 @@
             eHealth Id
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Place.SupportName">
+            <summary>
+            Support name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.SupportEmail">
+            <summary>
+            Support Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Place.SupportPhone">
+            <summary>
+            Support Phone
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Place.OtherLimitations">
             <summary>
             Limitations
@@ -3046,6 +3061,21 @@
         <member name="P:CovidMassTesting.Model.PlaceProviderPublic.PublicPhone">
             <summary>
             Phone
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.SupportName">
+            <summary>
+            Support name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.SupportEmail">
+            <summary>
+            Support Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.SupportPhone">
+            <summary>
+            Support Phone
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.PlaceProviderPublic.Logo">

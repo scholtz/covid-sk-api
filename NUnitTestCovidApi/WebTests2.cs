@@ -1183,6 +1183,8 @@ namespace NUnitTestCovidApi
             Assert.IsFalse(resultExport.Contains("0151020018"));
             Assert.IsTrue(resultExport.Contains("0101020007"));
 
+            if (DateTimeOffset.Now.Hour <= 1 || DateTimeOffset.Now.Hour >= 23) return;
+
             noEmailSender.Data.Clear();
             var exportTask = web.Server.Services.GetService<CovidMassTesting.ScheduledTasks.ExportTask>();
             var status = await exportTask.Process(DateTimeOffset.Now);
