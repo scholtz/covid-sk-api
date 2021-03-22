@@ -2875,13 +2875,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
             var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
             var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
-            foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
+            var keys = (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count);
+
+            logger.LogInformation($"ListAllVisitors keys {keys.Count()}");
+            foreach (var visitorId in keys)
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
                     try
                     {
-                        var visitor = await GetVisitor(visitorIdInt, false, true);
+                        var visitor = await GetVisitor(visitorIdInt, false, false);
                         if (visitor == null)
                         {
                             continue;
