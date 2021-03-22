@@ -721,9 +721,11 @@ namespace CovidMassTesting.Controllers
                 }
                 var documentClear = query.FormatDocument();
                 ret = await visitorRepository.GetVisitorByPersonalNumber(documentClear, true);
+
                 if (ret != null)
                 {
                     logger.LogInformation($"UpdateVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+
                     return Ok(ret);
                 }
                 throw new Exception("Visitor not found");

@@ -1791,7 +1791,18 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Unknown_personal_number].Value);
             }
 
-            return await GetVisitor(code.Value);
+            var visitor = await GetVisitor(code.Value);
+            try
+            {
+                var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+                visitor.Extend(places, products);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, $"Error in visitor: {exc.Message}");
+            }
+            return visitor;
         }
         /// <summary>
         /// Set test result
