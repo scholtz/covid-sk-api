@@ -2503,7 +2503,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, false);
                     if (visitor == null)
                     {
                         continue;
@@ -2606,7 +2606,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, false);
                     if (visitor == null)
                     {
                         continue;
@@ -2664,7 +2664,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, false);
                     if (visitor == null)
                     {
                         continue;
@@ -2791,7 +2791,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -2829,7 +2829,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, false);
                     if (visitor == null)
                     {
                         continue;
@@ -2942,7 +2942,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, false);
                     if (visitor == null)
                     {
                         continue;
@@ -3485,7 +3485,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -3574,7 +3574,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -3615,7 +3615,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt, false);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -3660,7 +3660,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt, false);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -3736,7 +3736,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt, false);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -3767,7 +3767,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt, false);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -3822,7 +3822,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 if (int.TryParse(visitorId, out var visitorIdInt))
                 {
-                    var visitor = await GetVisitor(visitorIdInt, false);
+                    var visitor = await GetVisitor(visitorIdInt, false, true);
                     if (visitor == null)
                     {
                         continue;
@@ -3892,7 +3892,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     try
                     {
-                        var visitor = await GetVisitor(visitorIdInt, false);
+                        var visitor = await GetVisitor(visitorIdInt, false, true);
                         if (visitor == null)
                         {
                             continue;
@@ -3939,7 +3939,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     try
                     {
-                        var visitor = await GetVisitor(visitorIdInt, false);
+                        var visitor = await GetVisitor(visitorIdInt, false, true);
                         if (visitor == null)
                         {
                             continue;
@@ -3977,7 +3977,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     try
                     {
-                        var visitor = await GetVisitor(visitorIdInt, false);
+                        var visitor = await GetVisitor(visitorIdInt, false, true);
                         if (visitor == null)
                         {
                             continue;

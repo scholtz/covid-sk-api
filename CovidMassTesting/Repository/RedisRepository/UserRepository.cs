@@ -563,6 +563,36 @@ namespace CovidMassTesting.Repository.RedisRepository
             return "";
         }
         /// <summary>
+        /// ResetPassword
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="placeProviderId"></param>
+        /// <returns></returns>
+        public async Task<bool> ResetPassword(string email, string placeProviderId)
+        {
+            var user = await GetUser(email, placeProviderId);
+            if (user == null) throw new Exception(localizer[Repository_RedisRepository_UserRepository.User_not_found_by_email].Value);
+            (string pass, string hash, string cohash) = GeneratePassword();
+            user.PswHash = hash;
+            user.CoHash = cohash;
+
+            var ret = await SetUser(user, false);
+            await emailSender.SendEmail(
+                localizer[Repository_RedisRepository_UserRepository.Invitation_to_covid_testing_place],
+                user.Email,
+                user.Name,
+                new Model.Email.InvitationEmail(CultureInfo.CurrentCulture.Name, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                {
+                    Name = user.Name,
+                    Password = pass,
+                    Roles = user.Roles?.ToArray(),
+                    WebPath = configuration["FrontedURL"]
+                });
+
+            return ret;
+        }
+
+        /// <summary>
         /// Change password
         /// 
         /// If successful, returns new JWT token
@@ -773,5 +803,6 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return ret;
         }
+
     }
 }

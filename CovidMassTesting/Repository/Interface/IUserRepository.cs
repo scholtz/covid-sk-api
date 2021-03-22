@@ -125,5 +125,9 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="placeProviderId"></param>
         /// <returns></returns>
         public Task<IEnumerable<Invitation>> ListInvitationsByPP(string placeProviderId);
+        /// <summary>
+        /// Reset user password
+        /// </summary>
+        public Task<bool> ResetPassword(string email, string placeProviderId);
     }
 }

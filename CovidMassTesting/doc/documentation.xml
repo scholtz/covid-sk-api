@@ -226,6 +226,13 @@
             <param name="visitor"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.ResetPassword(System.String)">
+            <summary>
+            Reset password 
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.SendSMS(System.String)">
             <summary>
             Test sms
@@ -6039,6 +6046,11 @@
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IUserRepository.ResetPassword(System.String,System.String)">
+            <summary>
+            Reset user password
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IVisitorRepository">
             <summary>
             Visitor repository interface for dependency injection
@@ -7721,6 +7733,14 @@
             <param name="email">Email</param>
             <param name="oldHash">Old password</param>
             <param name="newHash">New password</param>
+            <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.UserRepository.ResetPassword(System.String,System.String)">
+            <summary>
+            ResetPassword
+            </summary>
+            <param name="email"></param>
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
