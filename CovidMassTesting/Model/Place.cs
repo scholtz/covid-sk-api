@@ -139,6 +139,10 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string EHealthId { get; set; }
         /// <summary>
+        /// Support name
+        /// </summary>
+        public string SupportName { get; set; }
+        /// <summary>
         /// Support Email
         /// </summary>
         public string SupportEmail { get; set; }

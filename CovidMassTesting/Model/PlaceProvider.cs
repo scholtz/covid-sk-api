@@ -127,6 +127,18 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string PublicPhone { get; internal set; }
         /// <summary>
+        /// Support name
+        /// </summary>
+        public string SupportName { get; set; }
+        /// <summary>
+        /// Support Email
+        /// </summary>
+        public string SupportEmail { get; set; }
+        /// <summary>
+        /// Support Phone
+        /// </summary>
+        public string SupportPhone { get; set; }
+        /// <summary>
         /// Logo
         /// </summary>
         public string Logo { get; internal set; }
