@@ -177,7 +177,7 @@ namespace CovidMassTesting.Controllers
                 var testCodeClear = FormatBarCode(testCode);
                 if (int.TryParse(codeClear, out var codeInt))
                 {
-                    return Ok(await visitorRepository.ConnectVisitorToTest(codeInt, testCodeClear, User.GetEmail(), HttpContext.GetIPAddress()));
+                    return Ok(await visitorRepository.ConnectVisitorToTest(codeInt, testCodeClear, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress()));
                 }
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }

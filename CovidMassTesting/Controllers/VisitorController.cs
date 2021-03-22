@@ -807,7 +807,7 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation($"RegisterEmployeeByDocumenter: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 var saved = await visitorRepository.Register(visitor, User.GetEmail(), false);
                 var id = Guid.NewGuid().ToString().FormatDocument();
-                await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), HttpContext.GetIPAddress());
+                await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress());
                 return Ok(await visitorRepository.SetTestResult(id, result, true));
             }
             catch (ArgumentException exc)

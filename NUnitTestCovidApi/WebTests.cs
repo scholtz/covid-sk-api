@@ -3040,7 +3040,7 @@ namespace NUnitTestCovidApi
                 Phone = "+421907723428"
             }, true).Result;
 
-            iVisitor.ConnectVisitorToTest(vis1.Id, "12345", "aa@bb.cc", "");
+            iVisitor.ConnectVisitorToTest(vis1.Id, "12345", "aa@bb.cc", "", "");
             iVisitor.SetTestResult("12345", TestResult.NegativeWaitingForCertificate, true);
 
             var vis2 = iVisitor.Add(visitor = new Visitor()
@@ -3061,7 +3061,7 @@ namespace NUnitTestCovidApi
             }, true).Result;
             try
             {
-                var result = iVisitor.ConnectVisitorToTest(vis2.Id, "12345", "aa@bb.cc", "").Result;
+                var result = iVisitor.ConnectVisitorToTest(vis2.Id, "12345", "aa@bb.cc", "", "").Result;
                 Assert.Fail("ConnectVisitorToTest with duplicit testset id should throw exception");
             }
             catch (Exception exc)

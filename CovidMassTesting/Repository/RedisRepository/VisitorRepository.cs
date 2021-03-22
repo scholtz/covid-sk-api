@@ -714,9 +714,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="codeInt"></param>
         /// <param name="testCodeClear"></param>
         /// <param name="adminWorker"></param>
+        /// <param name="adminPlaceProviderId"></param>
         /// <param name="ipAddress"></param>
         /// <returns></returns>
-        public async Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string ipAddress)
+        public async Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string adminPlaceProviderId, string ipAddress)
         {
             var visitorCode = await GETVisitorCodeFromTesting(testCodeClear);
             if (visitorCode.HasValue)
@@ -727,7 +728,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
             await MapTestingSetToVisitorCode(codeInt, testCodeClear);
-            await UpdateTestingStateFull(codeInt, TestResult.TestIsBeingProcessing, testCodeClear, true, adminWorker, ipAddress);
+            await UpdateTestingStateFull(codeInt, TestResult.TestIsBeingProcessing, testCodeClear, true, adminWorker, adminPlaceProviderId, ipAddress);
             return testCodeClear;
         }
         /// <summary>
@@ -738,7 +739,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public Task<bool> UpdateTestingState(int code, string state)
         {
-            return UpdateTestingStateFull(code, state, "", true, "", "");
+            return UpdateTestingStateFull(code, state, "", true, "", "", "");
         }
         /// <summary>
         /// Updates the visitor test result
@@ -777,9 +778,10 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="testingSet"></param>
         /// <param name="updateStats"></param>
         /// <param name="adminWorker"></param>
+        /// <param name="placeProviderId"></param>
         /// <param name="ipAddress"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateTestingStateFull(int code, string state, string testingSet = "", bool updateStats = true, string adminWorker = "", string ipAddress = "")
+        public async Task<bool> UpdateTestingStateFull(int code, string state, string testingSet = "", bool updateStats = true, string adminWorker = "", string placeProviderId = "", string ipAddress = "")
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await GetVisitor(code);
@@ -857,7 +859,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                     break;
             }
+            if (!string.IsNullOrEmpty(placeProviderId))
+            {
+                // update place provider at the site
+                visitor.PlaceProviderId = placeProviderId;
+            }
             visitor.LastUpdate = DateTimeOffset.Now;
+
             await SetVisitor(visitor, false);
             var time = DateTimeOffset.Now;
             await MapDayToVisitorCode(new DateTimeOffset(time.Year, time.Month, time.Day, 0, 0, 0, TimeSpan.Zero).Ticks, visitor.Id);
@@ -3626,7 +3634,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         var state = visitor.Result;
                         visitor.Result = TestResult.TestMustBeRepeated;
                         await SetVisitor(visitor, false);// save visitor state
-                        await UpdateTestingStateFull(visitor.Id, state, "", false, "", "");
+                        await UpdateTestingStateFull(visitor.Id, state, "", false, "", "", "");
                         ret++;
                     }
                 }

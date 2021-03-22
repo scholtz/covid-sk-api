@@ -6084,13 +6084,14 @@
             <param name="state"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String,System.String)">
             <summary>
             Bind visitor to specific test
             </summary>
             <param name="codeInt"></param>
             <param name="testCodeClear"></param>
             <param name="adminWorker"></param>
+            <param name="adminPlaceProviderId"></param>
             <param name="ipAddress"></param>
             <returns></returns>
         </member>
@@ -7945,13 +7946,14 @@
             <param name="personalNumber"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String,System.String)">
             <summary>
             Map visitor code to testing code
             </summary>
             <param name="codeInt"></param>
             <param name="testCodeClear"></param>
             <param name="adminWorker"></param>
+            <param name="adminPlaceProviderId"></param>
             <param name="ipAddress"></param>
             <returns></returns>
         </member>
@@ -7972,7 +7974,7 @@
             <param name="isAdmin"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingStateFull(System.Int32,System.String,System.String,System.Boolean,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingStateFull(System.Int32,System.String,System.String,System.Boolean,System.String,System.String,System.String)">
             <summary>
             Updates testing state
             </summary>
@@ -7981,6 +7983,7 @@
             <param name="testingSet"></param>
             <param name="updateStats"></param>
             <param name="adminWorker"></param>
+            <param name="placeProviderId"></param>
             <param name="ipAddress"></param>
             <returns></returns>
         </member>

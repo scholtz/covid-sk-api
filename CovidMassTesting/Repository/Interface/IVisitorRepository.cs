@@ -51,9 +51,10 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="codeInt"></param>
         /// <param name="testCodeClear"></param>
         /// <param name="adminWorker"></param>
+        /// <param name="adminPlaceProviderId"></param>
         /// <param name="ipAddress"></param>
         /// <returns></returns>
-        public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string ipAddress);
+        public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string adminPlaceProviderId, string ipAddress);
         /// <summary>
         /// Load visitor
         /// </summary>
