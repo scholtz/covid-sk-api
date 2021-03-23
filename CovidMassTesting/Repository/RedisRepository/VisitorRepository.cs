@@ -2499,11 +2499,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
+        /// <param name="placePrividerId"></param>
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorTimezoned>> ListSickVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListSickVisitors(string placeProviderId, DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListSickVisitors {from} {count}");
             var ret = new List<VisitorTimezoned>();
@@ -2520,6 +2521,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         continue;
                     }
+                    if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
 
                     if (!string.IsNullOrEmpty(visitor.TestingSet))
                     {
@@ -2553,7 +2555,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="placeProviderId"></param>
         /// <param name="silent"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999, string placeProviderId = null, bool silent = false)
+        public async Task<IEnumerable<VisitorTimezoned>> ListTestedVisitors(string placeProviderId = null, DateTimeOffset? day = null, int from = 0, int count = 9999999, bool silent = false)
         {
             var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
             var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
@@ -2785,11 +2787,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
+        /// <param name="placeProviderId"></param>
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorTimezoned>> ListVisitorsInProcess(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListVisitorsInProcess(string placeProviderId, DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListVisitorsInProcess {from} {count}");
 
@@ -2808,6 +2811,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         continue;
                     }
+                    if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
 
                     if (visitor.Result == TestResult.TestIsBeingProcessing)
                     {
@@ -2823,11 +2827,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// List Sick Visitors. Data Exporter person at the end of testing can fetch all info and deliver them to medical office
         /// </summary>
+        /// <param name="placeProviderId"></param>
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorTimezoned>> ListAllVisitorsWhoDidNotCome(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListAllVisitorsWhoDidNotCome(string placeProviderId, DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListAllVisitorsWhoDidNotCome {from} {count}");
 
@@ -2846,6 +2851,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         continue;
                     }
+                    if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
 
                     if (string.IsNullOrEmpty(visitor.TestingSet)
                         //&& visitor.ChosenSlot < DateTimeOffset.UtcNow.Ticks
@@ -2863,11 +2869,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <summary>
         /// All visitors
         /// </summary>
+        /// <param name="placeProviderId"></param>
         /// <param name="day"></param>
         /// <param name="from"></param>
         /// <param name="count"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<VisitorTimezoned>> ListAllVisitors(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        public async Task<IEnumerable<VisitorTimezoned>> ListAllVisitors(string placeProviderId, DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListAllVisitors {from} {count}");
 
@@ -2889,6 +2896,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             continue;
                         }
+                        if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
                         visitor.Extend(places, products);
                         ret.Add(new VisitorTimezoned(visitor, offset));
                     }
@@ -2902,7 +2910,15 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
-        public async Task<IEnumerable<Visitor>> ListAllVisitorsOrig(DateTimeOffset? day = null, int from = 0, int count = 9999999)
+        /// <summary>
+        /// List all visitors, return visitor object
+        /// </summary>
+        /// <param name="placeProviderId"></param>
+        /// <param name="day"></param>
+        /// <param name="from"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        public async Task<IEnumerable<Visitor>> ListAllVisitorsOrig(string placeProviderId, DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListAllVisitors {from} {count}");
 
@@ -2918,6 +2934,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             continue;
                         }
+                        if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
                         ret.Add(visitor);
                     }
                     catch (Exception exc)

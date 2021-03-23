@@ -381,7 +381,7 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation("FixAdvancedStats");
                 await visitorRepository.DropAllStats();
                 var places = await placeRepository.ListAll();
-                var visitors = await visitorRepository.ListAllVisitors();
+                var visitors = await visitorRepository.ListAllVisitors(User.GetPlaceProvider());
 
                 foreach (var visitor in visitors)
                 {
@@ -585,9 +585,7 @@ namespace CovidMassTesting.Controllers
                 }
                 logger.LogInformation($"SendDayResultsToEHealth: {User.GetEmail()} is sending to nczi {date}");
 
-                var visitors = await visitorRepository.ListTestedVisitors(date);
-                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
-                visitors = visitors.Where(p => places.Contains(p.ChosenPlaceId));
+                var visitors = await visitorRepository.ListTestedVisitors(User.GetPlaceProvider(), date);
                 int ret = 0;
                 foreach (var visitor in visitors)
                 {
@@ -1074,7 +1072,7 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation($"FixConnectVisitorsWithEmployeeId");
 
                 var registrations = await visitorRepository.ExportRegistrations(placeProviderId: User.GetPlaceProvider());
-                var visitors = await visitorRepository.ListAllVisitorsOrig();
+                var visitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider());
                 foreach (var visitor in visitors)
                 {
                     var updated = false;
@@ -1253,7 +1251,7 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation($"RequeeUnprocessedVisitors");
                 var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
                 var results = await visitorRepository.ExportResultSubmissions(places: places);
-                var tested = await visitorRepository.ListTestedVisitors(DateTimeOffset.Now, placeProviderId: User.GetPlaceProvider(), silent: true);
+                var tested = await visitorRepository.ListTestedVisitors(User.GetPlaceProvider(), DateTimeOffset.Now, silent: true);
                 var visitors = new Dictionary<string, VisitorTimezoned>();
                 foreach (var visitor in tested.OrderBy(t => t.LastUpdate))
                 {
@@ -1378,7 +1376,7 @@ namespace CovidMassTesting.Controllers
                 {
                     var oldCulture = CultureInfo.CurrentCulture;
                     var oldUICulture = CultureInfo.CurrentUICulture;
-                    foreach (var visitor in await visitorRepository.ListTestedVisitors())
+                    foreach (var visitor in await visitorRepository.ListTestedVisitors(User.GetPlaceProvider()))
                     {
                         if (string.IsNullOrEmpty(visitor.Email)) continue;
                         if (from.HasValue && visitor.TestingTime < from.Value) continue;

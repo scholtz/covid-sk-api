@@ -649,7 +649,7 @@ namespace CovidMassTesting.Controllers
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
 
-                var data = await visitorRepository.ListSickVisitors(day, from, count);
+                var data = await visitorRepository.ListSickVisitors(User.GetPlaceProvider(), day, from, count);
                 var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
                 data = data.Where(p => places.Contains(p.ChosenPlaceId));
 
@@ -692,13 +692,10 @@ namespace CovidMassTesting.Controllers
 
                 logger.LogInformation($"User {User.GetEmail()} is exporting tested visitors {day}");
 
-                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
-
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ListTestedVisitors(day, from, count);
-                data = data.Where(p => places.Contains(p.ChosenPlaceId));
+                var data = await visitorRepository.ListTestedVisitors(User.GetPlaceProvider(), day, from, count);
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -891,7 +888,7 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ListTestedVisitors(day, from, count, User.GetPlaceProvider());
+                var data = await visitorRepository.ListTestedVisitors(User.GetPlaceProvider(), day, from, count);
                 logger.LogInformation($"Found: {data.Count()} records");
                 switch (exportType)
                 {
@@ -996,9 +993,7 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ListVisitorsInProcess(day, from, count);
-                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
-                data = data.Where(p => places.Contains(p.ChosenPlaceId));
+                var data = await visitorRepository.ListVisitorsInProcess(User.GetPlaceProvider(), day, from, count);
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -1041,9 +1036,7 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ListAllVisitorsWhoDidNotCome(day, from, count);
-                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
-                data = data.Where(p => places.Contains(p.ChosenPlaceId));
+                var data = await visitorRepository.ListAllVisitorsWhoDidNotCome(User.GetPlaceProvider(), day, from, count);
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();
@@ -1087,9 +1080,7 @@ namespace CovidMassTesting.Controllers
                 using var stream = new MemoryStream();
                 using var writer = new StreamWriter(stream);
                 using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture);
-                var data = await visitorRepository.ListAllVisitors(day, from, count);
-                var places = (await placeRepository.ListAll()).Where(place => place.PlaceProviderId == User.GetPlaceProvider()).Select(p => p.Id).ToHashSet();
-                data = data.Where(p => places.Contains(p.ChosenPlaceId));
+                var data = await visitorRepository.ListAllVisitors(User.GetPlaceProvider(), day, from, count);
                 csv.WriteRecords(data);
                 writer.Flush();
                 var ret = stream.ToArray();

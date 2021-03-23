@@ -3237,20 +3237,22 @@ namespace NUnitTestCovidApi
             {
                 Id = 123,
                 FirstName = "A",
-                TestingTime = DateTimeOffset.Now.AddDays(-15)
+                TestingTime = DateTimeOffset.Now.AddDays(-15),
+                PlaceProviderId = "11",
             }, false);
 
             await visitorRepository.SetVisitor(new Visitor()
             {
                 Id = 124,
                 FirstName = "B",
-                TestingTime = DateTimeOffset.Now.AddDays(-13)
+                TestingTime = DateTimeOffset.Now.AddDays(-13),
+                PlaceProviderId = "11",
             }, false);
 
             var ret = await visitorRepository.DeleteOldVisitors(14);
             Assert.AreEqual(1, ret);
 
-            var all = await visitorRepository.ListAllVisitors();
+            var all = await visitorRepository.ListAllVisitors("11");
             Assert.AreEqual(1, all.Count());
             Assert.AreEqual(124, all.FirstOrDefault().Id);
             Assert.AreEqual("B", all.FirstOrDefault().FirstName);
