@@ -3061,7 +3061,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (visitor.TestingTime.HasValue)
             {
-                data.Date = visitor.TestingTime.Value.ToOffset(new TimeSpan(1, 0, 0)).ToString("f");
+                data.Date = visitor.TestingTime.Value.ToLocalTime().ToString("f");
             }
             switch (visitor.PersonType)
             {

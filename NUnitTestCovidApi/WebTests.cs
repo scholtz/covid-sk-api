@@ -3258,6 +3258,17 @@ namespace NUnitTestCovidApi
             Assert.AreEqual("B", all.FirstOrDefault().FirstName);
         }
 
+
+        [Test]
+        public async Task TestOffset()
+        {
+            Assert.AreEqual(new TimeSpan(1, 0, 0), DateTimeOffset.Parse("2021-03-24T00:00:00+00:00").GetLocalOffset());
+            Assert.AreEqual(new TimeSpan(2, 0, 0), DateTimeOffset.Parse("2021-03-31T00:00:00+00:00").GetLocalOffset());
+
+            Assert.AreEqual(new TimeSpan(1, 0, 0), DateTimeOffset.Parse("2021-03-24T00:00:00+01:00").GetLocalOffset());
+            Assert.AreEqual(new TimeSpan(2, 0, 0), DateTimeOffset.Parse("2021-03-31T00:00:00+02:00").GetLocalOffset());
+        }
+
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>
         {
             private readonly string appSettings;

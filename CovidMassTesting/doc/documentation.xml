@@ -1446,12 +1446,12 @@
             <param name="time"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Helpers.OpeningHours.HasAnySlotWithinHourOpen(System.Collections.Generic.SortedDictionary{System.Int64,System.Boolean},System.TimeSpan)">
+        <member name="M:CovidMassTesting.Helpers.OpeningHours.HasAnySlotWithinHourOpen(System.Collections.Generic.SortedDictionary{System.Int64,System.Boolean},System.Int32)">
             <summary>
             Checks if time is within the range
             </summary>
             <param name="hours"></param>
-            <param name="time"></param>
+            <param name="hour"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Helpers.RandomGenerator">
@@ -1526,6 +1526,13 @@
         <member name="M:CovidMassTesting.Helpers.TimeHelper.ToLocalOffset(System.DateTimeOffset)">
             <summary>
             Set time to local offset
+            </summary>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.TimeHelper.GetLocalOffset(System.DateTimeOffset)">
+            <summary>
+            Returns local offset
             </summary>
             <param name="time"></param>
             <returns></returns>

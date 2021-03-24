@@ -27,9 +27,17 @@ namespace CovidMassTesting.Helpers
         /// <returns></returns>
         public static DateTimeOffset ToLocalOffset(this DateTimeOffset time)
         {
-            var offset = TimeZoneInfo.Local.GetUtcOffset(DateTime.UtcNow);
+            var offset = TimeZoneInfo.Local.GetUtcOffset(time.ToUniversalTime());
             return time.ToOffset(offset);
         }
-
+        /// <summary>
+        /// Returns local offset
+        /// </summary>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static TimeSpan GetLocalOffset(this DateTimeOffset time)
+        {
+            return TimeZoneInfo.Local.GetUtcOffset(time.ToUniversalTime());
+        }
     }
 }

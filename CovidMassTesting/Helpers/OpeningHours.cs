@@ -73,16 +73,16 @@ namespace CovidMassTesting.Helpers
         /// Checks if time is within the range
         /// </summary>
         /// <param name="hours"></param>
-        /// <param name="time"></param>
+        /// <param name="hour"></param>
         /// <returns></returns>
-        public static bool HasAnySlotWithinHourOpen(this SortedDictionary<long, bool> hours, TimeSpan time)
+        public static bool HasAnySlotWithinHourOpen(this SortedDictionary<long, bool> hours, int hour)
         {
             if (hours is null)
             {
                 throw new ArgumentNullException(nameof(hours));
             }
 
-            var from = TimeSpan.FromHours(time.Hours);
+            var from = TimeSpan.FromHours(hour);
             if (hours.IsTimeWhenIsOpen(from)) return true;
             var until = from.Add(TimeSpan.FromHours(1));
             var fromTicks = from.Ticks;

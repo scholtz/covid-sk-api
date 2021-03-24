@@ -22,7 +22,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Time in UTC+01:00
         /// </summary>
-        public DateTimeOffset TimeInCET => Time.ToOffset(new TimeSpan(1, 0, 0));
+        public DateTimeOffset TimeInCET => Time.ToLocalTime();
         /// <summary>
         /// Description
         /// </summary>

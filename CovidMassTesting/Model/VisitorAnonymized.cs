@@ -111,7 +111,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// ChosenSlotTime
         /// </summary>
-        public DateTimeOffset ChosenSlotTime => (new DateTimeOffset(ChosenSlot, TimeSpan.Zero)).ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset ChosenSlotTime => (new DateTimeOffset(ChosenSlot, TimeSpan.Zero)).ToLocalTime();
         /// <summary>
         /// Chosen place
         /// </summary>
@@ -123,7 +123,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Time when visitor has been notified by our notification methods
         /// </summary>
-        public DateTimeOffset? ResultNotifiedAt => visitor.ResultNotifiedAt?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? ResultNotifiedAt => visitor.ResultNotifiedAt?.ToLocalTime();
         /// <summary>
         /// Testing set identifier
         /// </summary>
@@ -131,7 +131,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Last change
         /// </summary>
-        public DateTimeOffset LastUpdate => visitor.LastUpdate.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset LastUpdate => visitor.LastUpdate.ToLocalTime();
         /// <summary>
         /// Last change
         /// </summary>
@@ -147,15 +147,15 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Registration time
         /// </summary>
-        public DateTimeOffset? RegistrationTime => visitor.RegistrationTime?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? RegistrationTime => visitor.RegistrationTime?.ToLocalTime();
         /// <summary>
         /// Real time when the test has been taken
         /// </summary>
-        public DateTimeOffset? TestingTime => visitor.TestingTime?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? TestingTime => visitor.TestingTime?.ToLocalTime();
         /// <summary>
         /// Time, when visitor has clicked that he is in the queue
         /// </summary>
-        public DateTimeOffset? Enqueued => visitor.Enqueued?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? Enqueued => visitor.Enqueued?.ToLocalTime();
         /// <summary>
         /// Product id
         /// </summary>
@@ -171,17 +171,17 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Time when test has been confirmed by lab
         /// </summary>
-        public DateTimeOffset? TestResultTime => visitor.TestResultTime?.ToOffset(TimeSpan.FromHours(1));
-        public DateTimeOffset? LastStatusCheck => visitor.LastStatusCheck?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? TestResultTime => visitor.TestResultTime?.ToLocalTime();
+        public DateTimeOffset? LastStatusCheck => visitor.LastStatusCheck?.ToLocalTime();
 
         /// <summary>
         /// Time when the result of the test was successfully sent to government system
         /// </summary>
-        public DateTimeOffset? EHealthNotifiedAt => visitor.EHealthNotifiedAt?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? EHealthNotifiedAt => visitor.EHealthNotifiedAt?.ToLocalTime();
         /// <summary>
         /// Time when the user was downloaded from external system
         /// </summary>
-        public DateTimeOffset? DownloadedAt => visitor.DownloadedAt?.ToOffset(TimeSpan.FromHours(1));
+        public DateTimeOffset? DownloadedAt => visitor.DownloadedAt?.ToLocalTime();
         /// <summary>
         /// Administration worker who has validated the person identity
         /// </summary>
