@@ -325,5 +325,46 @@ namespace CovidMassTesting.Repository.MockRepository
             }
             return true;
         }
+        /// <summary>
+        /// Return stats for specific place and time
+        /// </summary>
+        /// <param name="statsType"></param>
+        /// <param name="slotType"></param>
+        /// <param name="placeId"></param>
+        /// <param name="slotId"></param>
+        /// <returns></returns>
+        public async override Task<long?> GetStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, long slotId)
+        {
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{slotId}";
+            if (Stats.ContainsKey(keyPlace))
+            {
+                return Stats[keyPlace];
+            }
+            return 0;
+        }
+        /// <summary>
+        /// Day slots keys
+        /// </summary>
+        /// <returns></returns>
+        public async override Task<IEnumerable<string>> GetSlotKeysD()
+        {
+            return dataD.Keys;
+        }
+        /// <summary>
+        /// Hour slots keys
+        /// </summary>
+        /// <returns></returns>
+        public async override Task<IEnumerable<string>> GetSlotKeysH()
+        {
+            return dataH.Keys;
+        }
+        /// <summary>
+        /// Minute slots keys
+        /// </summary>
+        /// <returns></returns>
+        public async override Task<IEnumerable<string>> GetSlotKeysM()
+        {
+            return dataM.Keys;
+        }
     }
 }

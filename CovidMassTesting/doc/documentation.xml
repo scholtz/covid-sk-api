@@ -6975,6 +6975,34 @@
             <param name="from"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.GetStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.Int64)">
+            <summary>
+            Return stats for specific place and time
+            </summary>
+            <param name="statsType"></param>
+            <param name="slotType"></param>
+            <param name="placeId"></param>
+            <param name="slotId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.GetSlotKeysD">
+            <summary>
+            Day slots keys
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.GetSlotKeysH">
+            <summary>
+            Hour slots keys
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.GetSlotKeysM">
+            <summary>
+            Minute slots keys
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.UserRepository">
             <summary>
             In memory user repository

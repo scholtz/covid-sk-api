@@ -630,5 +630,9 @@ namespace CovidMassTesting.Repository.MockRepository
             registrations.Clear();
             return ret;
         }
+        public async override Task<Dictionary<string, Result>> GetAllResultObjects()
+        {
+            return dataResults.ToDictionary(k => k.Key, v => v.Value);
+        }
     }
 }

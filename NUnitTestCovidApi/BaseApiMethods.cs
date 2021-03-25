@@ -69,6 +69,16 @@ namespace NUnitTestCovidApi
                     })
                     ).Result;
         }
+        protected HttpResponseMessage FixAdvancedStatsSlots(HttpClient client)
+        {
+            return client.PostAsync("Admin/FixAdvancedStatsSlots",
+                    new System.Net.Http.FormUrlEncodedContent(new List<KeyValuePair<string, string>>()
+                    {
+
+                    })
+                    ).Result;
+        }
+
         protected HttpResponseMessage Preauthenticate(HttpClient client, string email)
         {
             return client.PostAsync("User/Preauthenticate",

@@ -108,6 +108,8 @@ namespace NUnitTestCovidApi
                 ).Result;
         }
 
+
+
         protected List<Visitor> RegisterTestVisitors(HttpClient client, string placeId, long slotId, string productId)
         {
             var Registered = new List<Visitor>();
@@ -1438,11 +1440,39 @@ namespace NUnitTestCovidApi
             var minute = minutes.Values.First();
             var registered = RegisterTestVisitors(client, place.Id, minute.SlotId, pr1.Id);
             Assert.IsTrue(registered.Count >= 2);
+
+            client.DefaultRequestHeaders.Clear();
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            response = FixAdvancedStatsSlots(client);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
+
+            response = ListDaySlotsByPlace(client, place.Id);
+
+            var days2 = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(response.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(days2.Count > 0);
+
+            var day2 = days.First().Value;
+            Assert.AreEqual(day.Registrations, day2.Registrations);
+            response = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, day.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
+            var hours2 = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(response.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(hours2.Count > 0);
+
+            var hour2 = hours.First().Value;
+            response = ListMinuteSlotsByPlaceAndHourSlotId(client, place.Id, hour.SlotId.ToString());
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
+            var minutes2 = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot5Min>>(response.Content.ReadAsStringAsync().Result);
+            Assert.IsTrue(minutes2.Count > 0);
+
+
             var registrationManager = users.First(u => u.Name == "RegistrationManager");
             response = AuthenticateUser(client, registrationManager.Email, registrationManager.Password);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
             var registrationManagerToken = response.Content.ReadAsStringAsync().Result;
             Assert.IsFalse(string.IsNullOrEmpty(registrationManagerToken));
+
+            client.DefaultRequestHeaders.Clear();
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {registrationManagerToken}");
 
             string test1 = "111-111-111";

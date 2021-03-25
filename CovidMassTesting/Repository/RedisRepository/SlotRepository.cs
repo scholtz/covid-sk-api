@@ -760,6 +760,20 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return ret;
         }
+
+        public virtual Task<IEnumerable<string>> GetSlotKeysD()
+        {
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}");
+        }
+        public virtual Task<IEnumerable<string>> GetSlotKeysH()
+        {
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}");
+        }
+        public virtual Task<IEnumerable<string>> GetSlotKeysM()
+        {
+            return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}");
+        }
+
         /// <summary>
         /// fix stats in published slots
         /// </summary>
@@ -767,8 +781,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<int> FixAllSlots()
         {
             int ret = 0;
-            var dayKeys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}");
-            foreach (var key in dayKeys)
+            foreach (var key in await GetSlotKeysD())
             {
                 var data = key.Split("_");
                 if (data.Length == 2)
@@ -786,8 +799,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                 }
             }
-            var hourKeys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}");
-            foreach (var key in hourKeys)
+            foreach (var key in await GetSlotKeysH())
             {
                 var data = key.Split("_");
                 if (data.Length == 2)
@@ -805,8 +817,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                 }
             }
-            var minKeys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}");
-            foreach (var key in minKeys)
+            foreach (var key in await GetSlotKeysM())
             {
                 var data = key.Split("_");
                 if (data.Length == 2)
