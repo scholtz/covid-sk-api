@@ -172,7 +172,7 @@ namespace CovidMassTesting.Controllers
             {
                 try
                 {
-                    var total = 0;
+                    var total = 0L;
                     var days = slotRepository.ListDaySlotsByPlace(item.Id).Result;
                     foreach (var day in
                         days.Where(d =>
@@ -195,7 +195,7 @@ namespace CovidMassTesting.Controllers
                                 x++;
                             }
 
-                            var countMAggregated = 0;
+                            var countMAggregated = 0L;
                             if (count > 0)
                             {
                                 var minutes = slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId).Result;

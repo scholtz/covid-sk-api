@@ -1,4 +1,5 @@
 ﻿using CovidMassTesting.Model;
+using CovidMassTesting.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,37 +35,37 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="slotD"></param>
         /// <returns></returns>
-        public Task DecrementRegistrationDaySlot(Slot1Day slotD);
+        public Task<long> DecrementRegistrationDaySlot(Slot1Day slotD);
         /// <summary>
         /// Decrement registration
         /// </summary>
         /// <param name="slotH"></param>
         /// <returns></returns>
-        public Task DecrementRegistrationHourSlot(Slot1Hour slotH);
+        public Task<long> DecrementRegistrationHourSlot(Slot1Hour slotH);
         /// <summary>
         /// Decrement registration
         /// </summary>
         /// <param name="slotM"></param>
         /// <returns></returns>
-        public Task DecrementRegistration5MinSlot(Slot5Min slotM);
+        public Task<long> DecrementRegistration5MinSlot(Slot5Min slotM);
         /// <summary>
         /// Increment registration
         /// </summary>
         /// <param name="slotD"></param>
         /// <returns></returns>
-        public Task IncrementRegistrationDaySlot(Slot1Day slotD);
+        public Task<long> IncrementRegistrationDaySlot(Slot1Day slotD);
         /// <summary>
         /// Increment registration
         /// </summary>
         /// <param name="slotH"></param>
         /// <returns></returns>
-        public Task IncrementRegistrationHourSlot(Slot1Hour slotH);
+        public Task<long> IncrementRegistrationHourSlot(Slot1Hour slotH);
         /// <summary>
         /// Increment registration
         /// </summary>
         /// <param name="slotM"></param>
         /// <returns></returns>
-        public Task IncrementRegistration5MinSlot(Slot5Min slotM);
+        public Task<long> IncrementRegistration5MinSlot(Slot5Min slotM);
         /// <summary>
         /// Get day slot
         /// </summary>
@@ -127,5 +128,34 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<int> DropAllData();
+        /// <summary>
+        /// Increment Slot Stats
+        /// </summary>
+        /// <param name="statsType"></param>
+        /// <param name="slotType"></param>
+        /// <param name="placeId"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public Task<long> IncrementStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, DateTimeOffset time);
+        /// <summary>
+        /// Decrement slot stats
+        /// </summary>
+        /// <param name="statsType"></param>
+        /// <param name="slotType"></param>
+        /// <param name="placeId"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public Task<long> DecrementStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, DateTimeOffset time);
+        /// <summary>
+        /// DropAllStats
+        /// </summary>
+        /// <param name="from"></param>
+        /// <returns></returns>
+        public Task<bool> DropAllStats(DateTimeOffset? from);
+        /// <summary>
+        /// Fix slots
+        /// </summary>
+        /// <returns></returns>
+        public Task<int> FixAllSlots();
     }
 }

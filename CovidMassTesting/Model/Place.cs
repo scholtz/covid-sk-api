@@ -129,7 +129,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// AvailableSlotsToday
         /// </summary>
-        public int? AvailableSlotsToday { get; set; }
+        public long? AvailableSlotsToday { get; set; }
         /// <summary>
         /// AvailableSlotsToday
         /// </summary>

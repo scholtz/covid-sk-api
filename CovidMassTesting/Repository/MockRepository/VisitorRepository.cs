@@ -588,9 +588,36 @@ namespace CovidMassTesting.Repository.MockRepository
         /// Reset stats
         /// </summary>
         /// <returns></returns>
-        public override async Task<bool> DropAllStats()
+        public override async Task<bool> DropAllStats(DateTimeOffset? from)
         {
-            Stats.Clear();
+            if (from.HasValue)
+            {
+                var decisionTick = from.Value.Ticks;
+                var toRemove = Stats.Keys.Where(item =>
+                {
+
+                    var k = item.Split("-");
+                    if (k.Length > 3)
+                    {
+                        if (long.TryParse(k[k.Length - 1], out var time))
+                        {
+                            if (time >= decisionTick)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }).ToArray();
+                foreach (var item in toRemove)
+                {
+                    Stats.TryRemove(item, out var _);
+                }
+            }
+            else
+            {
+                Stats.Clear();
+            }
             return true;
         }
         /// <summary>

@@ -42,6 +42,6 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Registrations stats
         /// </summary>
-        public int Registrations { get; set; }
+        public long Registrations { get; set; }
     }
 }

@@ -5,6 +5,7 @@ using CovidMassTesting.Controllers.SMS;
 using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
 using CovidMassTesting.Model.Email;
+using CovidMassTesting.Model.Enums;
 using CovidMassTesting.Model.SMS;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
@@ -369,7 +370,7 @@ namespace CovidMassTesting.Controllers
         [HttpPost("FixAdvancedStats")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> FixAdvancedStats()
+        public async Task<ActionResult<bool>> FixAdvancedStats([FromForm] DateTimeOffset? from)
         {
             try
             {
@@ -379,7 +380,93 @@ namespace CovidMassTesting.Controllers
                     throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 }
                 logger.LogInformation("FixAdvancedStats");
-                await visitorRepository.DropAllStats();
+                await visitorRepository.DropAllStats(from);
+                var places = await placeRepository.ListAll();
+                var visitors = await visitorRepository.ListAllVisitors(User.GetPlaceProvider());
+
+                foreach (var visitor in visitors)
+                {
+                    try
+                    {
+                        var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
+                        var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
+                        if (string.IsNullOrEmpty(pp)) continue;
+                        if (visitor.EHealthNotifiedAt.HasValue)
+                        {
+                            if (!from.HasValue || from >= visitor.EHealthNotifiedAt)
+                            {
+                                await visitorRepository.IncrementStats(StatsType.EHealthNotification, visitor.ChosenPlaceId, pp, visitor.EHealthNotifiedAt.Value);
+                            }
+                        }
+                        if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
+
+                        if (!from.HasValue || from >= visitor.ChosenSlotTime)
+                        {
+                            await visitorRepository.IncrementStats(StatsType.RegisteredTo, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
+                        }
+                        var to = visitor.RegistrationTime ?? visitor.ChosenSlotTime;
+                        if (!from.HasValue || from >= to)
+                        {
+                            await visitorRepository.IncrementStats(StatsType.RegisteredOn, visitor.ChosenPlaceId, pp, to);
+                        }
+                        i++;
+                        if (visitor.TestingTime.HasValue)
+                        {
+                            if (!from.HasValue || from >= visitor.TestingTime.Value)
+                            {
+                                await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                                await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                            }
+                        }
+                        if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
+                        {
+                            if (!from.HasValue || from >= visitor.TestingTime.Value)
+                            {
+                                await visitorRepository.IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                            }
+                        }
+                        if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
+                        {
+                            if (!from.HasValue || from >= visitor.TestingTime.Value)
+                            {
+                                await visitorRepository.IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
+                            }
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, $"FixAdvancedStats error {exc.Message}");
+                    }
+                }
+                logger.LogInformation($"FixAdvancedStats done {i}");
+                return Ok(i);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// fix slots stats
+        /// </summary>
+        /// <param name="from"></param>
+        /// <returns></returns>
+        [HttpPost("FixAdvancedStatsSlots")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> FixAdvancedStatsSlots([FromForm] DateTimeOffset? from)
+        {
+            try
+            {
+                int i = 0;
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                logger.LogInformation($"FixAdvancedStatsSlots {from}");
+                await slotRepository.DropAllStats(from);
                 var places = await placeRepository.ListAll();
                 var visitors = await visitorRepository.ListAllVisitors(User.GetPlaceProvider());
 
@@ -389,35 +476,20 @@ namespace CovidMassTesting.Controllers
                     {
                         var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
                         if (place == null) continue;
-                        var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
-                        if (visitor.EHealthNotifiedAt.HasValue)
-                        {
-                            await visitorRepository.IncrementStats(StatsType.EHealthNotification, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
-                        }
-                        if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
-                        await visitorRepository.IncrementStats(StatsType.RegisteredTo, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
-                        await visitorRepository.IncrementStats(StatsType.RegisteredOn, visitor.ChosenPlaceId, pp, visitor.RegistrationTime ?? visitor.ChosenSlotTime);
-                        i++;
-                        if (visitor.TestingTime.HasValue)
-                        {
-                            await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
-                            await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
-                        }
-                        if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
-                        {
-                            await visitorRepository.IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
-                        }
-                        if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
-                        {
-                            await visitorRepository.IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
-                        }
+                        await slotRepository.IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Min, place.Id, visitor.ChosenSlotTime);
+                        await slotRepository.IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Hour, place.Id, visitor.ChosenSlotTime);
+                        await slotRepository.IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Day, place.Id, visitor.ChosenSlotTime);
+
                     }
                     catch (Exception exc)
                     {
-                        logger.LogError(exc, $"FixAdvancedStats error {exc.Message}");
+                        logger.LogError(exc, $"FixAdvancedStatsSlots error {exc.Message}");
                     }
                 }
-                logger.LogInformation($"FixAdvancedStats done {i}");
+
+                i = await slotRepository.FixAllSlots();
+
+                logger.LogInformation($"FixAdvancedStatsSlots done {i}");
                 return Ok(i);
             }
             catch (Exception exc)

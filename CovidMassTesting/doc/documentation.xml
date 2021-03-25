@@ -174,10 +174,17 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.FixAdvancedStats">
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixAdvancedStats(System.Nullable{System.DateTimeOffset})">
             <summary>
             Fix advanced stats
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixAdvancedStatsSlots(System.Nullable{System.DateTimeOffset})">
+            <summary>
+            fix slots stats
+            </summary>
+            <param name="from"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.FixPersonPlace(System.String,System.String,System.String)">
@@ -1523,6 +1530,20 @@
             <param name="time"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Helpers.TimeHelper.RoundHour(System.DateTimeOffset)">
+            <summary>
+            Rounds to hour
+            </summary>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Helpers.TimeHelper.RoundMinute(System.DateTimeOffset)">
+            <summary>
+            Rounds to hour
+            </summary>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Helpers.TimeHelper.ToLocalOffset(System.DateTimeOffset)">
             <summary>
             Set time to local offset
@@ -1599,33 +1620,6 @@
             <summary>
             Employee identifier in the company
             </summary>
-        </member>
-        <member name="T:CovidMassTesting.Model.Currency">
-            <summary>
-            Currency validator
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Currency.EUR">
-            <summary>
-            shared infrastructure
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Currency.USD">
-            <summary>
-            bronze infrastructure
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Currency.CZK">
-            <summary>
-            silver infrastructure
-            </summary>
-        </member>
-        <member name="M:CovidMassTesting.Model.Currency.ValidateCurrency(System.String)">
-            <summary>
-            validates sla level
-            </summary>
-            <param name="input"></param>
-            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.DayTimeManagement">
             <summary>
@@ -2069,6 +2063,279 @@
             Registration obje
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Currency">
+            <summary>
+            Currency validator
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Currency.EUR">
+            <summary>
+            shared infrastructure
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Currency.USD">
+            <summary>
+            bronze infrastructure
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Currency.CZK">
+            <summary>
+            silver infrastructure
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Currency.ValidateCurrency(System.String)">
+            <summary>
+            validates sla level
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.Groups">
+            <summary>
+            List of roles/groups
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.Admin">
+            <summary>
+            Admin can create users, places, set dates, and all methods with other roles
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.PPAdmin">
+            <summary>
+            Place provider Admin can create users, places, set dates, and all methods with other roles within scope of the place provider
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.Accountant">
+            <summary>
+            Accountant is able to list invoices to the hospital or issue new one
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.PasswordProtected">
+            <summary>
+            User with this role can not change password
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.RegistrationManager">
+            <summary>
+            User in this role can fetch users by the registration code
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.MedicTester">
+            <summary>
+            User with this role can assign test bar code to the registed user
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.DocumentManager">
+            <summary>
+            User with this role can export data of all infected users and pass them to covid center
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.MedicLab">
+            <summary>
+            User with this role can set testing results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.DataExporter">
+            <summary>
+            Person in this group is allowed to list all sick people and export data
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Groups.Helper">
+            <summary>
+            Person who does not have any rights, but helps with the sampling process
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Groups.ValidateGroupName(System.String)">
+            <summary>
+            Validates input
+            </summary>
+            <param name="input"></param>
+            <returns></returns>
+        </member>
+        <member name="T:CovidMassTesting.Model.Enums.SlotType">
+            <summary>
+            Stats types
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.Enums.SlotType.Enum">
+            <summary>
+            Enum
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Enums.SlotType.Enum.Day">
+            <summary>
+            Day slot
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Enums.SlotType.Enum.Hour">
+            <summary>
+            Hour slot
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Enums.SlotType.Enum.Min">
+            <summary>
+            5 Minute slot
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.Enums.SlotType.ToText(CovidMassTesting.Model.Enums.SlotType.Enum)">
+            <summary>
+            Enum to text
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="F:CovidMassTesting.Model.Enums.SlotType.Day">
+            <summary>
+            Day slot
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Enums.SlotType.Hour">
+            <summary>
+            Hour slot
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.Enums.SlotType.Min">
+            <summary>
+            5 min slot
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.StatsType">
+            <summary>
+            Stats types
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.StatsType.Enum">
+            <summary>
+            Enum
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.Tested">
+            <summary>
+            Tested persons
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.EHealthNotification">
+            <summary>
+            EHealth notifications
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.Notification">
+            <summary>
+            Notifications
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.Repeat">
+            <summary>
+            Test repeated
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.Positive">
+            <summary>
+            Positive cases
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.Negative">
+            <summary>
+            Negative cases
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.RegisteredTo">
+            <summary>
+            Registered to date
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Enum.RegisteredOn">
+            <summary>
+            Registered on date
+            </summary>
+        </member>
+        <member name="M:CovidMassTesting.Model.StatsType.ToText(CovidMassTesting.Model.StatsType.Enum)">
+            <summary>
+            Enum to text
+            </summary>
+            <param name="type"></param>
+            <returns></returns>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Tested">
+            <summary>
+            Number of tested persons
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.EHealthNotification">
+            <summary>
+            EHealth notifications
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Notification">
+            <summary>
+            Number of notifications sent
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Repeat">
+            <summary>
+            Number of test results to be repeated
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Positive">
+            <summary>
+            Number of positive test results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.Negative">
+            <summary>
+            Number of negative test results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.RegisteredTo">
+            <summary>
+            Day for which new registrations were registered
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.StatsType.RegisteredOn">
+            <summary>
+            Day when person was registered
+            </summary>
+        </member>
+        <member name="T:CovidMassTesting.Model.TestResult">
+            <summary>
+            Test results strings
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.NotTaken">
+            <summary>
+            Waiting for visitor to take the test
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.TestIsBeingProcessing">
+            <summary>
+            Test has been taken by visitor and waiting for test results
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.TestMustBeRepeated">
+            <summary>
+            Test result is failed test, and must be repeated
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.PositiveWaitingForCertificate">
+            <summary>
+            Test result is positive. Waiting for visitor to take the certificate
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.PositiveCertificateTaken">
+            <summary>
+            Test result is positive. Certificate has been given to visitor.
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.NegativeWaitingForCertificate">
+            <summary>
+            Test result is negative. Waiting for visitor to take the certificate
+            </summary>
+        </member>
+        <member name="F:CovidMassTesting.Model.TestResult.NegativeCertificateTaken">
+            <summary>
+            Test result is negative. Certificate has been given to visitor.
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vFirst_name">
             <summary>
             First name
@@ -2143,68 +2410,6 @@
             <summary>
             Gender - M | F
             </summary>
-        </member>
-        <member name="T:CovidMassTesting.Model.Groups">
-            <summary>
-            List of roles/groups
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.Admin">
-            <summary>
-            Admin can create users, places, set dates, and all methods with other roles
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.PPAdmin">
-            <summary>
-            Place provider Admin can create users, places, set dates, and all methods with other roles within scope of the place provider
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.Accountant">
-            <summary>
-            Accountant is able to list invoices to the hospital or issue new one
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.PasswordProtected">
-            <summary>
-            User with this role can not change password
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.RegistrationManager">
-            <summary>
-            User in this role can fetch users by the registration code
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.MedicTester">
-            <summary>
-            User with this role can assign test bar code to the registed user
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.DocumentManager">
-            <summary>
-            User with this role can export data of all infected users and pass them to covid center
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.MedicLab">
-            <summary>
-            User with this role can set testing results
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.DataExporter">
-            <summary>
-            Person in this group is allowed to list all sick people and export data
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.Groups.Helper">
-            <summary>
-            Person who does not have any rights, but helps with the sampling process
-            </summary>
-        </member>
-        <member name="M:CovidMassTesting.Model.Groups.ValidateGroupName(System.String)">
-            <summary>
-            Validates input
-            </summary>
-            <param name="input"></param>
-            <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Model.PlaceLimitation">
             <summary>
@@ -4156,51 +4361,6 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="T:CovidMassTesting.Model.StatsType">
-            <summary>
-            Stats types
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.Tested">
-            <summary>
-            Number of tested persons
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.EHealthNotification">
-            <summary>
-            EHealth notifications
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.Notification">
-            <summary>
-            Number of notifications sent
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.Repeat">
-            <summary>
-            Number of test results to be repeated
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.Positive">
-            <summary>
-            Number of positive test results
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.Negative">
-            <summary>
-            Number of negative test results
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.RegisteredTo">
-            <summary>
-            Day for which new registrations were registered
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.StatsType.RegisteredOn">
-            <summary>
-            Day when person was registered
-            </summary>
-        </member>
         <member name="T:CovidMassTesting.Model.TestingDay">
             <summary>
             Registration day
@@ -4224,46 +4384,6 @@
         <member name="P:CovidMassTesting.Model.TestingDay.Sick">
             <summary>
             Sick
-            </summary>
-        </member>
-        <member name="T:CovidMassTesting.Model.TestResult">
-            <summary>
-            Test results strings
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.TestResult.NotTaken">
-            <summary>
-            Waiting for visitor to take the test
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.TestResult.TestIsBeingProcessing">
-            <summary>
-            Test has been taken by visitor and waiting for test results
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.TestResult.TestMustBeRepeated">
-            <summary>
-            Test result is failed test, and must be repeated
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.TestResult.PositiveWaitingForCertificate">
-            <summary>
-            Test result is positive. Waiting for visitor to take the certificate
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.TestResult.PositiveCertificateTaken">
-            <summary>
-            Test result is positive. Certificate has been given to visitor.
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.TestResult.NegativeWaitingForCertificate">
-            <summary>
-            Test result is negative. Waiting for visitor to take the certificate
-            </summary>
-        </member>
-        <member name="F:CovidMassTesting.Model.TestResult.NegativeCertificateTaken">
-            <summary>
-            Test result is negative. Certificate has been given to visitor.
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.TextValue">
@@ -5946,6 +6066,39 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.IncrementStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.DateTimeOffset)">
+            <summary>
+            Increment Slot Stats
+            </summary>
+            <param name="statsType"></param>
+            <param name="slotType"></param>
+            <param name="placeId"></param>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DecrementStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.DateTimeOffset)">
+            <summary>
+            Decrement slot stats
+            </summary>
+            <param name="statsType"></param>
+            <param name="slotType"></param>
+            <param name="placeId"></param>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DropAllStats(System.Nullable{System.DateTimeOffset})">
+            <summary>
+            DropAllStats
+            </summary>
+            <param name="from"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.FixAllSlots">
+            <summary>
+            Fix slots
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IUserRepository">
             <summary>
             User repository interface for dependency injection
@@ -6514,7 +6667,7 @@
             <param name="places"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllStats">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DropAllStats(System.Nullable{System.DateTimeOffset})">
             <summary>
             Reset the stats
             </summary>
@@ -6795,6 +6948,33 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.IncrementStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.DateTimeOffset)">
+            <summary>
+            Increment stats
+            </summary>
+            <param name="statsType"></param>
+            <param name="slotType"></param>
+            <param name="placeId"></param>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.DecrementStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.DateTimeOffset)">
+            <summary>
+            Decrement stats
+            </summary>
+            <param name="statsType"></param>
+            <param name="slotType"></param>
+            <param name="placeId"></param>
+            <param name="time"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.DropAllStats(System.Nullable{System.DateTimeOffset})">
+            <summary>
+            Drop stats from time or all
+            </summary>
+            <param name="from"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.UserRepository">
             <summary>
             In memory user repository
@@ -7020,7 +7200,7 @@
             <param name="mustBeNew"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.DropAllStats">
+        <member name="M:CovidMassTesting.Repository.MockRepository.VisitorRepository.DropAllStats(System.Nullable{System.DateTimeOffset})">
             <summary>
             Reset stats
             </summary>
@@ -7513,6 +7693,42 @@
             <param name="slotM"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.IncrementStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.DateTimeOffset)">
+            <summary>
+            Increment stats
+            </summary>
+            <param name="statsType">Model.StatsType.*</param>
+            <param name="slotType"></param>
+            <param name="time"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DecrementStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.DateTimeOffset)">
+            <summary>
+            DecrementStats
+            </summary>
+            <param name="statsType">Model.StatsType.*</param>
+            <param name="slotType"></param>
+            <param name="time"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetStats(CovidMassTesting.Model.StatsType.Enum,CovidMassTesting.Model.Enums.SlotType.Enum,System.String,System.Int64)">
+            <summary>
+            DecrementStats
+            </summary>
+            <param name="statsType">Model.StatsType.*</param>
+            <param name="slotType"></param>
+            <param name="slotId"></param>
+            <param name="placeId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DropAllStats(System.Nullable{System.DateTimeOffset})">
+            <summary>
+            Drop all stats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.Add(CovidMassTesting.Model.Slot1Day)">
             <summary>
             Create day slot
@@ -7637,6 +7853,12 @@
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DropAllData">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.FixAllSlots">
+            <summary>
+            fix stats in published slots
             </summary>
             <returns></returns>
         </member>
@@ -8080,7 +8302,7 @@
             <param name="placeId"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.DropAllStats">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.DropAllStats(System.Nullable{System.DateTimeOffset})">
             <summary>
             Drop all stats
             </summary>
@@ -8484,6 +8706,16 @@
             Removes old tests from the system
             </summary>
             <param name="daysToKeep"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.IncreaseStatsAndCheckLimits(CovidMassTesting.Model.Place,CovidMassTesting.Model.Slot1Day,CovidMassTesting.Model.Slot1Hour,CovidMassTesting.Model.Slot5Min)">
+            <summary>
+            Increases the registrations, checks if limit has been reached, and if it is overlimit, decrements the registrations back
+            </summary>
+            <param name="place"></param>
+            <param name="slotD"></param>
+            <param name="slotH"></param>
+            <param name="slotM"></param>
             <returns></returns>
         </member>
         <member name="T:CovidMassTesting.Resources.Controllers_AdminController">

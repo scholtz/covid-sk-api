@@ -1264,9 +1264,40 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// Drop all stats
         /// </summary>
         /// <returns></returns>
-        public virtual Task<bool> DropAllStats()
+        public async virtual Task<bool> DropAllStats(DateTimeOffset? from)
         {
-            return redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
+            if (from.HasValue)
+            {
+                var decisionTick = from.Value.Ticks;
+
+                var keys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
+                var toRemove = keys.Where(item =>
+                {
+                    var k = item.Split("-");
+                    if (k.Length > 3)
+                    {
+                        if (long.TryParse(k[k.Length - 1], out var time))
+                        {
+                            if (time >= decisionTick)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }).ToArray();
+                int removed = 0;
+                foreach (var item in toRemove)
+                {
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}", item);
+                    removed++;
+                }
+                return removed > 0;
+            }
+            else
+            {
+                return await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
+            }
         }
         /// <summary>
         /// 
@@ -1296,13 +1327,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             foreach (var item in keys.Where(k => k.StartsWith(search)))
             {
                 var k = item.Split("-");
-                if (k.Length == 4)
+                if (k.Length > 2)
                 {
-                    if (long.TryParse(k[3], out var time))
+                    if (long.TryParse(k[k.Length - 1], out var time))
                     {
                         ret[new DateTimeOffset(time, TimeSpan.Zero)] = await redisCacheClient.Db0.HashGetAsync<long>($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}", item);
                     }
                 }
+
             }
             return ret;
         }
@@ -2085,62 +2117,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                 if (slotH == null) { throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.We_are_not_able_to_find_chosen_hour_slot].Value); }
                 slotD = await slotRepository.GetDaySlot(visitor.ChosenPlaceId, slotH.DaySlotId);
             }
-            if (string.IsNullOrEmpty(managerEmail))
-            {
-                // manager is not affected by limits
-
-                var LimitPer5MinSlot = place.LimitPer5MinSlot;
-                if (!string.IsNullOrEmpty(configuration["LimitPer5MinSlot"]))
-                {
-                    if (int.TryParse(configuration["LimitPer5MinSlot"], out var confLimit))
-                    {
-                        if (LimitPer5MinSlot > confLimit)
-                        {
-                            LimitPer5MinSlot = confLimit;
-                        }
-                    }
-                }
-
-
-                if (slotM.Registrations >= LimitPer5MinSlot)
-                {
-                    throw new Exception(
-                        string.Format(
-                                localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value,
-                                LimitPer5MinSlot
-                            )
-                        );
-                }
-                var LimitPer1HourSlot = place.LimitPer1HourSlot;
-                if (!string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
-                {
-                    if (int.TryParse(configuration["LimitPer1HourSlot"], out var confLimit))
-                    {
-                        if (LimitPer1HourSlot > confLimit)
-                        {
-                            LimitPer1HourSlot = confLimit;
-                        }
-                    }
-                }
-                if (place.OtherLimitations != null)
-                {
-                    foreach (var limit in place.OtherLimitations.Where(l => l.From.Ticks <= slotH.SlotId && l.Until.Ticks > slotH.SlotId))
-                    {
-                        if (limit.HourLimit < LimitPer1HourSlot)
-                        {
-                            LimitPer1HourSlot = limit.HourLimit;
-                        }
-                    }
-                }
-                if (slotH.Registrations >= LimitPer1HourSlot)
-                {
-                    throw new Exception(
-                        string.Format(
-                            localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value,
-                            LimitPer1HourSlot
-                        ));
-                }
-            }
             Visitor previous = null;
             try
             {
@@ -2163,24 +2139,13 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             catch
             {
-
+                // if any error is returned consider it as new registration
             }
             if (previous == null)
             {
                 // new registration
                 logger.LogInformation($"New registration");
-
-                var ret = await Add(visitor, notify);
-                if (slotM != null)
-                {
-                    await slotRepository.IncrementRegistration5MinSlot(slotM);
-                    await slotRepository.IncrementRegistrationHourSlot(slotH);
-                    await slotRepository.IncrementRegistrationDaySlot(slotD);
-                    await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
-
-                    logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
-                }
-                return ret;
+                return await AddWithCheck(visitor, notify, managerEmail, place, slotD, slotH, slotM);
             }
             else
             {
@@ -2202,18 +2167,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             // new registration
                             logger.LogInformation($"New updated registration");
-
-                            var ret2 = await Add(visitor, notify);
-                            if (slotM != null)
-                            {
-                                await slotRepository.IncrementRegistration5MinSlot(slotM);
-                                await slotRepository.IncrementRegistrationHourSlot(slotH);
-                                await slotRepository.IncrementRegistrationDaySlot(slotD);
-                                await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
-
-                                logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
-                            }
-                            return ret2;
+                            return await AddWithCheck(visitor, notify, managerEmail, place, slotD, slotH, slotM);
                         }
                     }
                     else
@@ -2240,28 +2194,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 throw new Exception("POZOR !! Osoba je pozitívne testovaná v predchádzajúcich 2 dňoch");
                             }
                         }
-
                         // new registration
                         logger.LogInformation($"New updated registration");
-
-                        var ret2 = await Add(visitor, notify);
-                        if (slotM != null)
-                        {
-                            await slotRepository.IncrementRegistration5MinSlot(slotM);
-                            await slotRepository.IncrementRegistrationHourSlot(slotH);
-                            await slotRepository.IncrementRegistrationDaySlot(slotD);
-                            await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
-
-                            logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
-                        }
-                        return ret2;
+                        return await AddWithCheck(visitor, notify, managerEmail, place, slotD, slotH, slotM);
                     }
                     else
                     {
                         // manager registration when has not yet been tested
-
                         visitor.Id = previous.Id; // bar code does not change on new registration with the same personal number
-
                         // Update registration
                     }
                 }
@@ -2274,15 +2214,55 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     if (string.IsNullOrEmpty(visitor.Language)) visitor.Language = CultureInfo.CurrentCulture.Name;
                 }
-                var ret = await SetVisitor(visitor, false);
-                if (previous.ChosenPlaceId != visitor.ChosenPlaceId)
+                Place placePrev = null;
+                Slot5Min slotMPrev = null;
+                Slot1Hour slotHPrev = null;
+                Slot1Day slotDPrev = null;
+                if (previous.ChosenPlaceId != null)
                 {
-                    if (previous.ChosenPlaceId != null && visitor.ChosenPlaceId != null)
+                    placePrev = await placeRepository.GetPlace(previous.ChosenPlaceId);
+                    slotMPrev = await slotRepository.Get5MinSlot(previous.ChosenPlaceId, previous.ChosenSlot);
+                    if (slotMPrev != null)
                     {
-                        await placeRepository.DecrementPlaceRegistrations(previous.ChosenPlaceId);
-                        await placeRepository.IncrementPlaceRegistrations(visitor.ChosenPlaceId);
+                        slotHPrev = await slotRepository.GetHourSlot(previous.ChosenPlaceId, slotMPrev.HourSlotId);
+                    }
+                    if (slotHPrev != null)
+                    {
+                        slotDPrev = await slotRepository.GetDaySlot(previous.ChosenPlaceId, slotHPrev.DaySlotId);
                     }
                 }
+
+                if (string.IsNullOrEmpty(managerEmail))
+                {
+                    if (visitor.ChosenPlaceId != previous.ChosenPlaceId || visitor.ChosenSlot != previous.ChosenSlot)
+                    {
+                        await IncreaseStatsAndCheckLimits(place, slotD, slotH, slotM);
+                        await DecreaseStats(placePrev, slotDPrev, slotHPrev, slotMPrev);
+                    }
+                }
+                else
+                {
+                    if (visitor.ChosenPlaceId != previous.ChosenPlaceId || visitor.ChosenSlot != previous.ChosenSlot)
+                    {
+                        await IncreaseStats(place, slotD, slotH, slotM);
+                        await DecreaseStats(placePrev, slotDPrev, slotHPrev, slotMPrev);
+                    }
+                }
+                Visitor ret;
+                try
+                {
+                    ret = await SetVisitor(visitor, false);
+                }
+                catch
+                {
+                    if (visitor.ChosenPlaceId != previous.ChosenPlaceId || visitor.ChosenSlot != previous.ChosenSlot)
+                    {
+                        await IncreaseStats(placePrev, slotDPrev, slotHPrev, slotMPrev);
+                        await DecreaseStats(place, slotD, slotH, slotM);
+                    }
+                    throw;
+                }
+
                 var code = visitor.Id.ToString();
                 var codeFormatted = $"{code.Substring(0, 3)}-{code.Substring(3, 3)}-{code.Substring(6, 3)}";
 
@@ -2349,58 +2329,6 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                     CultureInfo.CurrentCulture = oldCulture;
                     CultureInfo.CurrentUICulture = oldUICulture;
-                }
-
-                if (previous.ChosenSlot != visitor.ChosenSlot || previous.ChosenPlaceId != visitor.ChosenPlaceId)
-                {
-                    try
-                    {
-
-                        var slotMPrev = await slotRepository.Get5MinSlot(previous.ChosenPlaceId, previous.ChosenSlot);
-                        if (slotMPrev != null)
-                        {
-                            var slotHPrev = await slotRepository.GetHourSlot(previous.ChosenPlaceId, slotMPrev.HourSlotId);
-                            if (slotHPrev != null)
-                            {
-                                var slotDPrev = await slotRepository.GetDaySlot(previous.ChosenPlaceId, slotHPrev.DaySlotId);
-                                if (slotDPrev != null)
-                                {
-                                    await slotRepository.DecrementRegistration5MinSlot(slotMPrev);
-                                    await slotRepository.DecrementRegistrationHourSlot(slotHPrev);
-                                    await slotRepository.DecrementRegistrationDaySlot(slotDPrev);
-
-                                    await UnMapDayToVisitorCode(slotDPrev.SlotId, visitor.Id);
-
-
-                                    logger.LogInformation($"Decremented: M-{slotMPrev.SlotId}, {slotHPrev.SlotId}, {slotDPrev.SlotId}");
-                                }
-                                else
-                                {
-                                    logger.LogError($"D Slot does not exists: {previous.ChosenPlaceId}, {slotHPrev.DaySlotId}");
-                                }
-                            }
-                            else
-                            {
-                                logger.LogError($"H Slot does not exists: {previous.ChosenPlaceId}, {slotMPrev.HourSlotId}");
-                            }
-                        }
-                        else
-                        {
-                            logger.LogError($"M Slot does not exists: {previous.ChosenPlaceId}, {previous.ChosenSlot}");
-                        }
-                    }
-                    catch (Exception exc)
-                    {
-                        logger.LogError(exc, exc.Message);
-                    }
-                    if (slotM != null)
-                    {
-                        await slotRepository.IncrementRegistration5MinSlot(slotM);
-                        await slotRepository.IncrementRegistrationHourSlot(slotH);
-                        await slotRepository.IncrementRegistrationDaySlot(slotD);
-                        await MapDayToVisitorCode(slotD.SlotId, visitor.Id);
-                        logger.LogInformation($"Incremented: M-{slotM.SlotId}, {slotH.SlotId}, {slotD.SlotId}");
-                    }
                 }
 
                 return ret;
@@ -4161,6 +4089,132 @@ namespace CovidMassTesting.Repository.RedisRepository
             logger.LogInformation($"DeleteOldVisitors done {ret}");
 
             return ret;
+        }
+        /// <summary>
+        /// Increases the registrations, checks if limit has been reached, and if it is overlimit, decrements the registrations back
+        /// </summary>
+        /// <param name="place"></param>
+        /// <param name="slotD"></param>
+        /// <param name="slotH"></param>
+        /// <param name="slotM"></param>
+        /// <returns></returns>
+        private async Task IncreaseStatsAndCheckLimits(Place place, Slot1Day slotD, Slot1Hour slotH, Slot5Min slotM)
+        {
+            logger.LogInformation($"Incremented with check: {place?.Id}-{slotM?.SlotId}, {slotH?.SlotId}, {slotD?.SlotId}");
+            if (place == null || slotM == null || slotH == null || slotD == null)
+            {
+                throw new Exception("Unable to determine the testing place or testing slot");
+            }
+            var LimitPer5MinSlot = place.LimitPer5MinSlot;
+            if (!string.IsNullOrEmpty(configuration["LimitPer5MinSlot"]))
+            {
+                if (int.TryParse(configuration["LimitPer5MinSlot"], out var confLimit))
+                {
+                    if (LimitPer5MinSlot > confLimit)
+                    {
+                        LimitPer5MinSlot = confLimit;
+                    }
+                }
+            }
+
+            var registrationsM = await slotRepository.IncrementRegistration5MinSlot(slotM);
+            if (registrationsM > LimitPer5MinSlot)
+            {
+                await slotRepository.DecrementRegistration5MinSlot(slotM);
+                throw new Exception(
+                    string.Format(
+                            localizer[Repository_RedisRepository_VisitorRepository.This_5_minute_time_slot_has_reached_the_capacity_].Value,
+                            LimitPer5MinSlot
+                        )
+                    );
+            }
+
+            var LimitPer1HourSlot = place.LimitPer1HourSlot;
+            if (!string.IsNullOrEmpty(configuration["LimitPer1HourSlot"]))
+            {
+                if (int.TryParse(configuration["LimitPer1HourSlot"], out var confLimit))
+                {
+                    if (LimitPer1HourSlot > confLimit)
+                    {
+                        LimitPer1HourSlot = confLimit;
+                    }
+                }
+            }
+            if (place.OtherLimitations != null)
+            {
+                foreach (var limit in place.OtherLimitations.Where(l => l.From.Ticks <= slotH.SlotId && l.Until.Ticks > slotH.SlotId))
+                {
+                    if (limit.HourLimit < LimitPer1HourSlot)
+                    {
+                        LimitPer1HourSlot = limit.HourLimit;
+                    }
+                }
+            }
+            var registrationsH = await slotRepository.IncrementRegistrationHourSlot(slotH);
+            if (registrationsH > LimitPer1HourSlot)
+            {
+                await slotRepository.DecrementRegistration5MinSlot(slotM);
+                await slotRepository.DecrementRegistrationHourSlot(slotH);
+
+                throw new Exception(
+                    string.Format(
+                        localizer[Repository_RedisRepository_VisitorRepository.This_1_hour_time_slot_has_reached_the_capacity_].Value,
+                        LimitPer1HourSlot
+                    ));
+            }
+            await slotRepository.IncrementRegistrationDaySlot(slotD);
+            await placeRepository.IncrementPlaceRegistrations(place.Id);
+        }
+        private async Task IncreaseStats(Place place, Slot1Day slotD, Slot1Hour slotH, Slot5Min slotM)
+        {
+            logger.LogInformation($"Incremented: {place?.Id}-{slotM?.SlotId}, {slotH?.SlotId}, {slotD?.SlotId}");
+            if (place == null) return;
+            await placeRepository.IncrementPlaceRegistrations(place.Id);
+            if (slotM == null) return;
+            await slotRepository.IncrementRegistration5MinSlot(slotM);
+            if (slotH == null) return;
+            await slotRepository.IncrementRegistrationHourSlot(slotH);
+            if (slotD == null) return;
+            await slotRepository.IncrementRegistrationDaySlot(slotD);
+        }
+        private async Task DecreaseStats(Place place, Slot1Day slotD, Slot1Hour slotH, Slot5Min slotM)
+        {
+            logger.LogInformation($"Decrement: {place?.Id}-{slotM?.SlotId}, {slotH?.SlotId}, {slotD?.SlotId}");
+            if (place == null) return;
+            await placeRepository.DecrementPlaceRegistrations(place.Id);
+            if (slotM == null) return;
+            await slotRepository.DecrementRegistration5MinSlot(slotM);
+            if (slotH == null) return;
+            await slotRepository.DecrementRegistrationHourSlot(slotH);
+            if (slotD == null) return;
+            await slotRepository.DecrementRegistrationDaySlot(slotD);
+        }
+        private async Task<Visitor> AddWithCheck(Visitor visitor, bool notify, string managerEmail, Place place, Slot1Day slotD, Slot1Hour slotH, Slot5Min slotM)
+        {
+            if (string.IsNullOrEmpty(managerEmail))
+            {
+                // manager is not affected by limits
+                await IncreaseStatsAndCheckLimits(place, slotD, slotH, slotM);
+            }
+            else
+            {
+                if (place != null)
+                {
+                    await IncreaseStats(place, slotD, slotH, slotM);
+                }
+            }
+            try
+            {
+                return await Add(visitor, notify);
+            }
+            catch
+            {
+                if (place != null)
+                {
+                    await DecreaseStats(place, slotD, slotH, slotM);
+                }
+                throw;
+            }
         }
     }
 }

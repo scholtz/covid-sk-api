@@ -1,4 +1,6 @@
-﻿using CovidMassTesting.Model;
+﻿using CovidMassTesting.Helpers;
+using CovidMassTesting.Model;
+using CovidMassTesting.Model.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
@@ -19,6 +21,7 @@ namespace CovidMassTesting.Repository.MockRepository
         private readonly ConcurrentDictionary<string, Slot1Day> dataD = new ConcurrentDictionary<string, Slot1Day>();
         private readonly ConcurrentDictionary<string, Slot1Hour> dataH = new ConcurrentDictionary<string, Slot1Hour>();
         private readonly ConcurrentDictionary<string, Slot5Min> dataM = new ConcurrentDictionary<string, Slot5Min>();
+        private readonly ConcurrentDictionary<string, long> Stats = new ConcurrentDictionary<string, long>();
         /// <summary>
         /// constructor
         /// </summary>
@@ -238,6 +241,89 @@ namespace CovidMassTesting.Repository.MockRepository
             dataH.Clear();
             dataM.Clear();
             return ret;
+        }
+        /// <summary>
+        /// Increment stats
+        /// </summary>
+        /// <param name="statsType"></param>
+        /// <param name="slotType"></param>
+        /// <param name="placeId"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public async override Task<long> IncrementStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, DateTimeOffset time)
+        {
+            var t = slotType switch
+            {
+                SlotType.Enum.Day => time.RoundDay(),
+                SlotType.Enum.Hour => time.RoundHour(),
+                SlotType.Enum.Min => time.RoundMinute(),
+                _ => throw new Exception("Invalid slot type"),
+            };
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{t}";
+            if (!Stats.ContainsKey(keyPlace)) Stats[keyPlace] = 0;
+            Stats[keyPlace]++;
+            return Stats[keyPlace];
+        }
+        /// <summary>
+        /// Decrement stats
+        /// </summary>
+        /// <param name="statsType"></param>
+        /// <param name="slotType"></param>
+        /// <param name="placeId"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public async override Task<long> DecrementStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, DateTimeOffset time)
+        {
+
+            var t = slotType switch
+            {
+                SlotType.Enum.Day => time.RoundDay(),
+                SlotType.Enum.Hour => time.RoundHour(),
+                SlotType.Enum.Min => time.RoundMinute(),
+                _ => throw new Exception("Invalid slot type"),
+            };
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{t}";
+            if (!Stats.ContainsKey(keyPlace)) Stats[keyPlace] = 0;
+            Stats[keyPlace]--;
+            return Stats[keyPlace];
+        }
+        /// <summary>
+        /// Drop stats from time or all
+        /// </summary>
+        /// <param name="from"></param>
+        /// <returns></returns>
+        public async override Task<bool> DropAllStats(DateTimeOffset? from)
+        {
+
+            if (from.HasValue)
+            {
+                var decisionTick = from.Value.Ticks;
+                var toRemove = Stats.Keys.Where(item =>
+                {
+
+                    var k = item.Split("-");
+                    if (k.Length > 4)
+                    {
+                        if (long.TryParse(k[k.Length - 1], out var time))
+                        {
+                            if (time >= decisionTick)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }).ToArray();
+                foreach (var item in toRemove)
+                {
+                    Stats.TryRemove(item, out var _);
+                }
+            }
+            else
+            {
+                Stats.Clear();
+            }
+            return true;
         }
     }
 }

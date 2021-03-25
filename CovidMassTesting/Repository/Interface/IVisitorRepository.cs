@@ -394,7 +394,7 @@ namespace CovidMassTesting.Repository.Interface
         /// Reset the stats
         /// </summary>
         /// <returns></returns>
-        public Task<bool> DropAllStats();
+        public Task<bool> DropAllStats(DateTimeOffset? from);
         /// <summary>
         /// Global admin task to reset registrations
         /// </summary>

@@ -38,6 +38,6 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Registrations
         /// </summary>
-        public int Registrations { get; set; }
+        public long Registrations { get; set; }
     }
 }

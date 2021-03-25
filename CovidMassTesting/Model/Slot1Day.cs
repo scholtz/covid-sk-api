@@ -30,7 +30,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// Registrations stats
         /// </summary>
-        public int Registrations { get; set; }
+        public long Registrations { get; set; }
         /// <summary>
         /// Opening hours in format 09:00-10:00
         /// </summary>

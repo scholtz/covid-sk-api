@@ -1,5 +1,6 @@
 ﻿using CovidMassTesting.Helpers;
 using CovidMassTesting.Model;
+using CovidMassTesting.Model.Enums;
 using CovidMassTesting.Repository.Interface;
 using CovidMassTesting.Resources;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,9 @@ namespace CovidMassTesting.Repository.RedisRepository
 
         private readonly string REDIS_KEY_SLOT_OBJECTS_M = "SLOTS_M";
         private readonly string REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR = "SLOTS_M_DP_LIST";
+        private readonly string REDIS_KEY_SLOT_STATS = "REDIS_KEY_SLOT_STATS";
+
+
         private readonly TimeSpan TimeZoneOffset = new TimeSpan(1, 0, 0);
 
 
@@ -193,7 +197,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="slotD"></param>
         /// <returns></returns>
-        public async Task IncrementRegistrationDaySlot(Slot1Day slotD)
+        public async Task<long> IncrementRegistrationDaySlot(Slot1Day slotD)
         {
             if (slotD is null)
             {
@@ -201,15 +205,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
-            update.Registrations++;
+            update.Registrations = await IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Day, slotD.PlaceId, slotD.Time);
             await SetDaySlot(update, false);
+            return update.Registrations;
         }
         /// <summary>
         /// Increment registrations for hour slot
         /// </summary>
         /// <param name="slotH"></param>
         /// <returns></returns>
-        public async Task IncrementRegistrationHourSlot(Slot1Hour slotH)
+        public async Task<long> IncrementRegistrationHourSlot(Slot1Hour slotH)
         {
             if (slotH is null)
             {
@@ -217,15 +222,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
-            update.Registrations++;
+            update.Registrations = await IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Hour, slotH.PlaceId, slotH.Time);
             await SetHourSlot(update, false);
+            return update.Registrations;
         }
         /// <summary>
         /// Increment registrations for minute slot
         /// </summary>
         /// <param name="slotM"></param>
         /// <returns></returns>
-        public async Task IncrementRegistration5MinSlot(Slot5Min slotM)
+        public async Task<long> IncrementRegistration5MinSlot(Slot5Min slotM)
         {
             if (slotM is null)
             {
@@ -233,15 +239,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
-            update.Registrations++;
+            update.Registrations = await IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Min, slotM.PlaceId, slotM.Time);
             await SetMinuteSlot(update, false);
+            return update.Registrations;
         }
         /// <summary>
         /// Decrement registrations for day slot
         /// </summary>
         /// <param name="slotD"></param>
         /// <returns></returns>
-        public async Task DecrementRegistrationDaySlot(Slot1Day slotD)
+        public async Task<long> DecrementRegistrationDaySlot(Slot1Day slotD)
         {
             if (slotD is null)
             {
@@ -249,15 +256,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
-            update.Registrations--;
+            update.Registrations = await DecrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Day, slotD.PlaceId, slotD.Time);
             await SetDaySlot(update, false);
+            return update.Registrations;
         }
         /// <summary>
         /// Decrement registrations for hour slot
         /// </summary>
         /// <param name="slotH"></param>
         /// <returns></returns>
-        public async Task DecrementRegistrationHourSlot(Slot1Hour slotH)
+        public async Task<long> DecrementRegistrationHourSlot(Slot1Hour slotH)
         {
             if (slotH is null)
             {
@@ -265,15 +273,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
-            update.Registrations--;
+            update.Registrations = await DecrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Hour, slotH.PlaceId, slotH.Time);
             await SetHourSlot(update, false);
+            return update.Registrations;
         }
         /// <summary>
         /// Decrement registrations for minute slot
         /// </summary>
         /// <param name="slotM"></param>
         /// <returns></returns>
-        public async Task DecrementRegistration5MinSlot(Slot5Min slotM)
+        public async Task<long> DecrementRegistration5MinSlot(Slot5Min slotM)
         {
             if (slotM is null)
             {
@@ -281,8 +290,115 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
 
             var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
-            update.Registrations--;
+            update.Registrations = await DecrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Min, slotM.PlaceId, slotM.Time);
             await SetMinuteSlot(update, false);
+            return update.Registrations;
+        }
+
+        /// <summary>
+        /// Increment stats
+        /// </summary>
+        /// <param name="statsType">Model.StatsType.*</param>
+        /// <param name="slotType"></param>
+        /// <param name="time"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public virtual async Task<long> IncrementStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, DateTimeOffset time)
+        {
+            var t = slotType switch
+            {
+                SlotType.Enum.Day => time.RoundDay(),
+                SlotType.Enum.Hour => time.RoundHour(),
+                SlotType.Enum.Min => time.RoundMinute(),
+                _ => throw new Exception("Invalid slot type"),
+            };
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{t}";
+
+            return await redisCacheClient.Db0.HashIncerementByAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}",
+                keyPlace,
+                1
+            );
+        }
+        /// <summary>
+        /// DecrementStats
+        /// </summary>
+        /// <param name="statsType">Model.StatsType.*</param>
+        /// <param name="slotType"></param>
+        /// <param name="time"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public virtual async Task<long> DecrementStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, DateTimeOffset time)
+        {
+            var t = slotType switch
+            {
+                SlotType.Enum.Day => time.RoundDay(),
+                SlotType.Enum.Hour => time.RoundHour(),
+                SlotType.Enum.Min => time.RoundMinute(),
+                _ => throw new Exception("Invalid slot type"),
+            };
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{t}";
+
+            return await redisCacheClient.Db0.HashIncerementByAsync(
+                $"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}",
+                keyPlace,
+                -1
+            );
+        }
+        /// <summary>
+        /// DecrementStats
+        /// </summary>
+        /// <param name="statsType">Model.StatsType.*</param>
+        /// <param name="slotType"></param>
+        /// <param name="slotId"></param>
+        /// <param name="placeId"></param>
+        /// <returns></returns>
+        public virtual async Task<long?> GetStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, long slotId)
+        {
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{slotId}";
+            return await redisCacheClient.Db0.HashGetAsync<long?>(
+                $"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}",
+                keyPlace
+            );
+        }
+        /// <summary>
+        /// Drop all stats
+        /// </summary>
+        /// <returns></returns>
+        public async virtual Task<bool> DropAllStats(DateTimeOffset? from)
+        {
+            if (from.HasValue)
+            {
+                var decisionTick = from.Value.Ticks;
+
+                var keys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}");
+                var toRemove = keys.Where(item =>
+                {
+                    var k = item.Split("-");
+                    if (k.Length > 4)
+                    {
+                        if (long.TryParse(k[k.Length - 1], out var time))
+                        {
+                            if (time >= decisionTick)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                    return false;
+                }).ToArray();
+                int removed = 0;
+                foreach (var item in toRemove)
+                {
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}", item);
+                    removed++;
+                }
+                return removed > 0;
+            }
+            else
+            {
+                return await redisCacheClient.Db0.RemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}");
+            }
         }
         /// <summary>
         /// Create day slot
@@ -642,6 +758,73 @@ namespace CovidMassTesting.Repository.RedisRepository
                     logger.LogError(exc, $"Error while dropping slot data: {exc.Message}");
                 }
             }
+            return ret;
+        }
+        /// <summary>
+        /// fix stats in published slots
+        /// </summary>
+        /// <returns></returns>
+        public async Task<int> FixAllSlots()
+        {
+            int ret = 0;
+            var dayKeys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}");
+            foreach (var key in dayKeys)
+            {
+                var data = key.Split("_");
+                if (data.Length == 2)
+                {
+                    if (long.TryParse(data[1], out var time))
+                    {
+                        var stats = await GetStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Day, data[0], time) ?? 0;
+                        var slot = await GetDaySlot(data[0], time);
+                        if (slot.Registrations != stats)
+                        {
+                            slot.Registrations = stats;
+                            ret++;
+                            await SetDaySlot(slot, false);
+                        }
+                    }
+                }
+            }
+            var hourKeys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}");
+            foreach (var key in hourKeys)
+            {
+                var data = key.Split("_");
+                if (data.Length == 2)
+                {
+                    if (long.TryParse(data[1], out var time))
+                    {
+                        var stats = await GetStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Hour, data[0], time) ?? 0;
+                        var slot = await GetHourSlot(data[0], time);
+                        if (slot.Registrations != stats)
+                        {
+                            slot.Registrations = stats;
+                            ret++;
+                            await SetHourSlot(slot, false);
+                        }
+                    }
+                }
+            }
+            var minKeys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}");
+            foreach (var key in minKeys)
+            {
+                var data = key.Split("_");
+                if (data.Length == 2)
+                {
+                    if (long.TryParse(data[1], out var time))
+                    {
+                        var stats = await GetStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Min, data[0], time) ?? 0;
+                        var slot = await Get5MinSlot(data[0], time);
+                        if (slot.Registrations != stats)
+                        {
+                            slot.Registrations = stats;
+                            ret++;
+                            await SetMinuteSlot(slot, false);
+                        }
+                    }
+                }
+            }
+
             return ret;
         }
     }
