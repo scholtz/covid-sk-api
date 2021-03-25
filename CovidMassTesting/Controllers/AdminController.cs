@@ -500,6 +500,51 @@ namespace CovidMassTesting.Controllers
             }
         }
 
+        [HttpPost("FixMoveVisitorsToSummerTime")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> FixMoveVisitorsToSummerTime([FromForm] DateTimeOffset? from)
+        {
+            try
+            {
+                int i = 0;
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                logger.LogInformation($"FixMoveVisitorsToSummerTime {from}");
+                await slotRepository.DropAllStats(from);
+                var places = await placeRepository.ListAll();
+                var visitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider());
+                var decision = DateTimeOffset.Parse("2021-03-28T00:00:00+00:00");
+                foreach (var visitor in visitors)
+                {
+                    try
+                    {
+                        if (visitor.ChosenSlotTime >= decision)
+                        {
+                            visitor.ChosenSlot = visitor.ChosenSlotTime.AddHours(-1).Ticks;
+                            await visitorRepository.SetVisitor(visitor, false);
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, $"FixMoveVisitorsToSummerTime error {exc.Message}");
+                    }
+                }
+
+
+                logger.LogInformation($"FixMoveVisitorsToSummerTime done {i}");
+                return Ok(i);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+
         /// <summary>
         /// Fix corrupted stats
         /// </summary>
