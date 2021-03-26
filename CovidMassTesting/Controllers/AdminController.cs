@@ -556,7 +556,6 @@ namespace CovidMassTesting.Controllers
         {
             try
             {
-                int i = 0;
                 if (!User.IsAdmin(userRepository))
                 {
                     throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
@@ -575,7 +574,7 @@ namespace CovidMassTesting.Controllers
                     }
                 }
                 logger.LogInformation($"ReportSlotIssues done {ret.Count}");
-                return Ok(i);
+                return Ok(ret);
             }
             catch (Exception exc)
             {
