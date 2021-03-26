@@ -605,7 +605,7 @@ namespace CovidMassTesting.Controllers
         [HttpPost("FixSlotIssues")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<IEnumerable<Slot1Hour>>> FixSlotIssues()
+        public async Task<ActionResult<IEnumerable<Slot1Hour>>> FixSlotIssues([FromForm] bool? rewrite)
         {
             try
             {
@@ -656,6 +656,11 @@ namespace CovidMassTesting.Controllers
                                     {
                                         logger.LogError(exc, exc.Message);
                                         log.AppendLine($"FAILED {clone.PlaceId} {clone.SlotId} {clone.Time.ToString("o")} {clone.TimeInCET.ToString("o")} {clone.Description} != {shouldBe} :: ");
+
+                                        if (rewrite == true)
+                                        {
+                                            await slotRepository.RemoveSlotH(hour);
+                                        }
                                     }
                                 }
                             }
