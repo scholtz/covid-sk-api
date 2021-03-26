@@ -164,10 +164,34 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="newOnly"></param>
         public Task<bool> SetHourSlot(Slot1Hour slot, bool newOnly);
         /// <summary>
+        /// Set hour slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="newOnly"></param>
+        public Task<bool> SetMinuteSlot(Slot5Min slot, bool newOnly);
+        /// <summary>
+        /// Set hour slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="newOnly"></param>
+        public Task<bool> SetDaySlot(Slot1Day slot, bool newOnly);
+        /// <summary>
         /// Removes hour slot
         /// </summary>
         /// <param name="hour"></param>
         /// <returns></returns>
-        public Task<bool> RemoveSlotH(Slot1Hour hour);
+        public Task<bool> DeleteDaySlot(Slot1Day hour);
+        /// <summary>
+        /// Removes hour slot
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteHourSlot(Slot1Hour hour);
+        /// <summary>
+        /// Removes hour slot
+        /// </summary>
+        /// <param name="hour"></param>
+        /// <returns></returns>
+        public Task<bool> DeleteMinuteSlot(Slot5Min hour);
     }
 }

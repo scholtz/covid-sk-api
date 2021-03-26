@@ -3358,6 +3358,24 @@ namespace NUnitTestCovidApi
                 TestingDayId = 637524864000000000,
                 DaySlotId = 637524864000000000
             });
+            await slotRepository.Add(new Slot5Min()
+            {
+                Time = DateTimeOffset.Parse("2021-03-28T14:00:00+00:00"),
+                Description = "15:00 - 15:05",
+                PlaceId = "123",
+                Registrations = 5,
+                TestingDayId = 637524864000000000,
+                HourSlotId = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00").Ticks
+            });
+            await slotRepository.Add(new Slot5Min()
+            {
+                Time = DateTimeOffset.Parse("2021-03-28T14:05:00+00:00"),
+                Description = "15:05 - 15:10",
+                PlaceId = "123",
+                Registrations = 5,
+                TestingDayId = 637524864000000000,
+                HourSlotId = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00").Ticks
+            });
 
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
             var admin = users.First(u => u.Name == "Admin");
@@ -3391,6 +3409,7 @@ namespace NUnitTestCovidApi
 
             Assert.AreEqual(1, (await slotRepository.ListDaySlotsByPlace("123")).Count());
             Assert.AreEqual(2, (await slotRepository.ListHourSlotsByPlaceAndDaySlotId("123", 637524864000000000)).Count());
+            Assert.AreEqual(2, (await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId("123", 637524864000000000)).Count());
 
         }
 

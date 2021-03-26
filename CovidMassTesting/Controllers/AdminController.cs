@@ -602,10 +602,10 @@ namespace CovidMassTesting.Controllers
         /// Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
         /// </summary>
         /// <returns></returns>
-        [HttpPost("FixSlotIssues")]
+        [HttpPost("ReportSlotIssuesM")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<IEnumerable<Slot1Hour>>> FixSlotIssues([FromForm] bool? rewrite)
+        public async Task<ActionResult<IEnumerable<Slot1Hour>>> ReportSlotIssuesM()
         {
             try
             {
@@ -613,7 +613,7 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 }
-                logger.LogInformation($"FixSlotIssues");
+                logger.LogInformation($"ReportSlotIssuesM");
                 StringBuilder log = new StringBuilder();
                 var ret = new List<Slot1Hour>();
                 var places = await placeRepository.ListAll();
@@ -624,11 +624,105 @@ namespace CovidMassTesting.Controllers
                     {
                         if (day.Time < DateTimeOffset.Parse("2021-03-01")) continue;
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
-                        foreach (var hour in hours.OrderBy(h => h.SlotId))
+                        foreach (var hour in hours)
                         {
                             var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
-                            
+                            if (hour.Description != shouldBe)
+                            {
+                                ret.Add(hour);
+                                log.AppendLine($"{hour.PlaceId} {hour.SlotId} {hour.Time.ToString("o")} {hour.TimeInCET.ToString("o")} {hour.Description} != {shouldBe}");
+                            }
+                        }
+                    }
+                }
+                logger.LogInformation($"ReportSlotIssuesM done {ret.Count}");
+                logger.LogInformation($"ReportSlotIssuesM {log}");
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
 
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FixSlotIssues")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<object>>> FixSlotIssues([FromForm] bool? rewrite)
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                logger.LogInformation($"FixSlotIssues");
+                StringBuilder log = new StringBuilder();
+                var ret = new List<object>();
+                var places = await placeRepository.ListAll();
+                foreach (var place in places)
+                {
+                    var days = await slotRepository.ListDaySlotsByPlace(place.Id);
+                    foreach (var day in days)
+                    {
+                        if (day.Time < DateTimeOffset.Parse("2021-03-01")) continue;
+                        var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
+                        foreach (var hour in hours.OrderBy(h => h.SlotId))
+                        {
+
+
+                            var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(place.Id, hour.SlotId);
+                            foreach (var minute in minutes.OrderBy(h => h.SlotId))
+                            {
+
+                                var shouldBeM = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+
+                                if (hour.Description != shouldBeM)
+                                {
+                                    var cloneM = new Slot5Min()
+                                    {
+                                        Description = hour.Description,
+                                        PlaceId = hour.PlaceId,
+                                        Registrations = hour.Registrations,
+                                        TestingDayId = hour.TestingDayId,
+                                        Time = hour.Time,
+                                        HourSlotId = hour.SlotId
+                                    };
+                                    cloneM.Time = hour.Time.AddHours(-1);
+                                    shouldBeM = $"{cloneM.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(cloneM.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+                                    if (cloneM.Description == shouldBeM)
+                                    {
+                                        try
+                                        {
+                                            var result = await slotRepository.SetMinuteSlot(cloneM, true);
+                                            await slotRepository.DeleteMinuteSlot(minute);
+                                            ret.Add(cloneM);
+
+                                            log.AppendLine($"OK {cloneM.PlaceId} {cloneM.SlotId} {cloneM.Time.ToString("o")} {cloneM.TimeInCET.ToString("o")} {cloneM.Description} != {shouldBeM} :: ");
+                                        }
+                                        catch (Exception exc)
+                                        {
+                                            logger.LogError(exc, exc.Message);
+                                            log.AppendLine($"FAILED {cloneM.PlaceId} {cloneM.SlotId} {cloneM.Time.ToString("o")} {cloneM.TimeInCET.ToString("o")} {cloneM.Description} != {shouldBeM} :: ");
+
+                                            if (rewrite == true)
+                                            {
+                                                await slotRepository.DeleteMinuteSlot(minute);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+
+
+                            var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+                            
                             if (hour.Description != shouldBe)
                             {
                                 var clone = new Slot1Hour()
@@ -647,7 +741,7 @@ namespace CovidMassTesting.Controllers
                                     try
                                     {
                                         var result = await slotRepository.SetHourSlot(clone, true);
-                                        await slotRepository.RemoveSlotH(hour);
+                                        await slotRepository.DeleteHourSlot(hour);
                                         ret.Add(clone);
 
                                         log.AppendLine($"OK {clone.PlaceId} {clone.SlotId} {clone.Time.ToString("o")} {clone.TimeInCET.ToString("o")} {clone.Description} != {shouldBe} :: ");
@@ -659,7 +753,7 @@ namespace CovidMassTesting.Controllers
 
                                         if (rewrite == true)
                                         {
-                                            await slotRepository.RemoveSlotH(hour);
+                                            await slotRepository.DeleteHourSlot(hour);
                                         }
                                     }
                                 }
