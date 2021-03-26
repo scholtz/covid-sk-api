@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace CovidMassTesting.Controllers
@@ -561,6 +562,7 @@ namespace CovidMassTesting.Controllers
                     throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 }
                 logger.LogInformation($"ReportSlotIssues");
+                StringBuilder log = new StringBuilder();
                 var ret = new List<Slot1Hour>();
                 var places = await placeRepository.ListAll();
                 foreach (var place in places)
@@ -569,11 +571,18 @@ namespace CovidMassTesting.Controllers
                     foreach (var day in days)
                     {
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
-                        
-                        ret.AddRange(hours.Where(s => s.Description != $"{s.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(s.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}"));
+                        foreach(var hour in hours)
+                        {
+                            var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(s.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+                            if (hour.Description != shouldBe){
+                                ret.Add(hour);
+                                log.AppendLine($"{hour.Time} {hour.TimeInCET} {hour.Description} != {shouldBe}");
+                            }
+                        }
                     }
                 }
                 logger.LogInformation($"ReportSlotIssues done {ret.Count}");
+                logger.LogInformation($"ReportSlotIssues {log}");
                 return Ok(ret);
             }
             catch (Exception exc)
