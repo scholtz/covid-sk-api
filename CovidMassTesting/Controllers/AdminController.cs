@@ -633,9 +633,10 @@ namespace CovidMassTesting.Controllers
                                 shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
                                 if (hour.Description == shouldBe)
                                 {
+                                    var result = await slotRepository.SetHourSlot(hour, false);
                                     ret.Add(hour);
                                     log.Append($"{hour.PlaceId} {hour.SlotId} {hour.Time.ToString("o")} {hour.TimeInCET.ToString("o")} {hour.Description} != {shouldBe} :: ");
-                                    log.AppendLine((await slotRepository.SetHourSlot(hour, false)).ToString());
+                                    log.AppendLine(result.ToString());
                                 }
                             }
                         }
