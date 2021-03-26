@@ -116,7 +116,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (!listH.ContainsKey(t.Ticks))
                     {
                         ret++;
-                        await Add(new Slot1Hour()
+                        await SetHourSlot(new Slot1Hour()
                         {
                             PlaceId = placeId,
                             Registrations = 0,
@@ -124,7 +124,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             DaySlotId = day.Ticks,
                             TestingDayId = testingDay,
                             Description = $"{t.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tNext.ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}"
-                        });
+                        },false);
                     }
                 }
                 else
