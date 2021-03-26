@@ -569,8 +569,8 @@ namespace CovidMassTesting.Controllers
                     foreach (var day in days)
                     {
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
-
-                        ret.AddRange(hours.Where(s => s.Description != s.TimeInCET.ToString("HH:00") + " - " + s.TimeInCET.AddHours(1).ToString("HH:00")));
+                        
+                        ret.AddRange(hours.Where(s => s.Description != $"{s.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(s.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}"));
                     }
                 }
                 logger.LogInformation($"ReportSlotIssues done {ret.Count}");
