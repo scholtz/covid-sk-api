@@ -570,7 +570,7 @@ namespace CovidMassTesting.Controllers
                     {
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
 
-                        ret.AddRange(hours.Where(s => s.Description != s.TimeInCET.ToString("HH:00") + " - " + s.TimeInCET.ToString("HH:00")));
+                        ret.AddRange(hours.Where(s => s.Description != s.TimeInCET.ToString("HH:00") + " - " + s.TimeInCET.AddHours(1).ToString("HH:00")));
                     }
                 }
                 logger.LogInformation($"ReportSlotIssues done {ret.Count}");
