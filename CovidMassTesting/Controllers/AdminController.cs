@@ -574,6 +574,7 @@ namespace CovidMassTesting.Controllers
                     var days = await slotRepository.ListDaySlotsByPlace(place.Id);
                     foreach (var day in days)
                     {
+                        if (day.Time < DateTimeOffset.Parse("2021-03-01")) continue;
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
                         foreach(var hour in hours)
                         {
