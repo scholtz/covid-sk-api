@@ -545,7 +545,45 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ReportSlotIssues")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<Slot1Hour>>> ReportSlotIssues()
+        {
+            try
+            {
+                int i = 0;
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                logger.LogInformation($"ReportSlotIssues");
+                var ret = new List<Slot1Hour>();
+                var places = await placeRepository.ListAll();
+                foreach (var place in places)
+                {
+                    var days = await slotRepository.ListDaySlotsByPlace(place.Id);
+                    foreach (var day in days)
+                    {
+                        var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
 
+                        ret.AddRange(hours.Where(s => s.Description != s.TimeInCET.ToString("HH:00") + " - " + s.TimeInCET.ToString("HH:00")));
+                    }
+                }
+                logger.LogInformation($"ReportSlotIssues done {ret.Count}");
+                return Ok(i);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// Fix corrupted stats
         /// </summary>
