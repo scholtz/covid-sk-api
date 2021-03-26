@@ -187,6 +187,25 @@
             <param name="from"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixMoveVisitorsToSummerTime(System.Nullable{System.DateTimeOffset})">
+            <summary>
+            Move visitors by one hour
+            </summary>
+            <param name="from"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.ReportSlotIssues">
+            <summary>
+            Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixSlotIssues">
+            <summary>
+            Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.FixPersonPlace(System.String,System.String,System.String)">
             <summary>
             Fix corrupted stats
@@ -275,6 +294,12 @@
         <member name="M:CovidMassTesting.Controllers.AdminController.FixVerificationData">
             <summary>
             Fix verification data
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixConnectVisitorsWithEmployeeId">
+            <summary>
+            FixConnectVisitorsWithEmployeeId
             </summary>
             <returns></returns>
         </member>
@@ -4993,7 +5018,11 @@
             Product id
             </summary>
         </member>
-        <!-- Badly formed XML comment ignored for member "P:CovidMassTesting.Model.Visitor.ProductName" -->
+        <member name="P:CovidMassTesting.Model.Visitor.ProductName">
+            <summary>
+            Name of the place
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Visitor.VerificationId">
             <summary>
             Verification id is used to share the test results with others. It does not contain any sensitive data such as personal number, but it contains information when the visitor has taken the test with the test result and his name.
@@ -6091,6 +6120,13 @@
             Fix slots
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.SetHourSlot(CovidMassTesting.Model.Slot1Hour,System.Boolean)">
+            <summary>
+            Set hour slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
         </member>
         <member name="T:CovidMassTesting.Repository.Interface.IUserRepository">
             <summary>
@@ -7874,6 +7910,24 @@
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.DropAllData">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetSlotKeysD">
+            <summary>
+            GetSlotKeysD
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetSlotKeysH">
+            <summary>
+            GetSlotKeysH
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.GetSlotKeysM">
+            <summary>
+            GetSlotKeysM
             </summary>
             <returns></returns>
         </member>

@@ -157,5 +157,11 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <returns></returns>
         public Task<int> FixAllSlots();
+        /// <summary>
+        /// Set hour slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <param name="newOnly"></param>
+        public Task<bool> SetHourSlot(Slot1Hour slot, bool newOnly);
     }
 }

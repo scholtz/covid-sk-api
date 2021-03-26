@@ -576,10 +576,11 @@ namespace CovidMassTesting.Controllers
                     {
                         if (day.Time < DateTimeOffset.Parse("2021-03-01")) continue;
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
-                        foreach(var hour in hours)
+                        foreach (var hour in hours)
                         {
                             var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
-                            if (hour.Description != shouldBe){
+                            if (hour.Description != shouldBe)
+                            {
                                 ret.Add(hour);
                                 log.AppendLine($"{hour.PlaceId} {hour.SlotId} {hour.Time.ToString("o")} {hour.TimeInCET.ToString("o")} {hour.Description} != {shouldBe}");
                             }
@@ -588,6 +589,60 @@ namespace CovidMassTesting.Controllers
                 }
                 logger.LogInformation($"ReportSlotIssues done {ret.Count}");
                 logger.LogInformation($"ReportSlotIssues {log}");
+                return Ok(ret);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
+        /// Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FixSlotIssues")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<IEnumerable<Slot1Hour>>> FixSlotIssues()
+        {
+            try
+            {
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                logger.LogInformation($"FixSlotIssues");
+                StringBuilder log = new StringBuilder();
+                var ret = new List<Slot1Hour>();
+                var places = await placeRepository.ListAll();
+                foreach (var place in places)
+                {
+                    var days = await slotRepository.ListDaySlotsByPlace(place.Id);
+                    foreach (var day in days)
+                    {
+                        if (day.Time < DateTimeOffset.Parse("2021-03-01")) continue;
+                        var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
+                        foreach (var hour in hours)
+                        {
+                            var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+                            if (hour.Description != shouldBe)
+                            {
+                                hour.Time = hour.Time.AddHours(-1);
+                                shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+                                if (hour.Description == shouldBe)
+                                {
+                                    ret.Add(hour);
+                                    log.Append($"{hour.PlaceId} {hour.SlotId} {hour.Time.ToString("o")} {hour.TimeInCET.ToString("o")} {hour.Description} != {shouldBe} :: ");
+                                    log.AppendLine((await slotRepository.SetHourSlot(hour, false)).ToString());
+                                }
+                            }
+                        }
+                    }
+                }
+                logger.LogInformation($"FixSlotIssues done {ret.Count}");
+                logger.LogInformation($"FixSlotIssues {log}");
                 return Ok(ret);
             }
             catch (Exception exc)
