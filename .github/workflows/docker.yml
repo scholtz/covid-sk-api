@@ -4,7 +4,7 @@ on: [ push ]
 
 jobs:
   multi:
-    runs-on: [linux]
+    runs-on: [self-hosted, linux]
     steps:
       -
         name: Checkout
