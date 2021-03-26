@@ -40,16 +40,6 @@ namespace CovidMassTesting.Helpers
             return DateTimeOffset.Parse(time.ToUniversalTime().AddMinutes(missingMinutes).ToString("yyyy-MM-ddTHH:mm:00", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
         }
         /// <summary>
-        /// Set time to local offset
-        /// </summary>
-        /// <param name="time"></param>
-        /// <returns></returns>
-        public static DateTimeOffset ToLocalOffset(this DateTimeOffset time)
-        {
-            var offset = TimeZoneInfo.Local.GetUtcOffset(time.ToUniversalTime());
-            return time.ToOffset(offset);
-        }
-        /// <summary>
         /// Returns local offset
         /// </summary>
         /// <param name="time"></param>

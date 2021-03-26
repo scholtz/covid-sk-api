@@ -3306,6 +3306,12 @@ namespace NUnitTestCovidApi
 
             Assert.AreEqual(637527744000000000, DateTimeOffset.Parse("2021-03-31T10:00:00+02:00").RoundHour());
             Assert.AreEqual(637527744000000000, DateTimeOffset.Parse("2021-03-31T10:00:00+02:00").RoundMinute());
+
+            Assert.AreEqual("2021-03-27T11:00:00.0000000+01:00", DateTimeOffset.Parse("2021-03-27T10:00:00+00:00").ToLocalTime().ToString("o"));
+            Assert.AreEqual("2021-03-28T12:00:00.0000000+02:00", DateTimeOffset.Parse("2021-03-28T10:00:00+00:00").ToLocalTime().ToString("o"));
+
+            
+
         }
 
         public class MockWebApp : WebApplicationFactory<CovidMassTesting.Startup>

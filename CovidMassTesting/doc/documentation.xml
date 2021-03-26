@@ -1544,13 +1544,6 @@
             <param name="time"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Helpers.TimeHelper.ToLocalOffset(System.DateTimeOffset)">
-            <summary>
-            Set time to local offset
-            </summary>
-            <param name="time"></param>
-            <returns></returns>
-        </member>
         <member name="M:CovidMassTesting.Helpers.TimeHelper.GetLocalOffset(System.DateTimeOffset)">
             <summary>
             Returns local offset
