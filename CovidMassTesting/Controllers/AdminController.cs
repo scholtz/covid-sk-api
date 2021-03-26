@@ -382,7 +382,7 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation("FixAdvancedStats");
                 await visitorRepository.DropAllStats(from);
                 var places = await placeRepository.ListAll();
-                var visitors = await visitorRepository.ListAllVisitors(User.GetPlaceProvider());
+                var visitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider());
 
                 foreach (var visitor in visitors)
                 {
@@ -468,7 +468,7 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation($"FixAdvancedStatsSlots {from}");
                 await slotRepository.DropAllStats(from);
                 var places = await placeRepository.ListAll();
-                var visitors = await visitorRepository.ListAllVisitors(User.GetPlaceProvider());
+                var visitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider());
 
                 foreach (var visitor in visitors)
                 {
