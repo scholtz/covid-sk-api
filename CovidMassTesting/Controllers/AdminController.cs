@@ -573,7 +573,7 @@ namespace CovidMassTesting.Controllers
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
                         foreach(var hour in hours)
                         {
-                            var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(s.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+                            var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
                             if (hour.Description != shouldBe){
                                 ret.Add(hour);
                                 log.AppendLine($"{hour.Time} {hour.TimeInCET} {hour.Description} != {shouldBe}");
