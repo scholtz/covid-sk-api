@@ -760,15 +760,26 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return ret;
         }
-
+        /// <summary>
+        /// GetSlotKeysD
+        /// </summary>
+        /// <returns></returns>
         public virtual Task<IEnumerable<string>> GetSlotKeysD()
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}");
         }
+        /// <summary>
+        /// GetSlotKeysH
+        /// </summary>
+        /// <returns></returns>
         public virtual Task<IEnumerable<string>> GetSlotKeysH()
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}");
         }
+        /// <summary>
+        /// GetSlotKeysM
+        /// </summary>
+        /// <returns></returns>
         public virtual Task<IEnumerable<string>> GetSlotKeysM()
         {
             return redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}");

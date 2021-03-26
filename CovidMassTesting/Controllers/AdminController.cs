@@ -500,7 +500,11 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
-
+        /// <summary>
+        /// Move visitors by one hour
+        /// </summary>
+        /// <param name="from"></param>
+        /// <returns></returns>
         [HttpPost("FixMoveVisitorsToSummerTime")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
@@ -576,7 +580,7 @@ namespace CovidMassTesting.Controllers
                             var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
                             if (hour.Description != shouldBe){
                                 ret.Add(hour);
-                                log.AppendLine($"{hour.Time} {hour.TimeInCET} {hour.Description} != {shouldBe}");
+                                log.AppendLine($"{hour.PlaceId} {hour.SlotId} {hour.Time.ToString("o")} {hour.TimeInCET.ToString("o")} {hour.Description} != {shouldBe}");
                             }
                         }
                     }
@@ -1219,6 +1223,10 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// FixConnectVisitorsWithEmployeeId
+        /// </summary>
+        /// <returns></returns>
 
         [HttpPost("FixConnectVisitorsWithEmployeeId")]
         [ProducesResponseType(200)]

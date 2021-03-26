@@ -166,6 +166,7 @@ namespace CovidMassTesting.Model
         /// Product id
         /// </summary>
         public string Product { get; set; }
+        /// <summary>
         /// Name of the place
         /// </summary>
         public string ProductName { get; set; }
