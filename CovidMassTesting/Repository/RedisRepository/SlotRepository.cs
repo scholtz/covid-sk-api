@@ -487,6 +487,30 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
         }
         /// <summary>
+        /// Remove hour slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> RemoveSlotH(Slot1Hour slot)
+        {
+            if (slot is null)
+            {
+                throw new ArgumentNullException(nameof(slot));
+            }
+
+            try
+            {
+                var ret = await redisCacheClient.Db0.SetRemoveAsync< string>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                await redisCacheClient.Db0.SetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                return true;
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return false;
+            }
+        }
+        /// <summary>
         /// Updates minute slot
         /// </summary>
         /// <param name="slot"></param>

@@ -147,6 +147,25 @@ namespace CovidMassTesting.Repository.MockRepository
             dataH[key] = slot;
             return true;
         }
+
+        /// <summary>
+        /// Remove hour slot
+        /// </summary>
+        /// <param name="slot"></param>
+        /// <returns></returns>
+        public override async Task<bool> RemoveSlotH(Slot1Hour slot)
+        {
+            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+
+            if (!dataH.ContainsKey(key))
+            {
+                throw new Exception("Item already exists");
+            }
+            dataH.TryRemove(key, out var _);
+            return true;
+        }
+
+
         /// <summary>
         /// Set minute slot
         /// </summary>
@@ -366,5 +385,7 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             return dataM.Keys;
         }
+
+
     }
 }

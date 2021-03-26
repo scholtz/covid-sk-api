@@ -6128,6 +6128,13 @@
             <param name="slot"></param>
             <param name="newOnly"></param>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.RemoveSlotH(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Removes hour slot
+            </summary>
+            <param name="hour"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.Interface.IUserRepository">
             <summary>
             User repository interface for dependency injection
@@ -6914,6 +6921,13 @@
             </summary>
             <param name="slot"></param>
             <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.RemoveSlotH(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Remove hour slot
+            </summary>
+            <param name="slot"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.MockRepository.SlotRepository.SetMinuteSlot(CovidMassTesting.Model.Slot5Min,System.Boolean)">
@@ -7821,6 +7835,13 @@
             </summary>
             <param name="slot"></param>
             <param name="newOnly"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.RemoveSlotH(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Remove hour slot
+            </summary>
+            <param name="slot"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.SlotRepository.SetMinuteSlot(CovidMassTesting.Model.Slot5Min,System.Boolean)">

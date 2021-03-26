@@ -1870,6 +1870,8 @@ namespace NUnitTestCovidApi
             request = ListHourSlotsByPlaceAndDaySlotId(client, place.Id, daySlot.SlotId.ToString());
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
+            if (DateTimeOffset.Now.Hour == 0) return;
+
             var hoursDictionary = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Hour>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, hoursDictionary.Count);
             var hourSlot = hoursDictionary.Values.First();
@@ -3310,7 +3312,85 @@ namespace NUnitTestCovidApi
             Assert.AreEqual("2021-03-27T11:00:00.0000000+01:00", DateTimeOffset.Parse("2021-03-27T10:00:00+00:00").ToLocalTime().ToString("o"));
             Assert.AreEqual("2021-03-28T12:00:00.0000000+02:00", DateTimeOffset.Parse("2021-03-28T10:00:00+00:00").ToLocalTime().ToString("o"));
 
-            
+
+
+        }
+
+        [Test]
+        public async Task SlotRepositoryTest()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var slotRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.ISlotRepository>();
+            var placeRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IPlaceRepository>();
+
+            await placeRepository.SetPlace(new Place()
+            {
+                Id = "123",
+                Name = "123"
+            });
+
+            await slotRepository.Add(new Slot1Day()
+            {
+                Time = DateTimeOffset.Parse("2021-03-28T00:00:00+00:00"),
+                Description = "28.3.",
+                PlaceId = "123",
+                Registrations = 5,
+            });
+
+            await slotRepository.Add(new Slot1Hour()
+            {
+                Time = DateTimeOffset.Parse("2021-03-28T14:00:00+00:00"),
+                Description = "15:00 - 16:00",
+                PlaceId = "123",
+                Registrations = 5,
+                TestingDayId = 637524864000000000,
+                DaySlotId = 637524864000000000
+            });
+            await slotRepository.Add(new Slot1Hour()
+            {
+                Time = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00"),
+                Description = "14:00 - 15:00",
+                PlaceId = "123",
+                Registrations = 5,
+                TestingDayId = 637524864000000000,
+                DaySlotId = 637524864000000000
+            });
+
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
+            var admin = users.First(u => u.Name == "Admin");
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = admin.Email,
+                PrivatePhone = "+421907000000",
+                MainContact = "Admin Person"
+            };
+
+            var request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
+            request = AuthenticateUser(client, admin.Email, admin.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+
+            var response = FixSlotIssues(client);
+            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
+            var fixSlotIssuesData = JsonConvert.DeserializeObject<List<Slot1Hour>>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(2, fixSlotIssuesData.Count);
+
+            Assert.AreEqual(1, (await slotRepository.ListDaySlotsByPlace("123")).Count());
+            Assert.AreEqual(2, (await slotRepository.ListHourSlotsByPlaceAndDaySlotId("123", 637524864000000000)).Count());
 
         }
 
