@@ -525,6 +525,7 @@ namespace CovidMassTesting.Controllers
                         {
                             visitor.ChosenSlot = visitor.ChosenSlotTime.AddHours(-1).Ticks;
                             await visitorRepository.SetVisitor(visitor, false);
+                            i++;
                         }
                     }
                     catch (Exception exc)
