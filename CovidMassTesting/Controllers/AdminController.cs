@@ -562,7 +562,7 @@ namespace CovidMassTesting.Controllers
                     }
                     catch (Exception exc)
                     {
-                        logger.LogError(exc, $"FixMoveVisitorsToSummerTime error {exc.Message}");
+                        logger.LogError(exc, $"FixMoveVisitorsToSummerTime error {visitor.Id} {exc.Message}");
                     }
                 }
 
