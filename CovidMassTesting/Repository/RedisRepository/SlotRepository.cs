@@ -358,7 +358,15 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual async Task<long?> GetStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, long slotId)
         {
-            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{slotId}";
+            var time = new DateTimeOffset(slotId, TimeSpan.Zero);
+            var t = slotType switch
+            {
+                SlotType.Enum.Day => time.RoundDay(),
+                SlotType.Enum.Hour => time.RoundHour(),
+                SlotType.Enum.Min => time.RoundMinute(),
+                _ => throw new Exception("Invalid slot type"),
+            };/**/
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{time.UtcTicks}";
             return await redisCacheClient.Db0.HashGetAsync<long?>(
                 $"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}",
                 keyPlace

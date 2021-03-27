@@ -354,7 +354,15 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public async override Task<long?> GetStats(StatsType.Enum statsType, SlotType.Enum slotType, string placeId, long slotId)
         {
-            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{slotId}";
+            var time = new DateTimeOffset(slotId, TimeSpan.Zero);
+            var t = slotType switch
+            {
+                SlotType.Enum.Day => time.RoundDay(),
+                SlotType.Enum.Hour => time.RoundHour(),
+                SlotType.Enum.Min => time.RoundMinute(),
+                _ => throw new Exception("Invalid slot type"),
+            };/**/
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{t}";
             if (Stats.ContainsKey(keyPlace))
             {
                 return Stats[keyPlace];

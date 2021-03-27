@@ -187,11 +187,12 @@
             <param name="from"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.FixMoveVisitorsToSummerTime(System.Nullable{System.DateTimeOffset})">
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixMoveVisitorsToSummerTime(System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
             <summary>
             Move visitors by one hour
             </summary>
-            <param name="from"></param>
+            <param name="regFrom"></param>
+            <param name="regUntil"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.ReportSlotIssues">
