@@ -727,6 +727,7 @@ namespace CovidMassTesting.Controllers
 
                                                     if (rewrite == true)
                                                     {
+                                                        var result = await slotRepository.SetMinuteSlot(cloneM, false);
                                                         await slotRepository.DeleteMinuteSlot(minute);
                                                     }
                                                 }
@@ -749,6 +750,7 @@ namespace CovidMassTesting.Controllers
 
                                         if (rewrite == true)
                                         {
+                                            var result = await slotRepository.SetHourSlot(clone, false);
                                             await slotRepository.DeleteHourSlot(hour);
                                         }
                                     }
