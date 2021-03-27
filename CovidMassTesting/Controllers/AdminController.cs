@@ -538,9 +538,23 @@ namespace CovidMassTesting.Controllers
                                 if (visitor.RegistrationTime >= regUntil) continue;
                             }
 
-                            visitor.ChosenSlot = visitor.ChosenSlotTime.AddHours(-1).UtcTicks;
-                            await visitorRepository.SetVisitor(visitor, false);
-                            i++;
+                            var newSlot = visitor.ChosenSlotTime.AddHours(-1).UtcTicks;
+                            var slotFound = false;
+                            try
+                            {
+                                var checkSlot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, newSlot);
+                                slotFound = true;
+                            }
+                            catch
+                            {
+                                slotFound = false;
+                            }
+                            if (slotFound)
+                            {
+                                visitor.ChosenSlot = newSlot;
+                                await visitorRepository.SetVisitor(visitor, false);
+                                i++;
+                            }
                         }
                     }
                     catch (Exception exc)
