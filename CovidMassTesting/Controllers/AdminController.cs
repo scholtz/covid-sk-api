@@ -543,7 +543,10 @@ namespace CovidMassTesting.Controllers
                             try
                             {
                                 var checkSlot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, newSlot);
-                                slotFound = true;
+                                if (checkSlot != null)
+                                {
+                                    slotFound = true;
+                                }
                             }
                             catch
                             {
