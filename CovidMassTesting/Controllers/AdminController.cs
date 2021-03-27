@@ -503,13 +503,13 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Move visitors by one hour
         /// </summary>
-        /// <param name="from"></param>
-        /// <param name="until"></param>
+        /// <param name="regFrom"></param>
+        /// <param name="regUntil"></param>
         /// <returns></returns>
         [HttpPost("FixMoveVisitorsToSummerTime")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> FixMoveVisitorsToSummerTime([FromForm] DateTimeOffset? from, [FromForm] DateTimeOffset? until)
+        public async Task<ActionResult<bool>> FixMoveVisitorsToSummerTime([FromForm] DateTimeOffset? regFrom, [FromForm] DateTimeOffset? regUntil)
         {
             try
             {
@@ -518,12 +518,10 @@ namespace CovidMassTesting.Controllers
                 {
                     throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 }
-                logger.LogInformation($"FixMoveVisitorsToSummerTime {from}");
+                logger.LogInformation($"FixMoveVisitorsToSummerTime {regFrom} {regUntil}");
                 var places = await placeRepository.ListAll();
                 var visitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider());
                 var decision = DateTimeOffset.Parse("2021-03-28T00:00:00+00:00");
-
-                if (from.HasValue) decision = from.Value;
 
                 foreach (var visitor in visitors)
                 {
@@ -531,10 +529,15 @@ namespace CovidMassTesting.Controllers
                     {
                         if (visitor.ChosenSlotTime >= decision)
                         {
-                            if (until.HasValue)
+                            if (regFrom.HasValue)
                             {
-                                if (visitor.ChosenSlotTime < until) continue;
+                                if (visitor.RegistrationTime < regFrom) continue;
                             }
+                            if (regUntil.HasValue)
+                            {
+                                if (visitor.RegistrationTime >= regUntil) continue;
+                            }
+
                             visitor.ChosenSlot = visitor.ChosenSlotTime.AddHours(-1).UtcTicks;
                             await visitorRepository.SetVisitor(visitor, false);
                             i++;
