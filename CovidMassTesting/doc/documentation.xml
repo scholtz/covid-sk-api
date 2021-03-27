@@ -187,6 +187,12 @@
             <param name="from"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixSlotsOnly">
+            <summary>
+            fix slots stats
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.FixMoveVisitorsToSummerTime(System.Nullable{System.DateTimeOffset},System.Nullable{System.DateTimeOffset})">
             <summary>
             Move visitors by one hour

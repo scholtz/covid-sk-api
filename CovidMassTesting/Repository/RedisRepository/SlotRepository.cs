@@ -366,7 +366,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 SlotType.Enum.Min => time.RoundMinute(),
                 _ => throw new Exception("Invalid slot type"),
             };/**/
-            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{time.UtcTicks}";
+            var keyPlace = $"{StatsType.ToText(statsType)}-slot-{SlotType.ToText(slotType)}-{placeId}-{t}";
             return await redisCacheClient.Db0.HashGetAsync<long?>(
                 $"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}",
                 keyPlace
