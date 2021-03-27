@@ -703,7 +703,7 @@ namespace CovidMassTesting.Controllers
                 var name = $"all-tested-alldays-{from}-{count}.csv";
                 if (day.HasValue)
                 {
-                    name = $"all-tested-{day.Value.Ticks}-{from}-{count}.csv";
+                    name = $"all-tested-{day.Value.UtcTicks}-{from}-{count}.csv";
                 }
                 return File(ret, "text/csv", name);
             }
@@ -767,7 +767,7 @@ namespace CovidMassTesting.Controllers
                 var name = $"all-anonymized-alldays-{from}-{count}.csv";
                 if (day.HasValue)
                 {
-                    name = $"all-anonymized-{day.Value.Ticks}-{from}-{count}.csv";
+                    name = $"all-anonymized-{day.Value.UtcTicks}-{from}-{count}.csv";
                 }
                 return File(ret, "text/csv", name);
             }

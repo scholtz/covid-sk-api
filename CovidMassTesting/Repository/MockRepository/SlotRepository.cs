@@ -53,7 +53,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 throw new ArgumentNullException(nameof(slot));
             }
 
-            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            string key = $"{slot.PlaceId}_{slot.Time.UtcTicks}";
             if (dataD.ContainsKey(key))
             {
                 dataD.TryRemove(key, out var _);
@@ -73,7 +73,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 throw new ArgumentNullException(nameof(slot));
             }
 
-            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            string key = $"{slot.PlaceId}_{slot.Time.UtcTicks}";
             if (dataH.ContainsKey(key))
             {
                 dataH.TryRemove(key, out var _);
@@ -93,7 +93,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 throw new ArgumentNullException(nameof(slot));
             }
 
-            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            string key = $"{slot.PlaceId}_{slot.Time.UtcTicks}";
             if (dataM.ContainsKey(key))
             {
                 dataM.TryRemove(key, out var _);
@@ -113,7 +113,7 @@ namespace CovidMassTesting.Repository.MockRepository
             {
                 throw new ArgumentNullException(nameof(slot));
             }
-            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            string key = $"{slot.PlaceId}_{slot.Time.UtcTicks}";
             if (newOnly)
             {
                 if (dataD.ContainsKey(key))
@@ -136,7 +136,7 @@ namespace CovidMassTesting.Repository.MockRepository
             {
                 throw new ArgumentNullException(nameof(slot));
             }
-            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            string key = $"{slot.PlaceId}_{slot.Time.UtcTicks}";
             if (newOnly)
             {
                 if (dataH.ContainsKey(key))
@@ -155,7 +155,7 @@ namespace CovidMassTesting.Repository.MockRepository
         /// <returns></returns>
         public override async Task<bool> RemoveSlotH(Slot1Hour slot)
         {
-            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            string key = $"{slot.PlaceId}_{slot.Time.UtcTicks}";
 
             if (!dataH.ContainsKey(key))
             {
@@ -178,7 +178,7 @@ namespace CovidMassTesting.Repository.MockRepository
             {
                 throw new ArgumentNullException(nameof(slot));
             }
-            string key = $"{slot.PlaceId}_{slot.Time.Ticks}";
+            string key = $"{slot.PlaceId}_{slot.Time.UtcTicks}";
             if (newOnly)
             {
                 if (dataM.ContainsKey(key))
@@ -316,7 +316,7 @@ namespace CovidMassTesting.Repository.MockRepository
 
             if (from.HasValue)
             {
-                var decisionTick = from.Value.Ticks;
+                var decisionTick = from.Value.UtcTicks;
                 var toRemove = Stats.Keys.Where(item =>
                 {
 

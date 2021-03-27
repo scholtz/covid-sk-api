@@ -176,14 +176,15 @@ namespace CovidMassTesting.Controllers
                     var days = slotRepository.ListDaySlotsByPlace(item.Id).Result;
                     foreach (var day in
                         days.Where(d =>
-                            d.Time >= DateTimeOffset.UtcNow.AddDays(-1)
-                            && d.Time < DateTimeOffset.UtcNow.AddDays(daysCount - 1)
+                            d.SlotId >= DateTimeOffset.Now.RoundDay()
+                            && d.SlotId < DateTimeOffset.Now.AddDays(1).RoundDay()
                     ))
                     {
                         var hours = slotRepository.ListHourSlotsByPlaceAndDaySlotId(item.Id, day.SlotId).Result;
                         foreach (var hour in hours)
                         {
-                            if (hour.Time < DateTimeOffset.Now.AddHours(-1))
+
+                            if (hour.TimeInCET < DateTimeOffset.Now.AddHours(-1))
                             {
                                 continue;
                             }
@@ -201,7 +202,7 @@ namespace CovidMassTesting.Controllers
                                 var minutes = slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(item.Id, hour.SlotId).Result;
                                 foreach (var minute in minutes)
                                 {
-                                    if (minute.Time < DateTimeOffset.Now.AddMinutes(-5))
+                                    if (minute.TimeInCET < DateTimeOffset.Now.AddMinutes(-5))
                                     {
                                         continue;
                                     }
@@ -415,7 +416,7 @@ namespace CovidMassTesting.Controllers
                         }
 
                         var hours = "";
-                        var dayTicks = action.Date.RoundDay();// DateTimeOffset.Parse(action.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
+                        var dayTicks = action.Date.RoundDay();// DateTimeOffset.Parse(action.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).UtcTicks;
                         if (action.Type == "set")
                         {
                             if (action.OpeningHoursTemplateId == 1)

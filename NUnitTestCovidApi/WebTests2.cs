@@ -1199,7 +1199,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
             var stats = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<DateTimeOffset, long>>(response.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, stats.Count);
-            var time = new DateTimeOffset(DateTimeOffset.Now.Date.Ticks, TimeSpan.Zero);
+            var time = new DateTimeOffset(DateTimeOffset.Now.RoundDay(), TimeSpan.Zero);
             Assert.AreEqual(2, stats[time]);
         }
 

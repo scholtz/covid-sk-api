@@ -49,7 +49,7 @@ namespace CovidMassTesting.Controllers
                 {
                     slots = slots.Where(s => s.Time >= DateTimeOffset.UtcNow.AddDays(-1));
                 }
-                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
+                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.UtcTicks, p => p));
             }
             catch (ArgumentException exc)
             {
@@ -85,7 +85,7 @@ namespace CovidMassTesting.Controllers
                 {
                     slots = slots.Where(s => s.Time >= DateTimeOffset.UtcNow.AddHours(-1));
                 }
-                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
+                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.UtcTicks, p => p));
             }
             catch (ArgumentException exc)
             {
@@ -124,7 +124,7 @@ namespace CovidMassTesting.Controllers
                         return s.TimeFromTicks >= DateTimeOffset.UtcNow.AddMinutes(-5);
                     });
                 }
-                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.Ticks, p => p));
+                return Ok(slots.OrderBy(s => s.SlotId).ToDictionary(p => p.Time.UtcTicks, p => p));
             }
             catch (ArgumentException exc)
             {

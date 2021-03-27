@@ -69,7 +69,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (string.IsNullOrEmpty(openingHours))
             {
                 //delete place
-                var dayslot = list.FirstOrDefault(d => d.Time.Ticks == testingDay);
+                var dayslot = list.FirstOrDefault(d => d.Time.UtcTicks == testingDay);
                 if (dayslot != null)
                 {
                     await DeleteDaySlot(dayslot);
@@ -77,7 +77,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             else
             {
-                if (!list.Any(d => d.Time.Ticks == testingDay))
+                if (!list.Any(d => d.Time.UtcTicks == testingDay))
                 {
                     ret++;
                     var result = await Add(new Slot1Day()
@@ -105,7 +105,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var end = start.AddDays(1);
             var iterator = TimeSpan.Zero;
 
-            var listH = (await ListHourSlotsByPlaceAndDaySlotId(placeId, testingDay)).ToDictionary(t => t.Time.Ticks, t => t);
+            var listH = (await ListHourSlotsByPlaceAndDaySlotId(placeId, testingDay)).ToDictionary(t => t.Time.UtcTicks, t => t);
             var hoursParsed = openingHours.ParseOpeningHours();
             var t = start + iterator;
             while (t < end)
@@ -113,7 +113,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var tNext = t.AddHours(1);
                 if (hoursParsed.HasAnySlotWithinHourOpen(t.ToLocalTime().Hour))
                 {
-                    if (!listH.ContainsKey(t.Ticks))
+                    if (!listH.ContainsKey(t.UtcTicks))
                     {
                         ret++;
                         await SetHourSlot(new Slot1Hour()
@@ -121,19 +121,19 @@ namespace CovidMassTesting.Repository.RedisRepository
                             PlaceId = placeId,
                             Registrations = 0,
                             Time = t,
-                            DaySlotId = day.Ticks,
+                            DaySlotId = day.UtcTicks,
                             TestingDayId = testingDay,
                             Description = $"{t.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tNext.ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}"
-                        },false);
+                        }, false);
                     }
                 }
                 else
                 {
                     // remove slot
-                    if (listH.ContainsKey(t.Ticks))
+                    if (listH.ContainsKey(t.UtcTicks))
                     {
                         ret++;
-                        await DeleteHourSlot(listH[t.Ticks]);
+                        await DeleteHourSlot(listH[t.UtcTicks]);
                     }
                 }
 
@@ -146,7 +146,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var tMinLocal = tMin.ToLocalTime();
             t = tMin;
             var tMinNext = tMin.AddMinutes(5);
-            var listM = (await ListMinuteSlotsByPlaceAndHourSlotId(placeId, t.Ticks)).ToDictionary(t => t.Time.Ticks, t => t);
+            var listM = (await ListMinuteSlotsByPlaceAndHourSlotId(placeId, t.UtcTicks)).ToDictionary(t => t.Time.UtcTicks, t => t);
             var lastH = tMin.Hour;
             while (tMin < end)
             {
@@ -154,14 +154,14 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                 if (lastH != tMin.Hour)
                 {
-                    listM = (await ListMinuteSlotsByPlaceAndHourSlotId(placeId, tMin.Ticks)).ToDictionary(t => t.Time.Ticks, t => t);
+                    listM = (await ListMinuteSlotsByPlaceAndHourSlotId(placeId, tMin.UtcTicks)).ToDictionary(t => t.Time.UtcTicks, t => t);
                     t = tMin;
                     lastH = tMin.Hour;
                 }
                 var timeInSpan = new TimeSpan(tMinLocal.Hour, tMinLocal.Minute, 0);
                 if (hoursParsed.IsTimeWhenIsOpen(timeInSpan))
                 {
-                    if (!listM.ContainsKey(tMin.Ticks))
+                    if (!listM.ContainsKey(tMin.UtcTicks))
                     {
                         ret++;
                         await Add(new Slot5Min()
@@ -170,7 +170,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             Registrations = 0,
                             Time = tMin,
                             TestingDayId = testingDay,
-                            HourSlotId = t.Ticks,
+                            HourSlotId = t.UtcTicks,
                             Description = $"{(tMinLocal).ToString("HH:mm", CultureInfo.CurrentCulture)} - {(tMinNext.ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}"
                         });
                     }
@@ -178,10 +178,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                 else
                 {
                     // remove slot
-                    if (listM.ContainsKey(tMin.Ticks))
+                    if (listM.ContainsKey(tMin.UtcTicks))
                     {
                         ret++;
-                        await DeleteMinuteSlot(listM[tMin.Ticks]);
+                        await DeleteMinuteSlot(listM[tMin.UtcTicks]);
                     }
                 }
 
@@ -204,7 +204,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(slotD));
             }
 
-            var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
+            var update = await GetDaySlot(slotD.PlaceId, slotD.Time.UtcTicks);
             update.Registrations = await IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Day, slotD.PlaceId, slotD.Time);
             await SetDaySlot(update, false);
             return update.Registrations;
@@ -221,7 +221,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(slotH));
             }
 
-            var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
+            var update = await GetHourSlot(slotH.PlaceId, slotH.Time.UtcTicks);
             update.Registrations = await IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Hour, slotH.PlaceId, slotH.Time);
             await SetHourSlot(update, false);
             return update.Registrations;
@@ -238,7 +238,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(slotM));
             }
 
-            var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
+            var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.UtcTicks);
             update.Registrations = await IncrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Min, slotM.PlaceId, slotM.Time);
             await SetMinuteSlot(update, false);
             return update.Registrations;
@@ -255,7 +255,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(slotD));
             }
 
-            var update = await GetDaySlot(slotD.PlaceId, slotD.Time.Ticks);
+            var update = await GetDaySlot(slotD.PlaceId, slotD.Time.UtcTicks);
             update.Registrations = await DecrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Day, slotD.PlaceId, slotD.Time);
             await SetDaySlot(update, false);
             return update.Registrations;
@@ -272,7 +272,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(slotH));
             }
 
-            var update = await GetHourSlot(slotH.PlaceId, slotH.Time.Ticks);
+            var update = await GetHourSlot(slotH.PlaceId, slotH.Time.UtcTicks);
             update.Registrations = await DecrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Hour, slotH.PlaceId, slotH.Time);
             await SetHourSlot(update, false);
             return update.Registrations;
@@ -289,7 +289,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new ArgumentNullException(nameof(slotM));
             }
 
-            var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.Ticks);
+            var update = await Get5MinSlot(slotM.PlaceId, slotM.Time.UtcTicks);
             update.Registrations = await DecrementStats(StatsType.Enum.RegisteredTo, SlotType.Enum.Min, slotM.PlaceId, slotM.Time);
             await SetMinuteSlot(update, false);
             return update.Registrations;
@@ -369,7 +369,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             if (from.HasValue)
             {
-                var decisionTick = from.Value.Ticks;
+                var decisionTick = from.Value.UtcTicks;
 
                 var keys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_STATS}");
                 var toRemove = keys.Where(item =>
@@ -443,12 +443,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
+                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.UtcTicks}", slot, newOnly);
                 if (newOnly && !ret)
                 {
                     throw new Exception(localizer[Repository_RedisRepository_SlotRepository.Error_creating_day_slot].Value);
                 }
-                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D_BY_PLACE}_{slot.PlaceId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D_BY_PLACE}_{slot.PlaceId}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                 return true;
             }
             catch (Exception exc)
@@ -472,12 +472,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
+                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.UtcTicks}", slot, newOnly);
                 if (newOnly && !ret)
                 {
                     throw new Exception(localizer[Repository_RedisRepository_SlotRepository.Error_creating_hour_slot].Value);
                 }
-                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                 return true;
             }
             catch (Exception exc)
@@ -500,8 +500,8 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                var ret = await redisCacheClient.Db0.SetRemoveAsync< string>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}");
-                await redisCacheClient.Db0.SetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                var ret = await redisCacheClient.Db0.SetRemoveAsync<string>($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
+                await redisCacheClient.Db0.SetRemoveAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                 return true;
             }
             catch (Exception exc)
@@ -525,12 +525,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.Ticks}", slot, newOnly);
+                var ret = await redisCacheClient.Db0.HashSetAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.UtcTicks}", slot, newOnly);
                 if (newOnly && !ret)
                 {
                     throw new Exception(localizer[Repository_RedisRepository_SlotRepository.Error_creating_minute_slot].Value);
                 }
-                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR}_{slot.PlaceId}_{slot.HourSlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                await redisCacheClient.Db0.SetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR}_{slot.PlaceId}_{slot.HourSlotId}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                 return true;
             }
             catch (Exception exc)
@@ -556,7 +556,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                 return true;
             }
             catch (Exception exc)
@@ -579,7 +579,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                 return true;
             }
             catch (Exception exc)
@@ -602,7 +602,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             try
             {
-                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                var ret = await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                 return true;
             }
             catch (Exception exc)
@@ -707,7 +707,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<Slot5Min> GetCurrentSlot(string place, DateTimeOffset time)
         {
             var days = await ListDaySlotsByPlace(place);
-            var currentDay = days.Where(d => d.SlotId < time.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var currentDay = days.Where(d => d.SlotId < time.UtcTicks).OrderByDescending(d => d.SlotId).FirstOrDefault();
             if (currentDay == null)
             {
                 throw new Exception("Toto miesto dnes nie je otvorené");
@@ -719,14 +719,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                 throw new Exception("Toto miesto dnes nie je otvorené");
             }
 
-            var currentHour = hours.Where(d => d.SlotId < time.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var currentHour = hours.Where(d => d.SlotId < time.UtcTicks).OrderByDescending(d => d.SlotId).FirstOrDefault();
             if (currentHour == null)
             {
                 currentHour = hours.Last();
             }
 
             var minutes = await ListMinuteSlotsByPlaceAndHourSlotId(place, currentHour.SlotId);
-            var ret = minutes.Where(d => d.SlotId < time.Ticks).OrderByDescending(d => d.SlotId).FirstOrDefault();
+            var ret = minutes.Where(d => d.SlotId < time.UtcTicks).OrderByDescending(d => d.SlotId).FirstOrDefault();
             if (ret == null)
             {
                 return minutes.Last();
@@ -746,8 +746,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.Ticks}");
-                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D_BY_PLACE}_{slot.PlaceId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_D_BY_PLACE}_{slot.PlaceId}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                     ret++;
                 }
                 catch (Exception exc)
@@ -759,8 +759,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.Ticks}");
-                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_H_BY_PLACE_AND_DAY}_{slot.PlaceId}_{slot.DaySlotId}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                     ret++;
 
                 }
@@ -773,8 +773,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 try
                 {
-                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.Ticks}");
-                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR}_{slot.PlaceId}_{slot.HourSlotId}", $"{slot.PlaceId}_{slot.Time.Ticks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
+                    await redisCacheClient.Db0.HashDeleteAsync($"{configuration["db-prefix"]}{REDIS_KEY_SLOT_OBJECTS_M_BY_PLACE_AND_HOUR}_{slot.PlaceId}_{slot.HourSlotId}", $"{slot.PlaceId}_{slot.Time.UtcTicks}");
                     ret++;
                 }
                 catch (Exception exc)

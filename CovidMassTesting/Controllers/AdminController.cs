@@ -109,7 +109,7 @@ namespace CovidMassTesting.Controllers
                 foreach (var item in await placeRepository.ListAll())
                 {
                     var time = $"{TimeSpan.FromHours(from)}-{TimeSpan.FromHours(until)}";
-                    ret += await slotRepository.CheckSlots(DateTimeOffset.Parse(testingDay, CultureInfo.InvariantCulture).Ticks, item.Id, time);
+                    ret += await slotRepository.CheckSlots(DateTimeOffset.Parse(testingDay, CultureInfo.InvariantCulture).UtcTicks, item.Id, time);
                 }
                 return Ok(ret);
             }
@@ -528,7 +528,7 @@ namespace CovidMassTesting.Controllers
                     {
                         if (visitor.ChosenSlotTime >= decision)
                         {
-                            visitor.ChosenSlot = visitor.ChosenSlotTime.AddHours(-1).Ticks;
+                            visitor.ChosenSlot = visitor.ChosenSlotTime.AddHours(-1).UtcTicks;
                             await visitorRepository.SetVisitor(visitor, false);
                             i++;
                         }
@@ -674,10 +674,8 @@ namespace CovidMassTesting.Controllers
                         var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day.SlotId);
                         foreach (var hour in hours.OrderBy(h => h.SlotId))
                         {
-
-
                             var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
-                            
+
                             if (hour.Description != shouldBe)
                             {
                                 var clone = new Slot1Hour()
@@ -736,7 +734,6 @@ namespace CovidMassTesting.Controllers
                                         }
                                     }
 
-
                                     try
                                     {
                                         var result = await slotRepository.SetHourSlot(clone, true);
@@ -745,7 +742,7 @@ namespace CovidMassTesting.Controllers
 
                                         log.AppendLine($"OK {clone.PlaceId} {clone.SlotId} {clone.Time.ToString("o")} {clone.TimeInCET.ToString("o")} {clone.Description} != {shouldBe} :: ");
                                     }
-                                    catch(Exception exc)
+                                    catch (Exception exc)
                                     {
                                         logger.LogError(exc, exc.Message);
                                         log.AppendLine($"FAILED {clone.PlaceId} {clone.SlotId} {clone.Time.ToString("o")} {clone.TimeInCET.ToString("o")} {clone.Description} != {shouldBe} :: ");

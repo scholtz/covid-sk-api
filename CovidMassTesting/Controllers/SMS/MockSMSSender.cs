@@ -49,7 +49,7 @@ namespace CovidMassTesting.Controllers.SMS
             logger.LogInformation($"SMS: {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
 
             await Task.Delay(1);
-            Data[DateTimeOffset.Now.Ticks] = (toPhone, data);
+            Data[DateTimeOffset.Now.UtcTicks] = (toPhone, data);
             await Task.Delay(1);
             return true;
         }

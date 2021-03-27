@@ -18,7 +18,7 @@ namespace CovidMassTesting.Helpers
         /// <returns></returns>
         public static long RoundDay(this DateTimeOffset time)
         {
-            return DateTimeOffset.Parse(time.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
+            return DateTimeOffset.Parse(time.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).UtcTicks;
         }
         /// <summary>
         /// Rounds to hour
@@ -27,7 +27,7 @@ namespace CovidMassTesting.Helpers
         /// <returns></returns>
         public static long RoundHour(this DateTimeOffset time)
         {
-            return DateTimeOffset.Parse(time.ToUniversalTime().ToString("yyyy-MM-ddTHH:00:00", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
+            return DateTimeOffset.Parse(time.ToUniversalTime().ToString("yyyy-MM-ddTHH:00:00", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).UtcTicks;
         }
         /// <summary>
         /// Rounds to hour
@@ -37,7 +37,7 @@ namespace CovidMassTesting.Helpers
         public static long RoundMinute(this DateTimeOffset time)
         {
             var missingMinutes = time.Minute % 5 * -1;
-            return DateTimeOffset.Parse(time.ToUniversalTime().AddMinutes(missingMinutes).ToString("yyyy-MM-ddTHH:mm:00", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).Ticks;
+            return DateTimeOffset.Parse(time.ToUniversalTime().AddMinutes(missingMinutes).ToString("yyyy-MM-ddTHH:mm:00", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).UtcTicks;
         }
         /// <summary>
         /// Returns local offset

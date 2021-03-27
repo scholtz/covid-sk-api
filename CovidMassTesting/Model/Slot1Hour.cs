@@ -10,7 +10,7 @@ namespace CovidMassTesting.Model
         /// <summary>
         /// id
         /// </summary>
-        public long SlotId => Time.Ticks;
+        public long SlotId => Time.UtcTicks;
         /// <summary>
         /// Place id
         /// </summary>

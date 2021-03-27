@@ -4152,6 +4152,11 @@
             Hour slot id
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Slot5Min.HourSlotCET">
+            <summary>
+            hour in cet
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Slot5Min.Description">
             <summary>
             Formatted time. Eg. 15:00 - 20:00

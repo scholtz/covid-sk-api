@@ -804,7 +804,7 @@ namespace CovidMassTesting.Controllers
                 visitor.SelfRegistration = false;
                 visitor.RegistrationUpdatedByManager = User.GetEmail();
                 visitor.TestingTime = time;
-                visitor.ChosenSlot = time.Ticks;
+                visitor.ChosenSlot = time.UtcTicks;
                 visitor.PlaceProviderId = User.GetPlaceProvider();
 
                 logger.LogInformation($"RegisterEmployeeByDocumenter: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");

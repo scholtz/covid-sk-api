@@ -172,7 +172,7 @@ namespace CovidMassTesting.Repository.MockRepository
             logger.LogInformation($"Visitor.ListAllKeys");
             if (day.HasValue)
             {
-                return day2visitor[day.Value.Ticks].Values.Select(v => v.ToString());
+                return day2visitor[day.Value.UtcTicks].Values.Select(v => v.ToString());
             }
             return data.Keys.Select(k => k.ToString());
         }
@@ -544,7 +544,7 @@ namespace CovidMassTesting.Repository.MockRepository
         public override async Task<long> IncrementStats(string statsType, string placeId, string placeProviderId, DateTimeOffset time)
         {
 
-            var keyPlace = $"{statsType}-place-{placeProviderId}-{placeId}-{time.Date.Ticks}";
+            var keyPlace = $"{statsType}-place-{placeProviderId}-{placeId}-{time.RoundDay()}";
             if (Stats.ContainsKey(keyPlace))
             {
                 Stats[keyPlace]++;
@@ -554,7 +554,7 @@ namespace CovidMassTesting.Repository.MockRepository
                 Stats[keyPlace] = 1;
             }
 
-            var keyPP = $"{statsType}-pp-{placeProviderId}-{time.Date.Ticks}";
+            var keyPP = $"{statsType}-pp-{placeProviderId}-{time.RoundDay()}";
             if (Stats.ContainsKey(keyPP))
             {
                 Stats[keyPP]++;
@@ -592,7 +592,7 @@ namespace CovidMassTesting.Repository.MockRepository
         {
             if (from.HasValue)
             {
-                var decisionTick = from.Value.Ticks;
+                var decisionTick = from.Value.UtcTicks;
                 var toRemove = Stats.Keys.Where(item =>
                 {
 

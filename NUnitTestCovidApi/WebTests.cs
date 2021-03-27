@@ -13,6 +13,7 @@ using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -1171,7 +1172,7 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
             var stats = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<DateTimeOffset, long>>(request.Content.ReadAsStringAsync().Result);
             Assert.AreEqual(1, stats.Count);
-            var time = new DateTimeOffset(DateTimeOffset.Now.Date.Ticks, TimeSpan.Zero);
+            var time = new DateTimeOffset(DateTimeOffset.Now.RoundDay(), TimeSpan.Zero);
             if (DateTime.Now.Hour > 1)
             {
                 Assert.AreEqual(1, stats[time]);
@@ -2886,8 +2887,8 @@ namespace NUnitTestCovidApi
             });
 
             iSlot.Add(new Slot1Day() { PlaceId = "123", Time = tick });
-            iSlot.Add(new Slot1Hour() { PlaceId = "123", Time = tick, DaySlotId = tick.Ticks });
-            iSlot.Add(new Slot5Min() { PlaceId = "123", Time = tick, HourSlotId = tick.Ticks });
+            iSlot.Add(new Slot1Hour() { PlaceId = "123", Time = tick, DaySlotId = tick.UtcTicks });
+            iSlot.Add(new Slot5Min() { PlaceId = "123", Time = tick, HourSlotId = tick.UtcTicks });
 
             var smsSender = web.Server.Services.GetService<CovidMassTesting.Controllers.SMS.ISMSSender>();
             var noSMSSender = smsSender as CovidMassTesting.Controllers.SMS.MockSMSSender;
@@ -2900,7 +2901,7 @@ namespace NUnitTestCovidApi
                     LastName = "S",
                     Language = "en",
                     ChosenPlaceId = "123",
-                    ChosenSlot = tick.Ticks,
+                    ChosenSlot = tick.UtcTicks,
                     RC = " 845123/0007",
                     BirthDayDay = 23,
                     BirthDayMonth = 01,
@@ -2948,7 +2949,7 @@ namespace NUnitTestCovidApi
                 LastName = "S",
                 Language = "en",
                 ChosenPlaceId = "123",
-                ChosenSlot = tick.Ticks,
+                ChosenSlot = tick.UtcTicks,
                 RC = " 845123/0007",
                 BirthDayDay = 23,
                 BirthDayMonth = 01,
@@ -3008,7 +3009,7 @@ namespace NUnitTestCovidApi
                 LastName = "S",
                 Language = "en",
                 ChosenPlaceId = "123",
-                ChosenSlot = tick.Ticks,
+                ChosenSlot = tick.UtcTicks,
                 RC = " 845123/0007",
                 BirthDayDay = 23,
                 BirthDayMonth = 01,
@@ -3066,7 +3067,7 @@ namespace NUnitTestCovidApi
                 LastName = "S",
                 Language = "en",
                 ChosenPlaceId = "123",
-                ChosenSlot = tick.Ticks,
+                ChosenSlot = tick.UtcTicks,
                 RC = " 845123/0007",
                 BirthDayDay = 23,
                 BirthDayMonth = 01,
@@ -3086,7 +3087,7 @@ namespace NUnitTestCovidApi
                 LastName = "S",
                 Language = "en",
                 ChosenPlaceId = "123",
-                ChosenSlot = tick.Ticks,
+                ChosenSlot = tick.UtcTicks,
                 RC = " 845123/0018",
                 BirthDayDay = 23,
                 BirthDayMonth = 01,
@@ -3300,14 +3301,14 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(new TimeSpan(1, 0, 0), DateTimeOffset.Parse("2021-03-24T00:00:00+01:00").GetLocalOffset());
             Assert.AreEqual(new TimeSpan(2, 0, 0), DateTimeOffset.Parse("2021-03-31T00:00:00+02:00").GetLocalOffset());
 
-            Assert.AreEqual(637527456000000000, DateTimeOffset.Parse("2021-03-31T00:00:00+02:00").RoundDay());
-            Assert.AreEqual(637527456000000000, DateTimeOffset.Parse("2021-03-31T00:00:00+02:00").RoundDay());
+            Assert.AreEqual(637527384000000000, DateTimeOffset.Parse("2021-03-31T00:00:00+02:00").RoundDay());
+            Assert.AreEqual(637527384000000000, DateTimeOffset.Parse("2021-03-31T00:00:00+02:00").RoundDay());
 
-            Assert.AreEqual(637527456000000000, DateTimeOffset.Parse("2021-03-31T00:00:00+00:00").RoundHour());
-            Assert.AreEqual(637527456000000000, DateTimeOffset.Parse("2021-03-31T02:00:00+02:00").RoundHour());
+            Assert.AreEqual(637527384000000000, DateTimeOffset.Parse("2021-03-31T00:00:00+00:00").RoundHour());
+            Assert.AreEqual(637527384000000000, DateTimeOffset.Parse("2021-03-31T02:00:00+02:00").RoundHour());
 
-            Assert.AreEqual(637527744000000000, DateTimeOffset.Parse("2021-03-31T10:00:00+02:00").RoundHour());
-            Assert.AreEqual(637527744000000000, DateTimeOffset.Parse("2021-03-31T10:00:00+02:00").RoundMinute());
+            Assert.AreEqual(637527672000000000, DateTimeOffset.Parse("2021-03-31T10:00:00+02:00").RoundHour());
+            Assert.AreEqual(637527672000000000, DateTimeOffset.Parse("2021-03-31T10:00:00+02:00").RoundMinute());
 
             Assert.AreEqual("2021-03-27T11:00:00.0000000+01:00", DateTimeOffset.Parse("2021-03-27T10:00:00+00:00").ToLocalTime().ToString("o"));
             Assert.AreEqual("2021-03-28T12:00:00.0000000+02:00", DateTimeOffset.Parse("2021-03-28T10:00:00+00:00").ToLocalTime().ToString("o"));
@@ -3365,7 +3366,7 @@ namespace NUnitTestCovidApi
                 PlaceId = "123",
                 Registrations = 5,
                 TestingDayId = 637524864000000000,
-                HourSlotId = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00").Ticks
+                HourSlotId = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00").UtcTicks
             });
             await slotRepository.Add(new Slot5Min()
             {
@@ -3374,7 +3375,7 @@ namespace NUnitTestCovidApi
                 PlaceId = "123",
                 Registrations = 5,
                 TestingDayId = 637524864000000000,
-                HourSlotId = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00").Ticks
+                HourSlotId = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00").UtcTicks
             });
 
             var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
@@ -3408,11 +3409,73 @@ namespace NUnitTestCovidApi
             Assert.AreEqual(4, fixSlotIssuesData.Count);
 
             Assert.AreEqual(1, (await slotRepository.ListDaySlotsByPlace("123")).Count());
-            Assert.AreEqual(2, (await slotRepository.ListHourSlotsByPlaceAndDaySlotId("123", 637524864000000000)).Count());
+            var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId("123", 637524864000000000);
+            Assert.AreEqual(2, hours.Count());
 
-            //
-            Assert.AreEqual(DateTimeOffset.Parse("2021-03-28T14:00:00+02:00").Ticks, 637525296000000000);
-            Assert.AreEqual(2, (await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId("123", 637525296000000000)).Count());
+            foreach (var hour in hours)
+            {
+                Trace.WriteLine(hour.TimeInCET.ToString("o"));
+            }
+            //Assert.AreEqual(DateTimeOffset.Parse("2021-03-28T14:00:00+02:00").UtcTicks, 637525296000000000);
+            Assert.AreEqual(DateTimeOffset.Parse("2021-03-28T14:00:00+02:00").UtcTicks, DateTimeOffset.Parse("2021-03-28T12:00:00+00:00").UtcTicks);
+            var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId("123", DateTimeOffset.Parse("2021-03-28T14:00:00+02:00").UtcTicks);
+            Assert.AreEqual(2, minutes.Count());
+
+        }
+
+
+        [Test]
+        public async Task SlotRegisterTest()
+        {
+            DropDatabase();
+
+            using var web = new MockWebApp(AppSettings);
+            var client = web.CreateClient();
+            var slotRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.ISlotRepository>();
+            var placeRepository = web.Server.Services.GetService<CovidMassTesting.Repository.Interface.IPlaceRepository>();
+
+            var users = configuration.GetSection("AdminUsers").Get<CovidMassTesting.Model.Settings.User[]>();
+            var admin = users.First(u => u.Name == "Admin");
+
+            var obj = new PlaceProvider()
+            {
+                VAT = "123",
+                Web = "123",
+                CompanyId = "123",
+                CompanyName = "123, s.r.o.",
+                Country = "SK",
+                MainEmail = admin.Email,
+                PrivatePhone = "+421907000000",
+                MainContact = "Admin Person"
+            };
+
+            var request = PlaceProviderRegistration(client, obj);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var data = request.Content.ReadAsStringAsync().Result;
+            var pp = JsonConvert.DeserializeObject<PlaceProvider>(data);
+            request = AuthenticateUser(client, admin.Email, admin.Password);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var adminToken = request.Content.ReadAsStringAsync().Result;
+            Assert.IsFalse(string.IsNullOrEmpty(adminToken));
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {adminToken}");
+            var places = SetupDebugPlaces(client);
+            var pr1 = SetupDebugProduct(client);
+
+            request = CheckSlotsDay1(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+
+            foreach (var place in places)
+            {
+                var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, DateTimeOffset.Now.RoundDay());
+
+                switch (place.OpeningHoursWorkDay)
+                {
+                    case "20:00-23:55":
+                        Assert.AreEqual(1, hours.Count());
+                        break;
+                }
+
+            }
 
         }
 

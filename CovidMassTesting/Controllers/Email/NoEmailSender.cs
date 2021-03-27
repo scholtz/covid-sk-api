@@ -28,7 +28,7 @@ namespace CovidMassTesting.Controllers.Email
         {
             System.Console.WriteLine($"Email: {subject} {Newtonsoft.Json.JsonConvert.SerializeObject(data)}");
             await Task.Delay(1);
-            Data[DateTimeOffset.Now.Ticks] = (subject, toEmail, toName, data, attachments);
+            Data[DateTimeOffset.Now.UtcTicks] = (subject, toEmail, toName, data, attachments);
             return true;
         }
     }

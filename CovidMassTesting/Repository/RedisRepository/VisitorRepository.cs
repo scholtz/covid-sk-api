@@ -868,7 +868,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             await SetVisitor(visitor, false);
             var time = DateTimeOffset.Now;
-            await MapDayToVisitorCode(new DateTimeOffset(time.Year, time.Month, time.Day, 0, 0, 0, TimeSpan.Zero).Ticks, visitor.Id);
+            await MapDayToVisitorCode(new DateTimeOffset(time.Year, time.Month, time.Day, 0, 0, 0, TimeSpan.Zero).UtcTicks, visitor.Id);
             try
             {
                 // update slots stats
@@ -1246,13 +1246,13 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual async Task<long> IncrementStats(string statsType, string placeId, string placeProviderId, DateTimeOffset time)
         {
-            var keyPlace = $"{statsType}-place-{placeProviderId}-{placeId}-{time.Date.Ticks}";
+            var keyPlace = $"{statsType}-place-{placeProviderId}-{placeId}-{time.RoundDay()}";
 
             var ret = await redisCacheClient.Db0.HashIncerementByAsync(
                 $"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}",
                 keyPlace,
                 1);
-            var keyPP = $"{statsType}-pp-{placeProviderId}-{time.Date.Ticks}";
+            var keyPP = $"{statsType}-pp-{placeProviderId}-{time.RoundDay()}";
 
             ret = await redisCacheClient.Db0.HashIncerementByAsync(
                 $"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}",
@@ -1268,7 +1268,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             if (from.HasValue)
             {
-                var decisionTick = from.Value.Ticks;
+                var decisionTick = from.Value.UtcTicks;
 
                 var keys = await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_DAILY_COUNT}");
                 var toRemove = keys.Where(item =>
@@ -1779,7 +1779,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             if (day.HasValue)
             {
-                var keys = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{day.Value.Ticks}";
+                var keys = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{day.Value.UtcTicks}";
                 return await redisCacheClient.Db0.HashValuesAsync<string>(keys);
             }
             return await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
@@ -1883,13 +1883,13 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual Task<bool> AddToDocQueue(string testId)
         {
-            return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId, DateTimeOffset.UtcNow.Ticks);
+            return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_DOCUMENT_QUEUE}", testId, DateTimeOffset.UtcNow.UtcTicks);
         }
 
         public virtual async Task<bool> AddToResultQueue(string resultId)
         {
             return await redisCacheClient.Db0.ListAddToLeftAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", resultId) > 0;
-            //return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", resultId, DateTimeOffset.UtcNow.Ticks);
+            //return redisCacheClient.Db0.SortedSetAddAsync($"{configuration["db-prefix"]}{REDIS_KEY_RESULT_QUEUE}", resultId, DateTimeOffset.UtcNow.UtcTicks);
         }
         /// <summary>
         /// Removes test from document queue
@@ -2582,7 +2582,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 logger.LogError(exc, "ListExportableDays error");
             }
-            return ret.OrderBy(d => d.Ticks);
+            return ret.OrderBy(d => d.UtcTicks);
         }
         /// <summary>
         /// Export for institution that pays for the tests
@@ -2782,7 +2782,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
 
                     if (string.IsNullOrEmpty(visitor.TestingSet)
-                        //&& visitor.ChosenSlot < DateTimeOffset.UtcNow.Ticks
+                        //&& visitor.ChosenSlot < DateTimeOffset.UtcNow.UtcTicks
                         )
                     {
                         visitor.Extend(places, products);
@@ -2909,8 +2909,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
 
                     if (visitor.ChosenPlaceId == placeId
-                        && visitor.ChosenSlot >= fromRegTime.ToUniversalTime().Ticks
-                        && visitor.ChosenSlot < untilRegTime.ToUniversalTime().Ticks
+                        && visitor.ChosenSlot >= fromRegTime.UtcTicks
+                        && visitor.ChosenSlot < untilRegTime.UtcTicks
                         )
                     {
 
@@ -3861,12 +3861,12 @@ namespace CovidMassTesting.Repository.RedisRepository
                         if (visitor.TestingTime.HasValue)
                         {
                             var time = new DateTimeOffset(visitor.TestingTime.Value.Year, visitor.TestingTime.Value.Month, visitor.TestingTime.Value.Day, 0, 0, 0, TimeSpan.Zero);
-                            await MapDayToVisitorCode(time.Ticks, visitor.Id);
+                            await MapDayToVisitorCode(time.UtcTicks, visitor.Id);
                         }
                         else
                         {
                             var time = new DateTimeOffset(visitor.ChosenSlotTime.Year, visitor.ChosenSlotTime.Month, visitor.ChosenSlotTime.Day, 0, 0, 0, TimeSpan.Zero);
-                            await MapDayToVisitorCode(time.Ticks, visitor.Id);
+                            await MapDayToVisitorCode(time.UtcTicks, visitor.Id);
                         }
                         ret++;
                     }
@@ -4142,7 +4142,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             if (place.OtherLimitations != null)
             {
-                foreach (var limit in place.OtherLimitations.Where(l => l.From.Ticks <= slotH.SlotId && l.Until.Ticks > slotH.SlotId))
+                foreach (var limit in place.OtherLimitations.Where(l => l.From.UtcTicks <= slotH.SlotId && l.Until.UtcTicks > slotH.SlotId))
                 {
                     if (limit.HourLimit < LimitPer1HourSlot)
                     {
