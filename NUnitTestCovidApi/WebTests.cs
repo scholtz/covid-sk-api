@@ -3461,20 +3461,80 @@ namespace NUnitTestCovidApi
             var places = SetupDebugPlaces(client);
             var pr1 = SetupDebugProduct(client);
 
-            request = CheckSlotsDay1(client);
-            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
 
+            // CheckSlotsDay1
+
+            var actions = new TimeUpdate[]
+            {
+               
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now,
+                    OpeningHoursTemplateId= 1,
+                    PlaceId = "__ALL__",
+                    Type = "set"
+                },/**/
+                new TimeUpdate()
+                {
+                    Date = DateTimeOffset.Now.AddDays(1),
+                    OpeningHoursTemplateId= 1,
+                    PlaceId = "__ALL__",
+                    Type = "set"
+                },
+            };
+
+            request = ListScheduledDays(client);
+            Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
+            var daysData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<DayTimeManagement>>(request.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(0, daysData.Count);
+
+            request = ScheduleOpenningHours(client, actions);
+
+            var day = DateTimeOffset.Now.RoundDay();
+            
             foreach (var place in places)
             {
-                var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, DateTimeOffset.Now.RoundDay());
+                var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day);
 
                 switch (place.OpeningHoursWorkDay)
                 {
                     case "20:00-23:55":
+                        Assert.AreEqual(4, hours.Count());
+                        break;
+                    case "21:00-23:55":
+                        Assert.AreEqual(3, hours.Count());
+                        break;
+                    case "23:00-23:55":
                         Assert.AreEqual(1, hours.Count());
                         break;
                 }
+                foreach (var hour in hours)
+                {
+                    Assert.AreEqual(day, hour.DaySlotId);
+                }
+            }/**/
 
+            day = DateTimeOffset.Now.AddDays(1).RoundDay();
+            foreach (var place in places)
+            {
+                var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day);
+
+                switch (place.OpeningHoursWorkDay)
+                {
+                    case "20:00-23:55":
+                        Assert.AreEqual(4, hours.Count());
+                        break;
+                    case "21:00-23:55":
+                        Assert.AreEqual(3, hours.Count());
+                        break;
+                    case "23:00-23:55":
+                        Assert.AreEqual(1, hours.Count());
+                        break;
+                }
+                foreach (var hour in hours)
+                {
+                    Assert.AreEqual(day, hour.DaySlotId);
+                }
             }
 
         }

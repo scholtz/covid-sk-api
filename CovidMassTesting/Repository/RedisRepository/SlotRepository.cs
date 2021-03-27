@@ -99,10 +99,13 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                 }
             }
-
-            var start = day - day.AddHours(12).GetLocalOffset();
+            var offset = day.GetLocalOffset();
+            var offsetDiff = day.AddDays(1).GetLocalOffset() - offset;
+            var start = day;
+            var end = start.AddDays(1).Subtract(offsetDiff);
+            var startCheck = start.ToLocalTime();
             var startInZone = start.ToLocalTime();
-            var end = start.AddDays(1);
+            var endCheck = end.ToLocalTime();
             var iterator = TimeSpan.Zero;
 
             var listH = (await ListHourSlotsByPlaceAndDaySlotId(placeId, testingDay)).ToDictionary(t => t.Time.UtcTicks, t => t);

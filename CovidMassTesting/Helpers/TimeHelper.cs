@@ -13,6 +13,8 @@ namespace CovidMassTesting.Helpers
     {
         /// <summary>
         /// Rounds to day
+        /// 
+        /// Round to first hour, then rounds that hour
         /// </summary>
         /// <param name="time"></param>
         /// <returns></returns>
