@@ -200,7 +200,13 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.FixSlotIssues">
+        <member name="M:CovidMassTesting.Controllers.AdminController.ReportSlotIssuesM">
+            <summary>
+            Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.FixSlotIssues(System.Nullable{System.Boolean})">
             <summary>
             Some slots at the time change from winter to summer time does not have description properly filled in regarding the timestamp
             </summary>
@@ -6128,7 +6134,35 @@
             <param name="slot"></param>
             <param name="newOnly"></param>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.RemoveSlotH(CovidMassTesting.Model.Slot1Hour)">
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.SetMinuteSlot(CovidMassTesting.Model.Slot5Min,System.Boolean)">
+            <summary>
+            Set hour slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.SetDaySlot(CovidMassTesting.Model.Slot1Day,System.Boolean)">
+            <summary>
+            Set hour slot
+            </summary>
+            <param name="slot"></param>
+            <param name="newOnly"></param>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DeleteDaySlot(CovidMassTesting.Model.Slot1Day)">
+            <summary>
+            Removes hour slot
+            </summary>
+            <param name="hour"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DeleteHourSlot(CovidMassTesting.Model.Slot1Hour)">
+            <summary>
+            Removes hour slot
+            </summary>
+            <param name="hour"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.Interface.ISlotRepository.DeleteMinuteSlot(CovidMassTesting.Model.Slot5Min)">
             <summary>
             Removes hour slot
             </summary>

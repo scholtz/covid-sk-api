@@ -676,51 +676,6 @@ namespace CovidMassTesting.Controllers
                         {
 
 
-                            var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(place.Id, hour.SlotId);
-                            foreach (var minute in minutes.OrderBy(h => h.SlotId))
-                            {
-
-                                var shouldBeM = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
-
-                                if (hour.Description != shouldBeM)
-                                {
-                                    var cloneM = new Slot5Min()
-                                    {
-                                        Description = hour.Description,
-                                        PlaceId = hour.PlaceId,
-                                        Registrations = hour.Registrations,
-                                        TestingDayId = hour.TestingDayId,
-                                        Time = hour.Time,
-                                        HourSlotId = hour.SlotId
-                                    };
-                                    cloneM.Time = hour.Time.AddHours(-1);
-                                    shouldBeM = $"{cloneM.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(cloneM.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
-                                    if (cloneM.Description == shouldBeM)
-                                    {
-                                        try
-                                        {
-                                            var result = await slotRepository.SetMinuteSlot(cloneM, true);
-                                            await slotRepository.DeleteMinuteSlot(minute);
-                                            ret.Add(cloneM);
-
-                                            log.AppendLine($"OK {cloneM.PlaceId} {cloneM.SlotId} {cloneM.Time.ToString("o")} {cloneM.TimeInCET.ToString("o")} {cloneM.Description} != {shouldBeM} :: ");
-                                        }
-                                        catch (Exception exc)
-                                        {
-                                            logger.LogError(exc, exc.Message);
-                                            log.AppendLine($"FAILED {cloneM.PlaceId} {cloneM.SlotId} {cloneM.Time.ToString("o")} {cloneM.TimeInCET.ToString("o")} {cloneM.Description} != {shouldBeM} :: ");
-
-                                            if (rewrite == true)
-                                            {
-                                                await slotRepository.DeleteMinuteSlot(minute);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-
-
                             var shouldBe = $"{hour.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(hour.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
                             
                             if (hour.Description != shouldBe)
@@ -732,12 +687,56 @@ namespace CovidMassTesting.Controllers
                                     PlaceId = hour.PlaceId,
                                     Registrations = hour.Registrations,
                                     TestingDayId = hour.TestingDayId,
-                                    Time = hour.Time
+                                    Time = hour.Time.AddHours(-1)
                                 };
-                                clone.Time = hour.Time.AddHours(-1);
                                 shouldBe = $"{clone.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(clone.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
                                 if (clone.Description == shouldBe)
                                 {
+
+
+                                    var minutes = await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId(place.Id, hour.SlotId);
+                                    foreach (var minute in minutes.OrderBy(h => h.SlotId))
+                                    {
+
+                                        var shouldBeM = $"{minute.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(minute.Time.AddHours(1).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+
+                                        if (minute.Description != shouldBeM)
+                                        {
+                                            var cloneM = new Slot5Min()
+                                            {
+                                                Description = minute.Description,
+                                                PlaceId = minute.PlaceId,
+                                                Registrations = minute.Registrations,
+                                                TestingDayId = minute.TestingDayId,
+                                                Time = minute.Time.AddHours(-1),
+                                                HourSlotId = clone.SlotId
+                                            };
+                                            shouldBeM = $"{cloneM.Time.ToLocalTime().ToString("HH:mm", CultureInfo.CurrentCulture)} - {(cloneM.Time.AddMinutes(5).ToLocalTime()).ToString("HH:mm", CultureInfo.CurrentCulture)}";
+                                            if (cloneM.Description == shouldBeM)
+                                            {
+                                                try
+                                                {
+                                                    var result = await slotRepository.SetMinuteSlot(cloneM, true);
+                                                    await slotRepository.DeleteMinuteSlot(minute);
+                                                    ret.Add(cloneM);
+
+                                                    log.AppendLine($"OK {cloneM.PlaceId} {cloneM.SlotId} {cloneM.Time.ToString("o")} {cloneM.TimeInCET.ToString("o")} {cloneM.Description} != {shouldBeM} :: ");
+                                                }
+                                                catch (Exception exc)
+                                                {
+                                                    logger.LogError(exc, exc.Message);
+                                                    log.AppendLine($"FAILED {cloneM.PlaceId} {cloneM.SlotId} {cloneM.Time.ToString("o")} {cloneM.TimeInCET.ToString("o")} {cloneM.Description} != {shouldBeM} :: ");
+
+                                                    if (rewrite == true)
+                                                    {
+                                                        await slotRepository.DeleteMinuteSlot(minute);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+
+
                                     try
                                     {
                                         var result = await slotRepository.SetHourSlot(clone, true);

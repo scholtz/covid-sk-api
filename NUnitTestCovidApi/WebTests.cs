@@ -3360,8 +3360,8 @@ namespace NUnitTestCovidApi
             });
             await slotRepository.Add(new Slot5Min()
             {
-                Time = DateTimeOffset.Parse("2021-03-28T14:00:00+00:00"),
-                Description = "15:00 - 15:05",
+                Time = DateTimeOffset.Parse("2021-03-28T13:00:00+00:00"),
+                Description = "14:00 - 14:05",
                 PlaceId = "123",
                 Registrations = 5,
                 TestingDayId = 637524864000000000,
@@ -3369,8 +3369,8 @@ namespace NUnitTestCovidApi
             });
             await slotRepository.Add(new Slot5Min()
             {
-                Time = DateTimeOffset.Parse("2021-03-28T14:05:00+00:00"),
-                Description = "15:05 - 15:10",
+                Time = DateTimeOffset.Parse("2021-03-28T13:05:00+00:00"),
+                Description = "14:05 - 14:10",
                 PlaceId = "123",
                 Registrations = 5,
                 TestingDayId = 637524864000000000,
@@ -3404,12 +3404,15 @@ namespace NUnitTestCovidApi
 
             var response = FixSlotIssues(client);
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, response.Content.ReadAsStringAsync().Result);
-            var fixSlotIssuesData = JsonConvert.DeserializeObject<List<Slot1Hour>>(response.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(2, fixSlotIssuesData.Count);
+            var fixSlotIssuesData = JsonConvert.DeserializeObject<List<object>>(response.Content.ReadAsStringAsync().Result);
+            Assert.AreEqual(4, fixSlotIssuesData.Count);
 
             Assert.AreEqual(1, (await slotRepository.ListDaySlotsByPlace("123")).Count());
             Assert.AreEqual(2, (await slotRepository.ListHourSlotsByPlaceAndDaySlotId("123", 637524864000000000)).Count());
-            Assert.AreEqual(2, (await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId("123", 637524864000000000)).Count());
+
+            //
+            Assert.AreEqual(DateTimeOffset.Parse("2021-03-28T14:00:00+02:00").Ticks, 637525296000000000);
+            Assert.AreEqual(2, (await slotRepository.ListMinuteSlotsByPlaceAndHourSlotId("123", 637525296000000000)).Count());
 
         }
 
