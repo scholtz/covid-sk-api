@@ -501,6 +501,36 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// fix slots stats
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("FixSlotsOnly")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> FixSlotsOnly()
+        {
+            try
+            {
+                int i = 0;
+                if (!User.IsAdmin(userRepository))
+                {
+                    throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
+                }
+                logger.LogInformation($"FixSlotsOnly");
+
+                i = await slotRepository.FixAllSlots();
+
+                logger.LogInformation($"FixSlotsOnly done {i}");
+                return Ok(i);
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// Move visitors by one hour
         /// </summary>
         /// <param name="regFrom"></param>
