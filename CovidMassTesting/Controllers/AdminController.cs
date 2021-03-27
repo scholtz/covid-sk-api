@@ -504,11 +504,12 @@ namespace CovidMassTesting.Controllers
         /// Move visitors by one hour
         /// </summary>
         /// <param name="from"></param>
+        /// <param name="until"></param>
         /// <returns></returns>
         [HttpPost("FixMoveVisitorsToSummerTime")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> FixMoveVisitorsToSummerTime([FromForm] DateTimeOffset? from)
+        public async Task<ActionResult<bool>> FixMoveVisitorsToSummerTime([FromForm] DateTimeOffset? from, [FromForm] DateTimeOffset? until)
         {
             try
             {
@@ -518,16 +519,22 @@ namespace CovidMassTesting.Controllers
                     throw new Exception(localizer[Resources.Controllers_AdminController.Only_admin_is_allowed_to_invite_other_users].Value);
                 }
                 logger.LogInformation($"FixMoveVisitorsToSummerTime {from}");
-                await slotRepository.DropAllStats(from);
                 var places = await placeRepository.ListAll();
                 var visitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider());
                 var decision = DateTimeOffset.Parse("2021-03-28T00:00:00+00:00");
+
+                if (from.HasValue) decision = from.Value;
+
                 foreach (var visitor in visitors)
                 {
                     try
                     {
                         if (visitor.ChosenSlotTime >= decision)
                         {
+                            if (until.HasValue)
+                            {
+                                if (visitor.ChosenSlotTime < until) continue;
+                            }
                             visitor.ChosenSlot = visitor.ChosenSlotTime.AddHours(-1).UtcTicks;
                             await visitorRepository.SetVisitor(visitor, false);
                             i++;
