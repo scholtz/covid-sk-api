@@ -1324,7 +1324,7 @@ namespace CovidMassTesting.Controllers
                                 }
                                 break;
                             case "BA601":
-                                if (visitor.ChosenSlotTime.UtcTicks >= 637524864000000000L)
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525395000000000L)
                                 {
                                     switch (visitor.Language)
                                     {
