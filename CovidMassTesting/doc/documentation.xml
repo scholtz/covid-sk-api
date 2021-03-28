@@ -279,6 +279,13 @@
             <param name="phone"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Controllers.AdminController.SendSMSSummerZone(System.String,System.DateTimeOffset)">
+            <summary>
+            Test sms
+            </summary>
+            <param name="test">Test first</param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Controllers.AdminController.DropDatabase(System.String)">
             <summary>
             Administrator has power to delete everything in the database. Password confirmation is required.

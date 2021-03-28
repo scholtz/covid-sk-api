@@ -20,7 +20,8 @@ namespace CovidMassTesting.Helpers
         /// <returns></returns>
         public static long RoundDay(this DateTimeOffset time)
         {
-            return DateTimeOffset.Parse(time.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture), CultureInfo.InvariantCulture).UtcTicks;
+            var date = time.Date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture) + "T00:00:00+00:00";
+            return DateTimeOffset.Parse(date).UtcTicks;
         }
         /// <summary>
         /// Rounds to hour
