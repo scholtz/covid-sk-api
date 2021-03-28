@@ -1261,6 +1261,116 @@ namespace CovidMassTesting.Controllers
             }
         }
         /// <summary>
+        /// Test sms
+        /// </summary>
+        /// <param name="test">Test first</param>
+        /// <returns></returns>
+        [HttpPost("SendSMSSummerZone")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> SendSMSSummerZone([FromForm] string test)
+        {
+            try
+            {
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can update visitor directly");
+                }
+
+                logger.LogInformation($"SendSMSSummerZone: {User.GetEmail()}");
+
+                var days = await visitorRepository.ListExportableDays();
+
+                var today = days.FirstOrDefault(d => d.UtcTicks >= DateTimeOffset.Now.AddDays(-1).UtcTicks && d.UtcTicks < DateTimeOffset.Now.AddDays(-1).UtcTicks);
+
+                var allVisitors = await visitorRepository.ListAllVisitors(User.GetPlaceProvider(), today);
+                int ret = 0;
+                foreach (var visitor in allVisitors)
+                {
+                    try
+                    {
+                        if (string.IsNullOrEmpty(visitor.Phone)) continue;
+                        if (!string.IsNullOrEmpty(visitor.TestingSet)) continue;
+                        var text = "";
+                        var range = $"{visitor.ChosenSlotTime.ToLocalTime().ToString("HH:mm")} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalTime().ToString("HH:mm")}";
+                        switch (visitor.ChosenPlaceId)
+                        {
+                            case "BA602":
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525188000000000L && visitor.ChosenSlotTime.UtcTicks < 637525260000000000L)
+                                {
+                                    switch (visitor.Language)
+                                    {
+                                        case "en":
+                                        case "en-US":
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place MU Ruzinov between {range}. Please note, that between 11:40 - 13:00 is lunch break.";
+                                            break;
+                                        default:
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat do MU Ruzinov medzi {range}. Pozor, medzi 11:40 - 13:00 je obednajsia prestavka.";
+                                            break;
+                                    }
+                                }
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525404000000000L)
+                                {
+                                    switch (visitor.Language)
+                                    {
+                                        case "en":
+                                        case "en-US":
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place MU Ruzinov between {range}. Please note, that after 18:00 place is closed.";
+                                            break;
+                                        default:
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat do MU Ruzinov medzi {range}. Pozor, po 18:00 je odberne miesto zatvorene.";
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "BA601":
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637524864000000000L)
+                                {
+                                    switch (visitor.Language)
+                                    {
+                                        case "en":
+                                        case "en-US":
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place at the airport between {range}. Please note, that after 17:45 place is closed.";
+                                            break;
+                                        default:
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat na letisko medzi {range}. Pozor, po 17:45 je odberne miesto zatvorene.";
+                                            break;
+                                    }
+                                }
+                                break;
+                        }
+
+                        if (!string.IsNullOrEmpty(text))
+                        {
+                            var phone = visitor.Phone;
+                            if (string.IsNullOrEmpty(test))
+                            {
+                                await smsSender.SendSMS(visitor.Phone, new Message(text));
+                                ret++;
+                            }
+                            else
+                            {
+                                return Ok(await smsSender.SendSMS(test, new Message(text)));
+                            }
+                        }
+                    }
+                    catch (Exception exc)
+                    {
+                        logger.LogError(exc, $"SendSMSSummerZone: ERROR {exc.Message}");
+                    }
+                }
+                logger.LogInformation($"SendSMSSummerZone: DONE {ret}");
+                return Ok(ret);
+
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
+        /// <summary>
         /// Administrator has power to delete everything in the database. Password confirmation is required.
         /// </summary>
         /// <param name="hash"></param>
