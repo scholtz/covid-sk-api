@@ -1779,8 +1779,21 @@ namespace CovidMassTesting.Repository.RedisRepository
         {
             if (day.HasValue)
             {
-                var keys = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{day.Value.UtcTicks}";
-                return await redisCacheClient.Db0.HashValuesAsync<string>(keys);
+                var ticks = day.Value.RoundDay();
+                var keys = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{ticks}";
+                var ret= await redisCacheClient.Db0.HashValuesAsync<string>(keys);
+
+                var offset = day.Value.GetLocalOffset();
+                var ticks2 = new DateTimeOffset(ticks, offset).UtcTicks;
+
+                var keys2 = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{ticks2}";
+                var ret2 = await redisCacheClient.Db0.HashValuesAsync<string>(keys2);
+                var retCombined = new HashSet<string>(ret);
+                foreach(var item in ret2)
+                {
+                    if (!retCombined.Contains(item)) retCombined.Add(item);
+                }
+                return retCombined;
             }
             return await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_VISITORS_OBJECTS}");
         }

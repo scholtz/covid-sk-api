@@ -3322,8 +3322,6 @@ namespace NUnitTestCovidApi
             Assert.AreEqual("2021-03-27T11:00:00.0000000+01:00", DateTimeOffset.Parse("2021-03-27T10:00:00+00:00").ToLocalTime().ToString("o"));
             Assert.AreEqual("2021-03-28T12:00:00.0000000+02:00", DateTimeOffset.Parse("2021-03-28T10:00:00+00:00").ToLocalTime().ToString("o"));
 
-
-
         }
 
         [Test]
