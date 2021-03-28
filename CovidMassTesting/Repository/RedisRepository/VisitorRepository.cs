@@ -1781,7 +1781,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 var ticks = day.Value.RoundDay();
                 var keys = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{ticks}";
-                var ret= await redisCacheClient.Db0.HashValuesAsync<string>(keys);
+                var ret = await redisCacheClient.Db0.HashValuesAsync<string>(keys);
 
                 var offset = day.Value.GetLocalOffset();
                 var ticks2 = new DateTimeOffset(ticks, offset).UtcTicks;
@@ -1789,7 +1789,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var keys2 = $"{configuration["db-prefix"]}{REDIS_KEY_DAY2VISITOR}-{ticks2}";
                 var ret2 = await redisCacheClient.Db0.HashValuesAsync<string>(keys2);
                 var retCombined = new HashSet<string>(ret);
-                foreach(var item in ret2)
+                foreach (var item in ret2)
                 {
                     if (!retCombined.Contains(item)) retCombined.Add(item);
                 }
@@ -2588,7 +2588,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 foreach (var dayStr in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}"))
                 {
-                    ret.Add(new DateTimeOffset(long.Parse(dayStr), TimeSpan.Zero));
+                    var ticks = long.Parse(dayStr);
+                    var t = new DateTimeOffset(ticks, TimeSpan.Zero);
+                    if (t.RoundDay() != ticks)
+                    {
+                        logger.LogError($"!!!!!!! exportable day issue: {ticks} is not boud to RoundDay.. {t.ToString("o")}");
+                        continue;
+                    }
+                    ret.Add(t);
                 }
             }
             catch (Exception exc)
