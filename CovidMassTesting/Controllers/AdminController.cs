@@ -1293,6 +1293,7 @@ namespace CovidMassTesting.Controllers
                     {
                         if (string.IsNullOrEmpty(visitor.Phone)) continue;
                         if (!string.IsNullOrEmpty(visitor.TestingSet)) continue;
+                        if (visitor.ChosenSlotTime < DateTimeOffset.UtcNow) continue;
                         var text = "";
                         var range = $"{visitor.ChosenSlotTime.ToLocalTime().ToString("HH:mm")} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalTime().ToString("HH:mm")}";
                         switch (visitor.ChosenPlaceId)
