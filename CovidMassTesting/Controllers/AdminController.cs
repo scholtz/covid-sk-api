@@ -1283,8 +1283,10 @@ namespace CovidMassTesting.Controllers
 
                 var today = days.FirstOrDefault(d => d.UtcTicks >= DateTimeOffset.Now.AddDays(-1).UtcTicks && d.UtcTicks < DateTimeOffset.Now.AddDays(-1).UtcTicks);
 
-                var allVisitors = await visitorRepository.ListAllVisitors(User.GetPlaceProvider(), today);
+                var allVisitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider(), today);
                 int ret = 0;
+
+                logger.LogInformation($"SendSMSSummerZone: Count all: {allVisitors.Count()} {today}");
                 foreach (var visitor in allVisitors)
                 {
                     try
@@ -1340,9 +1342,9 @@ namespace CovidMassTesting.Controllers
                                 break;
                         }
 
+                        logger.LogInformation($"SendSMSSummerZone: {visitor.Id}");
                         if (!string.IsNullOrEmpty(text))
                         {
-                            var phone = visitor.Phone;
                             if (string.IsNullOrEmpty(test))
                             {
                                 await smsSender.SendSMS(visitor.Phone, new Message(text));
