@@ -1268,7 +1268,7 @@ namespace CovidMassTesting.Controllers
         [HttpPost("SendSMSSummerZone")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> SendSMSSummerZone([FromForm] string test)
+        public async Task<ActionResult<bool>> SendSMSSummerZone([FromForm] string test, [FromForm] DateTimeOffset day)
         {
             try
             {
@@ -1281,12 +1281,12 @@ namespace CovidMassTesting.Controllers
 
                 var days = await visitorRepository.ListExportableDays();
 
-                var today = days.FirstOrDefault(d => d.UtcTicks >= DateTimeOffset.Now.AddDays(-1).UtcTicks && d.UtcTicks < DateTimeOffset.Now.AddDays(-1).UtcTicks);
+                //var today = days.FirstOrDefault(d => d.UtcTicks >= DateTimeOffset.Now.AddDays(-1).UtcTicks && d.UtcTicks < DateTimeOffset.Now.AddDays(-1).UtcTicks);
 
-                var allVisitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider(), today);
+                var allVisitors = await visitorRepository.ListAllVisitorsOrig(User.GetPlaceProvider(), day);
                 int ret = 0;
 
-                logger.LogInformation($"SendSMSSummerZone: Count all: {allVisitors.Count()} {today}");
+                logger.LogInformation($"SendSMSSummerZone: Count all: {allVisitors.Count()} {day}");
                 foreach (var visitor in allVisitors)
                 {
                     try
