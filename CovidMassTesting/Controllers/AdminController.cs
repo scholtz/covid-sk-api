@@ -1296,7 +1296,7 @@ namespace CovidMassTesting.Controllers
                         switch (visitor.ChosenPlaceId)
                         {
                             case "BA602":
-                                if (visitor.ChosenSlotTime.UtcTicks >= 637525188000000000L && visitor.ChosenSlotTime.UtcTicks < 637525260000000000L)
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525176000000000L && visitor.ChosenSlotTime.UtcTicks < 637525260000000000L)
                                 {
                                     switch (visitor.Language)
                                     {
