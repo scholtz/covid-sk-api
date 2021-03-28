@@ -1340,6 +1340,35 @@ namespace CovidMassTesting.Controllers
                                     }
                                 }
                                 break;
+                            case "62e2943e-ef10-49d7-9243-41d206c3aac8":
+
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525176000000000L && visitor.ChosenSlotTime.UtcTicks < 637525260000000000L)
+                                {
+                                    switch (visitor.Language)
+                                    {
+                                        case "en":
+                                        case "en-US":
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place Strkovec between {range}. Please note, that between 11:45 - 13:00 is lunch break.";
+                                            break;
+                                        default:
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat ku Strkovcu medzi {range}. Pozor, medzi 11:45 - 13:00 je obednajsia prestavka.";
+                                            break;
+                                    }
+                                }
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525392000000000L)
+                                {
+                                    switch (visitor.Language)
+                                    {
+                                        case "en":
+                                        case "en-US":
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place Strkovec between {range}. Please note, that after 17:45 place is closed.";
+                                            break;
+                                        default:
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat ku Strkovcu medzi {range}. Pozor, po 17:45 je odberne miesto zatvorene.";
+                                            break;
+                                    }
+                                }
+                                break;
                         }
 
                         logger.LogInformation($"SendSMSSummerZone: {visitor.Id}");
