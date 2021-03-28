@@ -1349,10 +1349,10 @@ namespace CovidMassTesting.Controllers
                                     {
                                         case "en":
                                         case "en-US":
-                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place Strkovec between {range}. Please note, that between 11:45 - 13:00 is lunch break.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place MOM Strkovec between {range}. Please note, that between 11:45 - 13:00 is lunch break.";
                                             break;
                                         default:
-                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat ku Strkovcu medzi {range}. Pozor, medzi 11:45 - 13:00 je obednajsia prestavka.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat do MOM Strkovec medzi {range}. Pozor, medzi 11:45 - 13:00 je obednajsia prestavka.";
                                             break;
                                     }
                                 }
@@ -1362,10 +1362,10 @@ namespace CovidMassTesting.Controllers
                                     {
                                         case "en":
                                         case "en-US":
-                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place Strkovec between {range}. Please note, that after 17:45 place is closed.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place MOM Strkovec between {range}. Please note, that after 17:45 place is closed.";
                                             break;
                                         default:
-                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat ku Strkovcu medzi {range}. Pozor, po 17:45 je odberne miesto zatvorene.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat do MOM Strkovec medzi {range}. Pozor, po 17:45 je odberne miesto zatvorene.";
                                             break;
                                     }
                                 }
