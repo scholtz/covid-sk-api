@@ -2583,19 +2583,17 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual async Task<IEnumerable<DateTimeOffset>> ListExportableDays()
         {
-            var ret = new List<DateTimeOffset>();
+            var ret = new HashSet<DateTimeOffset>();
             try
             {
                 foreach (var dayStr in await redisCacheClient.Db0.HashKeysAsync($"{configuration["db-prefix"]}{REDIS_KEY_OPENDAYS}"))
                 {
                     var ticks = long.Parse(dayStr);
                     var t = new DateTimeOffset(ticks, TimeSpan.Zero);
-                    if (t.RoundDay() != ticks)
+                    if (!ret.Contains(t))
                     {
-                        logger.LogError($"!!!!!!! exportable day issue: {ticks} is not boud to RoundDay.. {t.ToString("o")}");
-                        continue;
+                        ret.Add(t);
                     }
-                    ret.Add(t);
                 }
             }
             catch (Exception exc)
