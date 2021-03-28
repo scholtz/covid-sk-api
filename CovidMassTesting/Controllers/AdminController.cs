@@ -1309,31 +1309,31 @@ namespace CovidMassTesting.Controllers
                                             break;
                                     }
                                 }
-                                if (visitor.ChosenSlotTime.UtcTicks >= 637525404000000000L)
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525392000000000L)
                                 {
                                     switch (visitor.Language)
                                     {
                                         case "en":
                                         case "en-US":
-                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place MU Ruzinov between {range}. Please note, that after 18:00 place is closed.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place MU Ruzinov between {range}. Please note, that after 17:45 place is closed.";
                                             break;
                                         default:
-                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat do MU Ruzinov medzi {range}. Pozor, po 18:00 je odberne miesto zatvorene.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat do MU Ruzinov medzi {range}. Pozor, po 17:45 je odberne miesto zatvorene.";
                                             break;
                                     }
                                 }
                                 break;
                             case "BA601":
-                                if (visitor.ChosenSlotTime.UtcTicks >= 637525395000000000L)
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525392000000000L)
                                 {
                                     switch (visitor.Language)
                                     {
                                         case "en":
                                         case "en-US":
-                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place at the airport between {range}. Please note, that after 17:45 place is closed.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, please visit testing place at the airport between {range}. Please note, that after 17:40 place is closed.";
                                             break;
                                         default:
-                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat na letisko medzi {range}. Pozor, po 17:45 je odberne miesto zatvorene.";
+                                            text = $"{visitor.FirstName} {visitor.LastName}, pridte sa dnes prosim otestovat na letisko medzi {range}. Pozor, po 17:40 je odberne miesto zatvorene.";
                                             break;
                                     }
                                 }
