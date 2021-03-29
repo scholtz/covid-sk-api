@@ -186,6 +186,7 @@ namespace CovidMassTesting.Connectors
 
                 case TestResult.NegativeWaitingForCertificate:
                 case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeCertificateTakenTypo:
                     result = "NEGATIVE";
                     break;
                 default:

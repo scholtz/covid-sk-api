@@ -2376,6 +2376,11 @@
             Test result is negative. Certificate has been given to visitor.
             </summary>
         </member>
+        <member name="F:CovidMassTesting.Model.TestResult.NegativeCertificateTakenTypo">
+            <summary>
+            Test result is negative. Certificate has been given to visitor.
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.EZdravie.Request.RegisterPersonRequest.vFirst_name">
             <summary>
             First name

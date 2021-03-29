@@ -799,12 +799,12 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
             {
-                if (state == TestResult.TestMustBeRepeated || state == TestResult.NegativeCertificateTaken || state == TestResult.NegativeWaitingForCertificate)
+                if (state == TestResult.TestMustBeRepeated || state == TestResult.NegativeCertificateTaken || state == TestResult.NegativeCertificateTakenTypo || state == TestResult.NegativeWaitingForCertificate)
                 {
                     forceSend = true;
                 }
             }
-            if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
+            if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeCertificateTakenTypo || visitor.Result == TestResult.NegativeWaitingForCertificate)
             {
                 if (state == TestResult.TestMustBeRepeated || state == TestResult.PositiveWaitingForCertificate || state == TestResult.PositiveCertificateTaken)
                 {
@@ -984,6 +984,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeCertificateTakenTypo:
                     await SendResults(visitor);
                     break;
                 default:
@@ -1043,6 +1044,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     visitor.Result = TestResult.PositiveCertificateTaken;
                     break;
                 case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTakenTypo:
                     visitor.Result = TestResult.NegativeCertificateTaken;
                     break;
             }
@@ -1085,6 +1087,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.NegativeWaitingForCertificate:
                 case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeCertificateTakenTypo:
                     // process
                     break;
                 default:
@@ -1133,6 +1136,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.NegativeWaitingForCertificate:
                 case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeCertificateTakenTypo:
                     // process
                     break;
                 default:
@@ -1177,6 +1181,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.NegativeWaitingForCertificate:
                 case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeCertificateTakenTypo:
                     // process
                     break;
                 default:
@@ -1214,6 +1219,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.NegativeCertificateTaken:
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTakenTypo:
 
                     if (visitor.EHealthNotifiedAt.HasValue) return false;
 
@@ -1430,6 +1436,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
                 case TestResult.NegativeCertificateTaken:
                 case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTakenTypo:
                     await IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime ?? DateTimeOffset.UtcNow);
                     break;
             }
@@ -1440,6 +1447,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.NegativeCertificateTaken:
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTakenTypo:
                     var oldCulture = CultureInfo.CurrentCulture;
                     var oldUICulture = CultureInfo.CurrentUICulture;
                     var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
@@ -1468,6 +1476,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                     }
                                     break;
                                 case TestResult.NegativeCertificateTaken:
+                                case TestResult.NegativeCertificateTakenTypo:
                                 case TestResult.NegativeWaitingForCertificate:
                                     if (visitor.Result != TestResult.NegativeWaitingForCertificate)
                                     {
@@ -1563,6 +1572,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                     resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.POSITIVE];
                                     break;
                                 case TestResult.NegativeWaitingForCertificate:
+                                case TestResult.NegativeCertificateTakenTypo:
                                 case TestResult.NegativeCertificateTaken:
                                     resultLocalized = localizer[Repository_RedisRepository_VisitorRepository.NEGATIVE];
                                     break;
@@ -1673,7 +1683,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             else
             {
-                if (visitor.Result != TestResult.NegativeCertificateTaken && visitor.Result != TestResult.NegativeWaitingForCertificate)
+                if (visitor.Result != TestResult.NegativeCertificateTaken && visitor.Result != TestResult.NegativeCertificateTakenTypo && visitor.Result != TestResult.NegativeWaitingForCertificate)
                 {
                     throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Personal_data_may_be_deleted_only_after_the_test_has_proven_negative_result_and_person_receives_the_certificate_].Value);
                 }
@@ -2657,6 +2667,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                         var result = "";
                         if (visitor.Result == TestResult.NegativeCertificateTaken ||
+                            visitor.Result == TestResult.NegativeCertificateTakenTypo ||
                             visitor.Result == TestResult.NegativeWaitingForCertificate
                             )
                         {
@@ -2987,6 +2998,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     data.Description = "Zostaňte prosím v karanténe minimálne 14 dní. Potom si vykonajte ďalší antigénový alebo PCR test aby ste mali istotu že vírus nebudete šíriť medzi ľudí.";
                     break;
                 case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeCertificateTakenTypo:
                 case TestResult.NegativeWaitingForCertificate:
                     data.Text = "Negatívny";
                     data.Description = "Aj keď test u Vás nepreukázal COVID, prosím zostaňte ostražitý. V prípade príznakov ako kašeľ, zvýšená teplota, alebo bolesť hlavy choďte prosím na ďalší test.";
@@ -3656,7 +3668,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         stats[visitor.ChosenPlaceId].Sick++;
                     }
-                    if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
+                    if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeCertificateTakenTypo || visitor.Result == TestResult.NegativeWaitingForCertificate)
                     {
                         stats[visitor.ChosenPlaceId].Healthy++;
                     }
@@ -3761,6 +3773,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             visitor.TestingTime.Value.AddDays(3) > DateTimeOffset.Now)
                         {
                             if (visitor.Result == TestResult.NegativeCertificateTaken ||
+                                visitor.Result == TestResult.NegativeCertificateTakenTypo ||
                                 visitor.Result == TestResult.NegativeWaitingForCertificate ||
                                 visitor.Result == TestResult.PositiveWaitingForCertificate ||
                                 visitor.Result == TestResult.PositiveCertificateTaken)
@@ -3839,6 +3852,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             break;
                         case TestResult.NegativeWaitingForCertificate:
                         case TestResult.NegativeCertificateTaken:
+                        case TestResult.NegativeCertificateTakenTypo:
 
                             if (data.Result != TestResult.NegativeWaitingForCertificate)
                             {

@@ -999,6 +999,7 @@ namespace CovidMassTesting.Controllers
                             case TestResult.PositiveCertificateTaken:
                             case TestResult.NegativeWaitingForCertificate:
                             case TestResult.NegativeCertificateTaken:
+                            case TestResult.NegativeCertificateTakenTypo:
                                 // ok
                                 break;
                             default:

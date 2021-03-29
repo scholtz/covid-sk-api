@@ -32,6 +32,10 @@
         /// <summary>
         /// Test result is negative. Certificate has been given to visitor.
         /// </summary>
-        public const string NegativeCertificateTaken = "negative-certiciate-taken";
+        public const string NegativeCertificateTaken = "negative-certificate-taken";
+        /// <summary>
+        /// Test result is negative. Certificate has been given to visitor.
+        /// </summary>
+        public const string NegativeCertificateTakenTypo = "negative-certiciate-taken";
     }
 }
