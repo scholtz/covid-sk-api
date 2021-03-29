@@ -2591,9 +2591,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     var ticks = long.Parse(dayStr);
                     var t = new DateTimeOffset(ticks, TimeSpan.Zero);
-                    if (!ret.Contains(t))
+                    var t2 = t.RoundDay();
+                    var add = new DateTimeOffset(t2, TimeSpan.Zero);
+                    if (!ret.Contains(add))
                     {
-                        ret.Add(t);
+                        ret.Add(add);
                     }
                 }
             }
