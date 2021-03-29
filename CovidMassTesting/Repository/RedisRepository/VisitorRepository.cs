@@ -2583,6 +2583,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public virtual async Task<IEnumerable<DateTimeOffset>> ListExportableDays()
         {
+
             var ret = new HashSet<DateTimeOffset>();
             try
             {
