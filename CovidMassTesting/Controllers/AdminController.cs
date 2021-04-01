@@ -1294,7 +1294,40 @@ namespace CovidMassTesting.Controllers
                     {
                         if (string.IsNullOrEmpty(visitor.Phone)) continue;
                         if (!string.IsNullOrEmpty(visitor.TestingSet)) continue;
+                        if (string.IsNullOrEmpty(visitor.ChosenPlaceId)) continue;
                         if (visitor.ChosenSlotTime < DateTimeOffset.UtcNow) continue;
+
+                        Slot5Min slot = null;
+                        try
+                        {
+                            slot = await slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot);
+                        }
+                        catch
+                        {
+                            // not found
+                        }
+
+                        if(slot == null)
+                        {
+                            logger.LogError($"Error in visitor {visitor.Id} - slot {visitor.ChosenSlot} does not exists {visitor.ChosenSlotTime}");
+                            continue;
+                        }
+                        Place place = null;
+                        try
+                        {
+                            place = await placeRepository.GetPlace(visitor.ChosenPlaceId);
+                        }
+                        catch
+                        {
+                            // not found
+                        }
+
+                        if (place == null)
+                        {
+                            logger.LogError($"Error in visitor {visitor.Id} - place {visitor.ChosenPlaceId} does not exists {visitor.ChosenSlotTime}");
+                            continue;
+                        }
+
                         var text = "";
                         var range = $"{visitor.ChosenSlotTime.ToLocalTime().ToString("HH:mm")} - {visitor.ChosenSlotTime.AddMinutes(5).ToLocalTime().ToString("HH:mm")}";
                         switch (visitor.ChosenPlaceId)
@@ -1373,6 +1406,33 @@ namespace CovidMassTesting.Controllers
                                 break;
                         }
 
+
+                        var rangeDate = $"{visitor.ChosenSlotTime.ToLocalTime().ToString("dd.MM.")}";
+
+                        switch (visitor.PlaceProviderId)
+                        {
+                            case "08220387":
+
+                                if (visitor.ChosenSlotTime.UtcTicks >= 637525392000000000L)
+                                {
+                                    switch (visitor.Language)
+                                    {
+                                        case "en":
+                                        case "en-US":
+                                            text = $"{visitor.FirstName} {visitor.LastName}, we are waiting you on {rangeDate} between {range} at {place.Name}. Covidacek";
+                                            break;
+                                        case "cs":
+                                        case "cs-CZ":
+                                            text = $"{visitor.FirstName} {visitor.LastName}, čekáme tě {rangeDate} mezi {range} v {place.Name}. Covidacek";
+                                            break;
+                                        default:
+                                            text = $"{visitor.FirstName} {visitor.LastName}, čekáme ťa {rangeDate} medzi {range} v {place.Name}. Covidacek";
+                                            break;
+                                    }
+                                }
+
+                                break;
+                        }
                         logger.LogInformation($"SendSMSSummerZone: {visitor.Id}");
                         if (!string.IsNullOrEmpty(text))
                         {
