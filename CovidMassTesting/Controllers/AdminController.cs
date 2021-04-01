@@ -1269,7 +1269,7 @@ namespace CovidMassTesting.Controllers
         [HttpPost("SendSMSSummerZone")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<bool>> SendSMSSummerZone([FromForm] string test, [FromForm] DateTimeOffset day)
+        public async Task<ActionResult<bool>> SendSMSSummerZone([FromForm] string test, [FromForm] DateTimeOffset? day)
         {
             try
             {
