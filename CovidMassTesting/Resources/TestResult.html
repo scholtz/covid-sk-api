@@ -1,4 +1,4 @@
-﻿<html>
+<html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
@@ -98,6 +98,9 @@
             {{/Signature}}
         </tbody>
     </table>
+    
+    <div style="page-break-before:always">&nbsp;</div>
+
     <div style="font-size:larger">
         <h4>Poučenie pre osoby s pozitívnym výsledkom vyšetrenia a osoby žijúce s nimi v spoločnej domácnosti:</h4>
         <p>
@@ -139,5 +142,105 @@
             <li>Viac informácií na stránke: http://www.korona.gov.sk, http://www.uvz.sk</li>
         </ul>
     </div>
+
+    <div style="page-break-before:always">&nbsp;</div>
+
+    <h1>Medical Certificate</h1>
+
+    <h3>This is to certify that</h3>
+    <table>
+        <tbody>
+            <tr>
+                <th>name:</th>
+                <td>{{Name}}</td>
+            </tr>
+            <tr>
+                <th>born:</th>
+                <td>Day: {{BirthDayDay}} Month: {{BirthDayMonth}} Year: {{BirthDayYear}}</td>
+            </tr>
+            <tr>
+                <th>address:</th>                                                                                   <!--adresa-->
+                <td>{{Street}}, {{City}}</td>
+            </tr>
+            {{#PersonalNumber}}
+            <tr>
+                <th>Personal number:</th>
+                <td>{{PersonalNumber}}</td>
+            </tr>
+            {{/PersonalNumber}}
+            {{#PassportNumber}}
+            <tr>
+                <th>Passport number:</th>
+                <td>{{PassportNumber}}</td>
+            </tr>
+            {{/PassportNumber}}
+        </tbody>
+    </table>
+
+    <h3>has been tested for the presence of SARS-CoV-2 with an <b>ANTIGEN TEST</b>.</h3>
+
+    <h1>Status report of infection</h1>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>SARS-CoV-2:</th>
+                <td>{{Text}}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Tested in laboratory:</h3> <!-- názov pracoviska-->
+
+    <table>
+        <tbody>
+            <tr>
+                <th>Processed by:</th>
+                <td>{{TestingEntity}}</td>
+            </tr>
+            {{#Oversight}}
+            <tr>
+                <th>Garant:</th>
+                <td>{{Oversight}}</td>
+            </tr>
+            {{/Oversight}}
+            <tr>
+                <th>Testing address:</th>
+                <td>{{TestingAddress}}</td>
+            </tr>
+            <tr>
+                <th>URL address:</th>
+                <td>{{FrontedURL}}</td>
+            </tr>
+            <tr>
+                <th>Date:</th>
+                <td>{{Date}}</td>
+                <th>Signature:</th>
+                <td></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>Test check:</h3> 
+    <table>
+        <tbody>
+            <tr>
+                <th>Verification URL:</th>
+                <td>{{VerifyURL}}</td>
+            </tr>
+            <tr>
+                <th>Verification URL in QR code:</th>
+                <td><img style="width:150px;height:150px;" src="data:image/png;base64, {{QRVerificationURL}}" alt="QR" /></td>
+            </tr>
+            {{#Signature}}
+            <tr>
+                <th>Signature</th>
+                <td><img style="width:226px;height:90px;" src="data:image/png;base64, {{Signature}}" alt="Signature" /></td>
+            </tr>
+            {{/Signature}}
+        </tbody>
+    </table>    
+
+
 </body>
 </html>
