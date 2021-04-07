@@ -3023,6 +3023,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             if (visitor.TestingTime.HasValue)
             {
                 data.Date = visitor.TestingTime.Value.ToLocalTime().ToString("f");
+                data.DateEN = visitor.TestingTime.Value.ToLocalTime().ToString("f", CultureInfo.InvariantCulture);
             }
             switch (visitor.PersonType)
             {
@@ -3035,7 +3036,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     data.PersonalNumber = visitor.RC;
                     break;
             }
-
+            data.PernamentAddress = visitor.Address;
             data.TestingAddress = placeAddress;
             data.TestingEntity = testingEntity;
             data.FrontedURL = configuration["FrontedURL"];

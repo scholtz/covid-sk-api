@@ -55,6 +55,10 @@ namespace CovidMassTesting.Model.Mustache
         /// </summary>
         public string Date { get; set; }
         /// <summary>
+        /// DateTime en
+        /// </summary>
+        public string DateEN { get; set; }
+        /// <summary>
         /// Link to testing place
         /// </summary>
         public string FrontedURL { get; set; }
