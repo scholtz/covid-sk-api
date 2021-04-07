@@ -279,7 +279,7 @@
             <param name="phone"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.AdminController.SendSMSSummerZone(System.String,System.DateTimeOffset)">
+        <member name="M:CovidMassTesting.Controllers.AdminController.SendSMSSummerZone(System.String,System.Nullable{System.DateTimeOffset})">
             <summary>
             Test sms
             </summary>

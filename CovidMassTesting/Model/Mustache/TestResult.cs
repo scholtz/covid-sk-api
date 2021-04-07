@@ -23,6 +23,10 @@ namespace CovidMassTesting.Model.Mustache
         /// </summary>
         public int? BirthDayYear { get; set; }
         /// <summary>
+        /// Address where user has pernament residence
+        /// </summary>
+        public string PernamentAddress { get; set; }
+        /// <summary>
         /// Base64 encoded signature picture in png
         /// </summary>
         public string Signature { get; set; }

@@ -64,6 +64,12 @@
                 <th>Dátum narodenia:</th>
                 <td>{{BirthDayDay}}.{{BirthDayMonth}}.{{BirthDayYear}}</td>
             </tr>
+            {{#PernamentAddress}}
+            <tr>
+                <th>Adresa trvalého bydliska:</th>
+                <td>{{PernamentAddress}}</td>
+            </tr>
+            {{/PernamentAddress}}
             <tr>
                 <th>Test vykonal:</th>
                 <td>{{TestingEntity}}</td>
@@ -158,10 +164,12 @@
                 <th>Birth day:</th>
                 <td>Day: {{BirthDayDay}} Month: {{BirthDayMonth}} Year: {{BirthDayYear}}</td>
             </tr>
+            {{#PernamentAddress}}
             <tr>
-                <th>address:</th>                                                                                   <!--adresa-->
-                <td>{{Street}}, {{City}}</td>
+                <th>Address:</th>
+                <td>{{PernamentAddress}}</td>
             </tr>
+            {{/PernamentAddress}}
             {{#PersonalNumber}}
             <tr>
                 <th>Personal number:</th>
