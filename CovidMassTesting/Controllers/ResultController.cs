@@ -589,8 +589,45 @@ namespace CovidMassTesting.Controllers
                 return BadRequest(new ProblemDetails() { Detail = exc.Message });
             }
         }
+        /// <summary>
+        /// Get VisitorCode From TestCode
+        /// </summary>
+        /// <param name="testId"></param>
+        /// <returns></returns>
+        [Authorize]
+        [HttpPost("GetVisitorCodeFromTestCode")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<bool>> GetVisitorCodeFromTestCode([FromForm] string testId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(testId))
+                {
+                    throw new ArgumentException(localizer[Controllers_ResultController.Test_id_must_not_be_empty].Value);
+                }
 
+                if (!User.IsDocumentManager(userRepository, placeProviderRepository)
+                    && !User.IsDataExporter(userRepository, placeProviderRepository)
+                    )
+                {
+                    throw new Exception(localizer[Controllers_ResultController.Only_user_with_Document_Manager_role_is_allowed_to_move_the_queue_forward].Value);
+                }
 
+                var code = FormatBarCode(testId);
+                return Ok(await visitorRepository.GETVisitorCodeFromTesting(code));
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// This method removes test from queue
         /// </summary>
