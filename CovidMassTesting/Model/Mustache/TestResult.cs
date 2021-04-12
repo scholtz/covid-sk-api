@@ -35,6 +35,10 @@ namespace CovidMassTesting.Model.Mustache
         /// </summary>
         public string Text { get; set; }
         /// <summary>
+        /// Test result in english
+        /// </summary>
+        public string TextEN { get; set; }
+        /// <summary>
         /// Result help
         /// </summary>
         public string Description { get; set; }

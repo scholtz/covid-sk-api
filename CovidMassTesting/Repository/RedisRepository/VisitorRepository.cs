@@ -2995,12 +2995,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.PositiveWaitingForCertificate:
                     data.Text = "Pozitívny";
+                    data.TextEN = "Positive";
                     data.Description = "Zostaňte prosím v karanténe minimálne 14 dní. Potom si vykonajte ďalší antigénový alebo PCR test aby ste mali istotu že vírus nebudete šíriť medzi ľudí.";
                     break;
                 case TestResult.NegativeCertificateTaken:
                 case TestResult.NegativeCertificateTakenTypo:
                 case TestResult.NegativeWaitingForCertificate:
                     data.Text = "Negatívny";
+                    data.TextEN = "Negative";
                     data.Description = "Aj keď test u Vás nepreukázal COVID, prosím zostaňte ostražitý. V prípade príznakov ako kašeľ, zvýšená teplota, alebo bolesť hlavy choďte prosím na ďalší test.";
                     break;
                 default:
