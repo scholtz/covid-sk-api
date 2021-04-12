@@ -1149,23 +1149,23 @@ namespace CovidMassTesting.Controllers
                 }
                 var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, query));
                 var reg = await visitorRepository.GetRegistration(regId);
-                if (reg == null)
+                if (reg != null)
                 {
-                    throw new Exception("Zadajte platné osobné číslo zamestnanca");
-                }
-                ret = await visitorRepository.GetVisitorByPersonalNumber(reg.RC, true);
-                if (ret != null)
-                {
-                    var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
-                    var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
-                    ret.Extend(places, products);
-                    return Ok(ret);
+
+                    ret = await visitorRepository.GetVisitorByPersonalNumber(reg.RC, true);
+                    if (ret != null)
+                    {
+                        var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                        var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+                        ret.Extend(places, products);
+                        return Ok(ret);
+                    }
                 }
 
                 var lastTest = await visitorRepository.GETVisitorCodeFromTesting(documentClear);
                 if (lastTest.HasValue)
                 {
-                    ret = await visitorRepository.GetVisitor(lastTest.Value,false);
+                    ret = await visitorRepository.GetVisitor(lastTest.Value, false);
                     if (ret != null)
                     {
                         logger.LogInformation($"FindVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
@@ -1333,7 +1333,7 @@ namespace CovidMassTesting.Controllers
                             // not found
                         }
 
-                        if(slot == null)
+                        if (slot == null)
                         {
                             logger.LogError($"Error in visitor {visitor.Id} - slot {visitor.ChosenSlot} does not exists {visitor.ChosenSlotTime}");
                             continue;
