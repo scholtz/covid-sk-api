@@ -1162,6 +1162,32 @@ namespace CovidMassTesting.Controllers
                     return Ok(ret);
                 }
 
+                var lastTest = await visitorRepository.GETVisitorCodeFromTesting(documentClear);
+                if (lastTest.HasValue)
+                {
+                    ret = await visitorRepository.GetVisitor(lastTest.Value,false);
+                    if (ret != null)
+                    {
+                        logger.LogInformation($"FindVisitor: {User.GetEmail()} fetched visitor {ret.Id.ToString().GetSHA256Hash()}");
+
+                        try
+                        {
+                            var places = (await placeRepository.ListAll()).ToDictionary(p => p.Id, p => p);
+                            var products = (await placeProviderRepository.ListAll()).SelectMany(p => p.Products).ToDictionary(p => p.Id, p => p);
+                            ret.Extend(places, products);
+                            logger.LogInformation($"visitor extended: {ret.Id} {ret.ProductName}");
+                        }
+                        catch (Exception exc)
+                        {
+                            logger.LogError(exc, $"Error in visitor: {exc.Message}");
+                        }
+
+
+                        return Ok(ret);
+                    }
+                }
+
+
                 throw new Exception("Visitor not found");
             }
             catch (ArgumentException exc)
