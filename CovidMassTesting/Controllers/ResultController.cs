@@ -312,12 +312,14 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="registrationCode"></param>
         /// <param name="personalNumber"></param>
+        /// <param name="testingSet"></param>
+        /// <param name="employeeId"></param>
         /// <returns></returns>
         [Authorize]
         [HttpPost("PrintCertificateByDocumentManager")]
         [ProducesResponseType(200)]
         [ProducesResponseType(400)]
-        public async Task<ActionResult<Result>> PrintCertificateByDocumentManager([FromForm] string registrationCode, [FromForm] string personalNumber)
+        public async Task<ActionResult<Result>> PrintCertificateByDocumentManager([FromForm] string registrationCode, [FromForm] string personalNumber, [FromForm] string testingSet, [FromForm] string employeeId)
         {
             try
             {
@@ -343,6 +345,33 @@ namespace CovidMassTesting.Controllers
                     var data = await visitorRepository.GetResultPDFByEmployee(codeInt, User.GetEmail());
                     return File(data, "application/pdf", "result.pdf");
                 }
+                var testingSetClear = FormatBarCode(testingSet);
+                var visitorByTest = await visitorRepository.GETVisitorCodeFromTesting(testingSetClear);
+                if (visitorByTest.HasValue)
+                {
+                    var data = await visitorRepository.GetResultPDFByEmployee(visitorByTest.Value, User.GetEmail());
+                    return File(data, "application/pdf", "result.pdf");
+                }
+
+                var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                if (pp == null)
+                {
+                    throw new Exception("Place provider missing");
+                }
+                var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, employeeId));
+                var reg = await visitorRepository.GetRegistration(regId);
+                if (reg != null)
+                {
+
+                    var lastTest = await visitorRepository.GetVisitorByPersonalNumber(reg.RC, true);
+                    if (lastTest != null)
+                    {
+                        var data = await visitorRepository.GetResultPDFByEmployee(lastTest.Id, User.GetEmail());
+                        return File(data, "application/pdf", "result.pdf");
+                    }
+                }
+
+
                 throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
             }
             catch (ArgumentException exc)
