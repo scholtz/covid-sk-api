@@ -3228,7 +3228,7 @@ namespace NUnitTestCovidApi
 
             request = RegisterEmployeeByDocumenter(client, "100", "ludovit@scholtz.sk", "+421907000000", DateTimeOffset.Now.AddDays(-1), product.Id, TestResult.PositiveWaitingForCertificate);
             Assert.AreEqual(HttpStatusCode.OK, request.StatusCode, request.Content.ReadAsStringAsync().Result);
-            Assert.AreEqual(1, noSMSSender.Data.Count);
+            Assert.AreEqual(0, noSMSSender.Data.Count);
 
 
             stream1 = new MemoryStream(Encoding.UTF8.GetBytes("Meno;Priezvisko;Dátum narodenia;Rodné číslo;Ulica a číslo domu;Súpisné číslo;Orientačné číslo;Miesto;Pošt.smer.č./miesto;e-mail;Telefónne číslo;Osobné číslo\n" +
