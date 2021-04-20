@@ -806,13 +806,13 @@ namespace CovidMassTesting.Controllers
                 visitor.TestingTime = time;
                 visitor.ChosenSlot = time.UtcTicks;
                 visitor.PlaceProviderId = User.GetPlaceProvider();
-                
+
                 logger.LogInformation($"RegisterEmployeeByDocumenter: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 var saved = await visitorRepository.Register(visitor, User.GetEmail(), false);
                 var id = Guid.NewGuid().ToString().FormatDocument();
-                await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress(), silent:true);
+                await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress(), silent: true);
 
-                var ret = await visitorRepository.SetTestResult(id, result, isAdmin: true, silent:true);
+                var ret = await visitorRepository.SetTestResult(id, result, isAdmin: true, silent: true);
 
                 // Set testing time to the chosen slot time
                 var toUpdate = await visitorRepository.GetVisitor(saved.Id, false, true);
@@ -961,19 +961,32 @@ namespace CovidMassTesting.Controllers
                         n2k["osobne-cislo"] = n2k["oc"];
                     }
 
-                    var reg = new Registration()
+                    var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, fields[n2k["osobne-cislo"]]));
+                    Registration reg;
+                    if (string.IsNullOrEmpty(regId))
                     {
-                        PlaceProviderId = User.GetPlaceProvider(),
-                        PersonType = "idcard",
-                        FirstName = fields[n2k["meno"]],
-                        LastName = fields[n2k["priezvisko"]],
-                        City = fields[n2k["miesto"]],
-                        Phone = fields[n2k["telefonne-cislo"]],
-                        RC = fields[n2k["idc"]],
-                        Street = fields[n2k["ulica-a-cislo-domu"]],
-                        Email = fields[n2k["email"]],
-                        ZIP = fields[n2k["psc"]],
-                        CompanyIdentifiers = new List<CompanyIdentifier>()
+                        reg = new Registration();
+                    }
+                    else
+                    {
+                        reg = await visitorRepository.GetRegistration(regId);
+                        if (reg == null)
+                        {
+                            reg = new Registration();
+                        }
+                    }
+
+                    reg.PlaceProviderId = User.GetPlaceProvider();
+                    reg.PersonType = "idcard";
+                    reg.FirstName = fields[n2k["meno"]];
+                    reg.LastName = fields[n2k["priezvisko"]];
+                    reg.City = fields[n2k["miesto"]];
+                    reg.Phone = fields[n2k["telefonne-cislo"]];
+                    reg.RC = fields[n2k["idc"]];
+                    reg.Street = fields[n2k["ulica-a-cislo-domu"]];
+                    reg.Email = fields[n2k["email"]];
+                    reg.ZIP = fields[n2k["psc"]];
+                    reg.CompanyIdentifiers = new List<CompanyIdentifier>()
                         {
                             new CompanyIdentifier()
                             {
@@ -981,8 +994,8 @@ namespace CovidMassTesting.Controllers
                                 CompanyName = pp.CompanyName,
                                 EmployeeId = fields[n2k["osobne-cislo"]]
                             }
-                        }
-                    };
+                        };
+
                     if (n2k.ContainsKey("insurance"))
                     {
                         reg.InsuranceCompany = fields[n2k["insurance"]];
