@@ -390,30 +390,33 @@ namespace CovidMassTesting.Controllers
                     try
                     {
                         var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
-                        var pp = visitor.PlaceProviderId ?? place.PlaceProviderId;
-                        if (string.IsNullOrEmpty(pp)) continue;
+
+                        var pp = visitor.PlaceProviderId;
+                        if (string.IsNullOrEmpty(pp)) pp = place.PlaceProviderId;
+
+                        if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
+
                         if (visitor.EHealthNotifiedAt.HasValue)
                         {
-                            if (!from.HasValue || from >= visitor.EHealthNotifiedAt)
+                            if (!from.HasValue || from <= visitor.EHealthNotifiedAt)
                             {
                                 await visitorRepository.IncrementStats(StatsType.EHealthNotification, visitor.ChosenPlaceId, pp, visitor.EHealthNotifiedAt.Value);
                             }
                         }
-                        if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
 
-                        if (!from.HasValue || from >= visitor.ChosenSlotTime)
+                        if (!from.HasValue || from <= visitor.ChosenSlotTime)
                         {
                             await visitorRepository.IncrementStats(StatsType.RegisteredTo, visitor.ChosenPlaceId, pp, visitor.ChosenSlotTime);
                         }
                         var to = visitor.RegistrationTime ?? visitor.ChosenSlotTime;
-                        if (!from.HasValue || from >= to)
+                        if (!from.HasValue || from <= to)
                         {
                             await visitorRepository.IncrementStats(StatsType.RegisteredOn, visitor.ChosenPlaceId, pp, to);
                         }
                         i++;
                         if (visitor.TestingTime.HasValue)
                         {
-                            if (!from.HasValue || from >= visitor.TestingTime.Value)
+                            if (!from.HasValue || from <= visitor.TestingTime.Value)
                             {
                                 await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
                                 await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
@@ -421,14 +424,14 @@ namespace CovidMassTesting.Controllers
                         }
                         if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
                         {
-                            if (!from.HasValue || from >= visitor.TestingTime.Value)
+                            if (!from.HasValue || from <= visitor.TestingTime.Value)
                             {
                                 await visitorRepository.IncrementStats(StatsType.Positive, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
                             }
                         }
                         if (visitor.Result == TestResult.NegativeCertificateTaken || visitor.Result == TestResult.NegativeWaitingForCertificate)
                         {
-                            if (!from.HasValue || from >= visitor.TestingTime.Value)
+                            if (!from.HasValue || from <= visitor.TestingTime.Value)
                             {
                                 await visitorRepository.IncrementStats(StatsType.Negative, visitor.ChosenPlaceId, pp, visitor.TestingTime.Value);
                             }
