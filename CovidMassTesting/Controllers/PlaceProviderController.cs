@@ -224,6 +224,18 @@ namespace CovidMassTesting.Controllers
                 {
                     toUpdate.Web = placeProvider.Web;
                 }
+                if (!string.IsNullOrEmpty(placeProvider.SupportEmail))
+                {
+                    toUpdate.SupportEmail = placeProvider.SupportEmail;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.SupportName))
+                {
+                    toUpdate.SupportName = placeProvider.SupportName;
+                }
+                if (!string.IsNullOrEmpty(placeProvider.SupportPhone))
+                {
+                    toUpdate.SupportPhone = placeProvider.SupportPhone;
+                }
 
                 return Ok(await placeProviderRepository.SetPlaceProvider(toUpdate));
 
