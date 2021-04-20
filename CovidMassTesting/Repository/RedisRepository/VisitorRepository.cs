@@ -2873,7 +2873,16 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             continue;
                         }
-                        if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
+
+                        var userPP = visitor.PlaceProviderId;
+                        if (string.IsNullOrEmpty(userPP))
+                        {
+                            if (places.ContainsKey(visitor.ChosenPlaceId))
+                            {
+                                userPP = places[visitor.ChosenPlaceId].PlaceProviderId;
+                            }
+                        }
+                        if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != userPP) continue;
                         visitor.Extend(places, products);
                         ret.Add(new VisitorTimezoned(visitor, offset));
                     }
@@ -2898,6 +2907,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         public async Task<IEnumerable<Visitor>> ListAllVisitorsOrig(string placeProviderId, DateTimeOffset? day = null, int from = 0, int count = 9999999)
         {
             logger.LogInformation($"ListAllVisitors {from} {count}");
+            var places = await placeRepository.ListAll();
 
             var ret = new List<Visitor>();
             foreach (var visitorId in (await ListAllKeys(day)).OrderBy(i => i).Skip(from).Take(count))
@@ -2911,7 +2921,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                         {
                             continue;
                         }
-                        if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != visitor.PlaceProviderId) continue;
+                        var userPP = visitor.PlaceProviderId;
+                        if (string.IsNullOrEmpty(userPP))
+                        {
+                            var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
+                            userPP = place?.PlaceProviderId;
+                        }
+                        if (!string.IsNullOrEmpty(placeProviderId) && placeProviderId != userPP) continue;
                         ret.Add(visitor);
                     }
                     catch (Exception exc)

@@ -389,10 +389,14 @@ namespace CovidMassTesting.Controllers
                 {
                     try
                     {
-                        var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
+                        
 
                         var pp = visitor.PlaceProviderId;
-                        if (string.IsNullOrEmpty(pp)) pp = place.PlaceProviderId;
+                        if (string.IsNullOrEmpty(pp))
+                        {
+                            var place = places.FirstOrDefault(p => p.Id == visitor.ChosenPlaceId);
+                            pp = place?.PlaceProviderId;
+                        }
 
                         if (string.IsNullOrEmpty(pp)) continue;// place was deleted and visitor does not contain pp
 
