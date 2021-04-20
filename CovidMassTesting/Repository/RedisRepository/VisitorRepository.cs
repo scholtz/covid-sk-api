@@ -3262,6 +3262,14 @@ namespace CovidMassTesting.Repository.RedisRepository
                     chain[k] = ce[k].Certificate;
                 }
 
+                var pageWithStamp = 1;
+                if (!string.IsNullOrEmpty(configuration["SetStampToPageResult"]))
+                {
+                    if (int.TryParse(configuration["SetStampToPageResult"], out var toPage))
+                    {
+                        pageWithStamp = toPage;
+                    }
+                }
                 return Sign(
                     pdfStreamEncrypted.ToArray(),
                     Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
@@ -3271,7 +3279,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     iText.Signatures.PdfSigner.CryptoStandard.CADES,
                     "Covid test",
                     configuration["SignaturePlace"],
-                    2
+                    pageWithStamp
                     );
             }
             catch (Exception exc)
@@ -3353,7 +3361,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                 {
                     chain[k] = ce[k].Certificate;
                 }
-
+                var pageWithStamp = 1;
+                if (!string.IsNullOrEmpty(configuration["SetStampToPageRegistration"]))
+                {
+                    if (int.TryParse(configuration["SetStampToPageRegistration"], out var toPage)) {
+                        pageWithStamp = toPage;
+                    }
+                }
                 return Sign(
                     pdfStreamEncrypted.ToArray(),
                     Encoding.ASCII.GetBytes(configuration["MasterPDFPassword"] ?? ""),
@@ -3364,7 +3378,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     "Covid test",
                     configuration["SignaturePlace"],
                     //pages
-                    1
+                    pageWithStamp
                     );
             }
             catch (Exception exc)
