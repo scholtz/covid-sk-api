@@ -115,7 +115,7 @@ namespace CovidMassTesting.Model
                 Web = this.Web,
                 Country = this.Country,
                 SupportEmail = this.SupportEmail,
-                SupportName = this.PlaceProviderId,
+                SupportName = this.SupportName,
                 SupportPhone = this.SupportPhone
             };
         }
