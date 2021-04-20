@@ -941,7 +941,7 @@ namespace CovidMassTesting.Controllers
                         visitor.EHealthNotifiedAt = DateTimeOffset.UtcNow;
                         if (!visitor.ResultNotifiedAt.HasValue)
                         {
-                            await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                            await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, DateTimeOffset.UtcNow);
                         }
                         visitor.ResultNotifiedAt = visitor.EHealthNotifiedAt;
                         await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
@@ -1016,7 +1016,7 @@ namespace CovidMassTesting.Controllers
                             toUpdate.EHealthNotifiedAt = DateTimeOffset.UtcNow;
                             if (!visitor.ResultNotifiedAt.HasValue)
                             {
-                                await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                                await visitorRepository.IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, DateTimeOffset.UtcNow);
                             }
                             toUpdate.ResultNotifiedAt = toUpdate.EHealthNotifiedAt;
                             await visitorRepository.IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, toUpdate.ResultNotifiedAt.Value);
