@@ -806,12 +806,21 @@ namespace CovidMassTesting.Controllers
                 visitor.TestingTime = time;
                 visitor.ChosenSlot = time.UtcTicks;
                 visitor.PlaceProviderId = User.GetPlaceProvider();
-
+                
                 logger.LogInformation($"RegisterEmployeeByDocumenter: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 var saved = await visitorRepository.Register(visitor, User.GetEmail(), false);
                 var id = Guid.NewGuid().ToString().FormatDocument();
                 await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress());
-                return Ok(await visitorRepository.SetTestResult(id, result, true));
+
+                var ret = await visitorRepository.SetTestResult(id, result, true);
+
+                // Set testing time to the chosen slot time
+                var toUpdate = await visitorRepository.GetVisitor(saved.Id, false, true);
+                toUpdate.TestingTime = visitor.ChosenSlotTime;
+                toUpdate.ResultNotifiedAt = DateTimeOffset.UtcNow;
+                await visitorRepository.SetVisitor(toUpdate, false);
+
+                return Ok(ret);
             }
             catch (ArgumentException exc)
             {
