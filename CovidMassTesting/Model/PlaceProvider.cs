@@ -107,6 +107,7 @@ namespace CovidMassTesting.Model
         {
             return new PlaceProviderPublic()
             {
+                PlaceProviderId = this.PlaceProviderId,
                 CompanyName = this.CompanyName,
                 PublicEmail = this.PublicEmail,
                 PublicPhone = this.PublicPhone,
@@ -125,6 +126,10 @@ namespace CovidMassTesting.Model
     /// </summary>
     public class PlaceProviderPublic
     {
+        /// <summary>
+        /// ID 
+        /// </summary>
+        public string PlaceProviderId { get; set; }
         /// <summary>
         /// Company name
         /// </summary>
