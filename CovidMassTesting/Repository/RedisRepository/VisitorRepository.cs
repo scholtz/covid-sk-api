@@ -716,8 +716,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="adminWorker"></param>
         /// <param name="adminPlaceProviderId"></param>
         /// <param name="ipAddress"></param>
+        /// <param name="silent"></param>
         /// <returns></returns>
-        public async Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string adminPlaceProviderId, string ipAddress)
+        public async Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string adminPlaceProviderId, string ipAddress, bool silent = false)
         {
             var visitorCode = await GETVisitorCodeFromTesting(testCodeClear);
             if (visitorCode.HasValue)
@@ -728,7 +729,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
             }
             await MapTestingSetToVisitorCode(codeInt, testCodeClear);
-            await UpdateTestingStateFull(codeInt, TestResult.TestIsBeingProcessing, testCodeClear, true, adminWorker, adminPlaceProviderId, ipAddress);
+            await UpdateTestingStateFull(codeInt, TestResult.TestIsBeingProcessing, testCodeClear, true, adminWorker, adminPlaceProviderId, ipAddress, silent);
             return testCodeClear;
         }
         /// <summary>
@@ -736,10 +737,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="code"></param>
         /// <param name="state"></param>
+        /// <param name="silent">Do not send sms/email</param>
         /// <returns></returns>
-        public Task<bool> UpdateTestingState(int code, string state)
+        public Task<bool> UpdateTestingState(int code, string state, bool silent = false)
         {
-            return UpdateTestingStateFull(code, state, "", true, "", "", "");
+            return UpdateTestingStateFull(code, state, "", true, "", "", "", silent: silent);
         }
         /// <summary>
         /// Updates the visitor test result
@@ -780,8 +782,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="adminWorker"></param>
         /// <param name="placeProviderId"></param>
         /// <param name="ipAddress"></param>
+        /// <param name="silent"></param>
         /// <returns></returns>
-        public async Task<bool> UpdateTestingStateFull(int code, string state, string testingSet = "", bool updateStats = true, string adminWorker = "", string placeProviderId = "", string ipAddress = "")
+        public async Task<bool> UpdateTestingStateFull(int code, string state, string testingSet = "", bool updateStats = true, string adminWorker = "", string placeProviderId = "", string ipAddress = "", bool silent = false)
         {
             logger.LogInformation($"Updating state for {code.GetHashCode()}");
             var visitor = await GetVisitor(code);
@@ -910,31 +913,31 @@ namespace CovidMassTesting.Repository.RedisRepository
             switch (state)
             {
                 case TestResult.TestMustBeRepeated:
-                    var oldCulture = CultureInfo.CurrentCulture;
-                    var oldUICulture = CultureInfo.CurrentUICulture;
-                    var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                    CultureInfo.CurrentCulture = specifiedCulture;
-                    CultureInfo.CurrentUICulture = specifiedCulture;
-
-                    if (!string.IsNullOrEmpty(visitor.Phone))
+                    if (!silent)
                     {
-                        await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
-                            string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_,
-                            $"{visitor.FirstName} {visitor.LastName}")));
-
-                    }
-                    await emailSender.SendEmail(
-                        localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                        visitor.Email,
-                        $"{visitor.FirstName} {visitor.LastName}",
-                        new Model.Email.VisitorTestingToBeRepeatedEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                        var oldCulture = CultureInfo.CurrentCulture;
+                        var oldUICulture = CultureInfo.CurrentUICulture;
+                        var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                        CultureInfo.CurrentCulture = specifiedCulture;
+                        CultureInfo.CurrentUICulture = specifiedCulture;
+                        if (!string.IsNullOrEmpty(visitor.Phone))
                         {
-                            Name = $"{visitor.FirstName} {visitor.LastName}",
-                        });
+                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                                string.Format(Repository_RedisRepository_VisitorRepository.Dear__0___there_were_some_technical_issues_with_your_test__Please_visit_the_sampling_place_again_and_repeat_the_test_procedure__You_can_use_the_same_registration_as_before_,
+                                $"{visitor.FirstName} {visitor.LastName}")));
 
-
-                    CultureInfo.CurrentCulture = oldCulture;
-                    CultureInfo.CurrentUICulture = oldUICulture;
+                        }
+                        await emailSender.SendEmail(
+                            localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                            visitor.Email,
+                            $"{visitor.FirstName} {visitor.LastName}",
+                            new Model.Email.VisitorTestingToBeRepeatedEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                            {
+                                Name = $"{visitor.FirstName} {visitor.LastName}",
+                            });
+                        CultureInfo.CurrentCulture = oldCulture;
+                        CultureInfo.CurrentUICulture = oldUICulture;
+                    }
 
                     await IncrementStats(StatsType.Repeat, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.TestingTime ?? DateTimeOffset.UtcNow);
 
@@ -945,47 +948,50 @@ namespace CovidMassTesting.Repository.RedisRepository
                     {
                         // notify only own persons
 
-                        oldCulture = CultureInfo.CurrentCulture;
-                        oldUICulture = CultureInfo.CurrentUICulture;
-                        specifiedCulture = new CultureInfo(visitor.Language ?? "en");
-                        CultureInfo.CurrentCulture = specifiedCulture;
-                        CultureInfo.CurrentUICulture = specifiedCulture;
-
-                        await emailSender.SendEmail(
-                            localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                            visitor.Email,
-                            $"{visitor.FirstName} {visitor.LastName}",
-                            new Model.Email.VisitorTestingInProcessEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
-                            {
-                                Name = $"{visitor.FirstName} {visitor.LastName}",
-                            });
-
-                        if (!string.IsNullOrEmpty(visitor.Phone))
+                        if (!silent)
                         {
-                            /*
-                             * send only by email..
-                            await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(
-                                Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_,
-                                $"{visitor.FirstName} {visitor.LastName}"
-                                )));
-                            */
-                        }
+                            var oldCulture = CultureInfo.CurrentCulture;
+                            var oldUICulture = CultureInfo.CurrentUICulture;
+                            var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
+                            CultureInfo.CurrentCulture = specifiedCulture;
+                            CultureInfo.CurrentUICulture = specifiedCulture;
 
-                        CultureInfo.CurrentCulture = oldCulture;
-                        CultureInfo.CurrentUICulture = oldUICulture;
+                            await emailSender.SendEmail(
+                                localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                                visitor.Email,
+                                $"{visitor.FirstName} {visitor.LastName}",
+                                new Model.Email.VisitorTestingInProcessEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                                {
+                                    Name = $"{visitor.FirstName} {visitor.LastName}",
+                                });
+
+                            if (!string.IsNullOrEmpty(visitor.Phone))
+                            {
+                                /*
+                                 * send only by email..
+                                await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(string.Format(
+                                    Repository_RedisRepository_VisitorRepository.Dear__0___your_test_is_in_processing__Please_wait_for_further_instructions_in_next_sms_message_,
+                                    $"{visitor.FirstName} {visitor.LastName}"
+                                    )));
+                                */
+                            }
+
+                            CultureInfo.CurrentCulture = oldCulture;
+                            CultureInfo.CurrentUICulture = oldUICulture;
+                        }
                     }
                     break;
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
                     if (forceSend || !visitor.ResultNotifiedAt.HasValue)
                     {
-                        await SendResults(visitor);
+                        await SendResults(visitor, silent);
                     }
                     break;
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.NegativeCertificateTaken:
                 case TestResult.NegativeCertificateTakenTypo:
-                    await SendResults(visitor);
+                    await SendResults(visitor, silent);
                     break;
                 default:
                     break;
@@ -1345,7 +1351,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             return ret;
         }
 
-        private async Task SendResults(Visitor visitor)
+        private async Task SendResults(Visitor visitor, bool silent = false)
         {
 
             if (notifyWhenSickConfiguration?.Emails?.Count > 0)
@@ -1448,6 +1454,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
                 case TestResult.NegativeCertificateTakenTypo:
+                   
                     var oldCulture = CultureInfo.CurrentCulture;
                     var oldUICulture = CultureInfo.CurrentUICulture;
                     var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
@@ -1548,17 +1555,20 @@ namespace CovidMassTesting.Repository.RedisRepository
                     }
                     if (!notifiedByEHealth || configuration["AfterEHealthNotifyByEmail"] == "1")
                     {
-                        await emailSender.SendEmail(
-                            localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
-                            visitor.Email,
-                            $"{visitor.FirstName} {visitor.LastName}",
-                            new Model.Email.VisitorTestingResultEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
-                            {
-                                Name = $"{visitor.FirstName} {visitor.LastName}",
-                                IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
-                            },
-                            attachments
-                            );
+                        if (!silent)
+                        {
+                            await emailSender.SendEmail(
+                                localizer[Repository_RedisRepository_VisitorRepository.Covid_test],
+                                visitor.Email,
+                                $"{visitor.FirstName} {visitor.LastName}",
+                                new Model.Email.VisitorTestingResultEmail(visitor.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
+                                {
+                                    Name = $"{visitor.FirstName} {visitor.LastName}",
+                                    IsSick = visitor.Result == TestResult.PositiveWaitingForCertificate
+                                },
+                                attachments
+                                );
+                        }
                     }
                     if (!string.IsNullOrEmpty(visitor.Phone))
                     {
@@ -1579,7 +1589,9 @@ namespace CovidMassTesting.Repository.RedisRepository
                             }
                             if (!string.IsNullOrEmpty(resultLocalized))
                             {
-                                await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
+                                if (!silent)
+                                {
+                                    await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
                                     string.Format(
                                         //{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}
                                         Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_,
@@ -1589,6 +1601,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                         resultLocalized,
                                         configuration["FrontedURL"]
                                         )));
+                                }
                             }
                         }
                     }
@@ -1599,7 +1612,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                         await IncrementStats(StatsType.Tested, visitor.ChosenPlaceId, visitor.PlaceProviderId, DateTimeOffset.UtcNow);
                     }
                     visitor.ResultNotifiedAt = DateTimeOffset.UtcNow;
-                    await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                    if (!silent)
+                    {
+                        await IncrementStats(StatsType.Notification, visitor.ChosenPlaceId, visitor.PlaceProviderId, visitor.ResultNotifiedAt.Value);
+                    }
                     await SetVisitor(visitor, false);
                     break;
             }
@@ -1866,8 +1882,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="testCode"></param>
         /// <param name="result"></param>
         /// <param name="isAdmin"></param>
+        /// <param name="silent">Do not send email or sms</param>
         /// <returns></returns>
-        public async Task<Result> SetTestResult(string testCode, string result, bool isAdmin)
+        public async Task<Result> SetTestResult(string testCode, string result, bool isAdmin, bool silent = false)
         {
             var visitorCode = await GETVisitorCodeFromTesting(testCode);
             var ret = new Result()
@@ -1894,7 +1911,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 else
                 {
                     logger.LogInformation($"SendResultsThroughQueue 0: processing {result}");
-                    await UpdateTestingState(visitorCode.Value, result);
+                    await UpdateTestingState(visitorCode.Value, result, silent);
                 }
             }
             return ret;

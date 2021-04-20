@@ -810,9 +810,9 @@ namespace CovidMassTesting.Controllers
                 logger.LogInformation($"RegisterEmployeeByDocumenter: {User.GetEmail()} {Helpers.Hash.GetSHA256Hash(visitor.Id.ToString())}");
                 var saved = await visitorRepository.Register(visitor, User.GetEmail(), false);
                 var id = Guid.NewGuid().ToString().FormatDocument();
-                await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress());
+                await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress(), silent:true);
 
-                var ret = await visitorRepository.SetTestResult(id, result, true);
+                var ret = await visitorRepository.SetTestResult(id, result, isAdmin: true, silent:true);
 
                 // Set testing time to the chosen slot time
                 var toUpdate = await visitorRepository.GetVisitor(saved.Id, false, true);

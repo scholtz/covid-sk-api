@@ -869,12 +869,14 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Controllers.ResultController.PrintCertificateByDocumentManager(System.String,System.String)">
+        <member name="M:CovidMassTesting.Controllers.ResultController.PrintCertificateByDocumentManager(System.String,System.String,System.String,System.String)">
             <summary>
             PrintCertificateByDocumentManager
             </summary>
             <param name="registrationCode"></param>
             <param name="personalNumber"></param>
+            <param name="testingSet"></param>
+            <param name="employeeId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.ResendResult(System.String,System.String,System.String)">
@@ -915,6 +917,13 @@
             <summary>
             This method removes test from queue
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.GetVisitorCodeFromTestCode(System.String)">
+            <summary>
+            Get VisitorCode From TestCode
+            </summary>
+            <param name="testId"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.VerifyResult(System.String)">
@@ -2795,6 +2804,11 @@
             BirthDay - year
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.PernamentAddress">
+            <summary>
+            Address where user has pernament residence
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Signature">
             <summary>
             Base64 encoded signature picture in png
@@ -2803,6 +2817,11 @@
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Text">
             <summary>
             Result in text
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.TextEN">
+            <summary>
+            Test result in english
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Description">
@@ -2828,6 +2847,11 @@
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Date">
             <summary>
             DateTime
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.DateEN">
+            <summary>
+            DateTime en
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.FrontedURL">
@@ -3287,6 +3311,21 @@
         <member name="P:CovidMassTesting.Model.PlaceProvider.Products">
             <summary>
             List of products served by place provider
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.SupportName">
+            <summary>
+            Support name
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.SupportEmail">
+            <summary>
+            Support Email
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProvider.SupportPhone">
+            <summary>
+            Support Phone
             </summary>
         </member>
         <member name="M:CovidMassTesting.Model.PlaceProvider.ToPublic">
@@ -6374,15 +6413,16 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.UpdateTestingState(System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.UpdateTestingState(System.Int32,System.String,System.Boolean)">
             <summary>
             Update test state of visitor
             </summary>
             <param name="code"></param>
             <param name="state"></param>
+            <param name="silent">If true, do not send sms or email</param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String,System.String,System.Boolean)">
             <summary>
             Bind visitor to specific test
             </summary>
@@ -6391,6 +6431,7 @@
             <param name="adminWorker"></param>
             <param name="adminPlaceProviderId"></param>
             <param name="ipAddress"></param>
+            <param name="silent">Do not send email/SMS</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitor(System.Int32,System.Boolean,System.Boolean)">
@@ -6411,13 +6452,14 @@
             <param name="notify">If notify is set to false, it does not send email or sms</param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetTestResult(System.String,System.String,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.SetTestResult(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
             Set test result
             </summary>
             <param name="testCode"></param>
             <param name="result"></param>
-            <param name="isAdmin"></param>
+            <param name="isAdmin">Send right away</param>
+            <param name="silent">Do not send SMS or Email</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetVisitorByPersonalNumber(System.String,System.Boolean)">
@@ -8383,7 +8425,7 @@
             <param name="personalNumber"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.ConnectVisitorToTest(System.Int32,System.String,System.String,System.String,System.String,System.Boolean)">
             <summary>
             Map visitor code to testing code
             </summary>
@@ -8392,14 +8434,16 @@
             <param name="adminWorker"></param>
             <param name="adminPlaceProviderId"></param>
             <param name="ipAddress"></param>
+            <param name="silent"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingState(System.Int32,System.String,System.Boolean)">
             <summary>
             Updates testing state
             </summary>
             <param name="code"></param>
             <param name="state"></param>
+            <param name="silent">Do not send sms/email</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestWithoutNotification(System.Int32,System.String,System.Boolean)">
@@ -8411,7 +8455,7 @@
             <param name="isAdmin"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingStateFull(System.Int32,System.String,System.String,System.Boolean,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.UpdateTestingStateFull(System.Int32,System.String,System.String,System.Boolean,System.String,System.String,System.String,System.Boolean)">
             <summary>
             Updates testing state
             </summary>
@@ -8422,6 +8466,7 @@
             <param name="adminWorker"></param>
             <param name="placeProviderId"></param>
             <param name="ipAddress"></param>
+            <param name="silent"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GetTest(System.Int32,System.String)">
@@ -8528,13 +8573,14 @@
             <param name="nullOnMissing"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetTestResult(System.String,System.String,System.Boolean)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.SetTestResult(System.String,System.String,System.Boolean,System.Boolean)">
             <summary>
             Set test result
             </summary>
             <param name="testCode"></param>
             <param name="result"></param>
             <param name="isAdmin"></param>
+            <param name="silent">Do not send email or sms</param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.AddToDocQueue(System.String)">

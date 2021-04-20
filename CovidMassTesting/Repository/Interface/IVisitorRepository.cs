@@ -43,8 +43,9 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="code"></param>
         /// <param name="state"></param>
+        /// <param name="silent">If true, do not send sms or email</param>
         /// <returns></returns>
-        public Task<bool> UpdateTestingState(int code, string state);
+        public Task<bool> UpdateTestingState(int code, string state, bool silent = false);
         /// <summary>
         /// Bind visitor to specific test
         /// </summary>
@@ -53,8 +54,9 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="adminWorker"></param>
         /// <param name="adminPlaceProviderId"></param>
         /// <param name="ipAddress"></param>
+        /// <param name="silent">Do not send email/SMS</param>
         /// <returns></returns>
-        public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string adminPlaceProviderId, string ipAddress);
+        public Task<string> ConnectVisitorToTest(int codeInt, string testCodeClear, string adminWorker, string adminPlaceProviderId, string ipAddress, bool silent = false);
         /// <summary>
         /// Load visitor
         /// </summary>
@@ -77,9 +79,10 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="testCode"></param>
         /// <param name="result"></param>
-        /// <param name="isAdmin"></param>
+        /// <param name="isAdmin">Send right away</param>
+        /// <param name="silent">Do not send SMS or Email</param>
         /// <returns></returns>
-        public Task<Result> SetTestResult(string testCode, string result, bool isAdmin);
+        public Task<Result> SetTestResult(string testCode, string result, bool isAdmin, bool silent = false);
         /// <summary>
         /// Get visitor by personal number
         /// </summary>
