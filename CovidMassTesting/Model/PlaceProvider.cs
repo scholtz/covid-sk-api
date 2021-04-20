@@ -86,6 +86,18 @@ namespace CovidMassTesting.Model
         /// List of products served by place provider
         /// </summary>
         public List<Product> Products { get; set; } = new List<Product>();
+        /// <summary>
+        /// Support name
+        /// </summary>
+        public string SupportName { get; set; }
+        /// <summary>
+        /// Support Email
+        /// </summary>
+        public string SupportEmail { get; set; }
+        /// <summary>
+        /// Support Phone
+        /// </summary>
+        public string SupportPhone { get; set; }
 
         /// <summary>
         /// Convert to public info
@@ -102,6 +114,9 @@ namespace CovidMassTesting.Model
                 CSS = this.CSS,
                 Web = this.Web,
                 Country = this.Country,
+                SupportEmail = this.SupportEmail,
+                SupportName = this.PlaceProviderId,
+                SupportPhone = this.SupportPhone
             };
         }
     }
