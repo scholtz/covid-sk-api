@@ -222,6 +222,8 @@ namespace CovidMassTesting.Repository.Interface
                             ProductId = product.Id,
                             InsuranceOnly = product.InsuranceOnly,
                             CollectInsurance = product.CollectInsurance,
+                            CollectNationality = product.CollectNationality,
+                            CollectEmployeeNo = product.CollectEmployeeNo,
                             EmployeesOnly = product.EmployeesOnly,
                             EmployeesRegistration = product.EmployeesRegistration,
                             EHealthDefault = product.EHealthDefault,

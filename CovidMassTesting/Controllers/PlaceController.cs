@@ -885,6 +885,8 @@ namespace CovidMassTesting.Controllers
                     placeProduct.PlaceProviderId = User.GetPlaceProvider();
                     placeProduct.InsuranceOnly = product.InsuranceOnly;
                     placeProduct.CollectInsurance = product.CollectInsurance;
+                    placeProduct.CollectEmployeeNo = product.CollectEmployeeNo;
+                    placeProduct.CollectNationality = product.CollectNationality;
                     placeProduct.SchoolOnly = product.SchoolOnly;
                     placeProduct.EmployeesOnly = product.EmployeesOnly;
                     placeProduct.EHealthDefault = product.EHealthDefault;

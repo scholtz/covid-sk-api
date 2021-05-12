@@ -40,6 +40,14 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? EmployeesRegistration { get; set; } = false;
         /// <summary>
+        /// Collect employee id but do not verify it
+        /// </summary>
+        public bool? CollectEmployeeNo { get; set; } = false;
+        /// <summary>
+        /// Nationality is required by some insurance companies
+        /// </summary>
+        public bool? CollectNationality { get; set; } = false;
+        /// <summary>
         /// Default for eHealth connection
         /// </summary>
         public bool? EHealthDefault { get; set; } = false;

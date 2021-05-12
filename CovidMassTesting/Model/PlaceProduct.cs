@@ -68,6 +68,14 @@ namespace CovidMassTesting.Model
         /// </summary>
         public bool? EmployeesRegistration { get; set; } = false;
         /// <summary>
+        /// Collect employee id but do not verify it
+        /// </summary>
+        public bool? CollectEmployeeNo { get; set; } = false;
+        /// <summary>
+        /// Nationality is required by some insurance companies
+        /// </summary>
+        public bool? CollectNationality { get; set; } = false;
+        /// <summary>
         /// Collect insurance organisation
         /// </summary>
         public bool? CollectInsurance { get; set; } = true;
@@ -86,6 +94,8 @@ namespace CovidMassTesting.Model
                 From = From,
                 InsuranceOnly = InsuranceOnly,
                 CollectInsurance = CollectInsurance,
+                CollectEmployeeNo = CollectEmployeeNo,
+                CollectNationality = CollectNationality,
                 EmployeesOnly = EmployeesOnly,
                 EmployeesRegistration = EmployeesRegistration,
                 SchoolOnly = SchoolOnly,
