@@ -35,6 +35,10 @@ namespace CovidMassTesting.Model.Mustache
         /// </summary>
         public string Text { get; set; }
         /// <summary>
+        /// Id of the test from product
+        /// </summary>
+        public string TestBrandName { get; set; }
+        /// <summary>
         /// Test result in english
         /// </summary>
         public string TextEN { get; set; }

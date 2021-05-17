@@ -57,6 +57,10 @@ namespace CovidMassTesting.Model
         public bool? CollectInsurance { get; set; } = true;
 
         /// <summary>
+        /// Name of the test. Eg SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test
+        /// </summary>
+        public string TestBrandName { get; set; }
+        /// <summary>
         /// Applied for all places
         /// </summary>
         public bool All { get; set; }

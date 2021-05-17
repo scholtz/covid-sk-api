@@ -199,10 +199,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="testingEntity"></param>
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
+        /// <param name="testBrandName"></param>
         /// <param name="resultguid"></param>
         /// <param name="oversight"></param>
         /// <returns></returns>
-        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, string oversight = "");
+        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string testBrandName, string resultguid, string oversight = "");
         /// <summary>
         /// Enqueue visitor
         /// </summary>
@@ -218,11 +219,12 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="testingEntity"></param>
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
+        /// <param name="testBrandName"></param>
         /// <param name="resultguid"></param>
         /// <param name="sign">Sign and password protect</param>
         /// <param name="oversight"></param>
         /// <returns></returns>
-        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, bool sign = true, string oversight = "");
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string testBrandName, string resultguid, bool sign = true, string oversight = "");
 
         /// <summary>
         /// Decode visitor data from database

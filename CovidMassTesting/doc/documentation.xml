@@ -2819,6 +2819,11 @@
             Result in text
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.TestBrandName">
+            <summary>
+            Id of the test from product
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.TextEN">
             <summary>
             Test result in english
@@ -3191,6 +3196,16 @@
             Corporations may check this on and only its employees can self register
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.CollectEmployeeNo">
+            <summary>
+            Collect employee id but do not verify it
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.PlaceProduct.CollectNationality">
+            <summary>
+            Nationality is required by some insurance companies
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.PlaceProduct.CollectInsurance">
             <summary>
             Collect insurance organisation
@@ -3339,6 +3354,11 @@
             Public place provider information
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.PlaceProviderPublic.PlaceProviderId">
+            <summary>
+            ID 
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.PlaceProviderPublic.CompanyName">
             <summary>
             Company name
@@ -3464,6 +3484,16 @@
             Corporations may check this on and only its employees can self register
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Product.CollectEmployeeNo">
+            <summary>
+            Collect employee id but do not verify it
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.CollectNationality">
+            <summary>
+            Nationality is required by some insurance companies
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Product.EHealthDefault">
             <summary>
             Default for eHealth connection
@@ -3472,6 +3502,11 @@
         <member name="P:CovidMassTesting.Model.Product.CollectInsurance">
             <summary>
             Collect insurance organisation
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.TestBrandName">
+            <summary>
+            Name of the test. Eg SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Product.All">
@@ -6578,7 +6613,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -6586,6 +6621,7 @@
             <param name="testingEntity"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
+            <param name="testBrandName"></param>
             <param name="resultguid"></param>
             <param name="oversight"></param>
             <returns></returns>
@@ -6598,7 +6634,7 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -6606,6 +6642,7 @@
             <param name="testingEntity"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
+            <param name="testBrandName"></param>
             <param name="resultguid"></param>
             <param name="sign">Sign and password protect</param>
             <param name="oversight"></param>
@@ -8767,7 +8804,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -8775,7 +8812,9 @@
             <param name="testingEntity"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
+            <param name="testBrandName"></param>
             <param name="resultguid"></param>
+            <param name="oversight"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateRegistrationHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String)">
@@ -8788,7 +8827,7 @@
             <param name="product"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -8796,6 +8835,7 @@
             <param name="testingEntity"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
+            <param name="testBrandName"></param>
             <param name="resultguid"></param>
             <param name="sign"></param>
             <param name="oversight"></param>

@@ -32,6 +32,12 @@
                 <th>Typ testu:</th>
                 <td>Antigénový test</td>
             </tr>
+            {{#TestBrandName}}
+            <tr>
+                <th>Značka testu:</th>
+                <td>{{TestBrandName}}</td>
+            </tr>
+            {{/TestBrandName}}
             <tr>
                 <th>Čas testovania:</th>
                 <td>{{Date}}</td>
@@ -160,6 +166,12 @@
                 <th>Name:</th>
                 <td>{{Name}}</td>
             </tr>
+            {{#TestBrandName}}
+            <tr>
+                <th>Test id:</th>
+                <td>{{TestBrandName}}</td>
+            </tr>
+            {{/TestBrandName}}
             <tr>
                 <th>Birth day:</th>
                 <td>Day: {{BirthDayDay}} Month: {{BirthDayMonth}} Year: {{BirthDayYear}}</td>

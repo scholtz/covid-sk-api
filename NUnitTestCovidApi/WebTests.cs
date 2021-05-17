@@ -1458,7 +1458,7 @@ namespace NUnitTestCovidApi
             var days2 = Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, Slot1Day>>(response.Content.ReadAsStringAsync().Result);
             Assert.IsTrue(days2.Count > 0);
 
-            foreach(var dayI in days)
+            foreach (var dayI in days)
             {
                 Assert.AreEqual(days2[dayI.Key].Registrations, dayI.Value.Registrations);
             }
@@ -2771,7 +2771,7 @@ namespace NUnitTestCovidApi
                 TestingTime = t,
                 Result = TestResult.PositiveWaitingForCertificate,
             };
-            var html = visitorRepository.GenerateResultHTML(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            var html = visitorRepository.GenerateResultHTML(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", "SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test", Guid.NewGuid().ToString());
             Assert.IsTrue(html.Contains("X Y"));
             Assert.IsTrue(html.Contains("Sunday, January 17, 2021 2:14 PM"));
 
@@ -2784,11 +2784,11 @@ namespace NUnitTestCovidApi
                 TestingTime = t,
                 Result = TestResult.PositiveWaitingForCertificate,
             };
-            var html2 = visitorRepository.GenerateResultHTML(visitor2, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString());
+            var html2 = visitorRepository.GenerateResultHTML(visitor2, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", "SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test", Guid.NewGuid().ToString());
             Assert.IsTrue(html2.Contains("X Y"));
             Assert.IsTrue(html2.Contains("nedeľa 17. janu&#225;ra 2021 14:14"));
 
-            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", Guid.NewGuid().ToString(), true, "Oversight");
+            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", "SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test", Guid.NewGuid().ToString(), true, "Oversight");
             Assert.IsTrue(pdf.Length > 100);
 #if DEBUG
             File.WriteAllBytes("d:/covid/test-pdf.pdf", pdf);
@@ -3473,7 +3473,7 @@ namespace NUnitTestCovidApi
 
             var actions = new TimeUpdate[]
             {
-               
+
                 new TimeUpdate()
                 {
                     Date = DateTimeOffset.Now,
@@ -3498,7 +3498,7 @@ namespace NUnitTestCovidApi
             request = ScheduleOpenningHours(client, actions);
 
             var day = DateTimeOffset.Now.RoundDay();
-            
+
             foreach (var place in places)
             {
                 var hours = await slotRepository.ListHourSlotsByPlaceAndDaySlotId(place.Id, day);

@@ -1105,7 +1105,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId ?? place.PlaceProviderId);
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
             var oversight = GetOversight(place, visitor.TestingTime);
-            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, true, oversight);
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, visitor.VerificationId, true, oversight);
         }
         private string GetOversight(Place place, DateTimeOffset? time)
         {
@@ -1155,7 +1155,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
             var oversight = GetOversight(place, visitor.TestingTime);
 
-            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, false, oversight);
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, visitor.VerificationId, false, oversight);
         }
 
         public async Task<bool> ResendResults(int code, string pass)
@@ -1498,7 +1498,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 await SetResult(verification, false);
                             }
                             var oversight = GetOversight(place, visitor.TestingTime);
-                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, visitor.VerificationId, true, oversight);
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, visitor.VerificationId, true, oversight);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
                                 Content = Convert.ToBase64String(pdf),
@@ -1539,7 +1539,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             {
                                 oversight = GetOversight(place, visitor.TestingTime);
                             }
-                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, result.Id, true, oversight);
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, result.Id, true, oversight);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
                                 Content = Convert.ToBase64String(pdf),
@@ -3012,9 +3012,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="testingEntity"></param>
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
+        /// <param name="testBrandName"></param>
         /// <param name="resultguid"></param>
+        /// <param name="oversight"></param>
         /// <returns></returns>
-        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, string oversight)
+        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string testBrandName, string resultguid, string oversight)
         {
             var oldCulture = CultureInfo.CurrentCulture;
             var oldUICulture = CultureInfo.CurrentUICulture;
@@ -3078,6 +3080,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.ResultGUID = resultguid;
             data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
             data.Product = product;
+            data.TestBrandName = testBrandName;
             data.Oversight = oversight;
             var qrGenerator = new QRCoder.QRCodeGenerator();
             var qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.H);
@@ -3200,11 +3203,12 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="testingEntity"></param>
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
+        /// <param name="testBrandName"></param>
         /// <param name="resultguid"></param>
         /// <param name="sign"></param>
         /// <param name="oversight"></param>
         /// <returns></returns>
-        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string resultguid, bool sign = true, string oversight = "")
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string testBrandName, string resultguid, bool sign = true, string oversight = "")
         {
             string password;
 
@@ -3220,7 +3224,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
             }
 
-            var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid, oversight);
+            var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, testBrandName,  resultguid, oversight);
             using var pdfStreamEncrypted = new MemoryStream();
             iText.Kernel.Pdf.PdfWriter writer;
             if (sign)
