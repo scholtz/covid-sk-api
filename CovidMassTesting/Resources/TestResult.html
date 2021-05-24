@@ -29,30 +29,17 @@
     <table>
         <tbody>
             <tr>
-                <th>Typ testu:</th>
-                <td>Antigénový test</td>
-            </tr>
-            {{#TestBrandName}}
-            <tr>
-                <th>Značka testu:</th>
-                <td>{{TestBrandName}}</td>
-            </tr>
-            {{/TestBrandName}}
-            <tr>
-                <th>Čas testovania:</th>
-                <td>{{Date}}</td>
-            </tr>
-            <tr>
-                <th>Výsledok:</th>
-                <td>{{Text}}</td>
-            </tr>
-            <tr>
-                <th>Poučenie:</th>
-                <td>{{Description}}</td>
-            </tr>
-            <tr>
-                <th>Meno, priezvisko:</th>
+                <th>PRIEZVISKO, Meno:</th>
                 <td>{{Name}}</td>
+                {{#DGCQR}}
+                <td rowspan="20">
+                    <img style="width:200px;height:200px" src="data:image/png;base64, {{DGCQR}}" alt="Digital Green Certificate" />
+                </td>
+                {{/DGCQR}}
+            </tr>
+            <tr>
+                <th>Dátum narodenia:</th>
+                <td>{{BirthDayDay}}.{{BirthDayMonth}}.{{BirthDayYear}}</td>
             </tr>
             {{#PersonalNumber}}
             <tr>
@@ -66,16 +53,60 @@
                 <td>{{PassportNumber}}</td>
             </tr>
             {{/PassportNumber}}
-            <tr>
-                <th>Dátum narodenia:</th>
-                <td>{{BirthDayDay}}.{{BirthDayMonth}}.{{BirthDayYear}}</td>
-            </tr>
             {{#PernamentAddress}}
             <tr>
                 <th>Adresa trvalého bydliska:</th>
                 <td>{{PernamentAddress}}</td>
             </tr>
             {{/PernamentAddress}}
+            {{#TestPurpose}}
+            <tr>
+                <th>Zámer testu:</th>
+                <td>
+                    {{TestPurpose}}
+                </td>
+            </tr>
+            {{/TestPurpose}}
+            {{#Category}}
+            <tr>
+                <th>Typ testu:</th>
+                <td>{{Category}}</td>
+            </tr>
+            {{/Category}}
+            {{#TestBrandName}}
+            <tr>
+                <th>Názov testu:</th>
+                <td>{{TestBrandName}}</td>
+            </tr>
+            {{/TestBrandName}}
+            {{#TestManufacturer}}
+            <tr>
+                <th>Výrobca testu:</th>
+                <td>{{TestManufacturer}}</td>
+            </tr>
+            {{/TestManufacturer}}
+            {{#SampleOrigin}}
+            <tr>
+                <th>Spôsob odobratia vzorky:</th>
+                <td>{{SampleOrigin}}</td>
+            </tr>
+            {{/SampleOrigin}}
+            <tr>
+                <th>Čas testovania:</th>
+                <td>{{Date}}</td>
+            </tr>
+            <tr>
+                <th>Čas výsledku testu:</th>
+                <td>{{DateResult}}</td>
+            </tr>
+            <tr>
+                <th>Výsledok:</th>
+                <td>{{Text}}</td>
+            </tr>
+            <tr>
+                <th>Adresa výkonu testu:</th>
+                <td>{{TestingAddress}}</td>
+            </tr>
             <tr>
                 <th>Test vykonal:</th>
                 <td>{{TestingEntity}}</td>
@@ -86,10 +117,24 @@
                 <td>{{Oversight}}</td>
             </tr>
             {{/Oversight}}
+            {{#Country}}
             <tr>
-                <th>Adresa výkonu testu:</th>
-                <td>{{TestingAddress}}</td>
+                <th>Členský štát:</th>
+                <td>{{Country}}</td>
             </tr>
+            {{/Country}}
+            {{#DgcIssuer}}
+            <tr>
+                <th>Subjekt vydávajúci DGC:</th>
+                <td>{{DgcIssuer}}</td>
+            </tr>
+            {{/DgcIssuer}}
+            {{#ResultGUID}}
+            <tr>
+                <th>Jedinečný identifikátor potvrdenia:</th>
+                <td>{{ResultGUID}}</td>
+            </tr>
+            {{/ResultGUID}}
             <tr>
                 <th>URL adresa:</th>
                 <td>{{FrontedURL}}</td>
@@ -97,6 +142,10 @@
             <tr>
                 <th>Kontrola testu:</th>
                 <td>{{VerifyURL}}</td>
+            </tr>
+            <tr>
+                <th>Poučenie:</th>
+                <td>{{Description}}</td>
             </tr>
             <tr>
                 <th></th>
@@ -110,7 +159,7 @@
             {{/Signature}}
         </tbody>
     </table>
-    
+
     <div style="page-break-before:always">&nbsp;</div>
 
     <div style="font-size:larger">
@@ -160,28 +209,23 @@
     <h1>Medical Certificate</h1>
 
     <h3>This is to certify that</h3>
+
     <table>
         <tbody>
+
             <tr>
-                <th>Name:</th>
+                <th>SURNAME, Forename:</th>
                 <td>{{Name}}</td>
+                {{#DGCQR}}
+                <td rowspan="20">
+                    <img style="width:200px;height:200px" src="data:image/png;base64, {{DGCQR}}" alt="Digital Green Certificate" />
+                </td>
+                {{/DGCQR}}
             </tr>
-            {{#TestBrandName}}
             <tr>
-                <th>Test id:</th>
-                <td>{{TestBrandName}}</td>
-            </tr>
-            {{/TestBrandName}}
-            <tr>
-                <th>Birth day:</th>
+                <th>Date of birth:</th>
                 <td>Day: {{BirthDayDay}} Month: {{BirthDayMonth}} Year: {{BirthDayYear}}</td>
             </tr>
-            {{#PernamentAddress}}
-            <tr>
-                <th>Address:</th>
-                <td>{{PernamentAddress}}</td>
-            </tr>
-            {{/PernamentAddress}}
             {{#PersonalNumber}}
             <tr>
                 <th>Personal number:</th>
@@ -194,28 +238,65 @@
                 <td>{{PassportNumber}}</td>
             </tr>
             {{/PassportNumber}}
-        </tbody>
-    </table>
-
-    <h3>has been tested for the presence of SARS-CoV-2 with an <b>ANTIGEN TEST</b>.</h3>
-
-    <h1>Status report of infection</h1>
-
-    <table>
-        <tbody>
+            {{#PernamentAddress}}
             <tr>
-                <th>SARS-CoV-2:</th>
+                <th>Address:</th>
+                <td>{{PernamentAddress}}</td>
+            </tr>
+            {{/PernamentAddress}}
+            {{#TestPurpose}}
+            <tr>
+                <th>Disease or agent targeted:</th>
+                <td>
+                    {{TestPurpose}}
+                </td>
+            </tr>
+            {{/TestPurpose}}
+            {{#CategoryEN}}
+            <tr>
+                <th>The type of test:</th>
+                <td>{{CategoryEN}}</td>
+            </tr>
+            {{/CategoryEN}}
+
+            {{#TestBrandName}}
+            <tr>
+                <th>Test name:</th>
+                <td>{{TestBrandName}}</td>
+            </tr>
+            {{/TestBrandName}}
+            {{#TestManufacturer}}
+            <tr>
+                <th>Test manufacturer:</th>
+                <td>{{TestManufacturer}}</td>
+            </tr>
+            {{/TestManufacturer}}
+            {{#SampleOrigin}}
+            <tr>
+                <th>Sample origin:</th>
+                <td>{{SampleOrigin}}</td>
+            </tr>
+            {{/SampleOrigin}}
+            <tr>
+                <th>Date and time of the test sample collection:</th>
+                <td>{{Date}}</td>
+            </tr>
+            {{#DateResult}}
+            <tr>
+                <th>Date and time of the test result production:</th>
+                <td>{{DateResultEN}}</td>
+            </tr>
+            {{/DateResult}}
+            <tr>
+                <th>Result of the test:</th>
                 <td>{{TextEN}}</td>
             </tr>
-        </tbody>
-    </table>
-
-    <h3>Tested in laboratory:</h3> <!-- názov pracoviska-->
-
-    <table>
-        <tbody>
             <tr>
-                <th>Processed by:</th>
+                <th>Testing place:</th>
+                <td>{{TestingAddress}}</td>
+            </tr>
+            <tr>
+                <th>Testing centre or facility:</th>
                 <td>{{TestingEntity}}</td>
             </tr>
             {{#Oversight}}
@@ -224,30 +305,38 @@
                 <td>{{Oversight}}</td>
             </tr>
             {{/Oversight}}
+            {{#Country}}
             <tr>
-                <th>Testing address:</th>
-                <td>{{TestingAddress}}</td>
+                <th>Member state of test:</th>
+                <td>{{Country}}</td>
             </tr>
+            {{/Country}}
+            {{#DgcIssuer}}
             <tr>
-                <th>URL address:</th>
+                <th>Certificate issuer:</th>
+                <td>{{DgcIssuer}}</td>
+            </tr>
+            {{/DgcIssuer}}
+            {{#ResultGUID}}
+            <tr>
+                <th>Unique certificate identifier:</th>
+                <td>{{ResultGUID}}</td>
+            </tr>
+            {{/ResultGUID}}
+            <tr>
+                <th>Provider URL:</th>
                 <td>{{FrontedURL}}</td>
             </tr>
-            <tr>
-                <th>Date:</th>
-                <td>{{DateEN}}</td>
-            </tr>
-        </tbody>
-    </table>
-
-    <h3>Test check:</h3> 
-    <table>
-        <tbody>
             <tr>
                 <th>Verification URL:</th>
                 <td>{{VerifyURL}}</td>
             </tr>
             <tr>
-                <th>Verification URL in QR code:</th>
+                <th>Next steps:</th>
+                <td>{{DescriptionEN}}</td>
+            </tr>
+            <tr>
+                <th>Verification URL in QR code: (Not DGC)</th>
                 <td><img style="width:150px;height:150px;" src="data:image/png;base64, {{QRVerificationURL}}" alt="QR" /></td>
             </tr>
             {{#Signature}}
@@ -257,8 +346,6 @@
             </tr>
             {{/Signature}}
         </tbody>
-    </table>    
-
-
+    </table>
 </body>
 </html>

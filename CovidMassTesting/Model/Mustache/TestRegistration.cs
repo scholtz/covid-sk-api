@@ -27,6 +27,10 @@
         /// </summary>
         public string Date { get; set; }
         /// <summary>
+        /// DateResult DateTime
+        /// </summary>
+        public string DateResult { get; set; }
+        /// <summary>
         /// Link to testing place
         /// </summary>
         public string FrontedURL { get; set; }

@@ -35,17 +35,35 @@ namespace CovidMassTesting.Model.Mustache
         /// </summary>
         public string Text { get; set; }
         /// <summary>
+        /// Test result in english
+        /// </summary>
+        public string TextEN { get; set; }
+        public string Category { get; set; }
+        public string CategoryEN { get; set; }
+        public string DGCQR { get; set; }
+        public string TestPurpose { get; set; }
+        public string Country { get; set; }
+        public string DgcIssuer { get; set; }
+        /// <summary>
         /// Id of the test from product
         /// </summary>
         public string TestBrandName { get; set; }
         /// <summary>
-        /// Test result in english
+        /// TestManufacturer
         /// </summary>
-        public string TextEN { get; set; }
+        public string TestManufacturer { get; set; }
+        /// <summary>
+        /// SampleOrigin
+        /// </summary>
+        public string SampleOrigin { get; set; }
         /// <summary>
         /// Result help
         /// </summary>
         public string Description { get; set; }
+        /// <summary>
+        /// DescriptionEN
+        /// </summary>
+        public string DescriptionEN { get; set; }
         /// <summary>
         /// Name
         /// </summary>
@@ -62,6 +80,14 @@ namespace CovidMassTesting.Model.Mustache
         /// DateTime
         /// </summary>
         public string Date { get; set; }
+        /// <summary>
+        /// DateResult
+        /// </summary>
+        public string DateResult { get; set; }
+        /// <summary>
+        /// DateResult
+        /// </summary>
+        public string DateResultEN { get; set; }
         /// <summary>
         /// DateTime en
         /// </summary>

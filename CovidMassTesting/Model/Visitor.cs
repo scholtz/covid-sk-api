@@ -202,6 +202,10 @@ namespace CovidMassTesting.Model
         /// Administration worker IP adddress
         /// </summary>
         public string VerifiedFromIP { get; set; }
+        /// <summary>
+        /// DGC QR code PNG base64
+        /// </summary>
+        public string DGC { get; set; }
 
         internal void Extend(Dictionary<string, Place> places, Dictionary<string, Product> products)
         {

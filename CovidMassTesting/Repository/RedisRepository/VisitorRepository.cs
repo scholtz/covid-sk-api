@@ -9,6 +9,8 @@ using CovidMassTesting.Resources;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using RestSharp;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
 using System.Collections.Generic;
@@ -16,6 +18,8 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -1105,7 +1109,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId ?? place.PlaceProviderId);
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
             var oversight = GetOversight(place, visitor.TestingTime);
-            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, visitor.VerificationId, true, oversight);
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product, visitor.VerificationId, true, oversight);
         }
         private string GetOversight(Place place, DateTimeOffset? time)
         {
@@ -1155,7 +1159,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
             var oversight = GetOversight(place, visitor.TestingTime);
 
-            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, visitor.VerificationId, false, oversight);
+            return GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product, visitor.VerificationId, false, oversight);
         }
 
         public async Task<bool> ResendResults(int code, string pass)
@@ -1454,7 +1458,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveWaitingForCertificate:
                 case TestResult.NegativeWaitingForCertificate:
                 case TestResult.NegativeCertificateTakenTypo:
-                   
+
                     var oldCulture = CultureInfo.CurrentCulture;
                     var oldUICulture = CultureInfo.CurrentUICulture;
                     var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
@@ -1498,7 +1502,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 await SetResult(verification, false);
                             }
                             var oversight = GetOversight(place, visitor.TestingTime);
-                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, visitor.VerificationId, true, oversight);
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product, visitor.VerificationId, true, oversight);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
                                 Content = Convert.ToBase64String(pdf),
@@ -1539,7 +1543,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             {
                                 oversight = GetOversight(place, visitor.TestingTime);
                             }
-                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product?.Name, product?.TestBrandName, result.Id, true, oversight);
+                            var pdf = GenerateResultPDF(visitor, pp?.CompanyName, place?.Address, product, result.Id, true, oversight);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
                                 Content = Convert.ToBase64String(pdf),
@@ -3005,6 +3009,61 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+        private async Task<Visitor> GenerateDGC(Visitor visitor, Product product, string testingEntity)
+        {
+            var client = new RestClient(configuration["DGCEndpoint"]);
+            X509Certificate2 certificate = new X509Certificate2(configuration["DGCFile"], configuration["DGCFilePass"]);
+            client.ClientCertificates = new X509CertificateCollection() { certificate };
+            client.Proxy = new WebProxy();
+
+            var restrequest = new RestRequest(Method.POST);
+            restrequest.AddHeader("Cache-Control", "no-cache");
+            restrequest.AddHeader("Accept", "application/json");
+            restrequest.AddHeader("Content-Type", "application/json");
+
+            var result = "NOT_DETECTED";
+            if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
+            {
+                result = "DETECTED";
+            }
+            var testType = "AG Test";
+            if (product.Category == "vac") testType = "Vaccine";
+            if (product.Category == "pcr") testType = "PCR Test";
+
+            var body = JsonConvert.SerializeObject(
+                new Model.DGC.Base
+                {
+                    DgcLanguage = "en",
+                    RequiredAttachments = new string[] { "DGC_QR" },
+                    Subject = new Model.DGC.Subject()
+                    {
+                        DateOfBirth = $"{visitor.BirthDayYear}-{visitor.BirthDayMonth:D2}-{visitor.BirthDayDay:D2}",
+                        FamilyName = visitor.LastName,
+                        GivenName = visitor.FirstName
+                    },
+                    TestEntry = new Model.DGC.TestEntry()
+                    {
+                        CollectionCentreName = testingEntity,
+                        IssuerId = product.IssuerId,
+                        ResultProducedAt = visitor.TestResultTime?.ToString("o"),
+                        SampleCollectedAt = visitor.TestingTime?.ToString("o"),
+                        TestName = product.TestBrandName,
+
+                        TestResult = result,
+                        TestType = testType,
+                        Uvci = $"01:SK:{visitor.VerificationId}"
+                    }
+                }
+            );
+
+            restrequest.AddJsonBody(body);
+            var response = await client.ExecuteAsync(restrequest);
+
+            if (response.IsSuccessful)
+            {
+                .. visitor.DGC = response.Content;
+            }
+        }
         /// <summary>
         /// Creates html source code for pdf generation
         /// </summary>
@@ -3012,12 +3071,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="testingEntity"></param>
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
-        /// <param name="testBrandName"></param>
         /// <param name="resultguid"></param>
         /// <param name="oversight"></param>
         /// <returns></returns>
-        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, string product, string testBrandName, string resultguid, string oversight)
+        public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, Product product, string resultguid, string oversight)
         {
+            if (visitor.DGC == null && !string.IsNullOrEmpty(product.DgcIssuer))
+            {
+                visitor = GenerateDGC(visitor).Result;
+            }
+
             var oldCulture = CultureInfo.CurrentCulture;
             var oldUICulture = CultureInfo.CurrentUICulture;
             var specifiedCulture = new CultureInfo(visitor.Language ?? "en");
@@ -3031,7 +3094,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveWaitingForCertificate:
                     data.Text = "Pozitívny";
                     data.TextEN = "Positive";
-                    data.Description = "Zostaňte prosím v karanténe minimálne 14 dní. Potom si vykonajte ďalší antigénový alebo PCR test aby ste mali istotu že vírus nebudete šíriť medzi ľudí.";
+                    data.Description = "Zostaňte prosím v karanténe minimálne 14 dní. Kontaktujte svojho doktora.";
+                    data.DescriptionEN = "Please stay in quarantine 14 days. Contact your doctor for further instructions.";
                     break;
                 case TestResult.NegativeCertificateTaken:
                 case TestResult.NegativeCertificateTakenTypo:
@@ -3039,12 +3103,13 @@ namespace CovidMassTesting.Repository.RedisRepository
                     data.Text = "Negatívny";
                     data.TextEN = "Negative";
                     data.Description = "Aj keď test u Vás nepreukázal COVID, prosím zostaňte ostražitý. V prípade príznakov ako kašeľ, zvýšená teplota, alebo bolesť hlavy choďte prosím na ďalší test.";
+                    data.DescriptionEN = "Test has not proven the covid, but please stay aware. If you will feel disy, high temperature or snoozing please contact your doctor.";
                     break;
                 default:
                     throw new Exception("Invalid state for PDF generation");
             }
 
-            data.Name = $"{visitor.FirstName} {visitor.LastName}";
+            data.Name = $"{visitor.LastName?.ToUpper()} {visitor.FirstName}";
 
             data.BirthDayDay = visitor.BirthDayDay;
             data.BirthDayMonth = visitor.BirthDayMonth;
@@ -3061,6 +3126,14 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 data.Date = visitor.TestingTime.Value.ToLocalTime().ToString("f");
                 data.DateEN = visitor.TestingTime.Value.ToLocalTime().ToString("f", CultureInfo.InvariantCulture);
+
+
+                if (visitor.TestResultTime.HasValue)
+                {
+                    data.DateResult = visitor.TestResultTime.Value.ToLocalTime().ToString("f");
+                    data.DateResultEN = visitor.TestResultTime.Value.ToLocalTime().ToString("f", CultureInfo.InvariantCulture);
+                }
+
             }
             switch (visitor.PersonType)
             {
@@ -3079,8 +3152,28 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.FrontedURL = configuration["FrontedURL"];
             data.ResultGUID = resultguid;
             data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
-            data.Product = product;
-            data.TestBrandName = testBrandName;
+            data.Product = product?.Name;
+            data.TestBrandName = product?.TestBrandName;
+            data.TestManufacturer = product?.TestManufacturer;
+            data.TestPurpose = product?.TestPurpose;
+            data.Country = product?.Country;
+            data.DgcIssuer = product?.DgcIssuer;
+
+            if (product?.Category == "pcr")
+            {
+                data.Category = "PCR test";
+                data.CategoryEN = "PCR test";
+            }
+            else if (product?.Category == "vac")
+            {
+                data.Category = "Vaccine";
+                data.CategoryEN = "Vaccine";
+            }
+            else
+            {
+                data.Category = "Antigénový test";
+                data.CategoryEN = "Antigen Test";
+            }
             data.Oversight = oversight;
             var qrGenerator = new QRCoder.QRCodeGenerator();
             var qrCodeData = qrGenerator.CreateQrCode(data.VerifyURL, QRCoder.QRCodeGenerator.ECCLevel.H);
@@ -3132,7 +3225,6 @@ namespace CovidMassTesting.Repository.RedisRepository
             var slot = slotRepository.Get5MinSlot(visitor.ChosenPlaceId, visitor.ChosenSlot).Result;
 
             data.Date = $"{slot.TimeInCET.ToString("dd.MM.yyyy")} {slot.Description}";
-
             switch (visitor.PersonType)
             {
                 case "foreign":
@@ -3203,12 +3295,11 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="testingEntity"></param>
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
-        /// <param name="testBrandName"></param>
         /// <param name="resultguid"></param>
         /// <param name="sign"></param>
         /// <param name="oversight"></param>
         /// <returns></returns>
-        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, string product, string testBrandName, string resultguid, bool sign = true, string oversight = "")
+        public byte[] GenerateResultPDF(Visitor visitor, string testingEntity, string placeAddress, Product product, string resultguid, bool sign = true, string oversight = "")
         {
             string password;
 
@@ -3224,7 +3315,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     break;
             }
 
-            var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, testBrandName,  resultguid, oversight);
+            var html = GenerateResultHTML(visitor, testingEntity, placeAddress, product, resultguid, oversight);
             using var pdfStreamEncrypted = new MemoryStream();
             iText.Kernel.Pdf.PdfWriter writer;
             if (sign)
@@ -3384,7 +3475,8 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var pageWithStamp = 1;
                 if (!string.IsNullOrEmpty(configuration["SetStampToPageRegistration"]))
                 {
-                    if (int.TryParse(configuration["SetStampToPageRegistration"], out var toPage)) {
+                    if (int.TryParse(configuration["SetStampToPageRegistration"], out var toPage))
+                    {
                         pageWithStamp = toPage;
                     }
                 }

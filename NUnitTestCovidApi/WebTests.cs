@@ -2787,8 +2787,14 @@ namespace NUnitTestCovidApi
             var html2 = visitorRepository.GenerateResultHTML(visitor2, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", "SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test", Guid.NewGuid().ToString());
             Assert.IsTrue(html2.Contains("X Y"));
             Assert.IsTrue(html2.Contains("nedeľa 17. janu&#225;ra 2021 14:14"));
-
-            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", "SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test", Guid.NewGuid().ToString(), true, "Oversight");
+            var product = new Product()
+            {
+                Category = "ant",
+                TestBrandName = "Roche, STANDARD Q COVID-19 Ag Test",
+                TestManufacturer = "SD BIOSENSOR, Inc",
+                TestPurpose = "Covid Test",
+            };
+            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", product, Guid.NewGuid().ToString(), true, "Oversight");
             Assert.IsTrue(pdf.Length > 100);
 #if DEBUG
             File.WriteAllBytes("d:/covid/test-pdf.pdf", pdf);

@@ -20,6 +20,30 @@ namespace CovidMassTesting.Model
         /// </summary>
         public string Name { get; set; }
         /// <summary>
+        /// disease or agent targeted
+        /// </summary>
+        public string TestPurpose { get; set; }
+        /// <summary>
+        /// disease or agent targeted
+        /// </summary>
+        public string DgcIssuer { get; set; }
+        /// <summary>
+        /// IssuerId
+        /// </summary>
+        public string IssuerId { get;  set; }
+        /// <summary>
+        /// SampleOrigin - nasal vs blood 
+        /// </summary>
+        public string SampleOrigin { get; set; }
+        /// <summary>
+        /// Member state 
+        /// </summary>
+        public string Country { get; set; }
+        /// <summary>
+        /// TestManufacturer
+        /// </summary>
+        public string TestManufacturer { get; set; }
+        /// <summary>
         /// Insurance only
         /// </summary>
         public bool InsuranceOnly { get; set; }
@@ -84,6 +108,5 @@ namespace CovidMassTesting.Model
         /// Time when resource was last updated
         /// </summary>
         public DateTimeOffset LastUpdate { get; set; }
-
     }
 }
