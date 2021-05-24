@@ -124,5 +124,9 @@ namespace CovidMassTesting.Model.Mustache
         /// Oversight
         /// </summary>
         public string Oversight { get; set; }
+        /// <summary>
+        /// Eu Flag above DGC
+        /// </summary>
+        public string EuFlag { get; set; }
     }
 }

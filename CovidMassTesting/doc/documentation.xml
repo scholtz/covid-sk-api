@@ -2734,6 +2734,11 @@
             DateTime
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.DateResult">
+            <summary>
+            DateResult DateTime
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestRegistration.FrontedURL">
             <summary>
             Link to testing place
@@ -2819,19 +2824,34 @@
             Result in text
             </summary>
         </member>
-        <member name="P:CovidMassTesting.Model.Mustache.TestResult.TestBrandName">
-            <summary>
-            Id of the test from product
-            </summary>
-        </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.TextEN">
             <summary>
             Test result in english
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.TestBrandName">
+            <summary>
+            Id of the test from product
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.TestManufacturer">
+            <summary>
+            TestManufacturer
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.SampleOrigin">
+            <summary>
+            SampleOrigin
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Description">
             <summary>
             Result help
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.DescriptionEN">
+            <summary>
+            DescriptionEN
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Name">
@@ -2852,6 +2872,16 @@
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Date">
             <summary>
             DateTime
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.DateResult">
+            <summary>
+            DateResult
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.DateResultEN">
+            <summary>
+            DateResult
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.DateEN">
@@ -2897,6 +2927,11 @@
         <member name="P:CovidMassTesting.Model.Mustache.TestResult.Oversight">
             <summary>
             Oversight
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Mustache.TestResult.EuFlag">
+            <summary>
+            Eu Flag above DGC
             </summary>
         </member>
         <member name="T:CovidMassTesting.Model.PersonAllocation">
@@ -3457,6 +3492,36 @@
         <member name="P:CovidMassTesting.Model.Product.Name">
             <summary>
             Name of the product or service
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.TestPurpose">
+            <summary>
+            disease or agent targeted
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.DgcIssuer">
+            <summary>
+            disease or agent targeted
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.IssuerId">
+            <summary>
+            IssuerId
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.SampleOrigin">
+            <summary>
+            SampleOrigin - nasal vs blood 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.Country">
+            <summary>
+            Member state 
+            </summary>
+        </member>
+        <member name="P:CovidMassTesting.Model.Product.TestManufacturer">
+            <summary>
+            TestManufacturer
             </summary>
         </member>
         <member name="P:CovidMassTesting.Model.Product.InsuranceOnly">
@@ -5169,6 +5234,11 @@
             Administration worker IP adddress
             </summary>
         </member>
+        <member name="P:CovidMassTesting.Model.Visitor.DGC">
+            <summary>
+            DGC QR code PNG base64
+            </summary>
+        </member>
         <member name="P:CovidMassTesting.Model.VisitorAnonymized.Id">
             <summary>
             Registration code. 9-digit, formatted 000-000-000 for visitors
@@ -6613,7 +6683,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,CovidMassTesting.Model.Product,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -6634,7 +6704,7 @@
             <param name="pass"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,CovidMassTesting.Model.Product,System.String,System.Boolean,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -6642,7 +6712,6 @@
             <param name="testingEntity"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
-            <param name="testBrandName"></param>
             <param name="resultguid"></param>
             <param name="sign">Sign and password protect</param>
             <param name="oversight"></param>
@@ -8804,7 +8873,7 @@
             </summary>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,CovidMassTesting.Model.Product,System.String,System.String)">
             <summary>
             Creates html source code for pdf generation
             </summary>
@@ -8812,7 +8881,6 @@
             <param name="testingEntity"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
-            <param name="testBrandName"></param>
             <param name="resultguid"></param>
             <param name="oversight"></param>
             <returns></returns>
@@ -8827,7 +8895,7 @@
             <param name="product"></param>
             <returns></returns>
         </member>
-        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,System.String,System.String,System.String,System.Boolean,System.String)">
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultPDF(CovidMassTesting.Model.Visitor,System.String,System.String,CovidMassTesting.Model.Product,System.String,System.Boolean,System.String)">
             <summary>
             Creates pdf from test result
             </summary>
@@ -8835,7 +8903,6 @@
             <param name="testingEntity"></param>
             <param name="placeAddress"></param>
             <param name="product"></param>
-            <param name="testBrandName"></param>
             <param name="resultguid"></param>
             <param name="sign"></param>
             <param name="oversight"></param>

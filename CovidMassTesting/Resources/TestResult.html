@@ -32,7 +32,11 @@
                 <th>PRIEZVISKO, Meno:</th>
                 <td>{{Name}}</td>
                 {{#DGCQR}}
-                <td rowspan="20">
+                <td rowspan="20" style="background-color: forestgreen; text-align:center">
+                    <h3>Digitálny zelený certifikát</h3>
+                    {{#EuFlag}}
+                    <img style="width:200px;" src="data:image/png;base64, {{EuFlag}}" alt="EU Flag" />
+                    {{/EuFlag}}
                     <img style="width:200px;height:200px" src="data:image/png;base64, {{DGCQR}}" alt="Digital Green Certificate" />
                 </td>
                 {{/DGCQR}}
@@ -208,8 +212,6 @@
 
     <h1>Medical Certificate</h1>
 
-    <h3>This is to certify that</h3>
-
     <table>
         <tbody>
 
@@ -217,7 +219,11 @@
                 <th>SURNAME, Forename:</th>
                 <td>{{Name}}</td>
                 {{#DGCQR}}
-                <td rowspan="20">
+                <td rowspan="20" style="background-color: forestgreen; text-align:center">
+                    <h3>Digital Green Certificate</h3>
+                    {{#EuFlag}}
+                    <img style="width:200px;" src="data:image/png;base64, {{EuFlag}}" alt="EU Flag" />
+                    {{/EuFlag}}
                     <img style="width:200px;height:200px" src="data:image/png;base64, {{DGCQR}}" alt="Digital Green Certificate" />
                 </td>
                 {{/DGCQR}}
@@ -279,7 +285,7 @@
             {{/SampleOrigin}}
             <tr>
                 <th>Date and time of the test sample collection:</th>
-                <td>{{Date}}</td>
+                <td>{{DateEN}}</td>
             </tr>
             {{#DateResult}}
             <tr>

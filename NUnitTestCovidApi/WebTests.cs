@@ -2764,29 +2764,13 @@ namespace NUnitTestCovidApi
 
             var visitor = new Visitor()
             {
-                FirstName = "X",
-                LastName = "Y",
+                FirstName = "x",
+                LastName = "y",
                 RC = "1234567890",
                 Language = "en-US",
                 TestingTime = t,
                 Result = TestResult.PositiveWaitingForCertificate,
             };
-            var html = visitorRepository.GenerateResultHTML(visitor, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", "SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test", Guid.NewGuid().ToString());
-            Assert.IsTrue(html.Contains("X Y"));
-            Assert.IsTrue(html.Contains("Sunday, January 17, 2021 2:14 PM"));
-
-            var visitor2 = new Visitor()
-            {
-                FirstName = "X",
-                LastName = "Y",
-                RC = "1234567890",
-                Language = "sk-SK",
-                TestingTime = t,
-                Result = TestResult.PositiveWaitingForCertificate,
-            };
-            var html2 = visitorRepository.GenerateResultHTML(visitor2, "Nitra", "Bratislavská 1, Nitra", "Antigénový test", "SD BIOSENSOR, Inc.; Roche, STANDARD Q COVID-19 Ag Test", Guid.NewGuid().ToString());
-            Assert.IsTrue(html2.Contains("X Y"));
-            Assert.IsTrue(html2.Contains("nedeľa 17. janu&#225;ra 2021 14:14"));
             var product = new Product()
             {
                 Category = "ant",
@@ -2794,7 +2778,30 @@ namespace NUnitTestCovidApi
                 TestManufacturer = "SD BIOSENSOR, Inc",
                 TestPurpose = "Covid Test",
             };
-            var pdf = visitorRepository.GenerateResultPDF(visitor, "Nitra", "Bratislavská 1, Nitra", product, Guid.NewGuid().ToString(), true, "Oversight");
+            var html = visitorRepository.GenerateResultHTML(visitor, "Nitra", "Bratislavská 1, Nitra", product, Guid.NewGuid().ToString());
+            Assert.IsTrue(html.Contains("Y x"));
+            Assert.IsTrue(html.Contains("Sunday, January 17, 2021 2:14 PM"));
+
+            var visitor2 = new Visitor()
+            {
+                FirstName = "Firstname",
+                LastName = "Lastname",
+                RC = "1234567890",
+                Language = "sk-SK",
+                TestingTime = t,
+                TestResultTime = t.AddMinutes(15),
+                Result = TestResult.PositiveWaitingForCertificate,
+                BirthDayDay = 1,
+                BirthDayMonth = 1,
+                BirthDayYear = 2001,
+                VerificationId = Guid.NewGuid().ToString()
+            };
+            product.IssuerId = "ab62809d-2950-4c58-a102-2b6a2290c6ce";
+            product.DgcIssuer = "Inezis";
+            var html2 = visitorRepository.GenerateResultHTML(visitor2, "Nitra", "Bratislavská 1, Nitra", product, Guid.NewGuid().ToString());
+            Assert.IsTrue(html2.Contains("LASTNAME Firstname"));
+            Assert.IsTrue(html2.Contains("nedeľa 17. janu&#225;ra 2021 14:14"));
+            var pdf = visitorRepository.GenerateResultPDF(visitor2, "Nitra", "Bratislavská 1, Nitra", product, Guid.NewGuid().ToString(), true, "Oversight");
             Assert.IsTrue(pdf.Length > 100);
 #if DEBUG
             File.WriteAllBytes("d:/covid/test-pdf.pdf", pdf);

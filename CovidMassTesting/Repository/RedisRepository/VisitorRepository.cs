@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using RestSharp;
 using StackExchange.Redis.Extensions.Core.Abstractions;
 using System;
@@ -3011,6 +3012,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         }
         private async Task<Visitor> GenerateDGC(Visitor visitor, Product product, string testingEntity)
         {
+            if (string.IsNullOrEmpty(configuration["DGCFile"]) || string.IsNullOrEmpty(configuration["DGCFilePass"])) return visitor;
             var client = new RestClient(configuration["DGCEndpoint"]);
             X509Certificate2 certificate = new X509Certificate2(configuration["DGCFile"], configuration["DGCFilePass"]);
             client.ClientCertificates = new X509CertificateCollection() { certificate };
@@ -3026,14 +3028,16 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 result = "DETECTED";
             }
-            var testType = "AG Test";
+            var testType = "RAT";
             if (product.Category == "vac") testType = "Vaccine";
-            if (product.Category == "pcr") testType = "PCR Test";
+            if (product.Category == "pcr") testType = "NAAT";
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
 
             var body = JsonConvert.SerializeObject(
                 new Model.DGC.Base
                 {
-                    DgcLanguage = "en",
+                    DgcLanguage = "SK",
                     RequiredAttachments = new string[] { "DGC_QR" },
                     Subject = new Model.DGC.Subject()
                     {
@@ -3047,22 +3051,29 @@ namespace CovidMassTesting.Repository.RedisRepository
                         IssuerId = product.IssuerId,
                         ResultProducedAt = visitor.TestResultTime?.ToString("o"),
                         SampleCollectedAt = visitor.TestingTime?.ToString("o"),
-                        TestName = product.TestBrandName,
+                        TestName = "1218",
 
                         TestResult = result,
                         TestType = testType,
                         Uvci = $"01:SK:{visitor.VerificationId}"
                     }
-                }
+                }, serializerSettings
             );
-
+            //body = body.Replace("0000000", "000");
             restrequest.AddJsonBody(body);
+
             var response = await client.ExecuteAsync(restrequest);
 
             if (response.IsSuccessful)
             {
-                .. visitor.DGC = response.Content;
+                var data = JsonConvert.DeserializeObject<Model.DGC.Response>(response.Content);
+                visitor.DGC = data.Attachments.FirstOrDefault()?.Data;
+                if (!string.IsNullOrEmpty(visitor.DGC))
+                {
+                    visitor = await SetVisitor(visitor, false);
+                }
             }
+            return visitor;
         }
         /// <summary>
         /// Creates html source code for pdf generation
@@ -3076,9 +3087,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, Product product, string resultguid, string oversight)
         {
-            if (visitor.DGC == null && !string.IsNullOrEmpty(product.DgcIssuer))
+            if (visitor.DGC == null && !string.IsNullOrEmpty(product.DgcIssuer) && !string.IsNullOrEmpty(product.IssuerId))
             {
-                visitor = GenerateDGC(visitor).Result;
+                visitor = GenerateDGC(visitor, product, testingEntity).Result;
             }
 
             var oldCulture = CultureInfo.CurrentCulture;
@@ -3093,7 +3104,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.PositiveCertificateTaken:
                 case TestResult.PositiveWaitingForCertificate:
                     data.Text = "Pozitívny";
-                    data.TextEN = "Positive";
+                    data.TextEN = "DETECTED";
                     data.Description = "Zostaňte prosím v karanténe minimálne 14 dní. Kontaktujte svojho doktora.";
                     data.DescriptionEN = "Please stay in quarantine 14 days. Contact your doctor for further instructions.";
                     break;
@@ -3101,7 +3112,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 case TestResult.NegativeCertificateTakenTypo:
                 case TestResult.NegativeWaitingForCertificate:
                     data.Text = "Negatívny";
-                    data.TextEN = "Negative";
+                    data.TextEN = "NOT DETECTED";
                     data.Description = "Aj keď test u Vás nepreukázal COVID, prosím zostaňte ostražitý. V prípade príznakov ako kašeľ, zvýšená teplota, alebo bolesť hlavy choďte prosím na ďalší test.";
                     data.DescriptionEN = "Test has not proven the covid, but please stay aware. If you will feel disy, high temperature or snoozing please contact your doctor.";
                     break;
@@ -3135,6 +3146,18 @@ namespace CovidMassTesting.Repository.RedisRepository
                 }
 
             }
+            if (!string.IsNullOrEmpty(configuration["EuFlagFile"]))
+            {
+                try
+                {
+                    data.EuFlag = Convert.ToBase64String(File.ReadAllBytes(configuration["EuFlagFile"])).Replace("\n", "").Replace("\r", "");
+                }
+                catch (Exception exc)
+                {
+                    logger.LogError(exc.Message);
+                }
+            }
+
             switch (visitor.PersonType)
             {
                 case "foreign":
@@ -3182,7 +3205,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             qrCode.GetGraphic(20).Save(outData, System.Drawing.Imaging.ImageFormat.Png);
             var pngBytes = outData.ToArray();
             data.QRVerificationURL = Convert.ToBase64String(pngBytes).Replace("\n", "");
-
+            if (!string.IsNullOrEmpty(visitor.DGC))
+            {
+                data.DGCQR = visitor.DGC.Replace("\n", "");
+            }
             var stubble = new Stubble.Core.Builders.StubbleBuilder().Build();
             var template = Resources.Repository_RedisRepository_VisitorRepository.TestResult;
             if (File.Exists($"TestResult-{visitor.Language}.html"))
