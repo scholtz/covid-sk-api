@@ -3010,6 +3010,112 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             return ret;
         }
+        /// <summary>
+        /// Generates the DGC PkPass file
+        /// </summary>
+        /// <param name="codeInt"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        public async Task<byte[]> DownloadWalletDGC(int codeInt, string pass)
+        {
+            if (string.IsNullOrEmpty(pass))
+            {
+                throw new ArgumentException(localizer[Repository_RedisRepository_VisitorRepository.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
+            }
+            if (pass.Length < 4)
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            var visitor = await GetVisitor(codeInt);
+            if (visitor == null)
+            {
+                throw new Exception("Skontrolujte prosím správne zadanie kódu registrácie.");
+            }
+            if (visitor.RC?.Length > 4 && !visitor.RC.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            if (visitor.Passport?.Length > 4 && !visitor.Passport.Trim().EndsWith(pass.Trim(), true, CultureInfo.InvariantCulture))
+            {
+                throw new Exception(localizer[Repository_RedisRepository_VisitorRepository.Invalid_code].Value);
+            }
+            switch (visitor.Result)
+            {
+                case TestResult.NegativeWaitingForCertificate:
+                case TestResult.NegativeCertificateTaken:
+                case TestResult.NegativeCertificateTakenTypo:
+                    // process
+                    break;
+                default:
+                    throw new Exception("Môžeme Vám vygenerovať certifikát iba po absolvovaní testu");
+            }
+
+            var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId);
+            if (pp == null) throw new Exception("Place provider not set correctly to the test");
+            var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+            return await GenerateDGCWallet(visitor, product, pp.CompanyName);
+        }
+        private async Task<byte[]> GenerateDGCWallet(Visitor visitor, Product product, string testingEntity)
+        {
+            if (string.IsNullOrEmpty(configuration["DGCFile"]) || string.IsNullOrEmpty(configuration["DGCFilePass"])) throw new Exception("DGC not configured");
+            var client = new RestClient(configuration["DGCEndpoint"]);
+            X509Certificate2 certificate = new X509Certificate2(configuration["DGCFile"], configuration["DGCFilePass"]);
+            client.ClientCertificates = new X509CertificateCollection() { certificate };
+            client.Proxy = new WebProxy();
+
+            var restrequest = new RestRequest(Method.POST);
+            restrequest.AddHeader("Cache-Control", "no-cache");
+            restrequest.AddHeader("Accept", "application/json");
+            restrequest.AddHeader("Content-Type", "application/json");
+
+            var result = "NOT_DETECTED";
+            if (visitor.Result == TestResult.PositiveCertificateTaken || visitor.Result == TestResult.PositiveWaitingForCertificate)
+            {
+                result = "DETECTED";
+            }
+            var testType = "RAT";
+            if (product.Category == "vac") testType = "Vaccine";
+            if (product.Category == "pcr") testType = "NAAT";
+            var serializerSettings = new JsonSerializerSettings();
+            serializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            var body = JsonConvert.SerializeObject(
+                new Model.DGC.Base
+                {
+                    DgcLanguage = "SK",
+                    RequiredAttachments = new string[] { "PKPASS" },
+                    Subject = new Model.DGC.Subject()
+                    {
+                        DateOfBirth = $"{visitor.BirthDayYear}-{visitor.BirthDayMonth:D2}-{visitor.BirthDayDay:D2}",
+                        FamilyName = visitor.LastName,
+                        GivenName = visitor.FirstName
+                    },
+                    TestEntry = new Model.DGC.TestEntry()
+                    {
+                        CollectionCentreName = testingEntity,
+                        IssuerId = product.IssuerId,
+                        ResultProducedAt = visitor.TestResultTime?.ToString("o"),
+                        SampleCollectedAt = visitor.TestingTime?.ToString("o"),
+                        TestName = product.TestBrandName,
+
+                        TestResult = result,
+                        TestType = testType,
+                        Uvci = $"URN:UVCI:01:SK:RYCHLEJSIE/{visitor.Id}"
+                    }
+                }, serializerSettings
+            );
+            //body = body.Replace("0000000", "000");
+            restrequest.AddJsonBody(body);
+
+            var response = await client.ExecuteAsync(restrequest);
+
+            if (response.IsSuccessful)
+            {
+                var data = JsonConvert.DeserializeObject<Model.DGC.Response>(response.Content);
+                return Convert.FromBase64String(data.Attachments.FirstOrDefault()?.Data);
+            }
+            throw new Exception("Server is temporary not available. Please try again later.");
+        }
         private async Task<Visitor> GenerateDGC(Visitor visitor, Product product, string testingEntity)
         {
             if (string.IsNullOrEmpty(configuration["DGCFile"]) || string.IsNullOrEmpty(configuration["DGCFilePass"])) return visitor;
@@ -3051,11 +3157,11 @@ namespace CovidMassTesting.Repository.RedisRepository
                         IssuerId = product.IssuerId,
                         ResultProducedAt = visitor.TestResultTime?.ToString("o"),
                         SampleCollectedAt = visitor.TestingTime?.ToString("o"),
-                        TestName = "1218",
+                        TestName = product.TestBrandName,
 
                         TestResult = result,
                         TestType = testType,
-                        Uvci = $"01:SK:{visitor.VerificationId}"
+                        Uvci = $"URN:UVCI:01:SK:RYCHLEJSIE/{visitor.Id}"
                     }
                 }, serializerSettings
             );

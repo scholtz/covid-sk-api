@@ -360,6 +360,14 @@ namespace CovidMassTesting.Repository.Interface
         /// <returns></returns>
         public Task<Dictionary<DateTimeOffset, long>> GetPPStats(string statsType, string placeProviderId);
         /// <summary>
+        /// DownloadWalletDGC
+        /// </summary>
+        /// <param name="codeInt"></param>
+        /// <param name="pass"></param>
+        /// <returns></returns>
+        public Task<byte[]> DownloadWalletDGC(int codeInt, string pass);
+
+        /// <summary>
         /// RegistrationId From Hashed Id
         /// </summary>
         /// <param name="hashedId"></param>
