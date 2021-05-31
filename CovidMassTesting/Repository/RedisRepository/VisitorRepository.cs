@@ -3114,7 +3114,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var data = JsonConvert.DeserializeObject<Model.DGC.Response>(response.Content);
                 return Convert.FromBase64String(data.Attachments.FirstOrDefault()?.Data);
             }
-            throw new Exception("Server is temporary not available. Please try again later.");
+            throw new Exception("Server is temporary not available. Please try again later. "+response.Content);
         }
         private async Task<Visitor> GenerateDGC(Visitor visitor, Product product, string testingEntity)
         {
@@ -3279,7 +3279,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.TestingAddress = placeAddress;
             data.TestingEntity = testingEntity;
             data.FrontedURL = configuration["FrontedURL"];
-            data.ResultGUID = resultguid;
+            data.ResultGUID = $"URN:UVCI:01:SK:RYCHLEJSIE/{visitor.Id}";
             data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
             data.Product = product?.Name;
             data.TestBrandName = product?.TestBrandName;
@@ -3290,8 +3290,8 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (product?.Category == "pcr")
             {
-                data.Category = "PCR test";
-                data.CategoryEN = "PCR test";
+                data.Category = "PCR test (NAAT)";
+                data.CategoryEN = "PCR test (NAAT)";
             }
             else if (product?.Category == "vac")
             {
@@ -3300,8 +3300,8 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             else
             {
-                data.Category = "Antigénový test";
-                data.CategoryEN = "Antigen Test";
+                data.Category = "Antigénový test (RAT)";
+                data.CategoryEN = "Antigen Test (RAT)";
             }
             data.Oversight = oversight;
             var qrGenerator = new QRCoder.QRCodeGenerator();
