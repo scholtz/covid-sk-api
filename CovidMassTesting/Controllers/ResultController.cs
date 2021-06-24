@@ -253,6 +253,7 @@ namespace CovidMassTesting.Controllers
         /// </summary>
         /// <param name="code"></param>
         /// <param name="pass"></param>
+        /// <param name="captcha"></param>
         /// <returns></returns>
         [HttpPost("DownloadPDF")]
         [ProducesResponseType(200)]
@@ -307,6 +308,64 @@ namespace CovidMassTesting.Controllers
             }
         }
 
+        /// <summary>
+        /// Public method to show test results to user .. returns pdf file
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="pass"></param>
+        /// <param name="captcha"></param>
+        /// <returns></returns>
+        [HttpPost("DownloadWalletDGC")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<ActionResult<Result>> DownloadWalletDGC([FromForm] string code, [FromForm] string pass, [FromForm] string captcha)
+        {
+
+            try
+            {
+                if (string.IsNullOrEmpty(code))
+                {
+                    throw new ArgumentException(localizer[Controllers_ResultController.Visitor_code_must_not_be_empty].Value);
+                }
+
+                if (string.IsNullOrEmpty(pass))
+                {
+                    throw new ArgumentException(localizer[Controllers_ResultController.Last_4_digits_of_personal_number_or_declared_passport_for_foreigner_at_registration_must_not_be_empty].Value);
+                }
+                if (!string.IsNullOrEmpty(configuration["googleReCaptcha:SiteKey"]))
+                {
+                    if (string.IsNullOrEmpty(captcha))
+                    {
+                        throw new Exception("Please provide captcha");
+                    }
+
+                    var validation = await captchaValidator.IsCaptchaPassedAsync(captcha);
+                    if (!validation)
+                    {
+                        throw new Exception("Please provide valid captcha");
+                    }
+                }
+
+
+                var codeClear = FormatBarCode(code);
+                if (int.TryParse(codeClear, out var codeInt))
+                {
+                    var data = await visitorRepository.DownloadWalletDGC(codeInt, pass);
+                    return File(data, "application/vnd.apple.pkpass", "passport.pkpass");
+                }
+                throw new Exception(localizer[Controllers_ResultController.Invalid_visitor_code]);
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
         /// <summary>
         /// PrintCertificateByDocumentManager
         /// </summary>
