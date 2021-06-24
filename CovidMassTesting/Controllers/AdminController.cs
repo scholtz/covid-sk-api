@@ -14,9 +14,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic.FileIO;
+using SlugGenerator;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -389,7 +392,7 @@ namespace CovidMassTesting.Controllers
                 {
                     try
                     {
-                        
+
 
                         var pp = visitor.PlaceProviderId;
                         if (string.IsNullOrEmpty(pp))
@@ -2062,6 +2065,144 @@ namespace CovidMassTesting.Controllers
 
 
 
+        /// <summary>
+        /// Upload employees - PP Administrator can upload employees
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("UploadTests"), RequestSizeLimit(10000000)]
+        public async Task<ActionResult<int>> UploadTests()
+        {
+            try
+            {
+                if (Request.Form.Files.Count != 1)
+                {
+                    throw new Exception("Please upload file");
+                }
+
+                if (!await User.IsPlaceProviderAdmin(userRepository, placeProviderRepository))
+                {
+                    throw new Exception("Only administrator can upload employee tests");
+                }
+                var ret = 0;
+                var file = Request.Form.Files[0];
+
+                using var stream = new MemoryStream();
+                file.CopyTo(stream);
+
+                var outStream = new MemoryStream(stream.ToArray());
+                using var csvParser = new TextFieldParser(outStream)
+                {
+                    CommentTokens = new string[] { "#" }
+                };
+                csvParser.SetDelimiters(new string[] { ";" });
+                csvParser.HasFieldsEnclosedInQuotes = true;
+                var line = 0;
+                var n2k = new Dictionary<string, int>();
+                while (!csvParser.EndOfData)
+                {
+                    line++;
+
+                    var fields = csvParser.ReadFields();
+                    if (line == 1)
+                    {
+                        for (var i = 0; i < fields.Length; i++)
+                        {
+                            n2k[fields[i].GenerateSlug()] = i;
+                        }
+                        continue;
+                    }
+
+                    if (!n2k.ContainsKey("test")) throw new Exception("Does not contain column test");
+
+                    var pp = await placeProviderRepository.GetPlaceProvider(User.GetPlaceProvider());
+                    logger.LogInformation($"Import: {pp.CompanyId} {fields[n2k["osobne-cislo"]]}");
+
+                    var regId = await visitorRepository.GetRegistrationIdFromHashedId(visitorRepository.MakeCompanyPeronalNumberHash(pp.CompanyId, fields[n2k["osobne-cislo"]]));
+                    Registration reg = null;
+                    if (!string.IsNullOrEmpty(regId))
+                    {
+                        reg = await visitorRepository.GetRegistration(regId);
+                    }
+
+                    if (string.IsNullOrEmpty(fields[n2k["test"]])) continue;
+
+                    var visitorCode = await visitorRepository.GETVisitorCodeFromTesting(fields[n2k["test"]]);
+                    Visitor visitor = null;
+                    var update = false;
+                    if (visitorCode.HasValue)
+                    {
+                        visitor = await visitorRepository.GetVisitor(visitorCode.Value, false, false);
+                    }
+                    if (visitor == null)
+                    {
+                        visitor = new Visitor();
+                        update = true;
+                    }
+                    if (n2k.ContainsKey("prijmeni"))
+                    {
+                        var val = fields[n2k["prijmeni"]]?.Trim();
+                        if (visitor.LastName != val)
+                        {
+                            update = true;
+                            visitor.LastName = val;
+                        }
+                    }
+                    if (n2k.ContainsKey("jmeno"))
+                    {
+                        var val = fields[n2k["jmeno"]]?.Trim();
+                        if (visitor.FirstName != val)
+                        {
+                            update = true;
+                            visitor.FirstName = val;
+                        }
+                    }
+                    if (n2k.ContainsKey("tel-c"))
+                    {
+                        var val = fields[n2k["tel-c"]]?.Trim();
+                        if (visitor.Phone != val)
+                        {
+                            update = true;
+                            visitor.Phone = val;
+                        }
+                    }
+                    if (n2k.ContainsKey("test"))
+                    {
+                        var val = fields[n2k["test"]]?.Trim();
+                        if (visitor.TestingSet != val)
+                        {
+                            update = true;
+                            visitor.TestingSet = val;
+                        }
+                    }
+                    if (n2k.ContainsKey("rodne-cislo"))
+                    {
+                        var val = fields[n2k["rodne-cislo"]]?.Trim();
+                        if (visitor.TestingSet != val)
+                        {
+                            update = true;
+                            visitor.TestingSet = val;
+                        }
+                    }
+                    if (update)
+                    {
+                        await visitorRepository.SetVisitor(visitor, false);
+                        ret++;
+                    }
+                }
+
+                return Ok(ret);
+            }
+            catch (ArgumentException exc)
+            {
+                logger.LogError(exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
+                return BadRequest(new ProblemDetails() { Detail = exc.Message });
+            }
+        }
 
 
 

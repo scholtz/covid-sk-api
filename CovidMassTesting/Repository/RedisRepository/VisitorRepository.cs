@@ -470,6 +470,10 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 visitor.Address = $"{visitor.Street} {visitor.StreetNo}, {visitor.ZIP} {visitor.City}";
             }
+            if (visitor.Id == default(int))
+            {
+                visitor.Id = await CreateNewVisitorId();
+            }
             visitor = await FixVisitor(visitor, false);
             visitor.LastUpdate = DateTimeOffset.Now;
             if (!visitor.RegistrationTime.HasValue)
