@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using System;
@@ -3573,8 +3574,9 @@ namespace NUnitTestCovidApi
                 builder.ConfigureLogging((WebHostBuilderContext context, ILoggingBuilder loggingBuilder) =>
                 {
                     loggingBuilder.ClearProviders();
-                    loggingBuilder.AddConsole(options => options.IncludeScopes = true);
+                    loggingBuilder.AddConsole();
                 });
+
                 var configuration = new ConfigurationBuilder()
                     .AddJsonFile(appSettings)
                     .Build();
@@ -3594,6 +3596,7 @@ namespace NUnitTestCovidApi
                     .AddJsonFile(appSettings)
                     .Build();
                 services.AddSingleton(typeof(IConfiguration), configuration);
+                
             }
         }
     }

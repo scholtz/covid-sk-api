@@ -873,6 +873,16 @@
             </summary>
             <param name="code"></param>
             <param name="pass"></param>
+            <param name="captcha"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Controllers.ResultController.DownloadWalletDGC(System.String,System.String,System.String)">
+            <summary>
+            Public method to show test results to user .. returns pdf file
+            </summary>
+            <param name="code"></param>
+            <param name="pass"></param>
+            <param name="captcha"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.ResultController.PrintCertificateByDocumentManager(System.String,System.String,System.String,System.String)">
@@ -6878,6 +6888,14 @@
             <param name="placeProviderId"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.DownloadWalletDGC(System.Int32,System.String)">
+            <summary>
+            DownloadWalletDGC
+            </summary>
+            <param name="codeInt"></param>
+            <param name="pass"></param>
+            <returns></returns>
+        </member>
         <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.GetRegistrationIdFromHashedId(System.String)">
             <summary>
             RegistrationId From Hashed Id
@@ -8877,6 +8895,14 @@
             <summary>
             Tests the storage
             </summary>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.DownloadWalletDGC(System.Int32,System.String)">
+            <summary>
+            Generates the DGC PkPass file
+            </summary>
+            <param name="codeInt"></param>
+            <param name="pass"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.GenerateResultHTML(CovidMassTesting.Model.Visitor,System.String,System.String,CovidMassTesting.Model.Product,System.String,System.String)">

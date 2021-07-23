@@ -62,240 +62,247 @@ namespace CovidMassTesting
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
-
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
-
-            services.AddControllers(options =>
-            {
-                options.RespectBrowserAcceptHeader = true; // false by default
-            })
-                .AddNewtonsoftJson()
-                //.AddXmlSerializerFormatters()
-                //.AddXmlDataContractSerializerFormatters()
-                ;
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1", new OpenApiInfo
-                {
-                    Title = "Covid Mass Testing API",
-                    Version = "v1",
-
-                    Description = "This API has been created for optimisation of time required to take sample from person for Covid-19 test.\n" +
-                    "Medical personel scans the bar code on the testing set, scans the bar code of the person registration, and performs test.\n" +
-                    "After that the person is free to go home. This application aims to create mass testing possible with minimal risk of contamination from testing personel and minimising the queues in front of testing location.\n" +
-                    "\n" +
-                    "** Best practicies for strong passwords **\n" +
-                    "iv> openssl rand -base64 16\n" +
-                    "key> openssl rand -base64 32" +
-                    "MasterPDFPassword> openssl rand -base64 32\n" +
-                    "JWTTokenSecret > openssl rand - base64 32\n"
-                });
-                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
-                c.DocumentFilter<Model.Docs.SwashbuckleFilter>();
-
-                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                {
-                    Description = "Bearer token.",
-                    In = ParameterLocation.Header,
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.ApiKey
-                });
-                c.OperationFilter<Swashbuckle.AspNetCore.Filters.SecurityRequirementsOperationFilter>();
-
-                c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"doc/documentation.xml"));
-            });
-
-
-            services.AddAuthorization(options =>
-            {
-                options.DefaultPolicy = new AuthorizationPolicyBuilder(
-                    JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build();
-            });
-
-            var key = Encoding.ASCII.GetBytes(Configuration["JWTTokenSecret"]);
-
-            services.AddAuthentication(x =>
-            {
-                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-              .AddJwtBearer(x =>
-              {
-                  x.RequireHttpsMetadata = false;
-                  x.SaveToken = true;
-                  x.TokenValidationParameters = new TokenValidationParameters
-                  {
-                      ValidateIssuerSigningKey = true,
-                      IssuerSigningKey = new SymmetricSecurityKey(key),
-                      ValidateIssuer = false,
-                      ValidateAudience = false
-                  };
-              });
-
-            // Add CORS policy
-            var corsConfig = Configuration.GetSection("Cors").AsEnumerable().Select(k => k.Value).Where(k => !string.IsNullOrEmpty(k)).ToArray();
-
-            services.AddCors(options =>
-            {
-                options.AddDefaultPolicy(
-                builder =>
-                {
-                    builder.WithOrigins(corsConfig)
-                                        .SetIsOriginAllowedToAllowWildcardSubdomains()
-                                        .AllowAnyMethod()
-                                        .AllowAnyHeader()
-                                        .AllowCredentials();
-                });
-            });
-            ThreadPool.SetMinThreads(50, 50);
-            var redisConfiguration = new RedisConfiguration();
             try
             {
-                Configuration.GetSection("Redis")?.Bind(redisConfiguration);
-            }
-            catch (Exception exc)
-            {
-                Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
-            }
+                var logger = NLog.Web.NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
 
-            if (redisConfiguration.SyncTimeout < 10000)
-            {
-                redisConfiguration.SyncTimeout = 10000;
-            }
+                services.AddLocalization(options => options.ResourcesPath = "Resources");
 
-            if (string.IsNullOrEmpty(redisConfiguration.Hosts?.FirstOrDefault()?.Host))
-            {
-                services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
-
-
-                services.AddSingleton<IPlaceProviderRepository, Repository.MockRepository.PlaceProviderRepository>();
-                services.AddSingleton<IPlaceRepository, Repository.MockRepository.PlaceRepository>();
-                services.AddSingleton<ISlotRepository, Repository.MockRepository.SlotRepository>();
-                services.AddSingleton<IUserRepository, Repository.MockRepository.UserRepository>();
-                services.AddSingleton<IVisitorRepository, Repository.MockRepository.VisitorRepository>();
-            }
-            else
-            {
-                services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
-
-                services.AddSingleton<IPlaceProviderRepository, Repository.RedisRepository.PlaceProviderRepository>();
-                services.AddSingleton<IPlaceRepository, Repository.RedisRepository.PlaceRepository>();
-                services.AddSingleton<ISlotRepository, Repository.RedisRepository.SlotRepository>();
-                services.AddSingleton<IUserRepository, Repository.RedisRepository.UserRepository>();
-                services.AddSingleton<IVisitorRepository, Repository.RedisRepository.VisitorRepository>();
-            }
-
-            services.AddHttpClient<GoogleReCaptcha.V3.Interface.ICaptchaValidator, GoogleReCaptcha.V3.GoogleReCaptchaValidator>();
-            var smsConfigured = false;
-            if (Configuration.GetSection("GoSMSQueue").Exists())
-            {
-                var config = Configuration.GetSection("GoSMSQueue")?.Get<Model.Settings.GoSMSQueueConfiguration>();
-                if (!string.IsNullOrEmpty(config.QueueURL))
+                services.AddControllers(options =>
                 {
-                    logger.Info("GoSMSQueue configured");
-                    smsConfigured = true;
-                    services.Configure<Model.Settings.GoSMSQueueConfiguration>(Configuration.GetSection("GoSMSQueue"));
-                    services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSQueueSender>();
-                }
-            }
-            if (!smsConfigured && Configuration.GetSection("RabbitMQSMS").Exists())
-            {
-                var config = Configuration.GetSection("RabbitMQSMS")?.Get<Model.Settings.RabbitMQSMSQueueConfiguration>();
-                if (!string.IsNullOrEmpty(config.HostName))
+                    options.RespectBrowserAcceptHeader = true; // false by default
+                })
+                    .AddNewtonsoftJson()
+                    //.AddXmlSerializerFormatters()
+                    //.AddXmlDataContractSerializerFormatters()
+                    ;
+
+                services.AddSwaggerGen(c =>
                 {
-                    logger.Info("RabbitMQSMS configured");
-                    smsConfigured = true;
-                    services.Configure<Model.Settings.RabbitMQSMSQueueConfiguration>(Configuration.GetSection("RabbitMQSMS"));
-                    services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.RabbitMQSMSSender>();
-                }
-            }
-            else if (!smsConfigured && Configuration.GetSection("GoSMS").Exists())
-            {
-                var config = Configuration.GetSection("GoSMS")?.Get<Model.Settings.GoSMSConfiguration>();
-                if (!string.IsNullOrEmpty(config.ClientId))
+                    c.SwaggerDoc("v1", new OpenApiInfo
+                    {
+                        Title = "Covid Mass Testing API",
+                        Version = "v1",
+
+                        Description = "This API has been created for optimisation of time required to take sample from person for Covid-19 test.\n" +
+                        "Medical personel scans the bar code on the testing set, scans the bar code of the person registration, and performs test.\n" +
+                        "After that the person is free to go home. This application aims to create mass testing possible with minimal risk of contamination from testing personel and minimising the queues in front of testing location.\n" +
+                        "\n" +
+                        "** Best practicies for strong passwords **\n" +
+                        "iv> openssl rand -base64 16\n" +
+                        "key> openssl rand -base64 32" +
+                        "MasterPDFPassword> openssl rand -base64 32\n" +
+                        "JWTTokenSecret > openssl rand - base64 32\n"
+                    });
+                    c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First()); //This line
+                    c.DocumentFilter<Model.Docs.SwashbuckleFilter>();
+
+                    c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+                    {
+                        Description = "Bearer token.",
+                        In = ParameterLocation.Header,
+                        Name = "Authorization",
+                        Type = SecuritySchemeType.ApiKey
+                    });
+                    c.OperationFilter<Swashbuckle.AspNetCore.Filters.SecurityRequirementsOperationFilter>();
+
+                    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, $"doc/documentation.xml"));
+                });
+
+
+                services.AddAuthorization(options =>
                 {
-                    logger.Info("GoSMS configured");
-                    smsConfigured = true;
-                    services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
-                    services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();
+                    options.DefaultPolicy = new AuthorizationPolicyBuilder(
+                        JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build();
+                });
+
+                var key = Encoding.ASCII.GetBytes(Configuration["JWTTokenSecret"]);
+
+                services.AddAuthentication(x =>
+                {
+                    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                  .AddJwtBearer(x =>
+                  {
+                      x.RequireHttpsMetadata = false;
+                      x.SaveToken = true;
+                      x.TokenValidationParameters = new TokenValidationParameters
+                      {
+                          ValidateIssuerSigningKey = true,
+                          IssuerSigningKey = new SymmetricSecurityKey(key),
+                          ValidateIssuer = false,
+                          ValidateAudience = false
+                      };
+                  });
+
+                // Add CORS policy
+                var corsConfig = Configuration.GetSection("Cors").AsEnumerable().Select(k => k.Value).Where(k => !string.IsNullOrEmpty(k)).ToArray();
+
+                services.AddCors(options =>
+                {
+                    options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins(corsConfig)
+                                            .SetIsOriginAllowedToAllowWildcardSubdomains()
+                                            .AllowAnyMethod()
+                                            .AllowAnyHeader()
+                                            .AllowCredentials();
+                    });
+                });
+                ThreadPool.SetMinThreads(50, 50);
+                var redisConfiguration = new RedisConfiguration();
+                try
+                {
+                    Configuration.GetSection("Redis")?.Bind(redisConfiguration);
                 }
-            }
+                catch (Exception exc)
+                {
+                    Console.Error.WriteLine($"{exc.Message} {exc.InnerException?.Message}");
+                }
 
-            if (!smsConfigured)
-            {
-                services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.MockSMSSender>();
-            }
+                if (redisConfiguration.SyncTimeout < 10000)
+                {
+                    redisConfiguration.SyncTimeout = 10000;
+                }
+
+                if (string.IsNullOrEmpty(redisConfiguration.Hosts?.FirstOrDefault()?.Host) || redisConfiguration.Hosts?.FirstOrDefault()?.Host == "nohost")
+                {
+                    services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
 
 
-            services.AddSingleton<ScheduledTasks.ExportTask, ScheduledTasks.ExportTask>();
-            services.AddSingleton<ScheduledTasks.DeleteOldVisitors, ScheduledTasks.DeleteOldVisitors>();
+                    services.AddSingleton<IPlaceProviderRepository, Repository.MockRepository.PlaceProviderRepository>();
+                    services.AddSingleton<IPlaceRepository, Repository.MockRepository.PlaceRepository>();
+                    services.AddSingleton<ISlotRepository, Repository.MockRepository.SlotRepository>();
+                    services.AddSingleton<IUserRepository, Repository.MockRepository.UserRepository>();
+                    services.AddSingleton<IVisitorRepository, Repository.MockRepository.VisitorRepository>();
+                }
+                else
+                {
+                    services.AddStackExchangeRedisExtensions<NewtonsoftSerializer>(redisConfiguration);
+
+                    services.AddSingleton<IPlaceProviderRepository, Repository.RedisRepository.PlaceProviderRepository>();
+                    services.AddSingleton<IPlaceRepository, Repository.RedisRepository.PlaceRepository>();
+                    services.AddSingleton<ISlotRepository, Repository.RedisRepository.SlotRepository>();
+                    services.AddSingleton<IUserRepository, Repository.RedisRepository.UserRepository>();
+                    services.AddSingleton<IVisitorRepository, Repository.RedisRepository.VisitorRepository>();
+                }
+
+                services.AddHttpClient<GoogleReCaptcha.V3.Interface.ICaptchaValidator, GoogleReCaptcha.V3.GoogleReCaptchaValidator>();
+                var smsConfigured = false;
+                if (Configuration.GetSection("GoSMSQueue").Exists())
+                {
+                    var config = Configuration.GetSection("GoSMSQueue")?.Get<Model.Settings.GoSMSQueueConfiguration>();
+                    if (!string.IsNullOrEmpty(config.QueueURL))
+                    {
+                        logger.Info("GoSMSQueue configured");
+                        smsConfigured = true;
+                        services.Configure<Model.Settings.GoSMSQueueConfiguration>(Configuration.GetSection("GoSMSQueue"));
+                        services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSQueueSender>();
+                    }
+                }
+                if (!smsConfigured && Configuration.GetSection("RabbitMQSMS").Exists())
+                {
+                    var config = Configuration.GetSection("RabbitMQSMS")?.Get<Model.Settings.RabbitMQSMSQueueConfiguration>();
+                    if (!string.IsNullOrEmpty(config.HostName))
+                    {
+                        logger.Info("RabbitMQSMS configured");
+                        smsConfigured = true;
+                        services.Configure<Model.Settings.RabbitMQSMSQueueConfiguration>(Configuration.GetSection("RabbitMQSMS"));
+                        services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.RabbitMQSMSSender>();
+                    }
+                }
+                else if (!smsConfigured && Configuration.GetSection("GoSMS").Exists())
+                {
+                    var config = Configuration.GetSection("GoSMS")?.Get<Model.Settings.GoSMSConfiguration>();
+                    if (!string.IsNullOrEmpty(config.ClientId))
+                    {
+                        logger.Info("GoSMS configured");
+                        smsConfigured = true;
+                        services.Configure<Model.Settings.GoSMSConfiguration>(Configuration.GetSection("GoSMS"));
+                        services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.GoSMSSender>();
+                    }
+                }
+
+                if (!smsConfigured)
+                {
+                    services.AddSingleton<Controllers.SMS.ISMSSender, Controllers.SMS.MockSMSSender>();
+                }
+
+
+                services.AddSingleton<ScheduledTasks.ExportTask, ScheduledTasks.ExportTask>();
+                services.AddSingleton<ScheduledTasks.DeleteOldVisitors, ScheduledTasks.DeleteOldVisitors>();
 #if DEBUG
-            /*
-            if (Configuration["UseMockedEHealthConnection"] == "1" || Configuration["SendResultsToEHealth"] != "1")
-            {
-                services.AddSingleton<IMojeEZdravie, MojeEZdravieMock>();
-            }
-            else
-            {
+                /*
+                if (Configuration["UseMockedEHealthConnection"] == "1" || Configuration["SendResultsToEHealth"] != "1")
+                {
+                    services.AddSingleton<IMojeEZdravie, MojeEZdravieMock>();
+                }
+                else
+                {
+                    services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
+                }/**/
                 services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
-            }/**/
-            services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
 #else
                 services.AddSingleton<IMojeEZdravie, MojeEZdravieConnector>();
 #endif
 
-            var emailConfigured = false;
-            if (Configuration.GetSection("MailGun").Exists())
-            {
-                var config = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
-                if (!string.IsNullOrEmpty(config.ApiKey))
+                var emailConfigured = false;
+                if (Configuration.GetSection("MailGun").Exists())
                 {
-                    logger.Info("MailGun configured");
-                    Console.WriteLine("MailGun configured");
-                    emailConfigured = true;
-                    services.Configure<Model.Settings.MailGunConfiguration>(Configuration.GetSection("MailGun"));
-                    services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
+                    var config = Configuration.GetSection("MailGun")?.Get<Model.Settings.MailGunConfiguration>();
+                    if (!string.IsNullOrEmpty(config.ApiKey))
+                    {
+                        logger.Info("MailGun configured");
+                        Console.WriteLine("MailGun configured");
+                        emailConfigured = true;
+                        services.Configure<Model.Settings.MailGunConfiguration>(Configuration.GetSection("MailGun"));
+                        services.AddSingleton<IEmailSender, Controllers.Email.MailGunSender>();
+                    }
                 }
-            }
 
-            if (!emailConfigured && Configuration.GetSection("SendGrid").Exists())
-            {
-                var config = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
-                if (!string.IsNullOrEmpty(config.MailerApiKey))
+                if (!emailConfigured && Configuration.GetSection("SendGrid").Exists())
                 {
-                    logger.Info("SendGridEmail configured");
-                    Console.WriteLine("SendGridEmail configured");
+                    var config = Configuration.GetSection("SendGrid")?.Get<Model.Settings.SendGridConfiguration>();
+                    if (!string.IsNullOrEmpty(config.MailerApiKey))
+                    {
+                        logger.Info("SendGridEmail configured");
+                        Console.WriteLine("SendGridEmail configured");
 
-                    emailConfigured = true;
-                    services.Configure<Model.Settings.SendGridConfiguration>(Configuration.GetSection("SendGrid"));
-                    services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
+                        emailConfigured = true;
+                        services.Configure<Model.Settings.SendGridConfiguration>(Configuration.GetSection("SendGrid"));
+                        services.AddSingleton<IEmailSender, Controllers.Email.SendGridController>();
+                    }
                 }
-            }
 
-            if (!emailConfigured && Configuration.GetSection("RabbitMQEmail").Exists())
-            {
-                var config = Configuration.GetSection("RabbitMQEmail")?.Get<Model.Settings.RabbitMQEmailQueueConfiguration>();
-                if (!string.IsNullOrEmpty(config.HostName))
+                if (!emailConfigured && Configuration.GetSection("RabbitMQEmail").Exists())
                 {
-                    logger.Info("RabbitMQEmail configured " + JsonConvert.SerializeObject(config));
-                    Console.WriteLine("RabbitMQEmail configured " + JsonConvert.SerializeObject(config));
+                    var config = Configuration.GetSection("RabbitMQEmail")?.Get<Model.Settings.RabbitMQEmailQueueConfiguration>();
+                    if (!string.IsNullOrEmpty(config.HostName))
+                    {
+                        logger.Info("RabbitMQEmail configured " + JsonConvert.SerializeObject(config));
+                        Console.WriteLine("RabbitMQEmail configured " + JsonConvert.SerializeObject(config));
 
-                    emailConfigured = true;
-                    services.Configure<Model.Settings.RabbitMQEmailQueueConfiguration>(Configuration.GetSection("RabbitMQEmail"));
-                    services.AddSingleton<IEmailSender, Controllers.Email.RabbitMQEmailSender>();
+                        emailConfigured = true;
+                        services.Configure<Model.Settings.RabbitMQEmailQueueConfiguration>(Configuration.GetSection("RabbitMQEmail"));
+                        services.AddSingleton<IEmailSender, Controllers.Email.RabbitMQEmailSender>();
+                    }
                 }
-            }
 
-            if (!emailConfigured)
+                if (!emailConfigured)
+                {
+                    logger.Info("NoEmailSender configured");
+                    Console.WriteLine("NoEmailSender configured");
+                    services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
+                }
+
+                services.Configure<Model.Settings.ExportTaskConfiguration>(Configuration.GetSection("ExportTasks"));
+            }
+            catch (Exception exc)
             {
-                logger.Info("NoEmailSender configured");
-                Console.WriteLine("NoEmailSender configured");
-                services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
+                throw exc;
             }
-
-            services.Configure<Model.Settings.ExportTaskConfiguration>(Configuration.GetSection("ExportTasks"));
         }
 
         /// <summary>
