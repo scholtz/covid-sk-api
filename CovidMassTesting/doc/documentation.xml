@@ -4094,6 +4094,11 @@
             Reply to name
             </summary>
         </member>
+        <member name="T:CovidMassTesting.Model.Settings.TestConfiguration">
+            <summary>
+            default values for tests
+            </summary>
+        </member>
         <member name="T:CovidMassTesting.Model.Settings.User">
             <summary>
             Configuration user

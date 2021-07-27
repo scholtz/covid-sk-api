@@ -297,6 +297,7 @@ namespace CovidMassTesting
                     services.AddSingleton<IEmailSender, Controllers.Email.NoEmailSender>();
                 }
 
+                services.Configure<Model.Settings.TestConfiguration>(Configuration.GetSection("TestConfiguration"));
                 services.Configure<Model.Settings.ExportTaskConfiguration>(Configuration.GetSection("ExportTasks"));
             }
             catch (Exception exc)

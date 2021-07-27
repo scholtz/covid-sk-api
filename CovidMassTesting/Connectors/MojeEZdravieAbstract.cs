@@ -7,6 +7,7 @@ using CovidMassTesting.Model.EZdravie.Response;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace CovidMassTesting.Connectors
 {
     public abstract class MojeEZdravieAbstract : IMojeEZdravie
     {
+        protected IOptions<Model.Settings.TestConfiguration> settings;
         /// <summary>
         /// Downloads the visitors from eHealth
         /// </summary>

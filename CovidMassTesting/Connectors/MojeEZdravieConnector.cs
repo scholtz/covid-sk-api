@@ -6,6 +6,7 @@ using CovidMassTesting.Model.EZdravie.Request;
 using CovidMassTesting.Model.EZdravie.Response;
 using CovidMassTesting.Repository.Interface;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
@@ -23,8 +24,9 @@ namespace CovidMassTesting.Connectors
         private RestSharp.RestClient client;
         private JsonSerializerSettings deserializeSettings;
         private readonly ILogger<MojeEZdravieConnector> logger;
-        public MojeEZdravieConnector(ILogger<MojeEZdravieConnector> logger)
+        public MojeEZdravieConnector(ILogger<MojeEZdravieConnector> logger, IOptions<Model.Settings.TestConfiguration> settings)
         {
+            this.settings = settings;
             this.logger = logger;
             client = new RestSharp.RestClient("https://mojeezdravie.nczisk.sk/");
             deserializeSettings = new JsonSerializerSettings
@@ -257,6 +259,35 @@ namespace CovidMassTesting.Connectors
             //request.AddJsonBody(setResultRequest);
             //var body = Serialize(setResultRequest);
             //request.AddParameter("application/json", body, ParameterType.RequestBody);
+
+            if (string.IsNullOrEmpty(setResultRequest.TestTitle))
+            {
+                if (!string.IsNullOrEmpty(settings?.Value?.TestTitle))
+                {
+                    setResultRequest.TestTitle = settings.Value?.TestTitle;
+                }
+            }
+            if (string.IsNullOrEmpty(setResultRequest.TestLoinc))
+            {
+                if (!string.IsNullOrEmpty(settings?.Value?.TestLoinc))
+                {
+                    setResultRequest.TestLoinc = settings.Value?.TestLoinc;
+                }
+            }
+            if (string.IsNullOrEmpty(setResultRequest.TestNclp))
+            {
+                if (!string.IsNullOrEmpty(settings?.Value?.TestNclp))
+                {
+                    setResultRequest.TestNclp = settings.Value?.TestNclp;
+                }
+            }
+            if (string.IsNullOrEmpty(setResultRequest.SpecimenType))
+            {
+                if (!string.IsNullOrEmpty(settings?.Value?.SpecimenType))
+                {
+                    setResultRequest.SpecimenType = settings.Value?.SpecimenType;
+                }
+            }
 
             request.AddParameter("nUser_id", setResultRequest.UserId);
             request.AddParameter("nId", setResultRequest.Id);
