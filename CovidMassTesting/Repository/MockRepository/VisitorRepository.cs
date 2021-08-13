@@ -96,6 +96,10 @@ namespace CovidMassTesting.Repository.MockRepository
             {
                 throw new ArgumentNullException(nameof(visitor));
             }
+            if (visitor.Id == default(int))
+            {
+                visitor.Id = await CreateNewVisitorId();
+            }
             visitor.LastUpdate = DateTimeOffset.UtcNow;
             visitor = await FixVisitor(visitor, false);
 
