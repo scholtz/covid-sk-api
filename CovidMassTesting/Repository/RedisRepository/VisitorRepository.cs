@@ -3280,7 +3280,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.TestingEntity = testingEntity;
             data.FrontedURL = configuration["FrontedURL"];
             data.ResultGUID = $"URN:UVCI:01:SK:RYCHLEJSIE/{visitor.Id}";
-            data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{data.ResultGUID}";
+            data.VerifyURL = $"{configuration["FrontedURL"]}#/check/{resultguid}";
             data.Product = product?.Name;
             data.TestBrandName = product?.TestBrandName;
             data.TestManufacturer = product?.TestManufacturer;
