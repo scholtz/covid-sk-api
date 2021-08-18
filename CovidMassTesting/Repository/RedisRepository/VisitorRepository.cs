@@ -3197,7 +3197,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public string GenerateResultHTML(Visitor visitor, string testingEntity, string placeAddress, Product product, string resultguid, string oversight)
         {
-            if (visitor.DGC == null && !string.IsNullOrEmpty(product.DgcIssuer) && !string.IsNullOrEmpty(product.IssuerId))
+            if (visitor.DGC == null && product != null && !string.IsNullOrEmpty(product.DgcIssuer) && !string.IsNullOrEmpty(product.IssuerId))
             {
                 visitor = GenerateDGC(visitor, product, testingEntity).Result;
             }
