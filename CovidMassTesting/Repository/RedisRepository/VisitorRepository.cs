@@ -3294,8 +3294,8 @@ namespace CovidMassTesting.Repository.RedisRepository
 
             if (product?.Category == "pcr")
             {
-                data.Category = "PCR test (NAAT)";
-                data.CategoryEN = "PCR test (NAAT)";
+                data.Category = "RT-PCR test (NAAT)";
+                data.CategoryEN = "RT-PCR test (NAAT)";
             }
             else if (product?.Category == "vac")
             {
