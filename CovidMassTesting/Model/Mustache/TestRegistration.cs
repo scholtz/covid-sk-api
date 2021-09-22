@@ -5,7 +5,26 @@
     /// </summary>
     public class TestRegistration
     {
-
+        /// <summary>
+        /// Purpose - 
+        /// </summary>
+        public string TestPurpose { get; set; }
+        /// <summary>
+        /// AG or PCR
+        /// </summary>
+        public string Category { get; set; }
+        /// <summary>
+        /// English NAAT vs RAT
+        /// </summary>
+        public string CategoryEN { get; set; }
+        /// <summary>
+        /// TestManufacturer
+        /// </summary>
+        public string TestManufacturer { get; set; }
+        /// <summary>
+        /// Id of the test from product
+        /// </summary>
+        public string TestBrandName { get; set; }
         /// <summary>
         /// RegistrationCode
         /// </summary>

@@ -164,7 +164,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                     var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
                     var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
-                    var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product?.Name);
+                    var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product);
                     attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                     {
                         Content = Convert.ToBase64String(pdf),
@@ -2333,7 +2333,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                         var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
                         var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
-                        var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product?.Name);
+                        var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product);
                         attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                         {
                             Content = Convert.ToBase64String(pdf),
@@ -3345,7 +3345,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
         /// <returns></returns>
-        public string GenerateRegistrationHTML(Visitor visitor, string testingEntity, string placeName, string placeAddress, string product)
+        public string GenerateRegistrationHTML(Visitor visitor, string testingEntity, string placeName, string placeAddress, Product product)
         {
             var oldCulture = CultureInfo.CurrentCulture;
             var oldUICulture = CultureInfo.CurrentUICulture;
@@ -3377,7 +3377,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             data.TestingAddress = placeAddress;
             data.TestingEntity = testingEntity;
             data.FrontedURL = configuration["FrontedURL"];
-            data.Product = product;
+            data.Product = product?.Name;
             data.BirthDayDay = visitor.BirthDayDay;
             data.BirthDayMonth = visitor.BirthDayMonth;
             data.BirthDayYear = visitor.BirthDayYear;
@@ -3389,6 +3389,25 @@ namespace CovidMassTesting.Repository.RedisRepository
                 formatted = formatted.Substring(0, 3) + "-" + formatted.Substring(3, 3) + "-" + formatted.Substring(6, 3);
             }
             data.RegistrationCode = formatted;
+
+            if (product?.Category == "pcr")
+            {
+                data.Category = "RT-PCR test (NAAT)";
+                data.CategoryEN = "RT-PCR test (NAAT)";
+            }
+            else if (product?.Category == "vac")
+            {
+                data.Category = "Vaccine";
+                data.CategoryEN = "Vaccine";
+            }
+            else
+            {
+                data.Category = "Antigénový test (RAT)";
+                data.CategoryEN = "Antigen Test (RAT)";
+            }
+            data.TestBrandName = product?.TestBrandName;
+            data.TestManufacturer = product?.TestManufacturer;
+            data.TestPurpose = product?.TestPurpose;
 
             var img = b.Encode(BarcodeLib.TYPE.CODE39, formatted, Color.Black, Color.White, 300, 120);
             using var outDataBar = new MemoryStream();
@@ -3546,7 +3565,7 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <param name="placeAddress"></param>
         /// <param name="product"></param>
         /// <returns></returns>
-        public byte[] GenerateRegistrationPDF(Visitor visitor, string testingEntity, string placeName, string placeAddress, string product)
+        public byte[] GenerateRegistrationPDF(Visitor visitor, string testingEntity, string placeName, string placeAddress, Product product)
         {
             var password = "";
 
@@ -4289,7 +4308,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                             var pp = await placeProviderRepository.GetPlaceProvider(place?.PlaceProviderId);
                             var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
 
-                            var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product?.Name);
+                            var pdf = GenerateRegistrationPDF(visitor, pp?.CompanyName, place?.Name, place?.Address, product);
                             attachments.Add(new SendGrid.Helpers.Mail.Attachment()
                             {
                                 Content = Convert.ToBase64String(pdf),

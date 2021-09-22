@@ -29,10 +29,6 @@
     <table>
         <tbody>
             <tr>
-                <th>Typ testu:</th>
-                <td>Antigénový test</td>
-            </tr>
-            <tr>
                 <th>Kód registrácie:</th>
                 <td>{{RegistrationCode}}</td>
             </tr>
@@ -40,6 +36,32 @@
                 <th>Čas testovania:</th>
                 <td>{{Date}}</td>
             </tr>
+            {{#TestPurpose}}
+            <tr>
+                <th>Zámer testu:</th>
+                <td>
+                    {{TestPurpose}}
+                </td>
+            </tr>
+            {{/TestPurpose}}
+            {{#Category}}
+            <tr>
+                <th>Typ testu:</th>
+                <td>{{Category}}</td>
+            </tr>
+            {{/Category}}
+            {{#TestBrandName}}
+            <tr>
+                <th>Názov testu:</th>
+                <td>{{TestBrandName}}</td>
+            </tr>
+            {{/TestBrandName}}
+            {{#TestManufacturer}}
+            <tr>
+                <th>Výrobca testu:</th>
+                <td>{{TestManufacturer}}</td>
+            </tr>
+            {{/TestManufacturer}}
             <tr>
                 <th>Názov pracoviska:</th>
                 <td>{{TestingName}}</td>
@@ -82,6 +104,88 @@
             </tr>
         </tbody>
     </table>
+    <div style="page-break-before:always">&nbsp;</div>
 
+    <h1>Registrácia k odberu vzorky pre SARS-CoV-2</h1>
+    <table>
+        <tbody>
+            <tr>
+                <th>Registration code:</th>
+                <td>{{RegistrationCode}}</td>
+            </tr>
+
+            <tr>
+                <th>Time:</th>
+                <td>{{Date}}</td>
+            </tr>
+            {{#TestPurpose}}
+            <tr>
+                <th>Disease or agent targeted:</th>
+                <td>
+                    {{TestPurpose}}
+                </td>
+            </tr>
+            {{/TestPurpose}}
+            {{#CategoryEN}}
+            <tr>
+                <th>The type of test:</th>
+                <td>{{CategoryEN}}</td>
+            </tr>
+            {{/CategoryEN}}
+
+            {{#TestBrandName}}
+            <tr>
+                <th>Test name:</th>
+                <td>{{TestBrandName}}</td>
+            </tr>
+            {{/TestBrandName}}
+            {{#TestManufacturer}}
+            <tr>
+                <th>Test manufacturer:</th>
+                <td>{{TestManufacturer}}</td>
+            </tr>
+            {{/TestManufacturer}}
+            <tr>
+                <th>Name of testing centre:</th>
+                <td>{{TestingName}}</td>
+            </tr>
+            <tr>
+                <th>Address of the testing centre:</th>
+                <td>{{TestingAddress}}</td>
+            </tr>
+            <tr>
+                <th>Name:</th>
+                <td>{{Name}}</td>
+            </tr>
+            {{#PersonalNumber}}
+            <tr>
+                <th>Personal number:</th>
+                <td>{{PersonalNumber}}</td>
+            </tr>
+            {{/PersonalNumber}}
+            {{#PassportNumber}}
+            <tr>
+                <th>Passport number:</th>
+                <td>{{PassportNumber}}</td>
+            </tr>
+            {{/PassportNumber}}
+            <tr>
+                <th>Birth date:</th>
+                <td>{{BirthDayDay}}.{{BirthDayMonth}}.{{BirthDayYear}}</td>
+            </tr>
+            <tr>
+                <th>Testing centre or facility:</th>
+                <td>{{TestingEntity}}</td>
+            </tr>
+            <tr>
+                <th>URL address:</th>
+                <td>{{FrontedURL}}</td>
+            </tr>
+            <tr>
+                <th></th>
+                <td><img style="width:150px;height:150px;" src="data:image/png;base64, {{QRCode}}" alt="QR" /> </td>
+            </tr>
+        </tbody>
+    </table>
 </body>
 </html>
