@@ -343,21 +343,23 @@ namespace CovidMassTesting.Controllers
                         }
                     }).ToArray()
                 });
-                ret.Series.Add(new Model.Charts.ChartSeries()
-                {
-                    Name = "tested",
-                    Data = stats.Select(v =>
+                if (configuration["ShowTested"] == "1") { 
+                    ret.Series.Add(new Model.Charts.ChartSeries()
                     {
-                        if (v.Value.ContainsKey("tested"))
+                        Name = "tested",
+                        Data = stats.Select(v =>
                         {
-                            return v.Value["tested"];
-                        }
-                        else
-                        {
-                            return 0;
-                        }
-                    }).ToArray()
-                });
+                            if (v.Value.ContainsKey("tested"))
+                            {
+                                return v.Value["tested"];
+                            }
+                            else
+                            {
+                                return 0;
+                            }
+                        }).ToArray()
+                    });
+                }
                 return Ok(ret);
             }
             catch (Exception exc)
