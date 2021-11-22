@@ -130,7 +130,7 @@
     <value>{0}, Váš test se zpracovává. Počkejte na další instrukce které dostanete v další SMS zprávě.</value>
   </data>
   <data name="Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate." xml:space="preserve">
-    <value>{0}, {1}, AG test ze dne {2} je {3}. PDF Certifikát získáte na: {4}</value>
+    <value>{0}, {1}, {2} test ze dne {3} je {4}. PDF Certifikát získáte na: {5}</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
     <value>{1}, {0} je Váš registračný kód. Předložte tento kód při odběru vzorků na místě {3} dňa {2}</value>

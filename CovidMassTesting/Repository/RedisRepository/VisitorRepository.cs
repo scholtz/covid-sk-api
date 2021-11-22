@@ -1600,12 +1600,21 @@ namespace CovidMassTesting.Repository.RedisRepository
                             {
                                 if (!silent)
                                 {
+                                    var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId ?? place?.PlaceProviderId);
+                                    var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
+                                    var type = "AG";
+                                    if(product?.Category == "pcr")
+                                    {
+                                        type = "PCR";
+                                    }
+
                                     await smsSender.SendSMS(visitor.Phone, new Model.SMS.Message(
                                     string.Format(
                                         //{0}, {1}, AG test zo dna {2} je {3}. PDF Certifikát získate na: {4}
                                         Repository_RedisRepository_VisitorRepository.Dear__0___your_test_result_has_been_processed__You_can_check_the_result_online__Please_come_to_take_the_certificate_,
                                         $"{visitor.FirstName} {visitor.LastName}",
                                         visitor.BirthDayYear,
+                                        type,
                                         visitor.TestingTime?.ToString("dd.MM.yyyy"),
                                         resultLocalized,
                                         configuration["FrontedURL"]

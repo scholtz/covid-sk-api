@@ -130,7 +130,7 @@
     <value>Dear {0}, your test is in processing. Please wait for further instructions in next sms message.</value>
   </data>
   <data name="Dear {0}, your test result has been processed. You can check the result online. Please come to take the certificate." xml:space="preserve">
-    <value>{0}, {1}, AG test from {2} is {3}. Download PDF certificate from: {4}</value>
+    <value>{0}, {1}, {2} test from {3} is {4}. Download PDF certificate from: {5}</value>
   </data>
   <data name="Dear {0}, {1} is your registration code. Show this code at the covid sampling place {3} on {2}" xml:space="preserve">
     <value>Dear {1}, {0} is your registration code. Show this code at the covid sampling place {3} on {2}</value>
