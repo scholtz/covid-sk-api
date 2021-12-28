@@ -1359,8 +1359,12 @@ namespace CovidMassTesting.Repository.RedisRepository
             }
             return ret;
         }
-
-        private async Task SendResults(Visitor visitor, bool silent = false)
+        /// <summary>
+        /// Notifies personell about sick patients
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        public async Task NotifyWhenSick(Visitor visitor)
         {
 
             if (notifyWhenSickConfiguration?.Emails?.Count > 0)
@@ -1389,6 +1393,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                     logger.LogError(exc, exc.Message);
                 }
             }
+        }
+        private async Task SendResults(Visitor visitor, bool silent = false)
+        {
+            await NotifyWhenSick(visitor);
 
             var notifiedByEHealth = false;
             Place place = null;

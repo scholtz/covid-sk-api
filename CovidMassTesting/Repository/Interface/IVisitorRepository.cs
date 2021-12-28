@@ -424,5 +424,11 @@ namespace CovidMassTesting.Repository.Interface
         /// <param name="daysToKeep"></param>
         /// <returns></returns>
         public Task<int> DeleteOldVisitors(int daysToKeep);
+        /// <summary>
+        /// Notifies personell when sick person is found
+        /// </summary>
+        /// <param name="visitor"></param>
+        /// <returns></returns>
+        public Task NotifyWhenSick(Visitor visitor);
     }
 }

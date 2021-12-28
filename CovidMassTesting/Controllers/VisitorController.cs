@@ -813,13 +813,13 @@ namespace CovidMassTesting.Controllers
                 await visitorRepository.ConnectVisitorToTest(saved.Id, id, User.GetEmail(), User.GetPlaceProvider(), HttpContext.GetIPAddress(), silent: true);
 
                 var ret = await visitorRepository.SetTestResult(id, result, isAdmin: true, silent: true);
-
                 // Set testing time to the chosen slot time
                 var toUpdate = await visitorRepository.GetVisitor(saved.Id, false, true);
                 toUpdate.TestingTime = visitor.ChosenSlotTime;
                 toUpdate.ResultNotifiedAt = DateTimeOffset.UtcNow;
                 await visitorRepository.SetVisitor(toUpdate, false);
 
+                await visitorRepository.NotifyWhenSick(visitor);
                 return Ok(ret);
             }
             catch (ArgumentException exc)
