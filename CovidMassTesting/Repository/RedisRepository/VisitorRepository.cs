@@ -1366,15 +1366,16 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// <returns></returns>
         public async Task NotifyWhenSick(Visitor visitor)
         {
-
-            if (notifyWhenSickConfiguration?.Emails?.Count > 0)
+            try
             {
-                try
+                switch (visitor.Result)
                 {
-                    switch (visitor.Result)
-                    {
-                        case TestResult.PositiveWaitingForCertificate:
-                        case TestResult.PositiveCertificateTaken:
+                    case TestResult.PositiveWaitingForCertificate:
+                    case TestResult.PositiveCertificateTaken:
+
+                        if (notifyWhenSickConfiguration?.Emails?.Count > 0)
+                        {
+                            logger.LogInformation($"NotifyWhenSick not set up {notifyWhenSickConfiguration?.Emails?.Count}");
                             foreach (var email in notifyWhenSickConfiguration.Emails)
                             {
                                 await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
@@ -1385,13 +1386,17 @@ namespace CovidMassTesting.Repository.RedisRepository
                                         TextCS = string.Format("Byla identifikována pozitivní osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email)
                                     });
                             }
-                            break;
-                    }
+                        }
+                        else
+                        {
+                            logger.LogInformation("NotifyWhenSick not set up");
+                        }
+                        break;
                 }
-                catch (Exception exc)
-                {
-                    logger.LogError(exc, exc.Message);
-                }
+            }
+            catch (Exception exc)
+            {
+                logger.LogError(exc, exc.Message);
             }
         }
         private async Task SendResults(Visitor visitor, bool silent = false)
@@ -1611,7 +1616,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                                     var pp = await placeProviderRepository.GetPlaceProvider(visitor.PlaceProviderId ?? place?.PlaceProviderId);
                                     var product = pp.Products.FirstOrDefault(p => p.Id == visitor.Product);
                                     var type = "AG";
-                                    if(product?.Category == "pcr")
+                                    if (product?.Category == "pcr")
                                     {
                                         type = "PCR";
                                     }
@@ -3135,7 +3140,7 @@ namespace CovidMassTesting.Repository.RedisRepository
                 var data = JsonConvert.DeserializeObject<Model.DGC.Response>(response.Content);
                 return Convert.FromBase64String(data.Attachments.FirstOrDefault()?.Data);
             }
-            throw new Exception("Server is temporary not available. Please try again later. "+response.Content);
+            throw new Exception("Server is temporary not available. Please try again later. " + response.Content);
         }
         private async Task<Visitor> GenerateDGC(Visitor visitor, Product product, string testingEntity)
         {
