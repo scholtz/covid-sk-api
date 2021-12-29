@@ -63,6 +63,7 @@ namespace CovidMassTesting.Controllers.Email
             {
                 try
                 {
+                    logger.LogInformation($"Sending {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
                     var mailMessage = new MimeMessage();
                     mailMessage.From.Add(new MailboxAddress(settings.Value.FromName, settings.Value.FromEmail));
                     mailMessage.To.Add(new MailboxAddress(toName, toEmail));
@@ -97,8 +98,8 @@ namespace CovidMassTesting.Controllers.Email
                     channel.BasicPublish(exchange: settings.Value.Exchange,
                                          routingKey: settings.Value.QueueName,
                                          body: memoryStream.ToArray());
-                    logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
 
+                    logger.LogInformation($"Sent {data.TemplateId} email to {Helpers.Hash.GetSHA256Hash(settings.Value.CoHash + toEmail)}");
                     return true;
                 }
                 catch (Exception ex)
