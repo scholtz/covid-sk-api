@@ -429,6 +429,6 @@ namespace CovidMassTesting.Repository.Interface
         /// </summary>
         /// <param name="visitor"></param>
         /// <returns></returns>
-        public Task NotifyWhenSick(Visitor visitor);
+        public Task<int> NotifyWhenSick(Visitor visitor);
     }
 }

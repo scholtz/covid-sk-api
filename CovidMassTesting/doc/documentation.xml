@@ -6991,6 +6991,13 @@
             <param name="daysToKeep"></param>
             <returns></returns>
         </member>
+        <member name="M:CovidMassTesting.Repository.Interface.IVisitorRepository.NotifyWhenSick(CovidMassTesting.Model.Visitor)">
+            <summary>
+            Notifies personell when sick person is found
+            </summary>
+            <param name="visitor"></param>
+            <returns></returns>
+        </member>
         <member name="T:CovidMassTesting.Repository.MockRepository.PlaceProviderRepository">
             <summary>
             Place mock repository
@@ -8681,6 +8688,13 @@
             </summary>
             <param name="statsType">Model.StatsType.*</param>
             <param name="placeProviderId"></param>
+            <returns></returns>
+        </member>
+        <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.NotifyWhenSick(CovidMassTesting.Model.Visitor)">
+            <summary>
+            Notifies personell about sick patients
+            </summary>
+            <param name="visitor"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Repository.RedisRepository.VisitorRepository.Enqueued(System.Int32,System.String)">

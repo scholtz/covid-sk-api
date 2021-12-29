@@ -821,7 +821,8 @@ namespace CovidMassTesting.Controllers
                 if (result == TestResult.PositiveWaitingForCertificate)
                 {
                     logger.LogInformation($"Going to notify");
-                    await visitorRepository.NotifyWhenSick(visitor);
+                    var sent = await visitorRepository.NotifyWhenSick(visitor);
+                    logger.LogInformation($"Sent emails: {sent}");
                 }
                 else
                 {

@@ -1364,8 +1364,9 @@ namespace CovidMassTesting.Repository.RedisRepository
         /// </summary>
         /// <param name="visitor"></param>
         /// <returns></returns>
-        public async Task NotifyWhenSick(Visitor visitor)
+        public async Task<int> NotifyWhenSick(Visitor visitor)
         {
+            int ret = 0;
             try
             {
                 switch (visitor.Result)
@@ -1378,13 +1379,17 @@ namespace CovidMassTesting.Repository.RedisRepository
                             logger.LogInformation($"NotifyWhenSick not set up {notifyWhenSickConfiguration?.Emails?.Count}");
                             foreach (var email in notifyWhenSickConfiguration.Emails)
                             {
-                                await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
+                                var result = await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
                                     new Model.Email.GenericEmail(email.Language, configuration["FrontedURL"], configuration["EmailSupport"], configuration["PhoneSupport"])
                                     {
                                         TextSK = string.Format("Bola identifikovaná pozitívna osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
                                         TextEN = string.Format("Positive person has been identified: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email),
                                         TextCS = string.Format("Byla identifikována pozitivní osoba: {0} {1} {2} {3}", visitor.FirstName, visitor.LastName, visitor.EmployeeId, visitor.Email)
                                     });
+                                if (result)
+                                {
+                                    ret++;
+                                }
                             }
                         }
                         else
@@ -1398,6 +1403,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             {
                 logger.LogError(exc, exc.Message);
             }
+            return ret;
         }
         private async Task SendResults(Visitor visitor, bool silent = false)
         {
