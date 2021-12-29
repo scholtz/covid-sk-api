@@ -38,6 +38,7 @@ namespace CovidMassTesting.Controllers.SMS
             }
             this.settings = settings;
             this.logger = logger;
+            logger.LogInformation($"RabbitMQSMSSender initialized {settings.Value.HostName}/{settings.Value.RabbitUserName}");
         }
 
 

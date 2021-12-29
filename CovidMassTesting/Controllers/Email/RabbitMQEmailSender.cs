@@ -44,6 +44,7 @@ namespace CovidMassTesting.Controllers.Email
             }
             this.settings = settings;
             this.logger = logger;
+            logger.LogInformation($"RabbitMQEmailSender initialized {settings.Value.HostName}/{settings.Value.RabbitUserName}");
         }
 
 
