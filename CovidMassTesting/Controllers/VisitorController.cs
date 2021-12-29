@@ -817,7 +817,7 @@ namespace CovidMassTesting.Controllers
                 var toUpdate = await visitorRepository.GetVisitor(saved.Id, false, true);
                 toUpdate.TestingTime = visitor.ChosenSlotTime;
                 toUpdate.ResultNotifiedAt = DateTimeOffset.UtcNow;
-                await visitorRepository.SetVisitor(toUpdate, false);
+                visitor = await visitorRepository.SetVisitor(toUpdate, false);
                 if (result == TestResult.PositiveWaitingForCertificate)
                 {
                     logger.LogInformation($"Going to notify");
