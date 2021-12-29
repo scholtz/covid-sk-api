@@ -99,7 +99,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             this.eHealthConnector = eHealthConnector;
 
             notifyWhenSickConfiguration = configuration.GetSection("NotifyWhenSick")?.Get<Model.Settings.NotifyWhenSickConfiguration>();
-
+            logger.LogInformation($"VisitorRepository init NotifyWhenSick {notifyWhenSickConfiguration?.Emails?.Count}");
         }
         /// <summary>
         /// Creates new visitor registration
@@ -1369,6 +1369,7 @@ namespace CovidMassTesting.Repository.RedisRepository
             int ret = 0;
             try
             {
+                logger.LogInformation($"NotifyWhenSick {notifyWhenSickConfiguration?.Emails?.Count}");
                 switch (visitor.Result)
                 {
                     case TestResult.PositiveWaitingForCertificate:
