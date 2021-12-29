@@ -818,8 +818,15 @@ namespace CovidMassTesting.Controllers
                 toUpdate.TestingTime = visitor.ChosenSlotTime;
                 toUpdate.ResultNotifiedAt = DateTimeOffset.UtcNow;
                 await visitorRepository.SetVisitor(toUpdate, false);
-
-                await visitorRepository.NotifyWhenSick(visitor);
+                if (result == TestResult.PositiveWaitingForCertificate)
+                {
+                    logger.LogInformation($"Going to notify");
+                    await visitorRepository.NotifyWhenSick(visitor);
+                }
+                else
+                {
+                    logger.LogInformation($"Not going to notify. Result is {result}");
+                }
                 return Ok(ret);
             }
             catch (ArgumentException exc)
