@@ -820,7 +820,7 @@ namespace CovidMassTesting.Controllers
                 visitor = await visitorRepository.SetVisitor(toUpdate, false);
                 if (result == TestResult.PositiveWaitingForCertificate)
                 {
-                    logger.LogInformation($"Going to notify");
+                    logger.LogInformation($"Going to notify {visitor.Result}");
                     var sent = await visitorRepository.NotifyWhenSick(visitor);
                     logger.LogInformation($"Sent emails: {sent}");
                 }
@@ -845,7 +845,6 @@ namespace CovidMassTesting.Controllers
         /// <summary>
         /// Returns ECIES public key for private data encryption
         /// </summary>
-        /// <param name="visitor"></param>
         /// <returns></returns>
         [HttpGet("GetPublicKey")]
         [ProducesResponseType(200)]

@@ -1377,7 +1377,7 @@ namespace CovidMassTesting.Repository.RedisRepository
 
                         if (notifyWhenSickConfiguration?.Emails?.Count > 0)
                         {
-                            logger.LogInformation($"NotifyWhenSick not set up {notifyWhenSickConfiguration?.Emails?.Count}");
+                            logger.LogInformation($"NotifyWhenSick count {notifyWhenSickConfiguration?.Emails?.Count}");
                             foreach (var email in notifyWhenSickConfiguration.Emails)
                             {
                                 var result = await emailSender.SendEmail(localizer[Repository_RedisRepository_VisitorRepository.Positive_case], email.Email, email.Name,
@@ -1390,6 +1390,10 @@ namespace CovidMassTesting.Repository.RedisRepository
                                 if (result)
                                 {
                                     ret++;
+                                }
+                                else
+                                {
+                                    logger.LogError($"Email to {email.Email} not sent");
                                 }
                             }
                         }
