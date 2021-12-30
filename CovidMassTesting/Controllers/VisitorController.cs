@@ -820,6 +820,7 @@ namespace CovidMassTesting.Controllers
                 visitor = await visitorRepository.SetVisitor(toUpdate, false);
                 if (result == TestResult.PositiveWaitingForCertificate)
                 {
+                    visitor.Result = result;
                     logger.LogInformation($"Going to notify {visitor.Result}");
                     var sent = await visitorRepository.NotifyWhenSick(visitor);
                     logger.LogInformation($"Sent emails: {sent}");
