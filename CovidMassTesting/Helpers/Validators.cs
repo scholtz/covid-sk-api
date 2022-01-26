@@ -51,7 +51,7 @@ namespace CovidMassTesting.Helpers
          /// <returns></returns>
         public static bool IsValidPhoneNumber(this string number)
         {
-            return Regex.Match(number, @"^(\+[0-9]{12})$").Success;
+            return Regex.Match(number, @"^(\+[0-9]{11}[0-9]?)$").Success;
         }
     }
 }

@@ -1365,7 +1365,6 @@
             <summary>
             Returns ECIES public key for private data encryption
             </summary>
-            <param name="visitor"></param>
             <returns></returns>
         </member>
         <member name="M:CovidMassTesting.Controllers.VisitorController.GetPrivateKey">

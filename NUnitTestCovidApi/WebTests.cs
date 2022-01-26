@@ -3062,6 +3062,17 @@ namespace NUnitTestCovidApi
             Assert.IsTrue(sms.data.GetText().Contains("L S"));
             Assert.IsTrue(sms.data.GetText().Contains("1984"));
         }/**/
+        
+        [Test]
+        public void TestIsValidPhoneNumber()
+        {
+            Assert.AreEqual(true,  Validators.IsValidPhoneNumber("+421907000000"));
+            Assert.AreEqual(false, Validators.IsValidPhoneNumber("+4219070000000"));
+            Assert.AreEqual(false, Validators.IsValidPhoneNumber("+42190700000X"));
+            Assert.AreEqual(true, Validators.IsValidPhoneNumber("+420776000000"));
+            Assert.AreEqual(true, Validators.IsValidPhoneNumber("+48907000000"));
+            Assert.AreEqual(false, Validators.IsValidPhoneNumber("+4890700000"));
+        }
         [Test]
         public void TestDoubleTestInput()
         {
@@ -3596,7 +3607,7 @@ namespace NUnitTestCovidApi
                     .AddJsonFile(appSettings)
                     .Build();
                 services.AddSingleton(typeof(IConfiguration), configuration);
-                
+
             }
         }
     }
